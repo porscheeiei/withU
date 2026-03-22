@@ -33,7 +33,7 @@
         .price { font-weight: 700; font-size: 18px; color: var(--p); margin: 5px 0; }
         
         .qty-control { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
-        .qty-btn { background: #EEE; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; cursor: pointer; }
+        .qty-btn { background: #f0f0f0; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; cursor: pointer; }
         .btn-add { background: transparent; border: 1.5px solid var(--p); padding: 8px 18px; border-radius: 20px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; margin-top: 10px; }
 
         /* แถบตะกร้า */
@@ -43,7 +43,7 @@
         /* Modal */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; justify-content: center; z-index: 1000; }
         .modal-box { background: #FFF; width: 100%; max-width: 550px; border-radius: 30px 30px 0 0; padding: 25px; box-sizing: border-box; }
-        .success-box { background: #FFF; width: 90%; max-width: 380px; border-radius: 30px; padding: 30px 20px; text-align: center; }
+        .success-box { background: #FFF; width: 90%; max-width: 380px; border-radius: 30px; padding: 30px 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -51,8 +51,8 @@
 <div id="table-overlay">
     <div class="table-box">
         <img src="https://img1.pic.in.th/images/-------2.png" width="100">
-        <h2>WITHU</h2>
-        <p style="color:grey;">เลือกเลขโต๊ะเพื่อสั่งอาหาร</p>
+        <h2 style="margin: 15px 0 5px 0;">WITHU</h2>
+        <p style="color:grey; margin-bottom: 25px;">เลือกเลขโต๊ะเพื่อสั่งอาหาร</p>
         <select id="table-select">
             <option value="" disabled selected>เลือกเลขโต๊ะ...</option>
             <option value="1">โต๊ะ 1</option><option value="2">โต๊ะ 2</option>
@@ -67,7 +67,7 @@
     <div class="top-bar">WITHU <span id="display-table" class="display-table-badge"></span></div>
     <div class="app-container">
         <div id="category-nav" class="category-nav"></div>
-        <div id="loading" style="text-align:center; padding:50px;">กำลังโหลดเมนู...</div>
+        <div id="loading" style="text-align:center; padding:50px;">กำลังโหลดเมนูอร่อยๆ...</div>
         <div id="main-content"></div> 
     </div>
 </div>
@@ -79,14 +79,14 @@
 
 <div id="receipt-modal" class="modal" onclick="if(event.target==this)closeReceipt()">
     <div class="modal-box">
-        <h3 style="text-align:center;">สรุปรายการ</h3>
+        <h3 style="text-align:center; margin: 0 0 20px 0;">สรุปรายการ</h3>
         <div id="receipt-items" style="max-height:40vh; overflow-y:auto; margin-bottom:20px;"></div>
         <div style="display:flex; justify-content:space-between; font-weight:700; font-size:22px; border-top:1px dashed #DDD; padding-top:15px;">
-            <span>รวมทั้งสิ้น</span><span>฿<span id="receipt-total-sum">0</span></span>
+            <span>ยอดรวม</span><span>฿<span id="receipt-total-sum">0</span></span>
         </div>
-        <div style="display:flex; gap:12px; margin-top:20px;">
-            <button onclick="closeReceipt()" style="flex:1; padding:18px; border-radius:15px; border:1.5px solid #DDD; background:#FFF; font-family:'Prompt'; font-weight:600;">เลือกเพิ่ม</button>
-            <button id="btn-submit" onclick="submitOrder()" style="flex:2; padding:18px; border-radius:15px; border:none; background:#000; color:#fff; font-family:'Prompt'; font-weight:600;">ยืนยันออเดอร์</button>
+        <div style="display:flex; gap:12px; margin-top:25px;">
+            <button onclick="closeReceipt()" style="flex:1; padding:18px; border-radius:15px; border:1.5px solid #DDD; background:#FFF; font-family:'Prompt'; font-weight:600;">เพิ่มอีก</button>
+            <button id="btn-submit" onclick="submitOrder()" style="flex:2; padding:18px; border-radius:15px; border:none; background:#000; color:#fff; font-family:'Prompt'; font-weight:600;">ยืนยันสั่งอาหาร</button>
         </div>
     </div>
 </div>
@@ -96,7 +96,6 @@
 </div>
 
 <script>
-    // ⚠️ ตรวจสอบ URL /exec ของคุณให้ดี ห้ามมีเว้นวรรค
     const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
 
     let currentTable = ""; let cart = []; let fullMenu = [];
@@ -127,14 +126,12 @@
         let nav = document.getElementById('category-nav');
         let categories = [...new Set(fullMenu.map(row => row[2] || "อื่นๆ"))];
 
-        // สร้าง Nav
         let navHtml = `<button class="nav-pill ${filter==='ทั้งหมด'?'active':''}" onclick="renderMenu('ทั้งหมด')">ทั้งหมด</button>`;
         categories.forEach(c => {
             navHtml += `<button class="nav-pill ${filter===c?'active':''}" onclick="renderMenu('${c}')">${c}</button>`;
         });
         nav.innerHTML = navHtml;
 
-        // สร้างรายการ
         let html = "";
         fullMenu.forEach((row, idx) => {
             if(filter !== "ทั้งหมด" && row[2] !== filter) return;
@@ -165,7 +162,13 @@
         let q = parseInt(document.getElementById('q-'+i).innerText);
         cart.push({name, price, qty:q, total: price*q});
         btn.innerText = "✓ เพิ่มแล้ว"; 
-        setTimeout(()=>btn.innerText="ใส่ตะกร้า", 800);
+        btn.style.background = "#EEE";
+        btn.style.color = "#000";
+        setTimeout(()=> {
+            btn.innerText="ใส่ตะกร้า";
+            btn.style.background="transparent";
+            btn.style.color="#000";
+        }, 800);
         updateCartUI();
     }
 
@@ -183,9 +186,9 @@
         cart.forEach((i, idx) => {
             sum += i.total;
             res.innerHTML += `
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; padding:10px; background:#F9F9F9; border-radius:15px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; padding:12px; background:#F9F9F9; border-radius:15px; border:1px solid #EEE;">
                     <div><b>${i.qty}x ${i.name}</b></div>
-                    <div>฿${i.total.toLocaleString()} <span style="color:red; margin-left:10px;" onclick="rem(${idx})">✕</span></div>
+                    <div>฿${i.total.toLocaleString()} <span style="color:red; margin-left:12px; font-weight:bold; cursor:pointer;" onclick="rem(${idx})">✕</span></div>
                 </div>`;
         });
         document.getElementById('receipt-total-sum').innerText = sum.toLocaleString();
@@ -196,24 +199,26 @@
     function closeReceipt() { document.getElementById('receipt-modal').style.display='none'; }
 
     function submitOrder() {
-        let btn = document.getElementById('btn-submit'); btn.innerText = "กำลังส่ง..."; btn.disabled = true;
-        let sum = cart.reduce((s,i)=>s+i.total,0);
+        let btn = document.getElementById('btn-submit'); 
+        btn.innerText = "กำลังส่งออเดอร์..."; 
+        btn.disabled = true;
 
         fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) })
             .then(() => {
-                const qr = `https://promptpay.io/0931805507/${sum}.png`;
                 document.getElementById('success-content').innerHTML = `
                     <div class="success-box">
-                        <h3 style="margin-top:0;">สั่งซื้อสำเร็จ!</h3>
-                        <div style="background:#fff; padding:15px; border-radius:20px; border:1px solid #EEE;">
-                            <img src="${qr}" style="width:100%; max-width:200px;">
-                            <div style="font-size:28px; font-weight:700; margin-top:15px;">฿${sum.toLocaleString()}</div>
-                        </div>
-                        <p style="font-size:13px; color:red; margin:20px 0;">* กรุณาแจ้งสลิปที่เคาน์เตอร์นะคะ *</p>
-                        <button class="btn-lock" onclick="location.reload()">กลับหน้าหลัก</button>
+                        <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
+                        <h2 style="margin: 0 0 10px 0;">สั่งอาหารสำเร็จ!</h2>
+                        <p style="color:grey; font-size:16px; margin-bottom: 25px;">พนักงานได้รับรายการอาหารแล้วค่ะ<br>กรุณารอรับอาหารที่โต๊ะนะคะ</p>
+                        <button class="btn-lock" onclick="location.reload()" style="background:#000;">สั่งเพิ่ม / กลับหน้าหลัก</button>
                     </div>`;
                 document.getElementById('success-modal').style.display = 'flex';
                 cart=[]; updateCartUI(); closeReceipt();
+            })
+            .catch(err => {
+                alert("ส่งออเดอร์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+                btn.innerText = "ยืนยันสั่งอาหาร";
+                btn.disabled = false;
             });
     }
 </script>

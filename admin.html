@@ -1,223 +1,177 @@
 <!DOCTYPE html>
 <html lang="th">
-  <head>
-    <meta charset="UTF-8">
-    <base target="_top">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <style>
-      :root {
-        --bg-color: #F5F5F7; --surface-color: #FFFFFF; --text-main: #1D1D1F;
-        --text-muted: #86868B; --primary-color: #000000; --border-color: #E5E5EA;
-        --success-color: #27ae60; --danger-color: #e74c3c;
-      }
-      body { font-family: 'Prompt', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-      .app-container { max-width: 500px; margin: 0 auto; padding: 20px 15px 100px 15px; }
-      #table-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-      .table-box { background: var(--surface-color); padding: 40px 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); text-align: center; width: 85%; max-width: 320px; }
-      .table-box img.logo { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; margin-bottom: 15px; }
-      .table-box h2 { margin: 0; font-size: 20px; font-weight: 700; }
-      .table-box select { width: 100%; padding: 14px 15px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 25px; font-family: 'Prompt'; }
-      .btn-lock { width: 100%; background: var(--primary-color); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 500; cursor: pointer; }
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --bg-color: #f0f2f5; --surface-color: #ffffff; --text-main: #1c1e21; 
+      --primary-color: #000000; --accent-blue: #0078ff; --accent-green: #28a745;
+      --accent-red: #dc3545; --border-color: #dddfe2;
+    }
+    body { font-family: 'Prompt', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
+    
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    h1 { margin: 0; font-size: 24px; font-weight: 700; }
+
+    /* Layout การ์ดโต๊ะ */
+    .tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+    .table-card { background: var(--surface-color); border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 5px solid var(--primary-color); }
+    
+    .table-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+    .table-number { font-size: 20px; font-weight: 700; color: var(--accent-red); }
+    .order-time { font-size: 12px; color: #888; }
+
+    /* รายการอาหาร */
+    .item-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #f0f0f0; font-size: 15px; }
+    .item-detail { color: #666; font-size: 13px; }
+    
+    .total-area { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 12px; text-align: right; }
+    .total-label { font-size: 14px; color: #555; }
+    .total-amount { font-size: 24px; font-weight: 700; color: #000; }
+
+    /* ปุ่มจัดการ */
+    .action-group { display: flex; gap: 10px; margin-top: 15px; }
+    .btn { flex: 1; border: none; padding: 12px; border-radius: 10px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 14px; color: white; }
+    .btn-qr { background: var(--accent-blue); }
+    .btn-cash { background: var(--accent-green); }
+    .btn:active { transform: scale(0.95); opacity: 0.9; }
+
+    /* Modal QR Code */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-content { background: white; padding: 30px; border-radius: 25px; text-align: center; max-width: 400px; width: 100%; }
+    .modal-content img { width: 100%; max-width: 250px; margin-bottom: 15px; border-radius: 10px; }
+    .btn-close { background: #000; color: #fff; width: 100%; margin-top: 20px; }
+
+    #loading-state { text-align: center; padding: 50px; color: #888; }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-header">
+    <div>
+      <h1>WITHU Admin</h1>
+      <div style="font-size: 14px; color: #666;">ระบบรวมบิลรายโต๊ะและเช็คบิล</div>
+    </div>
+    <div id="status-tag" style="font-size: 12px; background: #fff; padding: 5px 12px; border-radius: 20px; border: 1px solid #ddd;">
+      อัปเดตล่าสุด: <span id="last-update">-</span>
+    </div>
+  </div>
+
+  <div id="loading-state">กำลังโหลดออเดอร์ค้างเสิร์ฟ...</div>
+  <div id="tables-container" class="tables-grid"></div>
+
+  <div id="qr-modal" class="modal-overlay" onclick="this.style.display='none'">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <h2 id="modal-table-name" style="margin-top:0;">โต๊ะ 1</h2>
+      <img id="qr-img" src="" alt="PromptPay QR">
+      <div id="modal-total" style="font-size: 28px; font-weight: 700;">฿0</div>
+      <p style="color: #666; font-size: 13px;">สแกนผ่านแอปธนาคารเพื่อชำระเงิน</p>
+      <button class="btn btn-close" onclick="document.getElementById('qr-modal').style.display='none'">ปิดหน้าจอ</button>
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ ถ้าใช้ใน Google Apps Script ไม่ต้องระบุ API_URL แต่ถ้าใช้ข้างนอกให้ใส่ครับ
+    // const API_URL = "YOUR_URL_HERE"; 
+
+    function fetchOrders() {
+      // เรียกฟังก์ชัน getAdminOrders จากรหัส.gs
+      google.script.run.withSuccessHandler(processAndRender).getAdminOrders();
+    }
+
+    function processAndRender(orders) {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('last-update').innerText = new Date().toLocaleTimeString();
       
-      .top-bar { background: var(--surface-color); padding: 12px 15px; text-align: center; font-weight: 600; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
-      .category-nav { display: flex; overflow-x: auto; gap: 10px; padding: 15px 0; -webkit-overflow-scrolling: touch; }
-      .nav-pill { background: var(--surface-color); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 20px; white-space: nowrap; cursor: pointer; font-family: 'Prompt'; }
-      .nav-pill.active { background: var(--primary-color); color: #fff; }
-
-      .menu-item { background: var(--surface-color); border-radius: 16px; padding: 16px; margin-bottom: 14px; display: flex; justify-content: space-between; border: 1px solid var(--border-color); }
-      .menu-img { width: 75px; height: 75px; object-fit: cover; border-radius: 12px; margin-right: 14px; }
-      .price { font-weight: 600; font-size: 16px; margin-bottom: 10px; }
-      .qty-control { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-      .qty-btn { background: var(--bg-color); width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-      .btn-add { background: var(--surface-color); border: 1px solid var(--border-color); padding: 6px 16px; border-radius: 20px; cursor: pointer; width: 100%; font-family: 'Prompt'; }
-
-      .bottom-cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface-color); padding: 15px 20px; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 900; }
-      .btn-view-cart { background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 25px; font-family: 'Prompt'; }
-
-      #receipt-modal, #success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
-      .receipt-box, .success-box { background: var(--bg-color); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; }
-      #success-modal { align-items: center; }
-      .success-box { border-radius: 24px; text-align: center; width: 90%; max-width: 350px; }
-      .success-icon { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; }
-    </style>
-  </head>
-  <body>
-
-    <div id="table-overlay">
-      <div class="table-box">
-        <img src="https://img1.pic.in.th/images/-------2.png" alt="Logo" class="logo">
-        <h2>WITHU</h2>
-        <p>เลือกโต๊ะเพื่อสั่งอาหาร</p>
-        <select id="table-select">
-          <option value="" disabled selected>-- เลือกโต๊ะ --</option>
-          <option value="1">โต๊ะ 1</option><option value="2">โต๊ะ 2</option>
-          <option value="3">โต๊ะ 3</option><option value="4">โต๊ะ 4</option>
-          <option value="5">โต๊ะ 5</option><option value="6">โต๊ะ 6</option>
-          <option value="7">โต๊ะ 7</option><option value="8">โต๊ะ 8</option>
-          <option value="9">โต๊ะ 9</option><option value="10">โต๊ะ 10</option>
-        </select>
-        <button class="btn-lock" onclick="lockTable()">เข้าสู่เมนู</button>
-      </div>
-    </div>
-
-    <div id="app-content" style="display:none;">
-      <div class="top-bar">WITHU <span id="display-table" style="background:#000; color:#fff; padding:2px 8px; border-radius:10px; font-size:12px;"></span></div>
-      <div class="app-container">
-        <div id="category-nav-container" class="category-nav"></div>
-        <div id="loading" style="text-align:center; padding:20px;">กำลังโหลดเมนู...</div>
-        <div id="main-content"></div> 
-      </div>
-    </div>
-
-    <div id="bottom-cart" class="bottom-cart-bar">
-      <div class="cart-info">ตะกร้า <span id="cart-count"></span></div>
-      <button class="btn-view-cart" onclick="openReceipt()">ดูบิล ฿<span id="cart-sum">0</span></button>
-    </div>
-
-    <div id="receipt-modal">
-      <div class="receipt-box">
-        <h3 style="text-align:center;">สรุปรายการ</h3>
-        <div id="receipt-items" style="max-height:300px; overflow-y:auto; margin-bottom:15px;"></div>
-        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:18px; margin-bottom:20px;">
-          <span>รวมทั้งสิ้น</span><span>฿<span id="receipt-total-sum">0</span></span>
-        </div>
-        <div style="display:flex; gap:10px;">
-          <button onclick="closeReceipt()" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ccc; background:#fff; font-family:'Prompt';">เพิ่มอีก</button>
-          <button id="btn-submit-order" onclick="submitOrder()" style="flex:2; padding:12px; border-radius:10px; border:none; background:#000; color:#fff; font-family:'Prompt';">ยืนยันออเดอร์</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="success-modal">
-      <div id="success-content"></div>
-    </div>
-
-    <script>
-      // ⚠️ ใส่ URL /exec ของคุณตรงนี้
-      const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
-
-      let currentTableNumber = "";
-      let cart = []; 
-
-      function lockTable() {
-        let sel = document.getElementById("table-select");
-        if(!sel.value) { alert("กรุณาเลือกโต๊ะ"); return; }
-        currentTableNumber = sel.value;
-        document.getElementById("display-table").innerText = "โต๊ะ " + currentTableNumber;
-        document.getElementById("table-overlay").style.display = "none";
-        document.getElementById("app-content").style.display = "block";
+      const container = document.getElementById('tables-container');
+      if (!orders || orders.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #888;">ไม่มีออเดอร์ค้างในขณะนี้</div>';
+        return;
       }
 
-      window.onload = () => {
-        fetch(API_URL + "?action=getMenu").then(res => res.json()).then(data => renderMenu(data));
-      };
-
-      function renderMenu(data) {
-        document.getElementById('loading').style.display = 'none';
-        let main = document.getElementById('main-content');
-        let nav = document.getElementById('category-nav-container');
-        let categories = {};
-        data.forEach(row => {
-          let c = row[2] || "อื่นๆ";
-          if(!categories[c]) categories[c] = [];
-          categories[c].push(row);
-        });
-        
-        let navH = `<button class="nav-pill active" onclick="filterMenu('ทั้งหมด', this)">ทั้งหมด</button>`;
-        for(let c in categories) navH += `<button class="nav-pill" onclick="filterMenu('${c}', this)">${c}</button>`;
-        nav.innerHTML = navH;
-
-        let html = ""; let idx = 0;
-        for(let c in categories) {
-          html += `<div class="cat-sec" data-cat="${c}"><h3>${c}</h3>`;
-          categories[c].forEach(row => {
-            idx++;
-            let img = row[4] ? `<img src="${row[4]}" class="menu-img">` : "";
-            let sweet = c === "เครื่องดื่ม" ? `<select id="sw-${idx}" style="width:100%; margin-top:5px; font-family:'Prompt'; border-radius:5px;"><option>หวานปกติ 50%</option><option>หวานน้อย 25%</option><option>หวานจึ้ง 75%</option></select>` : "";
-            html += `<div class="menu-item">
-              <div style="display:flex; flex:1;">${img}<div><div style="font-weight:600;">${row[0]}</div>${sweet}</div></div>
-              <div style="text-align:right;">
-                <div class="price">฿${row[1]}</div>
-                <div class="qty-control"><div class="qty-btn" onclick="uQty(${idx},-1)">-</div><span id="q-${idx}">1</span><div class="qty-btn" onclick="uQty(${idx},1)">+</div></div>
-                <button class="btn-add" onclick="add('${row[0]}',${row[1]},${idx},this)">ใส่ตะกร้า</button>
-              </div>
-            </div>`;
-          });
-          html += `</div>`;
+      // 1. รวมออเดอร์ตามโต๊ะ (Grouping)
+      const tableMap = {};
+      orders.forEach(order => {
+        if (!tableMap[order.table]) {
+          tableMap[order.table] = {
+            tableNum: order.table,
+            lastTime: order.time,
+            items: [],
+            total: 0,
+            rowNums: [] // เก็บ rowNum ทั้งหมดเพื่อกด Done ทีเดียว
+          };
         }
-        main.innerHTML = html;
-      }
+        tableMap[order.table].items.push(order);
+        tableMap[order.table].total += parseFloat(order.total.toString().replace(/,/g, ''));
+        tableMap[order.table].rowNums.push(order.rowNum);
+      });
 
-      function filterMenu(c, btn) {
-        document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.cat-sec').forEach(s => s.style.display = (c==='ทั้งหมด'||s.dataset.cat===c)?'block':'none');
-      }
-
-      function uQty(i,v) { let el=document.getElementById('q-'+i); let n=parseInt(el.innerText)+v; if(n>0) el.innerText=n; }
-
-      function add(n,p,i,b) {
-        let q = parseInt(document.getElementById('q-'+i).innerText);
-        let s = document.getElementById('sw-'+i) ? document.getElementById('sw-'+i).value : "";
-        cart.push({name:n, price:p, qty:q, sweetness:s, total:p*q});
-        b.innerText = "✓ เพิ่มแล้ว"; setTimeout(()=>b.innerText="ใส่ตะกร้า",800);
-        updateCartUI();
-      }
-
-      function updateCartUI() {
-        let bar = document.getElementById('bottom-cart');
-        if(cart.length===0) { bar.style.display='none'; return; }
-        bar.style.display='flex';
-        let sum = cart.reduce((s,i)=>s+i.total,0);
-        document.getElementById('cart-sum').innerText = sum;
-        document.getElementById('cart-count').innerText = `(${cart.length})`;
-      }
-
-      function openReceipt() {
-        let res = document.getElementById('receipt-items'); let sum = 0; res.innerHTML = "";
-        cart.forEach((i, idx) => {
-          sum += i.total;
-          res.innerHTML += `<div style="padding:10px; background:#fff; margin-bottom:5px; border-radius:10px; display:flex; justify-content:space-between;">
-            <div>${i.qty}x ${i.name}<br><small style="color:grey;">${i.sweetness}</small></div>
-            <div>฿${i.total} <span style="color:red; cursor:pointer;" onclick="rem(${idx})">✕</span></div>
-          </div>`;
-        });
-        document.getElementById('receipt-total-sum').innerText = sum;
-        document.getElementById('receipt-modal').style.display = 'flex';
-      }
-
-      function rem(i) { cart.splice(i,1); updateCartUI(); cart.length?openReceipt():closeReceipt(); }
-      function closeReceipt() { document.getElementById('receipt-modal').style.display='none'; }
-
-      function submitOrder() {
-        if(!cart.length) return;
-        let sum = cart.reduce((s,i)=>s+i.total,0);
-        let btn = document.getElementById('btn-submit-order');
-        btn.innerText = "กำลังส่ง..."; btn.disabled = true;
-
-        fetch(API_URL, {
-          method: 'POST',
-          body: JSON.stringify({action:'submitOrder', table:currentTableNumber, cart:cart})
-        }).then(() => {
-          const qr = `https://promptpay.io/0931805507/${sum}.png`;
-          document.getElementById('success-content').innerHTML = `
-            <div class="success-box">
-              <div class="success-icon" style="background:#e8f5e9; color:#2e7d32;"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:30px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
-              <h3 style="margin:0;">ส่งออเดอร์สำเร็จ!</h3>
-              <p style="font-size:13px; color:grey;">สแกนเพื่อจ่าย(แคปรูปจ่ายก่อนเช็คบิลได้ครับ) หรือจ่ายสดที่เคาน์เตอร์</p>
-              <div style="background:#fff; padding:15px; border-radius:15px; border:1px solid #eee;">
-                <img src="${qr}" style="width:180px;">
-                <div style="font-size:22px; font-weight:700; margin-top:10px;">฿${sum}</div>
-              </div>
-              <p style="font-size:11px; color:red; margin:10px 0;">* จ่ายเงินสด/สแกนแล้ว แจ้งสลิปที่เคาน์เตอร์นะคะ *</p>
-              <button class="btn-lock" onclick="location.reload()">กลับหน้าหลัก</button>
+      // 2. แสดงผลเป็นการ์ด
+      let html = "";
+      for (let t in tableMap) {
+        const table = tableMap[t];
+        html += `
+          <div class="table-card">
+            <div class="table-header">
+              <span class="table-number">โต๊ะ ${table.tableNum}</span>
+              <span class="order-time">${table.lastTime}</span>
             </div>
-          `;
-          document.getElementById('success-modal').style.display = 'flex';
-          cart=[]; updateCartUI(); closeReceipt();
-        });
+            <div class="items-list">
+              ${table.items.map(i => `
+                <div class="item-row">
+                  <div>
+                    <b>${i.qty}x ${i.menu}</b>
+                    <div class="item-detail">${i.sweetness !== '-' ? i.sweetness : ''}</div>
+                  </div>
+                  <div>฿${i.total}</div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="total-area">
+              <div class="total-label">ยอดรวมทั้งหมด</div>
+              <div class="total-amount">฿${table.total.toLocaleString()}</div>
+            </div>
+            <div class="action-group">
+              <button class="btn btn-qr" onclick="openQR('${table.tableNum}', ${table.total})">📱 เช็คบิล (QR)</button>
+              <button class="btn btn-cash" onclick="confirmPayment('${table.tableNum}', ${JSON.stringify(table.rowNums)})">💰 เงินสด</button>
+            </div>
+          </div>
+        `;
       }
-    </script>
-  </body>
+      container.innerHTML = html;
+    }
+
+    function openQR(table, amount) {
+      const qrImg = document.getElementById('qr-img');
+      const qrModal = document.getElementById('qr-modal');
+      const promptpayID = "0931805507"; // เบอร์คุณ
+      
+      document.getElementById('modal-table-name').innerText = "เช็คบิล โต๊ะ " + table;
+      document.getElementById('modal-total').innerText = "฿" + amount.toLocaleString();
+      qrImg.src = `https://promptpay.io/${promptpayID}/${amount}.png`;
+      qrModal.style.display = 'flex';
+    }
+
+    function confirmPayment(table, rowNums) {
+      if (!confirm(`ยืนยันการรับเงิน โต๊ะ ${table} ใช่หรือไม่?\n(ออเดอร์จะถูกย้ายไปหน้าประวัติทันที)`)) return;
+
+      // จัดการปิดปุ่มชั่วคราว
+      document.getElementById('loading-state').style.display = 'block';
+      document.getElementById('loading-state').innerText = "กำลังบันทึกข้อมูล...";
+
+      // วนลูปแจ้ง Google Script ว่าออเดอร์ชุดนี้เสร็จแล้ว
+      // หมายเหตุ: ส่งเป็น Array ของ rowNum ไปจัดการที่ฝั่ง server
+      google.script.run.withSuccessHandler(() => {
+        fetchOrders(); // รีเฟรชข้อมูลใหม่
+      }).markMultipleDone(rowNums);
+    }
+
+    window.onload = () => {
+      fetchOrders();
+      setInterval(fetchOrders, 10000); // อัปเดตทุก 10 วินาที
+    };
+  </script>
+</body>
 </html>

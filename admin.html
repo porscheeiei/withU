@@ -7,170 +7,178 @@
   <style>
     :root {
       --bg-color: #f0f2f5; --surface-color: #ffffff; --text-main: #1c1e21; 
-      --primary-color: #000000; --accent-blue: #0078ff; --accent-green: #28a745;
+      --primary-color: #000; --accent-blue: #0078ff; --accent-green: #28a745;
       --accent-red: #dc3545; --border-color: #dddfe2;
     }
     body { font-family: 'Prompt', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
     
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-    h1 { margin: 0; font-size: 24px; font-weight: 700; }
-
-    /* Layout การ์ดโต๊ะ */
-    .tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-    .table-card { background: var(--surface-color); border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 5px solid var(--primary-color); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .summary-card { background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 5px solid var(--primary-color); }
     
-    .table-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
-    .table-number { font-size: 20px; font-weight: 700; color: var(--accent-red); }
-    .order-time { font-size: 12px; color: #888; }
-
-    /* รายการอาหาร */
-    .item-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #f0f0f0; font-size: 15px; }
-    .item-detail { color: #666; font-size: 13px; }
+    /* ระบบการ์ดโต๊ะ */
+    .tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .table-card { background: var(--surface-color); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); position: relative; }
+    .table-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+    .table-num { font-size: 22px; font-weight: 700; color: var(--accent-red); }
     
-    .total-area { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 12px; text-align: right; }
-    .total-label { font-size: 14px; color: #555; }
-    .total-amount { font-size: 24px; font-weight: 700; color: #000; }
-
-    /* ปุ่มจัดการ */
-    .action-group { display: flex; gap: 10px; margin-top: 15px; }
-    .btn { flex: 1; border: none; padding: 12px; border-radius: 10px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 14px; color: white; }
+    .item-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #f0f0f0; font-size: 14px; }
+    .total-box { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 12px; text-align: right; }
+    
+    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+    .btn { flex: 1; border: none; padding: 12px; border-radius: 10px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; color: white; transition: 0.2s; }
     .btn-qr { background: var(--accent-blue); }
     .btn-cash { background: var(--accent-green); }
-    .btn:active { transform: scale(0.95); opacity: 0.9; }
+    .btn:disabled { background: #ccc; cursor: not-allowed; }
 
-    /* Modal QR Code */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-    .modal-content { background: white; padding: 30px; border-radius: 25px; text-align: center; max-width: 400px; width: 100%; }
-    .modal-content img { width: 100%; max-width: 250px; margin-bottom: 15px; border-radius: 10px; }
-    .btn-close { background: #000; color: #fff; width: 100%; margin-top: 20px; }
-
-    #loading-state { text-align: center; padding: 50px; color: #888; }
+    /* Modal QR */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-content { background: #fff; padding: 25px; border-radius: 20px; text-align: center; max-width: 350px; width: 100%; }
+    #qr-img { width: 100%; border-radius: 10px; margin: 15px 0; }
   </style>
 </head>
 <body>
 
   <div class="dashboard-header">
     <div>
-      <h1>WITHU Admin</h1>
-      <div style="font-size: 14px; color: #666;">ระบบรวมบิลรายโต๊ะและเช็คบิล</div>
+      <h1 style="margin:0;">WITHU Admin Dashboard</h1>
+      <p style="margin:5px 0; color:grey;">ระบบรวมบิลและเช็คบิลรายโต๊ะ</p>
     </div>
-    <div id="status-tag" style="font-size: 12px; background: #fff; padding: 5px 12px; border-radius: 20px; border: 1px solid #ddd;">
-      อัปเดตล่าสุด: <span id="last-update">-</span>
+    <button onclick="fetchAllData()" id="refresh-btn" style="padding:10px 20px; border-radius:10px; cursor:pointer; background:#000; color:#fff; border:none; font-family:'Prompt';">🔄 รีเฟรชข้อมูล</button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div style="font-size:12px; color:grey;">ยอดขายวันนี้</div>
+      <div style="font-size:24px; font-weight:700; color:#27ae60;" id="sum-revenue">฿0</div>
+    </div>
+    <div class="summary-card">
+      <div style="font-size:12px; color:grey;">รายการทั้งหมด</div>
+      <div style="font-size:24px; font-weight:700;" id="sum-items">0</div>
     </div>
   </div>
 
-  <div id="loading-state">กำลังโหลดออเดอร์ค้างเสิร์ฟ...</div>
+  <div id="loading-text" style="text-align:center; padding:50px; color:grey;">กำลังเชื่อมต่อกับ Google Sheets...</div>
   <div id="tables-container" class="tables-grid"></div>
 
-  <div id="qr-modal" class="modal-overlay" onclick="this.style.display='none'">
+  <div id="qr-modal" class="modal" onclick="this.style.display='none'">
     <div class="modal-content" onclick="event.stopPropagation()">
-      <h2 id="modal-table-name" style="margin-top:0;">โต๊ะ 1</h2>
-      <img id="qr-img" src="" alt="PromptPay QR">
-      <div id="modal-total" style="font-size: 28px; font-weight: 700;">฿0</div>
-      <p style="color: #666; font-size: 13px;">สแกนผ่านแอปธนาคารเพื่อชำระเงิน</p>
-      <button class="btn btn-close" onclick="document.getElementById('qr-modal').style.display='none'">ปิดหน้าจอ</button>
+      <h3 id="qr-title" style="margin-top:0;"></h3>
+      <img id="qr-img" src="">
+      <div id="qr-amount" style="font-size:28px; font-weight:700; margin-bottom:15px;"></div>
+      <button onclick="document.getElementById('qr-modal').style.display='none'" style="width:100%; padding:12px; border-radius:10px; background:#000; color:#fff; border:none; font-family:'Prompt';">ปิดหน้าจอ</button>
     </div>
   </div>
 
   <script>
-    // ⚠️ ถ้าใช้ใน Google Apps Script ไม่ต้องระบุ API_URL แต่ถ้าใช้ข้างนอกให้ใส่ครับ
-    // const API_URL = "YOUR_URL_HERE"; 
+    // ⚠️ สำคัญ: ใส่ URL Web App ของคุณที่นี่ (ต้องลงท้ายด้วย /exec)
+    const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
 
-    function fetchOrders() {
-      // เรียกฟังก์ชัน getAdminOrders จากรหัส.gs
-      google.script.run.withSuccessHandler(processAndRender).getAdminOrders();
+    function fetchAllData() {
+      const btn = document.getElementById('refresh-btn');
+      btn.innerText = "⏳ กำลังโหลด...";
+      
+      fetch(API_URL + "?action=getAdminData")
+        .then(res => res.json())
+        .then(data => {
+          renderSummary(data.summary);
+          renderTableCards(data.orders);
+          btn.innerText = "🔄 รีเฟรชข้อมูล";
+          document.getElementById('loading-text').style.display = 'none';
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('loading-text').innerHTML = "<b style='color:red;'>เชื่อมต่อไม่ได้!</b><br>เช็คว่าตั้งค่า Deploy เป็น Anyone หรือยัง?";
+        });
     }
 
-    function processAndRender(orders) {
-      document.getElementById('loading-state').style.display = 'none';
-      document.getElementById('last-update').innerText = new Date().toLocaleTimeString();
-      
+    function renderSummary(s) {
+      document.getElementById('sum-revenue').innerText = "฿" + parseFloat(s.revenue).toLocaleString();
+      document.getElementById('sum-items').innerText = s.items + " รายการ";
+    }
+
+    function renderTableCards(orders) {
       const container = document.getElementById('tables-container');
+      container.innerHTML = "";
+
       if (!orders || orders.length === 0) {
-        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #888;">ไม่มีออเดอร์ค้างในขณะนี้</div>';
+        container.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; color:grey;'>ยังไม่มีออเดอร์ค้างในขณะนี้</div>";
         return;
       }
 
-      // 1. รวมออเดอร์ตามโต๊ะ (Grouping)
+      // รวมออเดอร์ตามโต๊ะ
       const tableMap = {};
-      orders.forEach(order => {
-        if (!tableMap[order.table]) {
-          tableMap[order.table] = {
-            tableNum: order.table,
-            lastTime: order.time,
-            items: [],
-            total: 0,
-            rowNums: [] // เก็บ rowNum ทั้งหมดเพื่อกด Done ทีเดียว
-          };
+      orders.forEach(o => {
+        if (!tableMap[o.table]) {
+          tableMap[o.table] = { items: [], total: 0, rowNums: [], time: o.time };
         }
-        tableMap[order.table].items.push(order);
-        tableMap[order.table].total += parseFloat(order.total.toString().replace(/,/g, ''));
-        tableMap[order.table].rowNums.push(order.rowNum);
+        tableMap[o.table].items.push(o);
+        // แปลงราคาจาก String เป็น Number (ตัดลูกน้ำออกถ้ามี)
+        const price = parseFloat(o.total.toString().replace(/,/g, '')) || 0;
+        tableMap[o.table].total += price;
+        tableMap[o.table].rowNums.push(o.rowNum);
       });
 
-      // 2. แสดงผลเป็นการ์ด
-      let html = "";
+      // สร้างการ์ดแต่ละโต๊ะ
       for (let t in tableMap) {
         const table = tableMap[t];
-        html += `
-          <div class="table-card">
-            <div class="table-header">
-              <span class="table-number">โต๊ะ ${table.tableNum}</span>
-              <span class="order-time">${table.lastTime}</span>
-            </div>
-            <div class="items-list">
-              ${table.items.map(i => `
-                <div class="item-row">
-                  <div>
-                    <b>${i.qty}x ${i.menu}</b>
-                    <div class="item-detail">${i.sweetness !== '-' ? i.sweetness : ''}</div>
-                  </div>
-                  <div>฿${i.total}</div>
-                </div>
-              `).join('')}
-            </div>
-            <div class="total-area">
-              <div class="total-label">ยอดรวมทั้งหมด</div>
-              <div class="total-amount">฿${table.total.toLocaleString()}</div>
-            </div>
-            <div class="action-group">
-              <button class="btn btn-qr" onclick="openQR('${table.tableNum}', ${table.total})">📱 เช็คบิล (QR)</button>
-              <button class="btn btn-cash" onclick="confirmPayment('${table.tableNum}', ${JSON.stringify(table.rowNums)})">💰 เงินสด</button>
-            </div>
+        const card = document.createElement('div');
+        card.className = 'table-card';
+        card.innerHTML = `
+          <div class="table-header">
+            <span class="table-num">โต๊ะ ${t}</span>
+            <span style="font-size:11px; color:grey;">${table.time}</span>
+          </div>
+          <div>
+            ${table.items.map(i => `
+              <div class="item-row">
+                <div><b>${i.qty}x</b> ${i.menu} <br><small style="color:grey;">${i.details}</small></div>
+                <div>฿${i.total}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="total-box">
+            <div style="font-size:12px; color:grey;">ยอดรวมค้างชำระ</div>
+            <div style="font-size:24px; font-weight:700;">฿${table.total.toLocaleString()}</div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-qr" onclick="openQR('${t}', ${table.total})">📱 QR บิล</button>
+            <button class="btn btn-cash" onclick="payCash('${t}', [${table.rowNums}])">💰 รับเงินสด</button>
           </div>
         `;
+        container.appendChild(card);
       }
-      container.innerHTML = html;
     }
 
     function openQR(table, amount) {
-      const qrImg = document.getElementById('qr-img');
-      const qrModal = document.getElementById('qr-modal');
-      const promptpayID = "0931805507"; // เบอร์คุณ
+      document.getElementById('qr-title').innerText = "เช็คบิล โต๊ะ " + table;
+      document.getElementById('qr-amount').innerText = "฿" + amount.toLocaleString();
+      document.getElementById('qr-img').src = `https://promptpay.io/0931805507/${amount}.png`;
+      document.getElementById('qr-modal').style.display = 'flex';
+    }
+
+    function payCash(table, rows) {
+      if (!confirm(`ยืนยันการรับเงินสด โต๊ะ ${table} ใช่หรือไม่?`)) return;
       
-      document.getElementById('modal-table-name').innerText = "เช็คบิล โต๊ะ " + table;
-      document.getElementById('modal-total').innerText = "฿" + amount.toLocaleString();
-      qrImg.src = `https://promptpay.io/${promptpayID}/${amount}.png`;
-      qrModal.style.display = 'flex';
+      const btn = event.target;
+      btn.innerText = "⏳ บันทึก...";
+      btn.disabled = true;
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'markMultipleDone', rowNums: rows })
+      })
+      .then(res => res.json())
+      .then(res => {
+        fetchAllData(); // โหลดข้อมูลใหม่
+      })
+      .catch(err => alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง"));
     }
 
-    function confirmPayment(table, rowNums) {
-      if (!confirm(`ยืนยันการรับเงิน โต๊ะ ${table} ใช่หรือไม่?\n(ออเดอร์จะถูกย้ายไปหน้าประวัติทันที)`)) return;
-
-      // จัดการปิดปุ่มชั่วคราว
-      document.getElementById('loading-state').style.display = 'block';
-      document.getElementById('loading-state').innerText = "กำลังบันทึกข้อมูล...";
-
-      // วนลูปแจ้ง Google Script ว่าออเดอร์ชุดนี้เสร็จแล้ว
-      // หมายเหตุ: ส่งเป็น Array ของ rowNum ไปจัดการที่ฝั่ง server
-      google.script.run.withSuccessHandler(() => {
-        fetchOrders(); // รีเฟรชข้อมูลใหม่
-      }).markMultipleDone(rowNums);
-    }
-
+    // โหลดข้อมูลทุก 15 วินาที
     window.onload = () => {
-      fetchOrders();
-      setInterval(fetchOrders, 10000); // อัปเดตทุก 10 วินาที
+      fetchAllData();
+      setInterval(fetchAllData, 15000);
     };
   </script>
 </body>

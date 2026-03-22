@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root { --bg: #f8fafc; --text: #1e293b; --border: #e2e8f0; --accent: #16a34a; }
@@ -10,73 +10,125 @@
     .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
     .tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
     .card { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .btn { width: 100%; border: none; padding: 12px; border-radius: 10px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; margin-top: 10px; }
+    .btn { width: 100%; border: none; padding: 12px; border-radius: 10px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.2s; }
     .btn-qr { background: #000; color: #fff; }
     .btn-cash { background: #fff; border: 2px solid var(--accent); color: var(--accent); }
+    .btn:active { transform: scale(0.98); opacity: 0.8; }
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-box { background: #fff; padding: 30px; border-radius: 20px; text-align: center; max-width: 350px; }
+    .modal-box { background: #fff; padding: 30px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; }
+    #status-msg { font-size: 14px; color: #ef4444; text-align: center; width: 100%; padding: 20px; }
   </style>
 </head>
 <body>
   <div class="header">
-    <div><h1>WITHU Admin</h1><div id="update-time" style="font-size:12px;color:grey;">อัปเดตล่าสุด: -</div></div>
-    <div style="text-align:right;">ยอดรวมวันนี้: <span id="revenue" style="font-weight:700;font-size:20px;">฿0</span></div>
+    <div>
+      <h1>WITHU Admin</h1>
+      <div id="update-time" style="font-size:12px;color:grey;">อัปเดตล่าสุด: -</div>
+    </div>
+    <div style="text-align:right;">
+      ยอดรวมวันนี้: <span id="revenue" style="font-weight:700;font-size:20px;">฿0</span>
+    </div>
   </div>
-  <div id="container" class="tables-grid">กำลังดึงข้อมูล...</div>
+
+  <div id="container" class="tables-grid">
+    <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: grey;">กำลังดึงข้อมูลจากระบบ...</div>
+  </div>
 
   <div id="modal" class="modal" onclick="this.style.display='none'">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 id="m-title"></h3><img id="m-qr" style="width:100%;"><div id="m-total" style="font-size:28px;font-weight:700;"></div>
-      <button class="btn" style="background:#eee;" onclick="document.getElementById('modal').style.display='none'">ปิด</button>
+      <h3 id="m-title" style="margin-top: 0;"></h3>
+      <img id="m-qr" style="width:100%; border-radius: 10px; margin: 10px 0;">
+      <div id="m-total" style="font-size:32px; font-weight:700; margin-bottom: 15px;"></div>
+      <button class="btn" style="background:#eee; color: #000;" onclick="document.getElementById('modal').style.display='none'">ปิดหน้าจอ</button>
     </div>
   </div>
 
   <script>
-    const API_URL = "ใส่_API_URL_ตรงนี้"; 
+    // ⚠️ นำลิงก์จากหน้าลูกค้ามาวางที่นี่
+    const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
+
     async function refresh() {
       try {
         const res = await fetch(API_URL + "?action=getAdminData");
+        if (!res.ok) throw new Error("ไม่สามารถเชื่อมต่อ API ได้");
+        
         const data = await res.json();
-        document.getElementById('revenue').innerText = "฿"+data.summary.revenue.toLocaleString();
+        
+        // อัปเดตยอดรวมและเวลา
+        document.getElementById('revenue').innerText = "฿" + (data.summary.revenue || 0).toLocaleString();
         document.getElementById('update-time').innerText = "อัปเดตล่าสุด: " + new Date().toLocaleTimeString();
         
         const container = document.getElementById('container');
-        if(!data.orders.length) { container.innerHTML = "ไม่มีออเดอร์ค้าง"; return; }
         
+        if(!data.orders || data.orders.length === 0) { 
+          container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: grey;">ไม่มีออเดอร์ค้างในขณะนี้</div>`; 
+          return; 
+        }
+        
+        // จัดกลุ่มตามโต๊ะ
         let groups = {};
         data.orders.forEach(o => {
           if(!groups[o.table]) groups[o.table] = { items:[], total:0, rows:[] };
           groups[o.table].items.push(o);
-          groups[o.table].total += parseFloat(o.total.replace(/,/g,''));
+          // แปลงราคาเป็นตัวเลข (รองรับทั้งแบบมีลูกน้ำและไม่มี)
+          let val = parseFloat(o.total.toString().replace(/,/g,'')) || 0;
+          groups[o.table].total += val;
           groups[o.table].rows.push(o.rowNum);
         });
 
         let html = "";
         for(let t in groups) {
-          html += `<div class="card"><h2 style="margin:0;">โต๊ะ ${t}</h2><hr style="border:0;border-top:1px solid #eee;margin:15px 0;">
-            ${groups[t].items.map(i => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>${i.qty}x ${i.menu}</span><span>฿${i.total}</span></div>`).join('')}
-            <div style="font-size:22px;font-weight:700;text-align:right;margin:15px 0;">฿${groups[t].total.toLocaleString()}</div>
-            <button class="btn btn-qr" onclick="showQR('${t}', ${groups[t].total})">เช็คบิล QR</button>
-            <button class="btn btn-cash" onclick="pay('${t}', [${groups[t].rows}])">รับเงินสด</button></div>`;
+          html += `
+            <div class="card">
+              <h2 style="margin:0; color: #ef4444;">โต๊ะ ${t}</h2>
+              <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+              <div style="min-height: 50px;">
+                ${groups[t].items.map(i => `
+                  <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size: 14px;">
+                    <span><b>${i.qty}x</b> ${i.menu}</span>
+                    <span>฿${i.total}</span>
+                  </div>
+                `).join('')}
+              </div>
+              <div style="font-size:24px; font-weight:700; text-align:right; margin:15px 0; border-top: 1px dashed #eee; padding-top: 10px;">
+                ฿${groups[t].total.toLocaleString()}
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-qr" onclick="showQR('${t}', ${groups[t].total})">บิล QR</button>
+                <button class="btn btn-cash" onclick="pay('${t}', [${groups[t].rows}])">รับเงินสด</button>
+              </div>
+            </div>`;
         }
         container.innerHTML = html;
-      } catch(e) {}
+      } catch(e) {
+        console.error("Fetch Error:", e);
+        document.getElementById('container').innerHTML = `<div id="status-msg">เกิดข้อผิดพลาด: ${e.message}<br>กรุณาเช็ค API_URL หรือการตั้งค่า Anyone ใน Apps Script</div>`;
+      }
     }
 
     function showQR(t, a) {
-      document.getElementById('m-title').innerText = "โต๊ะ "+t;
+      document.getElementById('m-title').innerText = "เช็คบิล โต๊ะ "+t;
       document.getElementById('m-total').innerText = "฿"+a.toLocaleString();
       document.getElementById('m-qr').src = `https://promptpay.io/0931805507/${a}.png`;
       document.getElementById('modal').style.display = 'flex';
     }
 
     async function pay(t, rows) {
-      if(!confirm(`รับเงินโต๊ะ ${t}?`)) return;
-      await fetch(API_URL, { method:'POST', body: JSON.stringify({action:'markMultipleDone', rowNums:rows}) });
-      refresh();
+      if(!confirm(`ยืนยันการรับเงินโต๊ะ ${t}?`)) return;
+      try {
+        await fetch(API_URL, { 
+          method: 'POST', 
+          body: JSON.stringify({action: 'markMultipleDone', rowNums: rows}) 
+        });
+        refresh(); // โหลดข้อมูลใหม่ทันที
+      } catch(e) {
+        alert("บันทึกไม่สำเร็จ: " + e.message);
+      }
     }
 
-    setInterval(refresh, 5000); refresh();
+    // เริ่มทำงาน
+    refresh();
+    setInterval(refresh, 5000); // อัปเดตทุก 5 วินาที
   </script>
 </body>
 </html>

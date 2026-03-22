@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8">
+    <base target="_top">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <style>
+      :root {
+        --bg-color: #F5F5F7; --surface-color: #FFFFFF; --text-main: #1D1D1F;
+        --text-muted: #86868B; --primary-color: #000000; --border-color: #E5E5EA;
+        --success-color: #27ae60; --danger-color: #e74c3c;
+      }
+      body { font-family: 'Prompt', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+      .app-container { max-width: 500px; margin: 0 auto; padding: 20px 15px 100px 15px; }
+      #table-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+      .table-box { background: var(--surface-color); padding: 40px 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); text-align: center; width: 85%; max-width: 320px; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      .table-box img.logo { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+      .table-box h2 { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-main); line-height: 1.3;}
+      .table-box p.subtitle { margin: 8px 0 25px 0; font-size: 16px; font-weight: 500; color: var(--text-muted); }
+      .table-box select { width: 100%; padding: 14px 15px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 25px; font-family: 'Prompt', sans-serif; outline: none; background-color: #fafafa; box-sizing: border-box; }
+      .table-box select:focus { border-color: var(--primary-color); background-color: #fff;}
+      .btn-lock { width: 100%; background: var(--primary-color); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 500; cursor: pointer; font-family: 'Prompt', sans-serif; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+      .btn-lock:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(0,0,0,0.2);}
+      .top-bar { background: var(--surface-color); padding: 12px 15px; text-align: center; font-weight: 600; font-size: 15px; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+      .table-badge { background: #000; color: #fff; padding: 3px 10px; border-radius: 20px; margin-left: 8px; font-size: 13px; }
+      .app-header { text-align: center; margin-bottom: 25px; padding-top: 15px; }
+      .app-header h1 { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: 0.5px; }
+      .app-header p { margin: 0; font-size: 14px; color: var(--text-muted); }
+      .category-nav { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 15px; margin-bottom: 15px; -ms-overflow-style: none; scrollbar-width: none; }
+      .category-nav::-webkit-scrollbar { display: none; }
+      .nav-pill { background: var(--surface-color); color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; font-family: 'Prompt', sans-serif; transition: 0.2s; }
+      .nav-pill.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+      .menu-item { background: var(--surface-color); border-radius: 16px; padding: 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: flex-start; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+      .item-content-wrapper { display: flex; flex: 1; align-items: flex-start; min-width: 0; }
+      .menu-img { width: 75px; height: 75px; flex-shrink: 0; object-fit: cover; border-radius: 12px; margin-right: 14px; background-color: #fafafa; border: 1px solid #f0f0f0; }
+      .menu-info { flex: 1; padding-right: 10px; min-width: 0; }
+      .menu-info h3 { margin: 0 0 6px 0; font-size: 16px; font-weight: 600; line-height: 1.3; word-wrap: break-word;}
+      .sweetness-box { margin-top: 5px; }
+      .sweetness-select { width: 100%; max-width: 140px; padding: 6px 8px; font-size: 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Prompt', sans-serif; background: var(--bg-color); outline: none; }
+      .action-zone { display: flex; flex-direction: column; align-items: flex-end; min-width: 80px; }
+      .price { font-weight: 600; font-size: 16px; margin-bottom: 10px; color: var(--primary-color);}
+      .qty-control { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+      .qty-btn { background: var(--bg-color); border: 1px solid var(--border-color); width: 26px; height: 26px; border-radius: 6px; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; }
+      .qty-val { font-weight: 500; font-size: 14px; min-width: 15px; text-align: center; }
+      .btn-add { background: var(--surface-color); color: var(--primary-color); border: 1px solid var(--border-color); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 500; font-family: 'Prompt', sans-serif; transition: 0.2s; width: 100%; }
+      .btn-add:active { transform: scale(0.95); }
+      .bottom-cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface-color); padding: 15px 20px; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 900; }
+      .cart-info { font-weight: 600; font-size: 16px; }
+      .btn-view-cart { background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 25px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'Prompt', sans-serif; }
+      #receipt-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: flex-end; z-index: 1000; animation: fadeInOverlay 0.2s; }
+      @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+      .receipt-box { background: var(--bg-color); width: 100%; max-width: 500px; max-height: 85vh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; animation: slideUp 0.3s cubic-bezier(0.1, 0.9, 0.2, 1); }
+      @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+      .receipt-header { padding: 20px; background: var(--surface-color); border-radius: 20px 20px 0 0; text-align: center; border-bottom: 1px dashed var(--border-color); }
+      .receipt-header h2 { margin: 0; font-size: 20px; font-weight: 600; }
+      .receipt-header p { margin: 5px 0 0 0; font-size: 14px; color: var(--text-muted); }
+      .receipt-body { padding: 20px; overflow-y: auto; flex: 1; }
+      .cart-item { background: var(--surface-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; position: relative; }
+      .cart-item-head { display: flex; justify-content: space-between; font-weight: 500; font-size: 15px; margin-bottom: 5px; }
+      .cart-item-detail { font-size: 13px; color: var(--text-muted); }
+      .btn-remove { position: absolute; right: 15px; bottom: 15px; color: var(--danger-color); font-size: 12px; cursor: pointer; font-weight: 500; border: none; background: none; font-family: 'Prompt'; }
+      .receipt-footer { padding: 20px; background: var(--surface-color); border-top: 1px solid var(--border-color); }
+      .receipt-total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+      .btn-group { display: flex; gap: 10px; }
+      .btn-cancel { flex: 1; padding: 12px; border: 1px solid var(--border-color); border-radius: 10px; background: white; cursor: pointer; font-family: 'Prompt'; font-weight: 500; font-size: 15px; }
+      .btn-confirm { flex: 2; padding: 12px; border: none; border-radius: 10px; background: var(--primary-color); color: white; cursor: pointer; font-family: 'Prompt'; font-weight: 500; font-size: 15px; }
+      #success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; animation: fadeInOverlay 0.2s; padding: 20px; box-sizing: border-box; }
+      .success-box { background: var(--surface-color); padding: 40px 30px; border-radius: 24px; text-align: center; width: 100%; max-width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      .success-icon { width: 70px; height: 70px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; color: var(--success-color); }
+      .success-icon svg { width: 40px; height: 40px; }
+      .success-box h3 { margin: 0 0 10px 0; font-size: 22px; font-weight: 700; color: var(--text-main); }
+      .success-box p { margin: 0 0 25px 0; font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+      .btn-success-close { width: 100%; background: var(--primary-color); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 500; cursor: pointer; font-family: 'Prompt', sans-serif; transition: 0.2s; }
+      .btn-success-close:active { transform: scale(0.96); }
+      #loading { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 14px; }
+      #app-content { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="table-overlay">
+      <div class="table-box">
+        <img src="https://img1.pic.in.th/images/-------2.png" alt="Logo" class="logo">
+        <h2>WITHU (ร้านนั่งชิลล์หลังมอ)</h2>
+        <p class="subtitle">เลือกโต๊ะของคุณ</p>
+        <select id="table-select">
+          <option value="" disabled selected>-- เลือกโต๊ะ --</option>
+          <option value="1">โต๊ะ 1</option><option value="2">โต๊ะ 2</option>
+          <option value="3">โต๊ะ 3</option><option value="4">โต๊ะ 4</option>
+          <option value="5">โต๊ะ 5</option><option value="6">โต๊ะ 6</option>
+          <option value="7">โต๊ะ 7</option><option value="8">โต๊ะ 8</option>
+          <option value="9">โต๊ะ 9</option><option value="10">โต๊ะ 10</option>
+        </select>
+        <button class="btn-lock" onclick="lockTable()">เข้าสู่เมนู</button>
+      </div>
+    </div>
+    <div id="app-content">
+      <div class="top-bar">YOUR ORDER <span class="table-badge" id="display-table"></span></div>
+      <div class="app-container">
+        <div class="app-header">
+          <h1>WITHU</h1>
+          <p>ร้านนั่งชิลล์หลังมอ</p>
+        </div>
+        <div id="category-nav-container" class="category-nav"></div>
+        <div id="loading">กำลังโหลดข้อมูล...</div>
+        <div id="main-content"></div> 
+      </div>
+    </div>
+    <div id="bottom-cart" class="bottom-cart-bar">
+      <div class="cart-info">ตะกร้า <span id="cart-count" style="color:var(--text-muted); font-size:14px;">(0)</span></div>
+      <button class="btn-view-cart" onclick="openReceipt()">ดูบิลสรุปยอด ฿<span id="cart-sum">0</span></button>
+    </div>
+    <div id="receipt-modal">
+      <div class="receipt-box">
+        <div class="receipt-header">
+          <h2>สรุปรายการสั่งซื้อ</h2>
+          <p id="receipt-table-num"></p>
+        </div>
+        <div class="receipt-body" id="receipt-items"></div>
+        <div class="receipt-footer">
+          <div class="receipt-total">
+            <span>ยอดรวมทั้งสิ้น</span>
+            <span>฿<span id="receipt-total-sum">0</span></span>
+          </div>
+          <div class="btn-group">
+            <button class="btn-cancel" onclick="closeReceipt()">เลือกเพิ่ม</button>
+            <button class="btn-confirm" id="btn-submit-order" onclick="submitOrder()">ยืนยันออเดอร์</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="success-modal">
+      <div class="success-box">
+        <div class="success-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <h3>สั่งอาหารสำเร็จ!</h3>
+        <p>ทางร้านได้รับออเดอร์เรียบร้อยแล้วค่ะ<br>กรุณารอสักครู่นะคะ</p>
+        <button class="btn-success-close" onclick="closeSuccessModal()">กลับไปหน้าเมนู</button>
+      </div>
+    </div>
+
+    <script>
+      // ลิงก์ API ที่เชื่อมต่อกับ Google Sheets ของคุณเรียบร้อยแล้ว
+      const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
+
+      let currentTableNumber = "";
+      let cart = []; 
+
+      function lockTable() {
+        var selectBox = document.getElementById("table-select");
+        var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+        if(selectedValue === "") { alert("กรุณาเลือกโต๊ะก่อนครับ"); return; }
+        currentTableNumber = selectedValue;
+        document.getElementById("display-table").innerText = "โต๊ะ " + currentTableNumber;
+        document.getElementById("receipt-table-num").innerText = "สำหรับ โต๊ะที่ " + currentTableNumber;
+        document.getElementById("table-overlay").style.display = "none";
+        document.getElementById("app-content").style.display = "block";
+      }
+
+      window.onload = function() {
+        fetch(API_URL + "?action=getMenu")
+          .then(res => res.json())
+          .then(data => renderMenu(data))
+          .catch(err => {
+            console.error("Error:", err);
+            document.getElementById('loading').innerText = "โหลดข้อมูลไม่สำเร็จ กรุณาเช็กการตั้งค่าแอป";
+          });
+      };
+
+      function renderMenu(data) {
+        document.getElementById('loading').style.display = 'none';
+        var mainContent = document.getElementById('main-content');
+        var navContainer = document.getElementById('category-nav-container');
+        if(!data || data.length === 0) return;
+        var categories = {};
+        data.forEach(function(row) {
+          var mainCat = row[2] ? String(row[2]).trim() : "อื่นๆ";
+          var subCat = row[3] ? String(row[3]).trim() : "";
+          if (!categories[mainCat]) categories[mainCat] = {};
+          if (!categories[mainCat][subCat]) categories[mainCat][subCat] = [];
+          categories[mainCat][subCat].push(row);
+        });
+        let navHtml = `<button class="nav-pill active" onclick="filterMenu('ทั้งหมด', this)">ทั้งหมด</button>`;
+        for (var mainCatName in categories) {
+          navHtml += `<button class="nav-pill" onclick="filterMenu('${mainCatName}', this)">${mainCatName}</button>`;
+        }
+        navContainer.innerHTML = navHtml;
+        let globalItemIndex = 0;
+        for (var mainCatName in categories) {
+          let sectionHtml = `<div class="category-section-wrapper" data-category="${mainCatName}">`;
+          sectionHtml += `<div class="main-category-title">${mainCatName}</div>`;
+          for (var subCatName in categories[mainCatName]) {
+            if (subCatName !== "") { sectionHtml += `<div class="sub-category-title">${subCatName}</div>`; }
+            categories[mainCatName][subCatName].forEach(function(row) {
+              var menuName = row[0];
+              var price = row[1];
+              var imageUrl = row[4] ? String(row[4]).trim() : "";
+              globalItemIndex++;
+              var sweetnessHtml = "";
+              if (mainCatName === "เครื่องดื่ม") {
+                sweetnessHtml = `<div class="sweetness-box"><select id="sweet-${globalItemIndex}" class="sweetness-select"><option value="หวานปกติ 50%">หวานปกติ 50%</option><option value="หวานน้อย 25%">หวานน้อย 25%</option><option value="หวานจึ้ง 75%">หวานจึ้ง 75%</option><option value="หวานเริ่ด 100%">หวานเริ่ด 100%</option></select></div>`;
+              }
+              var imgHtml = (imageUrl !== "") ? `<img src="${imageUrl}" class="menu-img" onerror="this.style.display='none'">` : "";
+              sectionHtml += `<div class="menu-item"><div class="item-content-wrapper">${imgHtml}<div class="menu-info"><h3>${menuName}</h3>${sweetnessHtml}</div></div><div class="action-zone"><div class="price">฿${price}</div><div class="qty-control"><div class="qty-btn" onclick="updateQty(${globalItemIndex}, -1)">-</div><div class="qty-val" id="qty-${globalItemIndex}">1</div><div class="qty-btn" onclick="updateQty(${globalItemIndex}, 1)">+</div></div><button class="btn-add" onclick="addToCart('${menuName}', ${price}, ${globalItemIndex}, this)">ใส่ตะกร้า</button></div></div>`;
+            });
+          }
+          sectionHtml += `</div>`;
+          mainContent.innerHTML += sectionHtml;
+        }
+      }
+
+      function filterMenu(selectedCat, btnElement) {
+        let pills = document.querySelectorAll('.nav-pill');
+        pills.forEach(p => p.classList.remove('active'));
+        btnElement.classList.add('active');
+        let sections = document.querySelectorAll('.category-section-wrapper');
+        sections.forEach(sec => {
+          if (selectedCat === 'ทั้งหมด' || sec.getAttribute('data-category') === selectedCat) { sec.style.display = 'block'; } 
+          else { sec.style.display = 'none'; }
+        });
+      }
+
+      function updateQty(index, change) {
+        let el = document.getElementById('qty-' + index);
+        let newQty = parseInt(el.innerText) + change;
+        if (newQty < 1) newQty = 1; 
+        el.innerText = newQty;
+      }
+
+      function addToCart(name, price, index, btn) {
+        var qty = parseInt(document.getElementById('qty-' + index).innerText);
+        var sweetEl = document.getElementById('sweet-' + index);
+        var sweetness = sweetEl ? sweetEl.value : "";
+        cart.push({ name: name, price: price, qty: qty, sweetness: sweetness, total: price * qty });
+        document.getElementById('qty-' + index).innerText = "1";
+        if(sweetEl) sweetEl.value = "หวานปกติ 50%"; 
+        btn.innerText = "✓ เพิ่มแล้ว";
+        setTimeout(() => { btn.innerText = "ใส่ตะกร้า"; }, 1000);
+        updateCartUI();
+      }
+
+      function updateCartUI() {
+        let bottomCart = document.getElementById('bottom-cart');
+        if (cart.length === 0) { bottomCart.style.display = 'none'; return; }
+        bottomCart.style.display = 'flex';
+        let totalQty = 0; let totalSum = 0;
+        cart.forEach(item => { totalQty += item.qty; totalSum += item.total; });
+        document.getElementById('cart-count').innerText = `(${totalQty} รายการ)`;
+        document.getElementById('cart-sum').innerText = totalSum;
+      }
+
+      function openReceipt() {
+        let receiptItems = document.getElementById('receipt-items');
+        let totalSum = 0;
+        receiptItems.innerHTML = "";
+        cart.forEach((item, index) => {
+          totalSum += item.total;
+          let sweetText = item.sweetness ? `<br>+ ${item.sweetness}` : "";
+          receiptItems.innerHTML += `<div class="cart-item"><div class="cart-item-head"><span>${item.qty}x ${item.name}</span><span>฿${item.total}</span></div><div class="cart-item-detail">ราคา ฿${item.price} ${sweetText}</div><button class="btn-remove" onclick="removeFromCart(${index})">ลบ</button></div>`;
+        });
+        document.getElementById('receipt-total-sum').innerText = totalSum;
+        document.getElementById('receipt-modal').style.display = 'flex';
+      }
+
+      function removeFromCart(index) {
+        cart.splice(index, 1);
+        updateCartUI();
+        if (cart.length === 0) { closeReceipt(); } else { openReceipt(); }
+      }
+
+      function closeReceipt() { document.getElementById('receipt-modal').style.display = 'none'; }
+      function openSuccessModal() { document.getElementById('success-modal').style.display = 'flex'; }
+      function closeSuccessModal() { document.getElementById('success-modal').style.display = 'none'; }
+
+      function submitOrder() {
+        if (cart.length === 0) return;
+        let btnConfirm = document.getElementById('btn-submit-order');
+        btnConfirm.innerText = "กำลังส่งออเดอร์...";
+        btnConfirm.disabled = true;
+
+        fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'submitOrder', table: currentTableNumber, cart: cart })
+        })
+        .then(res => res.json())
+        .then(data => {
+          cart = []; updateCartUI(); closeReceipt();
+          btnConfirm.innerText = "ยืนยันออเดอร์"; btnConfirm.disabled = false;
+          openSuccessModal();
+        })
+        .catch(err => { 
+          alert("ส่งออเดอร์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง"); 
+          btnConfirm.innerText = "ยืนยันออเดอร์";
+          btnConfirm.disabled = false; 
+        });
+      }
+    </script>
+  </body>
+</html>

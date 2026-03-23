@@ -1,79 +1,74 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root { --bg: #f8fafc; --text: #1e293b; --accent: #16a34a; --blue: #2563eb; }
-    body { font-family: 'Prompt', sans-serif; background: var(--bg); padding: 20px; margin: 0; }
-    .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; }
-    .tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-    .card { background: #fff; border-radius: 20px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-    .btn { width: 100%; border: none; padding: 12px; border-radius: 10px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; margin-top: 10px; }
-    .btn-qr { background: #000; color: #fff; }
-    .btn-cash { background: #fff; border: 2px solid var(--accent); color: var(--accent); }
-    .status-btn-group { display: flex; gap: 5px; margin-top: 10px; }
-    .s-btn { flex:1; padding: 8px; font-size: 11px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: 600; }
-    .s-cooking { background: #fef9c3; color: #a16207; }
-    .s-waiting { background: #dcfce7; color: #166534; }
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-box { background: #fff; padding: 30px; border-radius: 24px; text-align: center; max-width: 360px; width: 90%; }
-    #m-qr { width: 100%; max-width: 250px; border-radius: 12px; margin: 15px 0; border: 1px solid #eee; }
-  </style>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root { --bg: #f8fafc; --accent: #16a34a; --red: #ef4444; --blue: #2563eb; }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg); padding: 20px; margin: 0; }
+        .alert-bar { background: var(--red); color: #fff; padding: 15px; border-radius: 15px; margin-bottom: 20px; animation: blink 1s infinite; display: none; cursor: pointer; text-align: center; font-weight: 700; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .card { background: #fff; border-radius: 20px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .s-btn { flex:1; padding: 10px; font-size: 11px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; margin: 2px; }
+        .btn-main { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; margin-top: 10px; font-family: 'Prompt'; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-box { background: #fff; padding: 30px; border-radius: 24px; text-align: center; max-width: 360px; width: 90%; }
+        #m-qr { width: 100%; max-width: 250px; border-radius: 12px; margin: 15px 0; border: 1px solid #eee; }
+        @media print { body * { display: none !important; } #p-area, #p-area * { display: block !important; } #p-area { width: 300px; margin: 0 auto; text-align: center; } .r-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 5px 0; } }
+    </style>
 </head>
 <body>
-  <div class="header"><div><h1>WITHU Admin</h1><div id="update-time" style="font-size:12px;color:grey;">กำลังโหลด...</div></div><div style="text-align:right;">ยอดวันนี้: <b id="revenue" style="font-size:20px;">฿0</b></div></div>
-  <div id="container" class="tables-grid">กำลังดึงข้อมูล...</div>
-  
-  <div id="modal" class="modal" onclick="this.style.display='none'"><div class="modal-box" onclick="event.stopPropagation()">
-    <h3 id="m-table"></h3><img id="m-qr" src=""><div id="m-total" style="font-size:32px;font-weight:700;"></div>
-    <button class="btn" style="background:var(--accent);color:#fff" id="m-confirm">ยืนยันได้รับเงินแล้ว</button>
-    <button class="btn" style="background:#eee" onclick="document.getElementById('modal').style.display='none'">ปิด</button>
-  </div></div>
+    <div id="staff-alert" class="alert-bar" onclick="clearCallAlert()">🔔 โต๊ะ <span id="alert-table"></span> เรียกพนักงาน! (คลิกเพื่อปิด)</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:25px;border-bottom:2px solid #eee;padding-bottom:15px;">
+        <h1>WITHU Admin</h1><div style="text-align:right;">ยอดวันนี้: <b id="revenue" style="font-size:22px;color:var(--accent)">฿0</b></div>
+    </div>
+    <div id="container" class="grid"></div>
 
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
-    
-    async function refresh() {
-      try {
-        const r = await fetch(API_URL + "?action=getAdminData"); const d = await r.json();
-        document.getElementById('revenue').innerText = "฿" + (d.summary.revenue || 0).toLocaleString();
-        document.getElementById('update-time').innerText = "อัปเดต: " + new Date().toLocaleTimeString();
-        const c = document.getElementById('container'); if(!d.orders.length) { c.innerHTML = "ไม่มีออเดอร์"; return; }
-        
-        let groups = {}; d.orders.forEach(o => { 
-          if(!groups[o.table]) groups[o.table] = { items:[], total:0, rows:[], time:o.time }; 
-          groups[o.table].items.push(o); 
-          groups[o.table].total += parseFloat(o.total.replace(/,/g,'')); 
-          groups[o.table].rows.push(o.rowNum); 
-        });
+    <div id="modal" class="modal" onclick="this.style.display='none'"><div class="modal-box" onclick="event.stopPropagation()"><h3 id="m-table"></h3><img id="m-qr" src=""><div id="m-total" style="font-size:32px;font-weight:700;"></div><button class="btn-main" style="background:var(--accent);color:#fff" id="m-confirm">ยืนยันได้รับเงินแล้ว</button><button class="btn-main" style="background:#eee" onclick="document.getElementById('modal').style.display='none'">ปิด</button></div></div>
+    <div id="p-area" style="display:none;"><h2>WITHU CAFE</h2><p id="p-date"></p><h3 id="p-t"></h3><hr><div id="p-list"></div><h2 id="p-tot" style="text-align:right;"></h2><p>- ขอบคุณค่ะ -</p></div>
 
-        let h = ""; for(let t in groups) {
-          h += `<div class="card"><div style="display:flex;justify-content:space-between"><b>โต๊ะ ${t}</b><small>${groups[t].time}</small></div><hr style="border:0;border-top:1px solid #f1f5f9;margin:12px 0;">
-            ${groups[t].items.map(i => `<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px;"><span>${i.qty}x ${i.menu}<br><small style="color:var(--blue)">${i.details} [${i.status}]</small></span><span>฿${i.total}</span></div>`).join('')}
-            <div class="status-btn-group">
-                <button class="s-btn s-cooking" onclick='changeS(${JSON.stringify(groups[t].rows)}, "กำลังทำ")'>เริ่มทำ</button>
-                <button class="s-btn s-waiting" onclick='changeS(${JSON.stringify(groups[t].rows)}, "รอเสิร์ฟ")'>พร้อมเสิร์ฟ</button>
-            </div>
-            <div style="font-size:24px;font-weight:700;text-align:right;margin:15px 0;">฿${groups[t].total.toLocaleString()}</div>
-            <button class="btn btn-qr" onclick='showQR("${t}",${groups[t].total},${JSON.stringify(groups[t].rows)})'>เก็บเงิน (QR)</button>
-            <button class="btn btn-cash" onclick='pay("${t}",${JSON.stringify(groups[t].rows)})'>ปิดโต๊ะ (รับเงินสด)</button></div>`;
-        } c.innerHTML = h;
-      } catch(e) {}
-    }
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec";
+        let cAlertTable = "";
 
-    async function changeS(r, s) { await fetch(API_URL, { method:'POST', body: JSON.stringify({action:'updateStatus', rowNums:r, nextStatus:s}) }); refresh(); }
-    function showQR(t, a, r) { 
-      document.getElementById('m-table').innerText = "โต๊ะ "+t; 
-      document.getElementById('m-total').innerText = "฿"+a.toLocaleString(); 
-      document.getElementById('m-qr').src = `https://promptpay.io/0931805507/${a}.png`; 
-      document.getElementById('m-confirm').onclick = () => { document.getElementById('modal').style.display='none'; pay(t, r); }; 
-      document.getElementById('modal').style.display = 'flex'; 
-    }
-    async function pay(t, r) { if(!confirm(`ยืนยันการปิดโต๊ะ ${t}?`)) return; await fetch(API_URL, { method:'POST', body: JSON.stringify({action:'markMultipleDone', rowNums:r}) }); refresh(); }
-    
-    setInterval(refresh, 5000); refresh();
-  </script>
+        async function refresh() {
+            try {
+                const r = await fetch(API_URL + "?action=getAdminData"); const d = await r.json();
+                document.getElementById('revenue').innerText = "฿" + d.summary.revenue.toLocaleString();
+                if(d.calls.length > 0) { cAlertTable = d.calls[0][1]; document.getElementById('staff-alert').style.display = 'block'; document.getElementById('alert-table').innerText = cAlertTable; }
+                else { document.getElementById('staff-alert').style.display = 'none'; }
+
+                const c = document.getElementById('container'); if(!d.orders.length){ c.innerHTML = "ไม่มีออเดอร์"; return; }
+                let groups = {}; d.orders.forEach(o => { if(!groups[o.table]) groups[o.table] = { items:[], total:0, rows:[], time:o.time }; groups[o.table].items.push(o); groups[o.table].total += parseFloat(o.total.replace(/,/g,'')); groups[o.table].rows.push(o.rowNum); });
+                
+                c.innerHTML = Object.keys(groups).map(t => `
+                    <div class="card">
+                        <div style="display:flex;justify-content:space-between"><b>โต๊ะ ${t}</b><small>${groups[t].time}</small></div><hr style="border:0;border-top:1px solid #eee;margin:10px 0;">
+                        ${groups[t].items.map(i => `<div style="font-size:13px;margin-bottom:5px;">${i.qty}x ${i.menu}<br><small style="color:var(--blue)">${i.details} [${i.status}]</small></div>`).join('')}
+                        <div style="display:flex;margin-top:10px;">
+                            <button class="s-btn" style="background:#fef9c3;color:#854d0e" onclick='upS(${JSON.stringify(groups[t].rows)},"กำลังทำ")'>กำลังทำ</button>
+                            <button class="s-btn" style="background:#dcfce7;color:#166534" onclick='upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ")'>รอเสิร์ฟ</button>
+                        </div>
+                        <div style="font-size:24px;font-weight:700;text-align:right;margin:15px 0;">฿${groups[t].total.toLocaleString()}</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                            <button class="btn-main" style="background:#000;color:#fff;margin:0" onclick='showQR("${t}",${groups[t].total},${JSON.stringify(groups[t].rows)})'>QR</button>
+                            <button class="btn-main" style="background:#64748b;color:#fff;margin:0" onclick='pr("${t}",${JSON.stringify(groups[t].items)},${groups[t].total})'>บิล</button>
+                        </div>
+                        <button class="btn-main" style="background:var(--accent);color:#fff" onclick='pay("${t}",${JSON.stringify(groups[t].rows)})'>เสิร์ฟแล้ว/ปิดโต๊ะ</button>
+                    </div>
+                `).join('');
+            } catch(e){}
+        }
+
+        async function upS(r, s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
+        function showQR(t, a, r) { document.getElementById('m-table').innerText = "โต๊ะ "+t; document.getElementById('m-total').innerText = "฿"+a.toLocaleString(); document.getElementById('m-qr').src = `https://promptpay.io/0931805507/${a}.png`; document.getElementById('m-confirm').onclick = () => { document.getElementById('modal').style.display='none'; pay(t, r); }; document.getElementById('modal').style.display = 'flex'; }
+        function pr(t, i, tot) { document.getElementById('p-date').innerText = new Date().toLocaleString('th-TH'); document.getElementById('p-t').innerText = "โต๊ะ " + t; document.getElementById('p-tot').innerText = "รวม: ฿" + tot.toLocaleString(); document.getElementById('p-list').innerHTML = i.map(x => `<div class="r-item"><span>${x.qty}x ${x.menu}</span><span>${x.total}</span></div>`).join(''); window.print(); }
+        async function pay(t, r) { if(confirm("ปิดโต๊ะ "+t+"?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r})}); refresh(); }}
+        async function clearCallAlert() { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'clearCall',table:cAlertTable})}); refresh(); }
+
+        setInterval(refresh, 5000); refresh();
+    </script>
 </body>
 </html>

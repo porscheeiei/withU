@@ -5,33 +5,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        :root { --bg: #f9f9f9; --accent: #16a34a; --red: #8b0000; --blue: #007AFF; }
+        :root { --bg: #F8F9FA; --accent: #16a34a; --red: #8b0000; --blue: #007AFF; }
         body { font-family: 'Prompt', sans-serif; background: var(--bg); padding: 20px; margin: 0; }
-        .alert-bar { background: var(--red); color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; cursor: pointer; font-size: 14px; font-weight: 600; }
-        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 25px; align-items: flex-end; }
+        .alert-bar { background: var(--red); color: #fff; padding: 15px; border-radius: 15px; margin-bottom: 25px; text-align: center; cursor: pointer; font-size: 15px; font-weight: 600; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .status-btn { flex:1; padding: 8px; font-size: 12px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: #fff; margin: 2px; font-family: 'Prompt'; }
-        .btn-action { width: 100%; padding: 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; margin-top: 10px; font-family: 'Prompt'; }
+        .card { background: #fff; border-radius: 35px; padding: 30px; border: 1px solid #eee; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .status-row { display: flex; gap: 6px; margin-top: 20px; flex-wrap: wrap; }
+        .s-btn { flex:1; min-width: 80px; padding: 12px; font-size: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: 'Prompt'; }
+        .btn-qr { width: 100%; background: #000; color: #fff; padding: 18px; border-radius: 18px; font-weight: 700; margin-top: 25px; border: none; cursor: pointer; font-family: 'Prompt'; font-size: 16px; }
+        .btn-cash { width: 100%; background: transparent; border: 2.5px solid #16a34a; color: #16a34a; padding: 18px; border-radius: 18px; font-weight: 700; margin-top: 12px; cursor: pointer; font-family: 'Prompt'; font-size: 16px; }
     </style>
 </head>
 <body>
     <div id="staff-alert" class="alert-bar" onclick="clearCallAlert()" style="display:none;">โต๊ะ <span id="alert-table"></span> เรียกพนักงาน (คลิกเพื่อปิด)</div>
-    <div class="header">
-        <h1>WITHU Admin</h1>
-        <div>ยอดวันนี้: <b id="revenue" style="color:var(--accent); font-size:22px;">฿0</b></div>
+    <div style="display:flex; justify-content: space-between; align-items: baseline; margin-bottom: 35px;">
+        <h1 style="margin:0; font-weight:700;">WITHU Admin</h1>
+        <div style="text-align:right;">วันนี้: <b id="revenue" style="color:var(--accent); font-size:26px;">฿0</b></div>
     </div>
     
-    <div style="margin-bottom: 20px; display:flex; gap:10px;">
-        <button onclick="showSec('orders')" style="padding:10px 20px; border:none; background:#000; color:#fff; border-radius:4px; cursor:pointer; font-family:'Prompt';">ดูออเดอร์</button>
-        <button onclick="showSec('stock')" style="padding:10px 20px; border:none; background:#8b0000; color:#fff; border-radius:4px; cursor:pointer; font-family:'Prompt';">จัดการสต็อก</button>
+    <div style="margin-bottom: 25px;">
+        <button onclick="showSec('orders')" style="padding:12px 30px; border:none; background:#000; color:#fff; border-radius:15px; cursor:pointer; font-weight:700;">ออเดอร์</button>
+        <button onclick="showSec('stock')" style="padding:12px 30px; border:none; background:#8b0000; color:#fff; border-radius:15px; cursor:pointer; font-weight:700; margin-left:10px;">สต็อก</button>
     </div>
 
     <div id="container" class="grid"></div>
     <div id="stock-sec" style="display:none;" class="grid"></div>
 
+    <div id="modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;z-index:1000;align-items:center;justify-content:center;" onclick="this.style.display='none'"><div class="modal-box" style="background:#fff;padding:35px;border-radius:40px;text-align:center;max-width:400px;width:90%;" onclick="event.stopPropagation()"><h3 id="m-table" style="margin-top:0;"></h3><img id="m-qr" style="width:100%; margin: 20px 0;"><div id="m-total" style="font-size:36px;font-weight:700;"></div><button class="btn-qr" style="background:#16a34a;" id="m-confirm">ยืนยันได้รับเงินแล้ว</button></div></div>
+
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec";
+        const API_URL = "ใส่_API_URL_ของคุณที่นี่";
         let cAlertT = "";
 
         async function refresh() {
@@ -41,26 +45,33 @@
                 if(d.calls.length > 0) { cAlertT = d.calls[0][1]; document.getElementById('staff-alert').style.display = 'block'; document.getElementById('alert-table').innerText = cAlertT; }
                 else { document.getElementById('staff-alert').style.display = 'none'; }
 
-                const c = document.getElementById('container'); if(!d.orders.length){ c.innerHTML = "ไม่มีออเดอร์"; return; }
+                const c = document.getElementById('container'); if(!d.orders.length){ c.innerHTML = "ไม่มีออเดอร์ค้าง"; return; }
                 let groups = {}; d.orders.forEach(o => { if(!groups[o.table]) groups[o.table] = { items:[], total:0, rows:[], time:o.time }; groups[o.table].items.push(o); groups[o.table].total += parseFloat(o.total.replace(/,/g,'')); groups[o.table].rows.push(o.rowNum); });
+                
                 c.innerHTML = Object.keys(groups).map(t => `
                     <div class="card">
-                        <div style="display:flex;justify-content:space-between"><b>โต๊ะ ${t}</b><small>${groups[t].time}</small></div><hr style="border:0;border-top:1px solid #eee;margin:10px 0;">
-                        ${groups[t].items.map(i => `<div style="font-size:13px;margin-bottom:5px;">${i.qty}x ${i.menu}<br><small style="color:var(--blue)">${i.details} [${i.status}]</small></div>`).join('')}
-                        <div style="display:flex;margin-top:10px;"><button class="status-btn" onclick='upS(${JSON.stringify(groups[t].rows)},"กำลังทำ")'>กำลังทำ</button><button class="status-btn" onclick='upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ")'>รอเสิร์ฟ</button></div>
-                        <div style="font-size:22px;font-weight:600;text-align:right;margin:15px 0;">฿${groups[t].total.toLocaleString()}</div>
-                        <button class="btn-action" style="background:#16a34a; color:#fff;" onclick='pay("${t}",${JSON.stringify(groups[t].rows)})'>เสิร์ฟแล้ว / ปิดโต๊ะ</button>
+                        <div class="card-header"><b>โต๊ะ ${t}</b><small style="color:#999; font-size:14px;">${groups[t].time}</small></div>
+                        ${groups[t].items.map(i => `<div style="margin-bottom:15px; font-size:16px;"><div><b>${i.qty}x ${i.menu}</b> <span style="float:right">฿${i.total}</span></div><small style="color:var(--blue)">${i.details} [${i.status}]</small></div>`).join('')}
+                        <div class="status-row">
+                            <button class="s-btn" style="background:#FFF9C4; color:#856404;" onclick='upS(${JSON.stringify(groups[t].rows)},"กำลังทำ")'>เริ่มทำ</button>
+                            <button class="s-btn" style="background:#E8F5E9; color:#2E7D32;" onclick='upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ")'>พร้อมเสิร์ฟ</button>
+                            <button class="s-btn" style="background:#E3F2FD; color:#1565C0;" onclick='upS(${JSON.stringify(groups[t].rows)},"สำเร็จ")'>เสิร์ฟแล้ว</button>
+                        </div>
+                        <div style="font-size:36px;font-weight:700;text-align:right;margin:25px 0;">฿${groups[t].total.toLocaleString()}</div>
+                        <button class="btn-qr" onclick='shQR("${t}",${groups[t].total},${JSON.stringify(groups[t].rows)})'>เก็บเงิน (QR)</button>
+                        <button class="btn-cash" onclick='pay("${t}",${JSON.stringify(groups[t].rows)})'>ปิดโต๊ะ (รับเงินสด)</button>
                     </div>`).join('');
                 
-                let sh = "<h3>เมนู</h3>" + d.menu.map(m => `<div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:15px;"><span>${m[0]}</span><button class="status-btn" style="background:${m[5]=='หมด'?'#eee':'#000'};color:${m[5]=='หมด'?'#000':'#fff'}" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เปิด':'ปิด'}</button></div>`).join('');
-                sh += "<h3>ท็อปปิ้ง</h3>" + d.toppings.map(t => `<div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:15px;"><span>${t[0]}</span><button class="status-btn" style="background:${t[2]=='หมด'?'#eee':'#000'};color:${t[2]=='หมด'?'#000':'#fff'}" onclick="tgS('top','${t[0]}','${t[2]=='หมด'?'ปกติ':'หมด'}')">${t[2]=='หมด'?'เปิด':'ปิด'}</button></div>`).join('');
-                document.getElementById('stock-sec').innerHTML = sh;
+                let sh = "<h3>เมนู</h3>" + d.menu.map(m => `<div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px; padding:20px; border-radius:20px;"><span>${m[0]}</span><button class="s-btn" style="flex:none; width:100px; background:${m[5]=='หมด'?'#eee':'#000'};color:${m[5]=='หมด'?'#000':'#fff'}" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เปิดขาย':'ปิดของ'}</button></div>`).join('');
+                sh += "<h3>ท็อปปิ้ง</h3>" + d.toppings.map(t => `<div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px; padding:20px; border-radius:20px;"><span>${t[0]}</span><button class="s-btn" style="flex:none; width:100px; background:${t[2]=='หมด'?'#eee':'#000'};color:${t[2]=='หมด'?'#000':'#fff'}" onclick="tgS('top','${t[0]}','${t[2]=='หมด'?'ปกติ':'หมด'}')">${t[2]=='หมด'?'เปิดขาย':'ปิดของ'}</button></div>`).join('');
+                document.getElementById('stock-sec').innerHTML = `<h3 style="padding-left:10px;">จัดการของหมด</h3>${sh}`;
             } catch(e){}
         }
 
         function showSec(n) { document.getElementById('container').style.display=(n=='orders'?'grid':'none'); document.getElementById('stock-sec').style.display=(n=='stock'?'grid':'none'); }
         async function upS(r, s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
         async function tgS(type, name, status) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStock',type:type,name:name,status:status})}); refresh(); }
+        function shQR(t, a, r) { document.getElementById('m-table').innerText = "โต๊ะ "+t; document.getElementById('m-total').innerText = "฿"+a.toLocaleString(); document.getElementById('m-qr').src = `https://promptpay.io/0931805507/${a}.png`; document.getElementById('m-confirm').onclick = () => { document.getElementById('modal').style.display='none'; pay(t, r); }; document.getElementById('modal').style.display = 'flex'; }
         async function pay(t, r) { if(confirm("ปิดโต๊ะ "+t+"?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r})}); refresh(); }}
         async function clearCallAlert() { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'clearCall',table:cAlertT})}); refresh(); }
         setInterval(refresh, 5000); refresh();

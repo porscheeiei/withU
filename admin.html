@@ -2,29 +2,198 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        :root { --bg: #f9f9f9; --accent: #16a34a; --red: #8b0000; }
-        body { font-family: 'Prompt', sans-serif; background: var(--bg); padding: 20px; margin: 0; }
-        .alert-bar { background: var(--red); color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; cursor: pointer; font-size: 14px; }
-        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 25px; align-items: flex-end; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #eee; }
-        .status-btn { flex:1; padding: 8px; font-size: 12px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: #fff; margin: 2px; }
-        .btn-action { width: 100%; padding: 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; margin-top: 10px; font-family: 'Prompt'; }
+        :root { 
+            --bg: #fdfdfd; 
+            --accent: #10b981; 
+            --red: #d63031; 
+            --blue: #3b82f6;
+            --yellow: #f59e0b;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        body { 
+            font-family: 'Prompt', sans-serif; 
+            background: #f9fafb; 
+            color: var(--text-main);
+            margin: 0; 
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Alert Notification --- */
+        .alert-bar { 
+            background: var(--red); 
+            color: #fff; 
+            padding: 16px; 
+            border-radius: 16px; 
+            margin-bottom: 25px; 
+            text-align: center; 
+            cursor: pointer; 
+            font-size: 15px; 
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(214, 48, 49, 0.2);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- Header Section --- */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 35px;
+            padding: 10px 5px;
+        }
+        .header h1 { 
+            margin: 0; 
+            font-weight: 800; 
+            font-size: 26px; 
+            letter-spacing: -0.5px;
+        }
+        .revenue-pill {
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid #f3f4f6;
+        }
+        .revenue-pill small { color: var(--text-sub); font-size: 12px; display: block; }
+        .revenue-pill b { font-size: 20px; color: var(--accent); }
+
+        /* --- Navigation Tabs --- */
+        .nav-container { display: flex; gap: 10px; margin-bottom: 30px; }
+        .nav-btn { 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 12px; 
+            font-family: 'Prompt'; 
+            font-weight: 600; 
+            font-size: 14px;
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+        .btn-orders { background: var(--text-main); color: #fff; }
+        .btn-stock { background: #fff; color: var(--text-main); border: 1px solid #e5e7eb; }
+        .btn-orders:hover, .btn-stock:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* --- Grid & Cards --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; }
+        .card { 
+            background: #fff; 
+            border-radius: 24px; 
+            padding: 28px; 
+            border: 1px solid rgba(229, 231, 235, 0.5); 
+            box-shadow: var(--card-shadow);
+            transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); }
+
+        .card-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .table-num { font-size: 20px; font-weight: 700; }
+        .order-time { color: var(--text-sub); font-size: 13px; }
+
+        .item-list { margin: 15px 0; border-top: 1px dashed #f3f4f6; padding-top: 15px; }
+        .order-item { margin-bottom: 10px; font-size: 14px; }
+        .order-item b { color: var(--text-main); }
+        .order-item small { color: var(--blue); font-weight: 500; display: block; margin-top: 2px; }
+
+        /* --- Status Buttons --- */
+        .status-group { display: flex; gap: 6px; margin: 20px 0; }
+        .status-btn { 
+            flex: 1; 
+            padding: 10px; 
+            font-size: 12px; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-family: 'Prompt'; 
+            font-weight: 600; 
+            transition: 0.2s;
+        }
+        .s-cooking { background: #fef3c7; color: #92400e; }
+        .s-waiting { background: #dcfce7; color: #166534; }
+        .status-btn:active { transform: scale(0.96); }
+
+        .total-price { 
+            font-size: 28px; 
+            font-weight: 700; 
+            text-align: right; 
+            margin: 15px 0; 
+            color: var(--text-main);
+        }
+
+        .btn-action { 
+            width: 100%; 
+            padding: 15px; 
+            border-radius: 14px; 
+            border: none; 
+            font-weight: 700; 
+            font-size: 15px;
+            cursor: pointer; 
+            font-family: 'Prompt';
+            transition: 0.3s;
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        }
+        .btn-action:hover { opacity: 0.9; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+
+        /* --- Stock Section --- */
+        #stock-sec h3 { 
+            grid-column: 1 / -1; 
+            margin: 20px 0 10px 5px; 
+            font-size: 18px; 
+            border-left: 4px solid var(--text-main);
+            padding-left: 15px;
+        }
+        .stock-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 18px 24px;
+            border-radius: 18px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 10px;
+        }
+        .stock-name { font-weight: 500; font-size: 15px; }
+        .toggle-btn { 
+            padding: 8px 20px; 
+            border-radius: 10px; 
+            font-size: 13px; 
+            font-weight: 600; 
+            border: none; 
+            cursor: pointer;
+            min-width: 80px;
+            font-family: 'Prompt';
+        }
     </style>
 </head>
 <body>
-    <div id="staff-alert" class="alert-bar" onclick="clearCallAlert()" style="display:none;">โต๊ะ <span id="alert-table"></span> เรียกพนักงาน (คลิกเพื่อปิด)</div>
+    <div id="staff-alert" class="alert-bar" onclick="clearCallAlert()" style="display:none;">
+        ⚠️ โต๊ะ <span id="alert-table"></span> เรียกพนักงาน (คลิกเพื่อปิด)
+    </div>
+
     <div class="header">
         <h1>WITHU Admin</h1>
-        <div>ยอดวันนี้: <b id="revenue">฿0</b></div>
+        <div class="revenue-pill">
+            <small>ยอดขายวันนี้</small>
+            <b id="revenue">฿0</b>
+        </div>
     </div>
     
-    <div style="margin-bottom: 20px;">
-        <button onclick="showSec('orders')" style="padding:10px 20px; border:none; background:#000; color:#fff; border-radius:4px; cursor:pointer;">ดูออเดอร์</button>
-        <button onclick="showSec('stock')" style="padding:10px 20px; border:none; background:#8b0000; color:#fff; border-radius:4px; cursor:pointer;">จัดการสต็อก</button>
+    <div class="nav-container">
+        <button id="nav-orders" onclick="showSec('orders')" class="nav-btn btn-orders">ดูออเดอร์</button>
+        <button id="nav-stock" onclick="showSec('stock')" class="nav-btn btn-stock">จัดการสต็อก</button>
     </div>
 
     <div id="container" class="grid"></div>
@@ -38,32 +207,75 @@
             try {
                 const r = await fetch(API_URL + "?action=getAdminData"); const d = await r.json();
                 document.getElementById('revenue').innerText = "฿" + d.summary.revenue.toLocaleString();
-                if(d.calls.length > 0) { cAlertT = d.calls[0][1]; document.getElementById('staff-alert').style.display = 'block'; document.getElementById('alert-table').innerText = cAlertT; }
-                else { document.getElementById('staff-alert').style.display = 'none'; }
+                
+                if(d.calls.length > 0) { 
+                    cAlertT = d.calls[0][1]; 
+                    document.getElementById('staff-alert').style.display = 'block'; 
+                    document.getElementById('alert-table').innerText = cAlertT; 
+                } else { 
+                    document.getElementById('staff-alert').style.display = 'none'; 
+                }
 
-                const c = document.getElementById('container'); if(!d.orders.length){ c.innerHTML = "ไม่มีออเดอร์"; return; }
+                const c = document.getElementById('container'); if(!d.orders.length){ c.innerHTML = "<div style='grid-column: 1/-1; text-align: center; padding: 100px; color: #9ca3af;'>ไม่มีออเดอร์ค้างในขณะนี้</div>"; return; }
                 let groups = {}; d.orders.forEach(o => { if(!groups[o.table]) groups[o.table] = { items:[], total:0, rows:[], time:o.time }; groups[o.table].items.push(o); groups[o.table].total += parseFloat(o.total.replace(/,/g,'')); groups[o.table].rows.push(o.rowNum); });
+                
                 c.innerHTML = Object.keys(groups).map(t => `
                     <div class="card">
-                        <div style="display:flex;justify-content:space-between"><b>โต๊ะ ${t}</b><small>${groups[t].time}</small></div><hr style="border:0;border-top:1px solid #eee;margin:10px 0;">
-                        ${groups[t].items.map(i => `<div style="font-size:13px;margin-bottom:5px;">${i.qty}x ${i.menu}<br><small style="color:#888">${i.details} [${i.status}]</small></div>`).join('')}
-                        <div style="display:flex;margin-top:10px;"><button class="status-btn" onclick='upS(${JSON.stringify(groups[t].rows)},"กำลังทำ")'>กำลังทำ</button><button class="status-btn" onclick='upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ")'>รอเสิร์ฟ</button></div>
-                        <div style="font-size:22px;font-weight:600;text-align:right;margin:15px 0;">฿${groups[t].total.toLocaleString()}</div>
-                        <button class="btn-action" style="background:#16a34a; color:#fff;" onclick='pay("${t}",${JSON.stringify(groups[t].rows)})'>เสิร์ฟแล้ว / ปิดโต๊ะ</button>
+                        <div class="card-meta">
+                            <span class="table-num">โต๊ะ ${t}</span>
+                            <span class="order-time">${groups[t].time}</span>
+                        </div>
+                        <div class="item-list">
+                            ${groups[t].items.map(i => `
+                                <div class="order-item">
+                                    <b>${i.qty}x ${i.menu}</b>
+                                    <small>${i.details} [${i.status}]</small>
+                                </div>`).join('')}
+                        </div>
+                        <div class="status-group">
+                            <button class="status-btn s-cooking" onclick='upS(${JSON.stringify(groups[t].rows)},"กำลังทำ")'>กำลังทำ</button>
+                            <button class="status-btn s-waiting" onclick='upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ")'>รอเสิร์ฟ</button>
+                        </div>
+                        <div class="total-price">฿${groups[t].total.toLocaleString()}</div>
+                        <button class="btn-action" onclick='pay("${t}",${JSON.stringify(groups[t].rows)})'>เสิร์ฟแล้ว / ปิดโต๊ะ</button>
                     </div>`).join('');
                 
-                let sh = "<h3>เมนู</h3>" + d.menu.map(m => `<div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span>${m[0]}</span><button class="status-btn" style="background:${m[5]=='หมด'?'#eee':'#000'};color:${m[5]=='หมด'?'#000':'#fff'}" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เปิด':'ปิด'}</button></div>`).join('');
-                sh += "<h3>ท็อปปิ้ง</h3>" + d.toppings.map(t => `<div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span>${t[0]}</span><button class="status-btn" style="background:${t[2]=='หมด'?'#eee':'#000'};color:${t[2]=='หมด'?'#000':'#fff'}" onclick="tgS('top','${t[0]}','${t[2]=='หมด'?'ปกติ':'หมด'}')">${t[2]=='หมด'?'เปิด':'ปิด'}</button></div>`).join('');
+                let sh = "<h3>เมนูอาหาร</h3>" + d.menu.map(m => `
+                    <div class="stock-card">
+                        <span class="stock-name">${m[0]}</span>
+                        <button class="toggle-btn" style="background:${m[5]=='หมด'?'#f3f4f6':'#1f2937'};color:${m[5]=='หมด'?'#1f2937':'#fff'}" 
+                        onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">
+                        ${m[5]=='หมด'?'เปิดขาย':'ปิด (หมด)'}</button>
+                    </div>`).join('');
+                
+                sh += "<h3>ท็อปปิ้ง</h3>" + d.toppings.map(t => `
+                    <div class="stock-card">
+                        <span class="stock-name">${t[0]}</span>
+                        <button class="toggle-btn" style="background:${t[2]=='หมด'?'#f3f4f6':'#1f2937'};color:${t[2]=='หมด'?'#1f2937':'#fff'}" 
+                        onclick="tgS('top','${t[0]}','${t[2]=='หมด'?'ปกติ':'หมด'}')">
+                        ${t[2]=='หมด'?'เปิดขาย':'ปิด (หมด)'}</button>
+                    </div>`).join('');
                 document.getElementById('stock-sec').innerHTML = sh;
             } catch(e){}
         }
 
-        function showSec(n) { document.getElementById('container').style.display=(n=='orders'?'grid':'none'); document.getElementById('stock-sec').style.display=(n=='stock'?'grid':'none'); }
+        function showSec(n) { 
+            const isOrders = n === 'orders';
+            document.getElementById('container').style.display = isOrders ? 'grid' : 'none'; 
+            document.getElementById('stock-sec').style.display = isOrders ? 'none' : 'grid'; 
+            
+            // Toggle Active Tab Style
+            document.getElementById('nav-orders').className = `nav-btn ${isOrders ? 'btn-orders' : 'btn-stock'}`;
+            document.getElementById('nav-stock').className = `nav-btn ${!isOrders ? 'btn-orders' : 'btn-stock'}`;
+        }
+
         async function upS(r, s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
         async function tgS(type, name, status) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStock',type:type,name:name,status:status})}); refresh(); }
-        async function pay(t, r) { if(confirm("ปิดโต๊ะ "+t+"?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r})}); refresh(); }}
+        async function pay(t, r) { if(confirm("ยืนยันการเสิร์ฟและปิดโต๊ะ "+t+"?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r})}); refresh(); }}
         async function clearCallAlert() { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'clearCall',table:cAlertT})}); refresh(); }
-        setInterval(refresh, 5000); refresh();
+        
+        setInterval(refresh, 5000); 
+        refresh();
     </script>
 </body>
 </html>

@@ -5,78 +5,217 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #000; --bg: #FAFAFA; --card: #FFF; --border: #E8E8E8; --text: #333; --sub: #888; --darkred: #8B0000; }
-        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; }
-        .app-container { width: 100%; max-width: 550px; margin: 0 auto; padding: 20px 15px 120px 15px; box-sizing: border-box; }
-        
-        /* Header & Table Badge */
-        .top-bar { background: var(--card); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-        .table-badge { background: #000; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        :root { 
+            --p: #1a1a1a; 
+            --bg: #f8f9fa; 
+            --card: #ffffff; 
+            --border: #f0f0f0; 
+            --text: #2d3436; 
+            --sub: #b2bec3; 
+            --darkred: #d63031; 
+            --blue: #0984e3;
+            --shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
 
-        /* Call Button Minimal */
-        .call-btn { position: fixed; top: 70px; right: 15px; background: var(--darkred); color: #fff; border: none; padding: 6px 15px; border-radius: 4px; font-size: 11px; font-weight: 500; z-index: 99; cursor: pointer; letter-spacing: 0.5px; }
+        body { 
+            font-family: 'Prompt', sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            color: var(--text); 
+            -webkit-font-smoothing: antialiased; 
+        }
 
-        /* Table Overlay */
+        .app-container { 
+            width: 100%; 
+            max-width: 550px; 
+            margin: 0 auto; 
+            padding: 0 15px 140px 15px; 
+            box-sizing: border-box; 
+        }
+
+        /* --- Header & Top Bar --- */
+        .top-bar { 
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+        .brand-name { font-weight: 700; font-size: 20px; letter-spacing: 0.5px; }
+        .table-badge { 
+            background: var(--p); 
+            color: #fff; 
+            padding: 4px 14px; 
+            border-radius: 50px; 
+            font-size: 13px; 
+            font-weight: 500; 
+        }
+
+        /* --- Minimal Call Button --- */
+        .call-btn { 
+            background: var(--darkred); 
+            color: #fff; 
+            border: none; 
+            padding: 6px 14px; 
+            border-radius: 50px; 
+            font-size: 11px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+        .call-btn:active { transform: scale(0.95); opacity: 0.8; }
+
+        /* --- Table Overlay --- */
         #table-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .table-box { background: var(--card); padding: 40px 30px; border-radius: 12px; text-align: center; width: 80%; border: 1px solid var(--border); }
-        .table-box h2 { margin-bottom: 25px; font-weight: 500; letter-spacing: 2px; }
-        select { width: 100%; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; font-family: 'Prompt'; outline: none; appearance: none; text-align-last: center; }
-        .btn-black { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 8px; font-weight: 500; font-size: 16px; cursor: pointer; }
+        .table-box { 
+            background: var(--card); 
+            padding: 50px 30px; 
+            border-radius: 30px; 
+            text-align: center; 
+            width: 85%; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.05); 
+        }
+        .table-box h2 { margin-bottom: 30px; font-weight: 700; color: var(--p); font-size: 28px; }
+        select { 
+            width: 100%; padding: 16px; border-radius: 15px; border: 1px solid var(--border); 
+            margin-bottom: 25px; font-family: 'Prompt'; outline: none; appearance: none; 
+            text-align-last: center; background: #fafafa; font-size: 16px;
+        }
+        .btn-black { 
+            width: 100%; background: var(--p); color: #fff; border: none; padding: 18px; 
+            border-radius: 15px; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.3s;
+        }
 
-        /* Category Nav */
-        .category-nav { display: flex; overflow-x: auto; gap: 8px; padding: 15px 0; scrollbar-width: none; }
-        .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 6px 18px; border-radius: 4px; font-size: 13px; white-space: nowrap; cursor: pointer; transition: 0.2s; color: var(--sub); }
-        .nav-pill.active { border-color: #000; color: #000; font-weight: 500; }
+        /* --- Category Nav --- */
+        .category-nav { display: flex; overflow-x: auto; gap: 10px; padding: 20px 0; scrollbar-width: none; }
+        .category-nav::-webkit-scrollbar { display: none; }
+        .nav-pill { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            padding: 8px 20px; 
+            border-radius: 50px; 
+            font-size: 14px; 
+            white-space: nowrap; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            color: var(--sub);
+            font-weight: 500;
+        }
+        .nav-pill.active { background: var(--p); color: #fff; border-color: var(--p); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
-        /* Menu Items */
-        .menu-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; border: 1px solid var(--border); }
-        .menu-img { width: 85px; height: 85px; object-fit: cover; border-radius: 8px; margin-right: 15px; background: #f9f9f9; }
+        /* --- Menu Items --- */
+        .menu-item { 
+            background: var(--card); 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            border: 1px solid var(--border); 
+            box-shadow: var(--shadow);
+            transition: 0.3s;
+        }
+        .menu-img { width: 95px; height: 95px; object-fit: cover; border-radius: 15px; margin-right: 20px; background: #f9f9f9; }
         .menu-info { flex: 1; }
-        .menu-info h3 { margin: 0 0 5px 0; font-size: 16px; font-weight: 500; }
-        .price { font-weight: 600; font-size: 15px; margin-bottom: 10px; }
-        .sold-out { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
-        .sold-out-text { color: red; font-size: 11px; margin-left: 5px; font-weight: 400; }
-
-        /* Sweetness & Options */
-        .sweet-selector { display: flex; gap: 4px; margin: 10px 0; }
-        .sweet-btn { border: 1px solid var(--border); padding: 5px 0; border-radius: 4px; font-size: 11px; cursor: pointer; background: #fff; flex: 1; text-align: center; color: var(--sub); }
-        .sweet-btn.active { background: #000; color: #fff; border-color: #000; }
+        .menu-info h3 { margin: 0 0 4px 0; font-size: 17px; font-weight: 600; }
+        .price { font-weight: 700; font-size: 18px; color: var(--p); margin-bottom: 12px; }
         
-        .smoothie-btn { border: 1px solid var(--border); padding: 5px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; display: inline-block; margin-bottom: 10px; color: var(--sub); }
-        .smoothie-btn.active { border-color: #000; color: #000; font-weight: 500; background: #f9f9f9; }
+        .sold-out { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
+        .sold-out-text { color: var(--darkred); font-size: 12px; font-weight: 600; margin-left: 5px; }
 
-        /* Accordion Toppings */
-        .topping-toggle { font-size: 12px; color: var(--blue); cursor: pointer; margin-top: 8px; display: inline-block; text-decoration: underline; text-underline-offset: 3px; }
-        .topping-drawer { max-height: 0; overflow: hidden; transition: 0.3s ease-in-out; }
-        .topping-drawer.open { max-height: 500px; padding-top: 10px; }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .option-chip { border: 1px solid var(--border); padding: 6px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; color: var(--sub); text-align: center; }
-        .option-chip.active { border-color: #000; color: #000; font-weight: 500; background: #f9f9f9; }
+        /* --- Sweetness & Options --- */
+        .sweet-selector { display: flex; gap: 4px; margin: 12px 0; }
+        .sweet-btn { 
+            border: 1px solid var(--border); padding: 7px 0; border-radius: 8px; 
+            font-size: 11px; cursor: pointer; background: #f9f9f9; flex: 1; 
+            text-align: center; color: var(--sub); font-weight: 600; transition: 0.2s;
+        }
+        .sweet-btn.active { background: var(--p); color: #fff; border-color: var(--p); }
+        
+        .smoothie-btn { 
+            border: 1px solid var(--border); padding: 6px 16px; border-radius: 50px; 
+            font-size: 11px; cursor: pointer; display: inline-block; margin-bottom: 10px; 
+            color: var(--sub); font-weight: 600; background: #f9f9f9;
+        }
+        .smoothie-btn.active { border-color: var(--p); color: var(--p); background: #fff; }
 
-        /* Add Button */
-        .btn-add { background: #000; color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 500; width: 100%; margin-top: 15px; font-size: 14px; cursor: pointer; }
+        /* --- Accordion Toppings --- */
+        .topping-toggle { font-size: 12px; color: var(--blue); cursor: pointer; margin-top: 10px; font-weight: 600; display: inline-block; }
+        .topping-drawer { max-height: 0; overflow: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .topping-drawer.open { max-height: 500px; padding-top: 12px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .option-chip { 
+            border: 1px solid var(--border); padding: 8px; border-radius: 10px; 
+            font-size: 11px; cursor: pointer; color: var(--sub); text-align: center; 
+            background: #fff; font-weight: 500; transition: 0.2s;
+        }
+        .option-chip.active { border-color: var(--p); color: var(--p); font-weight: 600; background: #fafafa; }
 
-        /* Cart Bar */
-        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; padding: 20px; display: none; box-sizing: border-box; justify-content: space-between; align-items: center; z-index: 900; color: #fff; }
-        .cart-btn { background: #fff; color: #000; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; font-size: 14px; }
+        /* --- Add Button --- */
+        .btn-add { 
+            background: var(--p); color: #fff; border: none; padding: 14px; 
+            border-radius: 12px; font-weight: 600; width: 100%; margin-top: 15px; 
+            font-size: 15px; cursor: pointer; transition: 0.3s;
+        }
+        .btn-add:active { transform: scale(0.98); }
 
-        /* Status Tracker Minimal */
-        .status-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 30px 20px; text-align: center; }
-        .stepper-mini { display: flex; justify-content: space-between; margin-bottom: 30px; border-top: 1px solid var(--border); padding-top: 20px; }
-        .step-mini { flex: 1; font-size: 10px; color: var(--sub); }
-        .step-mini.active { color: #000; font-weight: 600; }
-        .status-list-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+        /* --- Cart Bar --- */
+        .cart-bar { 
+            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--p); 
+            padding: 20px 25px; display: none; box-sizing: border-box; 
+            justify-content: space-between; align-items: center; z-index: 1100; 
+            color: #fff; border-radius: 30px 30px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+        }
+        .cart-btn { 
+            background: #fff; color: var(--p); border: none; padding: 12px 24px; 
+            border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer;
+        }
+
+        /* --- Status Tracker Modern --- */
+        .status-card { 
+            background: var(--card); border: 1px solid var(--border); 
+            border-radius: 25px; padding: 40px 20px; text-align: center; 
+            box-shadow: var(--shadow);
+        }
+        .stepper-mini { display: flex; justify-content: space-between; margin-bottom: 40px; position: relative; padding: 0 10px; }
+        .stepper-mini::before { content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px; background: var(--border); z-index: 1; }
+        
+        .step-mini { 
+            position: relative; z-index: 2; width: 32px; height: 32px; 
+            background: #fff; border: 2px solid var(--border); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 12px; font-weight: 700; color: var(--sub); transition: 0.3s;
+        }
+        .step-mini.active { background: var(--p); border-color: var(--p); color: #fff; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        .step-label-mini { position: absolute; top: 40px; font-size: 10px; white-space: nowrap; color: var(--sub); font-weight: 600; }
+        .step-mini.active + .step-label-mini { color: var(--p); }
+
+        .status-list-item { 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; 
+        }
     </style>
 </head>
 <body>
 
-<button class="call-btn" id="call-btn-ui" style="display:none;" onclick="callStaff()">เรียกพนักงาน</button>
+<div id="app-header" class="top-bar" style="display:none;">
+    <div class="brand-name">WITHU</div>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <button class="call-btn" onclick="callStaff()">เรียกพนักงาน</button>
+        <span id="display-table" class="table-badge"></span>
+    </div>
+</div>
 
 <div id="table-overlay">
     <div class="table-box">
         <h2>WITHU</h2>
         <select id="table-select">
-            <option value="" disabled selected>เลือกโต๊ะ</option>
+            <option value="" disabled selected>เลือกเลขโต๊ะ</option>
             <script>for(let i=1;i<=10;i++) document.write(`<option value="${i}">โต๊ะ ${i}</option>`);</script>
         </select>
         <button class="btn-black" onclick="lockTable()">เข้าสู่หน้าเมนู</button>
@@ -84,24 +223,20 @@
 </div>
 
 <div id="app-content" style="display:none;">
-    <div class="top-bar">
-        <span style="letter-spacing:1px; font-weight:600;">WITHU</span>
-        <span id="display-table" class="table-badge"></span>
-    </div>
     <div class="app-container">
         <div id="category-nav" class="category-nav"></div>
-        <div id="loading" style="text-align:center; padding:50px; font-size:12px; color:#888;">กำลังจัดเตรียมเมนู...</div>
+        <div id="loading" style="text-align:center; padding:50px; font-size:14px; color:#999;">กำลังจัดเตรียมเมนูพรีเมียมให้คุณ...</div>
         <div id="main-content"></div> 
     </div>
 </div>
 
 <div id="cart-bar" class="cart-bar">
-    <div>ตะกร้า (<span id="cart-count">0</span>)</div>
+    <div style="font-weight:600; font-size: 15px;">ตะกร้า (<span id="cart-count">0</span>)</div>
     <button onclick="openReceipt()" class="cart-btn">สรุปรายการ ฿<span id="cart-sum">0</span></button>
 </div>
 
-<div id="modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;z-index:2000;align-items:flex-end;justify-content:center;" onclick="if(event.target==this)this.style.display='none'">
-    <div id="modal-body" style="background:#fff;width:100%;max-width:500px;border-radius:15px 15px 0 0;padding:25px;box-sizing:border-box;"></div>
+<div id="modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;z-index:2000;align-items:flex-end;justify-content:center;" onclick="if(event.target==this)this.style.display='none'">
+    <div id="modal-body" style="background:#fff;width:100%;max-width:500px;border-radius:30px 30px 0 0;padding:30px;box-sizing:border-box;box-shadow: 0 -10px 40px rgba(0,0,0,0.1);"></div>
 </div>
 
 <script>
@@ -113,8 +248,10 @@
     function lockTable() {
         let sel = document.getElementById("table-select"); if(!sel.value) return;
         currentTable = sel.value; document.getElementById("display-table").innerText = "โต๊ะ " + currentTable;
-        document.getElementById("table-overlay").style.display = "none"; document.getElementById("app-content").style.display = "block";
-        document.getElementById("call-btn-ui").style.display = "block"; loadMenu();
+        document.getElementById("table-overlay").style.display = "none"; 
+        document.getElementById("app-content").style.display = "block";
+        document.getElementById("app-header").style.display = "flex"; 
+        loadMenu();
     }
 
     function loadMenu() {
@@ -142,12 +279,12 @@
             h += `<div class="menu-item ${isAvail ? '' : 'sold-out'}">
                 <img src="${r[4]||''}" class="menu-img" onerror="this.src='https://via.placeholder.com/100'">
                 <div class="menu-info">
-                    <h3>${r[0]} ${isAvail ? '' : '<span class="sold-out-text">สินค้าหมด</span>'}</h3>
+                    <h3>${r[0]} ${isAvail ? '' : '<span class="sold-out-text">หมด</span>'}</h3>
                     <div class="price">฿${r[1]}</div>
                     ${isAvail && isD ? `
                     <div class="sweet-selector">${['0%','25%','50%','75%','100%'].map(l=>`<div class="sweet-btn ${currentS[idx]==l?'active':''}" onclick="setS(${idx},'${l}')">${l}</div>`).join('')}</div>
                     ${showS ? `<div class="smoothie-btn ${itemOpt[idx].smoothie?'active':''}" onclick="tS(${idx})">ปั่น (+10)</div>` : ''}
-                    <div class="topping-toggle" onclick="toggleDrawer(${idx})">${isExp ? 'ปิดท็อปปิ้ง' : 'เลือกท็อปปิ้งเพิ่มเติม'}</div>
+                    <div class="topping-toggle" onclick="toggleDrawer(${idx})">${isExp ? 'ปิดท็อปปิ้ง' : 'เพิ่มท็อปปิ้งเพิ่มเติม'}</div>
                     <div class="topping-drawer ${isExp ? 'open' : ''}">
                         <div class="options-grid">
                             ${toppingsData.map(t => {
@@ -188,10 +325,10 @@
     }
 
     function openReceipt() {
-        let h = `<h3 style="margin:0 0 20px 0; font-weight:500;">รายการอาหาร</h3>`;
-        cart.forEach((i,idx) => h += `<div style="display:flex;justify-content:space-between;margin-bottom:15px; font-size:14px;"><span><b>${i.name}</b><br><small style="color:#888">${i.sweetness}</small></span><span>฿${i.total} <span style="color:red; margin-left:12px; cursor:pointer;" onclick="rem(${idx})">ยกเลิก</span></span></div>`);
-        h += `<div style="border-top:1px solid #eee; padding-top:15px; margin-top:15px; display:flex; justify-content:space-between; font-weight:600; font-size:18px;"><span>ยอดรวม</span><span>฿${cart.reduce((s,i)=>s+i.total,0).toLocaleString()}</span></div>`;
-        h += `<button class="btn-black" style="margin-top:25px;" onclick="sub()">ยืนยันสั่งอาหาร</button>`;
+        let h = `<h3 style="margin:0 0 25px 0; font-weight:700; font-size:22px;">รายการอาหาร</h3>`;
+        cart.forEach((i,idx) => h += `<div style="display:flex;justify-content:space-between;margin-bottom:18px; font-size:15px;"><span><b>${i.name}</b><br><small style="color:#999">${i.sweetness}</small></span><span style="font-weight:600;">฿${i.total} <span style="color:var(--darkred); margin-left:12px; cursor:pointer; font-weight:400;" onclick="rem(${idx})">ยกเลิก</span></span></div>`);
+        h += `<div style="border-top:1px solid #eee; padding-top:20px; margin-top:20px; display:flex; justify-content:space-between; font-weight:700; font-size:20px;"><span>ยอดรวม</span><span>฿${cart.reduce((s,i)=>s+i.total,0).toLocaleString()}</span></div>`;
+        h += `<button class="btn-black" style="margin-top:30px; padding:20px; border-radius:18px;" onclick="sub()">ยืนยันสั่งอาหาร</button>`;
         document.getElementById('modal-body').innerHTML = h; document.getElementById('modal').style.display = 'flex';
     }
 
@@ -200,17 +337,21 @@
 
     function showStatus() {
         document.getElementById('modal').style.display='none';
+        document.getElementById('app-header').style.display='none';
         document.getElementById('app-content').innerHTML = `
-            <div class="app-container"><div class="status-card">
-                <h3 style="font-weight:500;">โต๊ะ ${currentTable}</h3>
-                <div id="stat-list" style="margin:25px 0; text-align:left;"></div>
+            <div class="app-container" style="padding-top:40px;"><div class="status-card">
+                <h3 style="font-weight:700; font-size:24px; margin-bottom:40px;">โต๊ะ ${currentTable}</h3>
+                
                 <div class="stepper-mini">
-                    <div class="step-mini" id="st-1">1 รับออเดอร์</div>
-                    <div class="step-mini" id="st-2">2 กำลังทำ</div>
-                    <div class="step-mini" id="st-3">3 รอเสิร์ฟ</div>
-                    <div class="step-mini" id="st-4">4 เรียบร้อย</div>
+                    <div class="step-mini" id="st-1">1<span class="step-label-mini">รับออเดอร์</span></div>
+                    <div class="step-mini" id="st-2">2<span class="step-label-mini">กำลังทำ</span></div>
+                    <div class="step-mini" id="st-3">3<span class="step-label-mini">รอเสิร์ฟ</span></div>
+                    <div class="step-mini" id="st-4">4<span class="step-label-mini">เรียบร้อย</span></div>
                 </div>
-                <button class="btn-black" style="background:#f1f5f9; color:#000; font-size:13px;" onclick="location.reload()">สั่งเพิ่ม</button>
+
+                <div id="stat-list" style="margin:60px 0 30px 0; text-align:left;"></div>
+                
+                <button class="btn-black" style="background:#f1f3f5; color:#2d3436; font-size:14px; border-radius:15px;" onclick="location.reload()">กลับหน้าหลัก / สั่งเพิ่ม</button>
             </div></div>`;
         chk(); sInterval = setInterval(chk, 5000);
     }
@@ -221,11 +362,11 @@
         const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "เสิร์ฟเรียบร้อย":4};
         let min = d[0].status; d.forEach(o => { if (p[o.status] < p[min]) min = o.status; });
         upS(p[min]);
-        document.getElementById('stat-list').innerHTML = d.map(o => `<div class="status-list-item"><span>${o.qty}x ${o.menu}</span><b style="color:#2563eb">${o.status}</b></div>`).join('');
+        document.getElementById('stat-list').innerHTML = d.map(o => `<div class="status-list-item"><span>${o.qty}x ${o.menu}</span><b style="color:var(--blue)">${o.status}</b></div>`).join('');
     }
 
     function upS(s) { for(let i=1;i<=4;i++) document.getElementById('st-'+i).classList.toggle('active',i<=s); }
-    function callStaff() { if(confirm("ต้องการเรียกพนักงานใช่ไหมคะ?")) { fetch(API_URL,{method:'POST',body:JSON.stringify({action:'callStaff',table:currentTable,reason:'ทั่วไป'})}); alert("ส่งสัญญาณแล้วค่ะ!"); } }
+    function callStaff() { if(confirm("ต้องการเรียกพนักงานใช่ไหมคะ?")) { fetch(API_URL,{method:'POST',body:JSON.stringify({action:'callStaff',table:currentTable,reason:'ทั่วไป'})}); alert("ส่งสัญญาณแล้วค่ะ พนักงานกำลังไปดูแลท่าน"); } }
 </script>
 </body>
 </html>

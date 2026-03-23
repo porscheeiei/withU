@@ -4,304 +4,76 @@
   <meta charset="UTF-8">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WITHU Admin - ระบบจัดการร้าน</title>
   <style>
-    :root { 
-      --bg: #f8fafc; 
-      --text: #1e293b; 
-      --border: #e2e8f0; 
-      --accent: #16a34a; 
-      --blue: #2563eb; 
-      --danger: #ef4444;
-      --gray: #64748b;
-    }
-    
-    body { 
-      font-family: 'Prompt', sans-serif; 
-      background: var(--bg); 
-      color: var(--text); 
-      padding: 20px; 
-      margin: 0; 
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .container { max-width: 1200px; margin: 0 auto; }
-
-    .header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: flex-end; 
-      margin-bottom: 30px; 
-      border-bottom: 2px solid var(--border); 
-      padding-bottom: 15px; 
-    }
-    h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-    
-    .summary-card {
-      background: #fff;
-      padding: 12px 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      text-align: right;
-      border-left: 4px solid var(--accent);
-    }
-    .summary-label { font-size: 12px; color: #64748b; font-weight: 600; }
-    .summary-val { font-size: 22px; font-weight: 700; color: var(--text); }
-
-    .tables-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-      gap: 20px; 
-    }
-
-    .card { 
-      background: #fff; 
-      border-radius: 20px; 
-      padding: 24px; 
-      border: 1px solid var(--border); 
-      box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
-      display: flex;
-      flex-direction: column;
-      transition: 0.2s;
-    }
-    
-    .card-header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 15px;
-    }
-    .table-badge { font-size: 20px; font-weight: 700; color: var(--danger); }
-    .time-badge { font-size: 11px; color: #94a3b8; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; }
-
-    .items-container { flex-grow: 1; margin-bottom: 15px; }
-    .item-row { 
-      display: flex; 
-      justify-content: space-between; 
-      padding: 8px 0; 
-      border-bottom: 1px dashed #f1f5f9; 
-    }
-    .item-info { font-size: 15px; }
-    .item-details { font-size: 12px; color: var(--blue); font-weight: 500; margin-top: 2px; }
-    .item-price { font-weight: 600; font-size: 15px; }
-
-    .total-area { 
-      background: #f8fafc; 
-      padding: 12px; 
-      border-radius: 12px; 
-      text-align: right; 
-      margin-top: 10px;
-    }
-    .total-label { font-size: 13px; color: #64748b; }
-    .total-val { font-size: 26px; font-weight: 700; color: var(--text); }
-
-    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
-    .btn { 
-      border: none; 
-      padding: 12px; 
-      border-radius: 10px; 
-      font-family: 'Prompt'; 
-      font-weight: 600; 
-      cursor: pointer; 
-      transition: 0.2s; 
-      font-size: 14px; 
-    }
-    .btn-qr { background: #000; color: #fff; grid-column: span 1; }
-    .btn-print { background: var(--gray); color: #fff; grid-column: span 1; }
-    .btn-cash { background: #fff; border: 2px solid var(--accent); color: var(--accent); grid-column: span 2; }
-    .btn:active { transform: scale(0.98); opacity: 0.9; }
-
-    .modal { 
-      position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
-      display: none; align-items: center; justify-content: center; z-index: 1000; 
-    }
-    .modal-box { 
-      background: #fff; padding: 30px; border-radius: 24px; text-align: center; 
-      max-width: 360px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
-    }
+    :root { --bg: #f8fafc; --text: #1e293b; --accent: #16a34a; --blue: #2563eb; }
+    body { font-family: 'Prompt', sans-serif; background: var(--bg); padding: 20px; margin: 0; }
+    .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; }
+    .tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .card { background: #fff; border-radius: 20px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+    .btn { width: 100%; border: none; padding: 12px; border-radius: 10px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; margin-top: 10px; }
+    .btn-qr { background: #000; color: #fff; }
+    .btn-cash { background: #fff; border: 2px solid var(--accent); color: var(--accent); }
+    .status-btn-group { display: flex; gap: 5px; margin-top: 10px; }
+    .s-btn { flex:1; padding: 8px; font-size: 11px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: 600; }
+    .s-cooking { background: #fef9c3; color: #a16207; }
+    .s-waiting { background: #dcfce7; color: #166534; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-box { background: #fff; padding: 30px; border-radius: 24px; text-align: center; max-width: 360px; width: 90%; }
     #m-qr { width: 100%; max-width: 250px; border-radius: 12px; margin: 15px 0; border: 1px solid #eee; }
-    .btn-confirm { background: var(--accent); color: #fff; margin-top: 10px; width: 100%; }
-
-    #loading-state { grid-column: 1/-1; text-align: center; padding: 100px 0; color: #94a3b8; }
-
-    /* 🖨️ สไตล์ใบเสร็จสำหรับสั่งพิมพ์ */
-    #receipt-print { display: none; }
-
-    @media print {
-      body * { display: none !important; }
-      #receipt-print, #receipt-print * { display: block !important; }
-      #receipt-print { 
-        width: 100%; 
-        max-width: 300px; 
-        margin: 0 auto; 
-        padding: 10px; 
-        color: #000; 
-        font-size: 14px;
-        line-height: 1.4;
-      }
-      .r-header { text-align: center; margin-bottom: 10px; }
-      .r-item { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px dashed #ccc; padding-bottom: 2px; }
-      .r-total { text-align: right; font-size: 18px; font-weight: bold; margin-top: 10px; border-top: 2px solid #000; padding-top: 5px; }
-      hr { border: none; border-top: 1px solid #000; margin: 10px 0; }
-    }
   </style>
 </head>
 <body>
-
-  <div class="container">
-    <div class="header">
-      <div>
-        <h1>WITHU Admin</h1>
-        <div id="update-time" style="font-size:12px;color:grey;margin-top:4px;">กำลังเชื่อมต่อข้อมูล...</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">ยอดขายวันนี้</div>
-        <div class="summary-val" id="revenue">฿0</div>
-      </div>
-    </div>
-
-    <div id="container" class="tables-grid">
-      <div id="loading-state">กำลังดึงข้อมูลออเดอร์ล่าสุด...</div>
-    </div>
-  </div>
-
-  <div id="modal" class="modal" onclick="this.style.display='none'">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 id="m-title" style="margin:0; color: #64748b; font-size: 16px;">เช็คบิล</h3>
-      <div id="m-table-name" style="font-size: 24px; font-weight: 700; margin-top: 5px;"></div>
-      <img id="m-qr" src="" alt="PromptPay QR">
-      <div id="m-total" style="font-size: 34px; font-weight: 700; color: #000;"></div>
-      
-      <button id="m-confirm-btn" class="btn btn-confirm">ยืนยันได้รับเงินโอนแล้ว</button>
-      <button class="btn" style="background:#f1f5f9; color:#666; margin-top: 10px; width: 100%;" onclick="document.getElementById('modal').style.display='none'">ปิดหน้าจอ</button>
-    </div>
-  </div>
-
-  <div id="receipt-print">
-    <div class="r-header">
-      <h2 style="margin:0;">WITHU CAFE</h2>
-      <p id="p-date" style="font-size:11px; margin:2px 0;"></p>
-      <h3 id="p-table-no" style="margin:5px 0;"></h3>
-      <hr>
-    </div>
-    <div id="p-items"></div>
-    <div class="r-total" id="p-total"></div>
-    <p style="text-align:center; font-size:11px; margin-top:20px;">- ขอบคุณที่ใช้บริการค่ะ -</p>
-  </div>
+  <div class="header"><div><h1>WITHU Admin</h1><div id="update-time" style="font-size:12px;color:grey;">กำลังโหลด...</div></div><div style="text-align:right;">ยอดวันนี้: <b id="revenue" style="font-size:20px;">฿0</b></div></div>
+  <div id="container" class="tables-grid">กำลังดึงข้อมูล...</div>
+  
+  <div id="modal" class="modal" onclick="this.style.display='none'"><div class="modal-box" onclick="event.stopPropagation()">
+    <h3 id="m-table"></h3><img id="m-qr" src=""><div id="m-total" style="font-size:32px;font-weight:700;"></div>
+    <button class="btn" style="background:var(--accent);color:#fff" id="m-confirm">ยืนยันได้รับเงินแล้ว</button>
+    <button class="btn" style="background:#eee" onclick="document.getElementById('modal').style.display='none'">ปิด</button>
+  </div></div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
     
     async function refresh() {
       try {
-        const res = await fetch(API_URL + "?action=getAdminData");
-        const data = await res.json();
+        const r = await fetch(API_URL + "?action=getAdminData"); const d = await r.json();
+        document.getElementById('revenue').innerText = "฿" + (d.summary.revenue || 0).toLocaleString();
+        document.getElementById('update-time').innerText = "อัปเดต: " + new Date().toLocaleTimeString();
+        const c = document.getElementById('container'); if(!d.orders.length) { c.innerHTML = "ไม่มีออเดอร์"; return; }
         
-        document.getElementById('revenue').innerText = "฿" + (data.summary.revenue || 0).toLocaleString();
-        document.getElementById('update-time').innerText = "อัปเดตล่าสุด: " + new Date().toLocaleTimeString();
-        
-        const container = document.getElementById('container');
-        if(!data.orders || data.orders.length === 0) { 
-          container.innerHTML = "<div id='loading-state'>ไม่มีออเดอร์ค้างในขณะนี้</div>"; 
-          return; 
-        }
-        
-        let groups = {};
-        data.orders.forEach(o => {
-          if(!groups[o.table]) groups[o.table] = { items:[], total:0, rows:[], time:o.time };
-          groups[o.table].items.push(o);
-          let price = parseFloat(o.total.toString().replace(/,/g,'')) || 0;
-          groups[o.table].total += price;
-          groups[o.table].rows.push(o.rowNum);
+        let groups = {}; d.orders.forEach(o => { 
+          if(!groups[o.table]) groups[o.table] = { items:[], total:0, rows:[], time:o.time }; 
+          groups[o.table].items.push(o); 
+          groups[o.table].total += parseFloat(o.total.replace(/,/g,'')); 
+          groups[o.table].rows.push(o.rowNum); 
         });
 
-        let html = "";
-        for(let t in groups) {
-          const group = groups[t];
-          html += `
-            <div class="card">
-              <div class="card-header">
-                <span class="table-badge">โต๊ะ ${t}</span>
-                <span class="time-badge">${group.time}</span>
-              </div>
-              <div class="items-container">
-                ${group.items.map(i => `
-                  <div class="item-row">
-                    <div class="item-info">
-                      <b>${i.qty}x ${i.menu}</b>
-                      <div class="item-details">${i.details != '-' ? i.details : ''}</div>
-                    </div>
-                    <div class="item-price">฿${i.total}</div>
-                  </div>
-                `).join('')}
-              </div>
-              <div class="total-area">
-                <div class="total-label">ยอดรวมสุทธิ</div>
-                <div class="total-val">฿${group.total.toLocaleString()}</div>
-              </div>
-              <div class="btn-group">
-                <button class="btn btn-qr" onclick='showQR("${t}", ${group.total}, ${JSON.stringify(group.rows)})'>บิล QR</button>
-                <button class="btn btn-print" onclick='printSlip("${t}", ${JSON.stringify(group.items)}, ${group.total})'>พิมพ์บิล</button>
-                <button class="btn btn-cash" onclick='pay("${t}", ${JSON.stringify(group.rows)})'>จ่ายเงินสด (ปิดโต๊ะ)</button>
-              </div>
-            </div>`;
-        }
-        container.innerHTML = html;
-      } catch(e) { 
-        document.getElementById('update-time').innerText = "การเชื่อมต่อขัดข้อง...";
-      }
+        let h = ""; for(let t in groups) {
+          h += `<div class="card"><div style="display:flex;justify-content:space-between"><b>โต๊ะ ${t}</b><small>${groups[t].time}</small></div><hr style="border:0;border-top:1px solid #f1f5f9;margin:12px 0;">
+            ${groups[t].items.map(i => `<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px;"><span>${i.qty}x ${i.menu}<br><small style="color:var(--blue)">${i.details} [${i.status}]</small></span><span>฿${i.total}</span></div>`).join('')}
+            <div class="status-btn-group">
+                <button class="s-btn s-cooking" onclick='changeS(${JSON.stringify(groups[t].rows)}, "กำลังทำ")'>เริ่มทำ</button>
+                <button class="s-btn s-waiting" onclick='changeS(${JSON.stringify(groups[t].rows)}, "รอเสิร์ฟ")'>พร้อมเสิร์ฟ</button>
+            </div>
+            <div style="font-size:24px;font-weight:700;text-align:right;margin:15px 0;">฿${groups[t].total.toLocaleString()}</div>
+            <button class="btn btn-qr" onclick='showQR("${t}",${groups[t].total},${JSON.stringify(groups[t].rows)})'>เก็บเงิน (QR)</button>
+            <button class="btn btn-cash" onclick='pay("${t}",${JSON.stringify(groups[t].rows)})'>ปิดโต๊ะ (รับเงินสด)</button></div>`;
+        } c.innerHTML = h;
+      } catch(e) {}
     }
 
-    // 🖨️ ฟังก์ชันจัดการข้อมูลและสั่งพิมพ์
-    function printSlip(table, items, total) {
-      document.getElementById('p-date').innerText = "วันที่: " + new Date().toLocaleString('th-TH');
-      document.getElementById('p-table-no').innerText = "โต๊ะ " + table;
-      document.getElementById('p-total').innerText = "ยอดสุทธิ: ฿" + total.toLocaleString();
-      
-      let itemsHtml = "";
-      items.forEach(i => {
-        itemsHtml += `
-          <div class="r-item">
-            <span>${i.qty}x ${i.menu}</span>
-            <span>${i.total}</span>
-          </div>`;
-      });
-      document.getElementById('p-items').innerHTML = itemsHtml;
-      
-      window.print();
+    async function changeS(r, s) { await fetch(API_URL, { method:'POST', body: JSON.stringify({action:'updateStatus', rowNums:r, nextStatus:s}) }); refresh(); }
+    function showQR(t, a, r) { 
+      document.getElementById('m-table').innerText = "โต๊ะ "+t; 
+      document.getElementById('m-total').innerText = "฿"+a.toLocaleString(); 
+      document.getElementById('m-qr').src = `https://promptpay.io/0931805507/${a}.png`; 
+      document.getElementById('m-confirm').onclick = () => { document.getElementById('modal').style.display='none'; pay(t, r); }; 
+      document.getElementById('modal').style.display = 'flex'; 
     }
-
-    function showQR(table, amount, rows) {
-      document.getElementById('m-table-name').innerText = "โต๊ะ " + table;
-      document.getElementById('m-total').innerText = "฿" + amount.toLocaleString();
-      document.getElementById('m-qr').src = `https://promptpay.io/0931805507/${amount}.png`;
-      
-      const confirmBtn = document.getElementById('m-confirm-btn');
-      confirmBtn.onclick = () => {
-        document.getElementById('modal').style.display = 'none';
-        pay(table, rows);
-      };
-      
-      document.getElementById('modal').style.display = 'flex';
-    }
-
-    async function pay(table, rows) {
-      if(!confirm(`ยืนยันการชำระเงิน โต๊ะ ${table}?`)) return;
-      document.getElementById('update-time').innerText = "กำลังบันทึกข้อมูล...";
-      try {
-        const res = await fetch(API_URL, { 
-          method: 'POST', 
-          body: JSON.stringify({action: 'markMultipleDone', rowNums: rows}) 
-        });
-        const result = await res.json();
-        if(result.status === "success") refresh();
-      } catch(e) {
-        alert("เกิดข้อผิดพลาดในการบันทึก");
-      }
-    }
-
-    refresh();
-    setInterval(refresh, 5000);
+    async function pay(t, r) { if(!confirm(`ยืนยันการปิดโต๊ะ ${t}?`)) return; await fetch(API_URL, { method:'POST', body: JSON.stringify({action:'markMultipleDone', rowNums:r}) }); refresh(); }
+    
+    setInterval(refresh, 5000); refresh();
   </script>
 </body>
 </html>

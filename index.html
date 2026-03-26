@@ -13,37 +13,38 @@
         .table-badge { background: var(--p); color: #fff; padding: 4px 14px; border-radius: 50px; font-size: 13px; }
         .call-btn { background: var(--darkred); color: #fff; border: none; padding: 6px 14px; border-radius: 50px; font-size: 11px; font-weight: 600; cursor: pointer; }
         
-        /* 🚩 ปรับปรุงหน้าเลือกโต๊ะ (Table Overlay) ให้ทันสมัย */
         #table-overlay { position: fixed; inset: 0; background: rgba(248, 249, 250, 0.8); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .table-box { background: var(--card); padding: 60px 40px; border-radius: 40px; text-align: center; width: 85%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); border: 1px solid rgba(255,255,255,0.3); }
-        
         .logo-top { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; border: 4px solid #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .table-box h2 { font-weight: 700; font-size: 28px; letter-spacing: 1px; margin-bottom: 30px; color: var(--p); }
 
         select { width: 100%; padding: 18px; border-radius: 20px; border: 1px solid #eee; margin-bottom: 20px; font-family: 'Prompt'; outline: none; appearance: none; text-align-last: center; background: #fcfcfc; font-size: 16px; font-weight: 500; color: #555; transition: 0.3s; }
-        select:focus { border-color: var(--p); background: #fff; }
-
         .btn-black { width: 100%; background: var(--p); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 600; font-size: 17px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .btn-black:active { transform: scale(0.97); }
-        /* 🚩 จบส่วนที่ปรับปรุง UI หน้าเลือกโต๊ะ */
-
-        .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 8px 20px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; color: #b2bec3; font-weight: 500; margin-right: 8px; }
-        .nav-pill.active { background: var(--p); color: #fff; border-color: var(--p); }
+        
+        .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 8px 20px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; color: #b2bec3; font-weight: 500; margin-right: 8px; border: none; }
+        .nav-pill.active { background: var(--p); color: #fff; }
+        
         .menu-item { background: var(--card); border-radius: 30px; padding: 25px; margin-bottom: 20px; display: flex; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
         .menu-img { width: 100px; height: 100px; object-fit: cover; border-radius: 20px; margin-right: 20px; background: #f9f9f9; }
         .price { font-weight: 700; font-size: 19px; color: var(--p); margin: 5px 0 12px 0; }
+        
         .sweet-selector { display: flex; gap: 4px; margin-bottom: 12px; }
         .sweet-btn { border: 1px solid var(--border); padding: 8px 0; border-radius: 8px; font-size: 11px; cursor: pointer; background: #f9f9f9; flex: 1; text-align: center; color: #b2bec3; font-weight: 600; }
         .sweet-btn.active { background: var(--p); color: #fff; border-color: var(--p); }
+        
         .acc-btn { font-size: 12px; color: var(--blue); font-weight: 600; cursor: pointer; margin-bottom: 12px; text-decoration: underline; text-underline-offset: 4px; }
         .acc-content { max-height: 0; overflow: hidden; transition: 0.4s ease; }
         .acc-content.open { max-height: 500px; padding-bottom: 15px; }
+        
         .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .top-chip { border: 1px solid #eee; padding: 10px; border-radius: 12px; font-size: 11px; text-align: center; cursor: pointer; font-weight: 600; background: #fff; }
-        .top-chip.active { background: #f1f5f9; border-color: #000; }
+        .top-chip.active { background: #eef2ff; border-color: var(--blue); color: var(--blue); }
+        .sold-out { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
+        
         .btn-add { background: transparent; border: 2px solid #000; padding: 14px; border-radius: 35px; font-family: 'Prompt'; font-weight: 700; cursor: pointer; width: 100%; font-size: 15px; margin-top: 10px; }
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 25px; box-shadow: 0 -5px 25px rgba(0,0,0,0.08); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 35px 35px 0 0; }
         .btn-checkout { background: #000; color: #fff; border: none; padding: 15px 35px; border-radius: 25px; font-family: 'Prompt'; font-weight: 700; font-size: 16px; }
+        
         .status-card { background: #fff; border-radius: 35px; padding: 45px 25px; text-align: center; border: 1px solid #eee; box-shadow: 0 10px 40px rgba(0,0,0,0.03); }
         .status-stepper { display: flex; justify-content: space-between; align-items: center; margin: 40px 0; position: relative; }
         .status-stepper::before { content: ''; position: absolute; top: 16px; left: 10%; right: 10%; height: 2px; background: #eee; z-index: 1; }
@@ -56,7 +57,14 @@
     </style>
 </head>
 <body>
-<div id="app-header" class="top-bar" style="display:none;"><div class="brand">WITHU</div><div style="display:flex; align-items:center; gap:10px;"><button class="call-btn" onclick="callStaff()">เรียกพนักงาน</button><span id="display-table" class="table-badge"></span></div></div>
+
+<div id="app-header" class="top-bar" style="display:none;">
+    <div class="brand">WITHU</div>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <button class="call-btn" onclick="callStaff()">เรียกพนักงาน</button>
+        <span id="display-table" class="table-badge"></span>
+    </div>
+</div>
 
 <div id="table-overlay">
     <div class="table-box">
@@ -70,60 +78,211 @@
     </div>
 </div>
 
-<div id="app-content" style="display:none;"><div class="app-container"><div id="category-nav" style="display:flex; overflow-x:auto; padding:20px 0; scrollbar-width:none;"></div><div id="loading" style="text-align:center; padding:50px;">กำลังโหลดเมนู...</div><div id="main-content"></div></div></div>
-<div id="cart-bar" class="cart-bar"><div style="font-weight:700; font-size: 18px;">ตะกร้า (<span id="cart-count">0</span>)</div><button onclick="openReceipt()" class="btn-checkout">สรุปรายการ ฿<span id="cart-sum">0</span></button></div>
-<div id="modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;z-index:2000;align-items:flex-end;justify-content:center;" onclick="if(event.target==this)this.style.display='none'"><div id="modal-body" style="background:#fff;width:100%;max-width:550px;border-radius:35px 35px 0 0;padding:35px;box-sizing:border-box;"></div></div>
+<div id="app-content" style="display:none;">
+    <div class="app-container">
+        <div id="category-nav" style="display:flex; overflow-x:auto; padding:20px 0; scrollbar-width:none;"></div>
+        <div id="loading" style="text-align:center; padding:50px;">กำลังโหลดเมนู...</div>
+        <div id="main-content"></div>
+    </div>
+</div>
+
+<div id="cart-bar" class="cart-bar">
+    <div style="font-weight:700; font-size: 18px;">ตะกร้า (<span id="cart-count">0</span>)</div>
+    <button onclick="openReceipt()" class="btn-checkout">สรุปรายการ ฿<span id="cart-sum">0</span></button>
+</div>
+
+<div id="modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;z-index:2000;align-items:flex-end;justify-content:center;" onclick="if(event.target==this)this.style.display='none'">
+    <div id="modal-body" style="background:#fff;width:100%;max-width:550px;border-radius:35px 35px 0 0;padding:35px;box-sizing:border-box;"></div>
+</div>
+
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
     let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentS = {}, itemOpt = {}, itemExpanded = {}, currentF = "ทั้งหมด", sInterval;
-    function lockTable() { let s = document.getElementById("table-select"); if(!s.value) return; currentTable = s.value; document.getElementById("display-table").innerText = "โต๊ะ " + currentTable; document.getElementById("table-overlay").style.display = "none"; document.getElementById("app-content").style.display = "block"; document.getElementById("app-header").style.display = "flex"; loadMenu(); }
-    function loadMenu() { fetch(API_URL + "?action=getMenu").then(r => r.json()).then(d => { fullMenu = d.menu; toppingsData = d.toppings; renderMenu("ทั้งหมด"); document.getElementById('loading').style.display = 'none'; }); }
-    function renderMenu(f) {
-        currentF = f; const m = document.getElementById('main-content'); const n = document.getElementById('category-nav');
-        let cats = [...new Set(fullMenu.map(r => r[2] || "อื่นๆ"))];
-        n.innerHTML = `<button onclick="renderMenu('ทั้งหมด')" class="nav-pill ${f==='ทั้งหมด'?'active':''}">ทั้งหมด</button>` + cats.map(c => `<button onclick="renderMenu('${c}')" class="nav-pill ${f===c?'active':''}">${c}</button>`).join('');
-        let h = ""; fullMenu.forEach((r, idx) => {
-            if(f !== "ทั้งหมด" && r[2] !== f) return;
-            let isAvail = (r[5] !== "หมด"), cat = r[2] || "", isD = (cat === "เครื่องดื่ม" || cat === "สมูทตี้"), showS = (cat === "เครื่องดื่ม"), isExp = itemExpanded[idx] || false;
-            if(isD && !currentS[idx]) currentS[idx] = "100%"; if(!itemOpt[idx]) itemOpt[idx] = { toppings: [], smoothie: false };
-            h += `<div class="menu-item ${isAvail ? '' : 'sold-out'}"><img src="${r[4]||''}" class="menu-img" onerror="this.src='https://via.placeholder.com/100'"><div class="menu-info"><h3>${r[0]} ${isAvail ? '' : '<span style="color:red; font-size:12px;">(หมด)</span>'}</h3><div class="price">฿${r[1]}</div>
-                ${isAvail && isD ? `<div class="sweet-selector">${['0%','25%','50%','75%','100%'].map(l=>`<div class="sweet-btn ${currentS[idx]==l?'active':''}" onclick="setS(${idx},'${l}')">${l}</div>`).join('')}</div>
-                ${showS ? `<div style="border:1px solid #ddd;padding:8px 18px;border-radius:15px;font-size:12px;display:inline-block;margin-bottom:15px;font-weight:600;" class="${itemOpt[idx].smoothie?'active':''}" onclick="tS(${idx})">เพิ่มปั่น (+10)</div>` : ''}
-                <br><div class="acc-btn" onclick="toggleAcc(${idx})">${isExp ? 'ปิดตัวเลือกเพิ่มเติม' : 'เลือกท็อปปิ้งเพิ่มเติม'}</div><div class="acc-content ${isExp ? 'open' : ''}"><div class="top-grid">${toppingsData.map(t => { let isTOut = (t[2] === "หมด"); return `<div class="top-chip ${itemOpt[idx].toppings.includes(t[0])?'active':''} ${isTOut?'sold-out':''}" onclick="tT(${idx},'${t[0]}')">${t[0]} (+฿${t[1]})</div>`; }).join('')}</div></div>` : ''}
-                <button class="btn-add" ${isAvail ? '' : 'disabled'} onclick="addC('${r[0]}',${r[1]},${idx},${isD})">${isAvail ? 'ใส่ตะกร้า' : 'สินค้าหมด'}</button></div></div>`;
-        }); m.innerHTML = h;
+
+    function lockTable() { 
+        let s = document.getElementById("table-select"); 
+        if(!s.value) return; 
+        currentTable = s.value; 
+        document.getElementById("display-table").innerText = "โต๊ะ " + currentTable; 
+        document.getElementById("table-overlay").style.display = "none"; 
+        document.getElementById("app-content").style.display = "block"; 
+        document.getElementById("app-header").style.display = "flex"; 
+        loadMenu(); 
     }
+
+    function loadMenu() { 
+        fetch(API_URL + "?action=getMenu").then(r => r.json()).then(d => { 
+            fullMenu = d.menu; 
+            toppingsData = d.toppings; 
+            renderMenu("ทั้งหมด"); 
+            document.getElementById('loading').style.display = 'none'; 
+        }); 
+    }
+
+    function renderMenu(f) {
+        currentF = f; 
+        const m = document.getElementById('main-content'); 
+        const n = document.getElementById('category-nav');
+        let cats = [...new Set(fullMenu.map(r => r[2] || "อื่นๆ"))];
+        
+        n.innerHTML = `<button onclick="renderMenu('ทั้งหมด')" class="nav-pill ${f==='ทั้งหมด'?'active':''}">ทั้งหมด</button>` + 
+                      cats.map(c => `<button onclick="renderMenu('${c}')" class="nav-pill ${f===c?'active':''}">${c}</button>`).join('');
+        
+        let h = ""; 
+        fullMenu.forEach((r, idx) => {
+            if(f !== "ทั้งหมด" && r[2] !== f) return;
+            let isAvail = (r[5] !== "หมด"), cat = r[2] || "", 
+                isD = (cat === "เครื่องดื่ม" || cat === "สมูทตี้"), 
+                showSmoothieOpt = (cat === "เครื่องดื่ม"), 
+                isExp = itemExpanded[idx] || false;
+            
+            if(isD && !currentS[idx]) currentS[idx] = "100%"; 
+            if(!itemOpt[idx]) itemOpt[idx] = { toppings: [], smoothie: false };
+
+            h += `
+            <div class="menu-item ${isAvail ? '' : 'sold-out'}">
+                <img src="${r[4]||'https://via.placeholder.com/100'}" class="menu-img">
+                <div class="menu-info">
+                    <h3 style="margin:0;">${r[0]} ${isAvail ? '' : '<span style="color:red; font-size:12px;">(หมด)</span>'}</h3>
+                    <div class="price">฿${r[1]}</div>
+                    ${isAvail && isD ? `
+                        <div class="sweet-selector">
+                            ${['0%','25%','50%','75%','100%'].map(l=>`
+                                <div class="sweet-btn ${currentS[idx]===l?'active':''}" onclick="setS(${idx},'${l}')">${l}</div>
+                            `).join('')}
+                        </div>
+                        ${showSmoothieOpt ? `
+                            <div style="border:1px solid #ddd;padding:8px 18px;border-radius:15px;font-size:12px;display:inline-block;margin-bottom:15px;font-weight:600; cursor:pointer;" 
+                                 class="${itemOpt[idx].smoothie?'active':''}" onclick="tS(${idx})">
+                                ${itemOpt[idx].smoothie ? '✓ ปั่นเรียบร้อย' : '+ เพิ่มปั่น (+10)'}
+                            </div>
+                        ` : ''}
+                        <br>
+                        <div class="acc-btn" onclick="toggleAcc(${idx})">${isExp ? 'ปิดตัวเลือกเพิ่มเติม' : 'เลือกท็อปปิ้งเพิ่มเติม'}</div>
+                        <div class="acc-content ${isExp ? 'open' : ''}">
+                            <div class="top-grid">
+                                ${toppingsData.map(t => { 
+                                    let isTOut = (t[2] === "หมด"); 
+                                    return `<div class="top-chip ${itemOpt[idx].toppings.includes(t[0])?'active':''} ${isTOut?'sold-out':''}" onclick="tT(${idx},'${t[0]}')">${t[0]} (+฿${t[1]})</div>`; 
+                                }).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    <button class="btn-add" ${isAvail ? '' : 'disabled'} onclick="addC('${r[0]}',${r[1]},${idx},${isD})">${isAvail ? 'ใส่ตะกร้า' : 'สินค้าหมด'}</button>
+                </div>
+            </div>`;
+        }); 
+        m.innerHTML = h;
+    }
+
     function toggleAcc(idx) { itemExpanded[idx] = !itemExpanded[idx]; renderMenu(currentF); }
     function setS(i, l) { currentS[i] = l; renderMenu(currentF); }
-    function tT(i, n) { let t = itemOpt[i].toppings; itemOpt[i].toppings = t.includes(n) ? t.filter(x => x !== n) : [...t, n]; renderMenu(currentF); }
-    function tS(i) { itemOpt[i].smoothie = !itemOpt[i].smoothie; renderMenu(currentF); }
-    function addC(n, p, idx, isD) {
-        let fp = p, det = []; if(isD) { det.push("หวาน " + currentS[idx]); if(itemOpt[idx].smoothie) { fp += 10; det.push("ปั่น"); } itemOpt[idx].toppings.forEach(tn => { let tObj = toppingsData.find(x => x[0] === tn); if(tObj) { fp += parseFloat(tObj[1]); det.push(tn); } }); }
-        cart.push({name: n, price: fp, qty: 1, total: fp, sweetness: det.join(", ")||'-'}); itemOpt[idx] = { toppings: [], smoothie: false }; updateUI();
+    function tT(i, n) { 
+        let t = itemOpt[i].toppings; 
+        itemOpt[i].toppings = t.includes(n) ? t.filter(x => x !== n) : [...t, n]; 
+        renderMenu(currentF); 
     }
-    function updateUI() { let b = document.getElementById('cart-bar'); b.style.display = cart.length > 0 ? 'flex' : 'none'; document.getElementById('cart-sum').innerText = cart.reduce((s,i)=>s+i.total,0).toLocaleString(); document.getElementById('cart-count').innerText = cart.length; }
+    function tS(i) { itemOpt[i].smoothie = !itemOpt[i].smoothie; renderMenu(currentF); }
+
+    function addC(n, p, idx, isD) {
+        let fp = parseFloat(p), det = []; 
+        if(isD) { 
+            det.push("หวาน " + currentS[idx]); 
+            if(itemOpt[idx].smoothie) { fp += 10; det.push("ปั่น"); } 
+            itemOpt[idx].toppings.forEach(tn => { 
+                let tObj = toppingsData.find(x => x[0] === tn); 
+                if(tObj) { fp += parseFloat(tObj[1]); det.push(tn); } 
+            }); 
+        }
+        cart.push({name: n, price: p, qty: 1, total: fp, sweetness: det.join(", ")||'-'}); 
+        itemOpt[idx] = { toppings: [], smoothie: false }; 
+        updateUI();
+    }
+
+    function updateUI() { 
+        let b = document.getElementById('cart-bar'); 
+        b.style.display = cart.length > 0 ? 'flex' : 'none'; 
+        let total = cart.reduce((s,i)=>s+i.total,0);
+        document.getElementById('cart-sum').innerText = total.toLocaleString(); 
+        document.getElementById('cart-count').innerText = cart.length; 
+    }
+
     function openReceipt() {
         let h = `<h3 style="margin-top:0; font-weight:700; font-size:22px;">ยืนยันออเดอร์</h3>`;
-        cart.forEach((i,idx) => h += `<div style="display:flex;justify-content:space-between;margin-bottom:18px; font-size:15px;"><span><b>${i.name}</b><br><small style="color:#888">${i.sweetness}</small></span><span>฿${i.total} <span style="color:red; margin-left:12px; cursor:pointer;" onclick="rem(${idx})">ลบ</span></span></div>`);
-        h += `<div style="border-top:2px solid #eee; padding-top:20px; margin-top:20px; display:flex; justify-content:space-between; font-weight:700; font-size:22px;"><span>ยอดรวม</span><span>฿${cart.reduce((s,i)=>s+i.total,0).toLocaleString()}</span></div><button class="btn-black" style="margin-top:35px; border-radius:35px; padding:20px;" onclick="sub()">สั่งเลย</button>`;
-        document.getElementById('modal-body').innerHTML = h; document.getElementById('modal').style.display = 'flex';
+        cart.forEach((i,idx) => h += `
+            <div style="display:flex;justify-content:space-between;margin-bottom:18px; font-size:15px;">
+                <span><b>${i.name}</b><br><small style="color:#888">${i.sweetness}</small></span>
+                <span>฿${i.total.toLocaleString()} <span style="color:red; margin-left:12px; cursor:pointer;" onclick="rem(${idx})">ลบ</span></span>
+            </div>`);
+        let total = cart.reduce((s,i)=>s+i.total,0);
+        h += `<div style="border-top:2px solid #eee; padding-top:20px; margin-top:20px; display:flex; justify-content:space-between; font-weight:700; font-size:22px;"><span>ยอดรวม</span><span>฿${total.toLocaleString()}</span></div>
+              <button class="btn-black" style="margin-top:35px; border-radius:35px; padding:20px;" onclick="sub()">สั่งอาหารเลย</button>`;
+        document.getElementById('modal-body').innerHTML = h; 
+        document.getElementById('modal').style.display = 'flex';
     }
-    function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
-    function sub() { fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) }).then(() => { showStatus(); cart=[]; updateUI(); }); }
+
+    function rem(i) { 
+        cart.splice(i, 1); 
+        updateUI(); 
+        cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; 
+    }
+
+    function sub() { 
+        fetch(API_URL, { 
+            method: 'POST', 
+            body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) 
+        }).then(() => { showStatus(); cart=[]; updateUI(); }); 
+    }
+
     function showStatus() {
-        document.getElementById('modal').style.display='none'; document.getElementById('app-header').style.display='none';
-        document.getElementById('app-content').innerHTML = `<div class="app-container" style="padding-top:40px;"><div class="status-card"><h2 style="font-weight:700; font-size:28px;">ออเดอร์โต๊ะ ${currentTable}</h2><div class="status-stepper"><div class="step-point" id="st-1"><div class="step-circle">1</div><div class="step-label">รับออเดอร์</div></div><div class="step-point" id="st-2"><div class="step-circle">2</div><div class="step-label">กำลังทำ</div></div><div class="step-point" id="st-3"><div class="step-circle">3</div><div class="step-label">รอเสิร์ฟ</div></div><div class="step-point" id="st-4"><div class="step-circle">4</div><div class="step-label">สำเร็จ</div></div></div><div id="stat-list" style="margin:30px 0; text-align:left; border-top:1px solid #f8f8f8; padding-top:20px;"></div><button class="btn-more" onclick="location.reload()">สั่งเพิ่ม</button></div></div>`;
+        document.getElementById('modal').style.display='none'; 
+        document.getElementById('app-header').style.display='none';
+        document.getElementById('app-content').innerHTML = `
+            <div class="app-container" style="padding-top:40px;">
+                <div class="status-card">
+                    <h2 style="font-weight:700; font-size:28px;">ออเดอร์โต๊ะ ${currentTable}</h2>
+                    <div class="status-stepper">
+                        <div class="step-point" id="st-1"><div class="step-circle">1</div><div class="step-label">รับออเดอร์</div></div>
+                        <div class="step-point" id="st-2"><div class="step-circle">2</div><div class="step-label">กำลังทำ</div></div>
+                        <div class="step-point" id="st-3"><div class="step-circle">3</div><div class="step-label">รอเสิร์ฟ</div></div>
+                        <div class="step-point" id="st-4"><div class="step-circle">4</div><div class="step-label">สำเร็จ</div></div>
+                    </div>
+                    <div id="stat-list" style="margin:30px 0; text-align:left; border-top:1px solid #f8f8f8; padding-top:20px;"></div>
+                    <button class="btn-more" onclick="location.reload()">สั่งเพิ่ม / กลับหน้าหลัก</button>
+                </div>
+            </div>`;
         chk(); sInterval = setInterval(chk, 5000);
     }
+
     async function chk() {
-        const r = await fetch(API_URL + "?action=getOrderStatus&table=" + currentTable); const d = await r.json();
-        if (!d.length) { upS(4); clearInterval(sInterval); setTimeout(() => { document.getElementById('app-content').innerHTML = `<div class="app-container" style="padding-top:100px;"><div class="status-card"><h2>ขอบคุณค่ะ</h2><p>พนักงานเสิร์ฟอาหารให้คุณเรียบร้อยแล้ว</p><button class="btn-black" style="margin-top:30px; border-radius:35px;" onclick="location.reload()">กลับหน้าหลัก</button></div></div>`; }, 3000); return; }
-        const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4, "เสิร์ฟเรียบร้อย":4};
-        let min = d[0].status; d.forEach(o => { if (p[o.status] < p[min]) min = o.status; });
-        upS(p[min] || 1); document.getElementById('stat-list').innerHTML = d.map(o => `<div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid #f9f9f9;font-size:16px;"><span>${o.qty}x ${o.menu}</span><b style="color:var(--blue)">${o.status}</b></div>`).join('');
+        try {
+            const r = await fetch(API_URL + "?action=getOrderStatus&table=" + currentTable); 
+            const d = await r.json();
+            if (!d || !d.length) { 
+                upS(4); 
+                clearInterval(sInterval); 
+                return; 
+            }
+            const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4, "เสิร์ฟเรียบร้อย":4};
+            let minVal = 4;
+            d.forEach(o => { if (p[o.status] < minVal) minVal = p[o.status]; });
+            upS(minVal); 
+            document.getElementById('stat-list').innerHTML = d.map(o => `
+                <div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid #f9f9f9;font-size:16px;">
+                    <span>${o.qty}x ${o.menu}</span>
+                    <b style="color:var(--blue)">${o.status}</b>
+                </div>`).join('');
+        } catch(e) {}
     }
+
     function upS(s) { for(let i=1;i<=4;i++) document.getElementById('st-'+i).classList.toggle('active',i<=s); }
-    function callStaff() { if(confirm("ต้องการเรียกพนักงานใช่ไหมคะ?")) { fetch(API_URL,{method:'POST',body:JSON.stringify({action:'callStaff',table:currentTable,reason:'ทั่วไป'})}); alert("ส่งสัญญาณแล้วค่ะ!"); } }
+
+    function callStaff() { 
+        if(confirm("ต้องการเรียกพนักงานใช่ไหมคะ?")) { 
+            fetch(API_URL,{method:'POST',body:JSON.stringify({action:'callStaff',table:currentTable,reason:'ทั่วไป'})}); 
+            alert("ส่งสัญญาณเรียบร้อยค่ะ พนักงานกำลังไปดูแลนะคะ"); 
+        } 
+    }
 </script>
 </body>
 </html>

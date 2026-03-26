@@ -84,11 +84,11 @@
     </div>
 
     <script>
-        // ⚠️ สำคัญ: ใส่ลิงก์ API จาก Apps Script ของคุณที่นี่
+        // ⚠️ ลิงก์ API เดิมของน้อง
         const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
         
-        const orderSound = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_7325997672.mp3'); // เสียงติ๊งหน่อง
-        const callSound = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625624707.mp3');  // เสียงกระดิ่ง
+        const orderSound = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_7325997672.mp3'); 
+        const callSound = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625624707.mp3');  
         
         let lastOrderCount = 0, lastCallCount = 0, isFirstLoad = true, cAlertT = "";
 
@@ -109,7 +109,7 @@
                     document.getElementById('staff-alert').style.display='block'; 
                     document.getElementById('alert-table').innerText=cAlertT; 
                     if(!isFirstLoad && d.calls.length > lastCallCount) {
-                        callSound.play().catch(e => console.log("Audio play blocked by browser"));
+                        callSound.play().catch(e => console.log("Audio play blocked"));
                     }
                 } else { 
                     document.getElementById('staff-alert').style.display='none'; 
@@ -123,7 +123,7 @@
                     lastOrderCount = 0; 
                 } else {
                     if(!isFirstLoad && d.orders.length > lastOrderCount) {
-                        orderSound.play().catch(e => console.log("Audio play blocked by browser"));
+                        orderSound.play().catch(e => console.log("Audio play blocked"));
                     }
                     lastOrderCount = d.orders.length;
 
@@ -180,7 +180,11 @@
         async function upS(r, s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
         async function tgS(type, name, status) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStock',type:type,name:name,status:status})}); refresh(); }
         
-        function shQR(t, a, r) { 
+        // 🚩 แก้ไขจุดที่ 1: ส่งสัญญาณไปจอฝั่งลูกค้าตอนกด QR
+        async function shQR(t, a, r) { 
+            // แจ้ง CDS ให้โชว์ QR
+            fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'paying'})});
+
             document.getElementById('m-table').innerText = "โต๊ะ "+t; 
             document.getElementById('m-total').innerText = "฿"+a.toLocaleString(); 
             document.getElementById('m-qr').src = `https://promptpay.io/0931805507/${a}.png`; 
@@ -188,7 +192,17 @@
             document.getElementById('modal').style.display = 'flex'; 
         }
 
-        async function pay(t, r) { if(confirm("ยืนยันได้รับเงินและปิดโต๊ะ "+t+"?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r})}); refresh(); }}
+        // 🚩 แก้ไขจุดที่ 2: ส่งสัญญาณปิดจอตอนได้รับเงินแล้ว
+        async function pay(t, r) { 
+            if(confirm("ยืนยันได้รับเงินและปิดโต๊ะ "+t+"?")){ 
+                // แจ้ง CDS ให้กลับหน้า Welcome
+                await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'idle'})});
+
+                await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r})}); 
+                refresh(); 
+            }
+        }
+
         async function clearCallAlert() { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'clearCall',table:cAlertT})}); refresh(); }
         
         setInterval(refresh, 5000); 

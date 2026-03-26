@@ -3,50 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WITHU Customer Display System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>WITHU COUNTER DISPLAY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
             --navy: #0f172a; 
-            --blue: #1d4ed8; 
-            --accent: #10b981; 
+            --blue: #2563eb; 
             --bg: #f8fafc; 
             --white: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
         }
         
-        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--navy); }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--text-main); }
         
-        /* --- 📹 ส่วน Video Idle (โชว์ตอนไม่มีลูกค้า) --- */
+        /* --- 📹 หน้าวิดีโอ (Idle) --- */
         #idle-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         #promo-video { width: 100%; height: 100%; object-fit: cover; }
-        .video-overlay { position: absolute; bottom: 50px; left: 50px; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .video-overlay { position: absolute; bottom: 60px; left: 60px; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.6); }
 
-        /* --- 💳 ส่วน Display ออเดอร์ (ขาว-ฟ้าน้ำเงิน) --- */
-        .order-side { flex: 1.2; padding: 60px; background: var(--white); display: flex; flex-direction: column; border-radius: 0 40px 40px 0; box-shadow: 15px 0 50px rgba(0,0,0,0.05); z-index: 2; }
-        .order-list { flex: 1; overflow-y: auto; margin-top: 30px; padding-right: 15px; }
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 25px 0; border-bottom: 2px dashed #e2e8f0; animation: slideIn 0.4s ease-out; }
-        .item b { font-size: 32px; font-weight: 600; color: var(--navy); }
-        .item small { font-size: 20px; color: #64748b; display: block; margin-top: 5px; }
-        .item .item-price { font-size: 32px; font-weight: 800; color: var(--blue); }
+        /* --- 🏢 Layout หลัก (Split Screen) --- */
+        #active-container { display: none; width: 100%; height: 100%; grid-template-columns: 1.1fr 0.9fr; }
+
+        /* --- 📝 ฝั่งซ้าย: รายการ (Clean White) --- */
+        .order-side { background: var(--white); padding: 50px 70px; display: flex; flex-direction: column; box-shadow: 15px 0 50px rgba(0,0,0,0.02); z-index: 2; border-radius: 0 45px 45px 0; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .header-row h1 { font-size: 42px; font-weight: 800; margin: 0; color: var(--navy); letter-spacing: -1px; }
         
-        .payment-side { flex: 0.8; padding: 60px; background: var(--navy); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
-        .logo-box { width: 180px; height: 180px; border-radius: 50%; border: 6px solid rgba(255,255,255,0.1); margin-bottom: 30px; overflow: hidden; }
-        .logo-box img { width: 100%; height: 100%; object-fit: cover; }
+        .table-badge { background: var(--blue); color: #fff; padding: 10px 25px; border-radius: 100px; font-size: 24px; font-weight: 700; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
         
-        .total-label { font-size: 35px; opacity: 0.8; font-weight: 300; }
-        .total-amount { font-size: 110px; font-weight: 800; color: #60a5fa; margin: 10px 0; line-height: 1; }
-        .currency { font-size: 45px; margin-left: 10px; }
+        .order-list { flex: 1; overflow-y: auto; padding-right: 15px; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 25px 0; border-bottom: 1px solid #f1f5f9; animation: slideIn 0.5s ease-out; }
+        .item-info b { font-size: 30px; font-weight: 700; color: var(--navy); }
+        .item-info small { font-size: 18px; color: var(--text-sub); display: block; margin-top: 4px; font-weight: 400; }
+        .item-price { font-size: 32px; font-weight: 800; color: var(--blue); }
 
-        /* QR Code */
-        #qr-container { background: #fff; padding: 35px; border-radius: 40px; margin-top: 30px; animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        #qr-container img { width: 300px; height: 300px; }
-        .qr-label { color: #000; font-weight: 800; margin-top: 15px; font-size: 24px; }
+        /* --- 💳 ฝั่งขวา: จ่ายเงิน (Premium Navy) --- */
+        .payment-side { background: var(--navy); color: #fff; padding: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        
+        /* แก้ปัญหาโลโก้เบี้ยว */
+        .logo-container { width: 160px; height: 160px; margin-bottom: 30px; }
+        .logo-container img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3)); }
+        
+        .total-label { font-size: 30px; opacity: 0.7; font-weight: 300; letter-spacing: 1px; }
+        .total-amount { font-size: 130px; font-weight: 800; color: #60a5fa; margin: 5px 0; line-height: 1; letter-spacing: -3px; }
+        .currency { font-size: 50px; margin-left: 10px; color: rgba(255,255,255,0.5); }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes popUp { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        /* QR Code Card */
+        .qr-card { background: #fff; padding: 35px; border-radius: 45px; box-shadow: 0 30px 60px rgba(0,0,0,0.4); margin-top: 30px; transition: 0.3s; animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .qr-card img { width: 280px; height: 280px; display: block; }
+        .qr-label { color: var(--navy); font-weight: 800; margin-top: 20px; font-size: 22px; letter-spacing: 1px; }
+
+        .footer-text { position: absolute; bottom: 30px; opacity: 0.2; font-size: 14px; font-weight: 300; letter-spacing: 2px; }
+
+        /* Animations */
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes popUp { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -57,45 +72,47 @@
         </video>
         <div class="video-overlay">
             <h1 style="font-size: 65px; margin: 0; font-weight: 800;">WITHU CAFE</h1>
-            <p style="font-size: 28px; font-weight: 300;">Moments in every cup.</p>
+            <p style="font-size: 26px; font-weight: 300; opacity: 0.8;">Freshly brewed happiness in every cup.</p>
         </div>
     </div>
 
-    <div class="order-side">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h1 style="font-size: 48px; margin: 0; font-weight: 800; color: var(--navy);">สรุปรายการสั่งซื้อ</h1>
-            <span id="display-table-id" style="background: var(--blue); color: #fff; padding: 10px 30px; border-radius: 100px; font-size: 26px; font-weight: 700;">โต๊ะ -</span>
-        </div>
-        <div id="order-items" class="order-list"></div>
-    </div>
-
-    <div class="payment-side">
-        <div class="logo-box">
-            <img src="https://img1.pic.in.th/images/-------2.png" alt="Logo">
-        </div>
-        <div class="total-label">ยอดชำระทั้งหมด</div>
-        <div class="total-amount"><span id="total-price">0</span><span class="currency">฿</span></div>
-        
-        <div id="qr-container">
-            <img id="qr-img" src="" alt="PromptPay QR">
-            <div class="qr-label">สแกนเพื่อชำระเงิน</div>
+    <div id="active-container">
+        <div class="order-side">
+            <div class="header-row">
+                <h1>สรุปรายการสั่งซื้อ</h1>
+                <div id="display-table-id" class="table-badge">โต๊ะ -</div>
+            </div>
+            <div id="order-items-list" class="order-list">
+                </div>
         </div>
 
-        <div style="position: absolute; bottom: 40px; opacity: 0.3; font-weight: 300; font-size: 16px;">WITHU CUSTOMER DISPLAY SYSTEM</div>
+        <div class="payment-side">
+            <div class="logo-container">
+                <img src="https://img1.pic.in.th/images/-------2.png" alt="WithU Logo">
+            </div>
+            <div class="total-label">ยอดชำระทั้งหมด</div>
+            <div class="total-amount"><span id="total-val">0</span><span class="currency">฿</span></div>
+            
+            <div class="qr-card">
+                <img id="qr-img-cds" src="" alt="QR Payment">
+                <div class="qr-label">สแกนเพื่อชำระเงิน</div>
+            </div>
+
+            <div class="footer-text">WITHU CUSTOMER DISPLAY SYSTEM</div>
+        </div>
     </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
+    const API_URL = "ใส่_Web_App_URL_ของคุณ"; 
 
     async function updateCDS() {
         try {
-            // ดึงข้อมูลสถานะ "โต๊ะที่กำลังจ่ายเงิน" จากระบบจอกลาง
             const response = await fetch(API_URL + "?action=getCDSActive");
             const data = await response.json();
 
             if (data.status === 'active' && data.orders.length > 0) {
-                // สลับมาโชว์หน้าชำระเงิน
                 document.getElementById('idle-screen').style.display = 'none';
+                document.getElementById('active-container').style.display = 'grid';
                 document.getElementById('display-table-id').innerText = "โต๊ะ " + data.table;
                 
                 let total = 0;
@@ -104,32 +121,26 @@
                     total += price;
                     return `
                         <div class="item">
-                            <span>
+                            <div class="item-info">
                                 <b>${o.qty}x ${o.menu}</b>
-                                <small>${o.details}</small>
-                            </span>
-                            <span class="item-price">฿${price.toLocaleString()}</span>
+                                <small>${o.details || '-'}</small>
+                            </div>
+                            <div class="item-price">฿${price.toLocaleString()}</div>
                         </div>`;
                 }).join('');
                 
-                document.getElementById('order-items').innerHTML = html;
-                document.getElementById('total-price').innerText = total.toLocaleString();
-
-                // เจน QR Code ทันที
-                document.getElementById('qr-img').src = `https://promptpay.io/0931805507/${total}.png`;
+                document.getElementById('order-items-list').innerHTML = html;
+                document.getElementById('total-val').innerText = total.toLocaleString();
+                document.getElementById('qr-img-cds').src = `https://promptpay.io/0931805507/${total}.png`;
             } else {
-                // ไม่มีใครจ่ายเงิน ให้เล่นวิดีโอโฆษณา
                 document.getElementById('idle-screen').style.display = 'flex';
-                // พยายามสั่งให้วิดีโอเล่น (กรณีโดน Browser บล็อค)
+                document.getElementById('active-container').style.display = 'none';
                 const video = document.getElementById('promo-video');
                 if (video.paused) video.play().catch(e => {});
             }
-        } catch(e) {
-            console.error("CDS Sync Error:", e);
-        }
+        } catch(e) { console.error("Sync Error:", e); }
     }
 
-    // ตรวจสอบข้อมูลทุก 2.5 วินาทีเพื่อให้จอสลับได้เร็ว
     setInterval(updateCDS, 2500);
 </script>
 </body>

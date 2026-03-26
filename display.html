@@ -3,65 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WITHU | Premium CDS</title>
+    <title>WITHU | Premium POS Display</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --navy: #0f172a; 
             --blue: #2563eb; 
-            --bg: #f1f5f9; 
+            --bg-light: #f8fafc; 
             --white: #ffffff;
-            --text-main: #0f172a;
-            --text-sub: #64748b;
-            --accent: #10b981;
+            --text-dark: #0f172a;
+            --text-gray: #64748b;
+            --border: #f1f5f9;
         }
         
-        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--text-main); }
+        body { 
+            font-family: 'Prompt', sans-serif; 
+            background: var(--bg-light); 
+            margin: 0; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+            color: var(--text-dark);
+        }
         
-        /* --- 📹 Video Idle (Full Screen) --- */
+        /* --- 📹 Video Idle --- */
         #idle-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
-        #promo-video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.7); }
+        #promo-video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8); }
         .video-overlay { position: absolute; bottom: 80px; left: 80px; color: #fff; }
-        .video-overlay h1 { font-size: 80px; font-weight: 800; margin: 0; letter-spacing: -2px; }
-        .video-overlay p { font-size: 32px; font-weight: 300; opacity: 0.9; margin-top: 10px; }
+        .video-overlay h1 { font-size: 70px; font-weight: 800; margin: 0; }
 
-        /* --- 🏢 Layout หลัก (60/40 Split) --- */
-        #active-container { display: none; width: 100%; height: 100%; grid-template-columns: 1.2fr 0.8fr; background: var(--bg); }
+        /* --- 🏢 Layout 2-Column --- */
+        #active-container { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            grid-template-columns: 1.1fr 0.9fr; 
+            gap: 0;
+        }
 
-        /* --- 📝 Left: Order List --- */
-        .order-side { background: var(--bg); padding: 60px 80px; display: flex; flex-direction: column; overflow: hidden; }
-        .header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 50px; }
-        .header-row h1 { font-size: 48px; font-weight: 800; margin: 0; letter-spacing: -1.5px; color: var(--navy); }
-        .table-tag { background: var(--white); color: var(--navy); padding: 12px 30px; border-radius: 20px; font-size: 24px; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        /* --- 📝 ฝั่งซ้าย: รายการอาหาร --- */
+        .order-side { 
+            padding: 60px 80px; 
+            display: flex; 
+            flex-direction: column; 
+            background: var(--white);
+            border-right: 1px solid var(--border);
+        }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; }
+        .header-row h1 { font-size: 42px; font-weight: 800; margin: 0; letter-spacing: -1px; }
+        .table-tag { 
+            background: var(--blue); 
+            color: #fff; 
+            padding: 8px 24px; 
+            border-radius: 50px; 
+            font-size: 20px; 
+            font-weight: 700; 
+        }
         
-        .order-list { flex: 1; overflow-y: auto; padding-right: 20px; }
-        .item-card { background: var(--white); padding: 30px; border-radius: 30px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid rgba(255,255,255,0.5); animation: fadeInUp 0.5s ease; }
-        .item-info b { font-size: 32px; font-weight: 700; color: var(--navy); display: block; line-height: 1.2; }
-        .item-info small { font-size: 20px; color: var(--text-sub); margin-top: 8px; display: block; }
-        .item-price { font-size: 34px; font-weight: 800; color: var(--navy); }
+        .order-list { flex: 1; overflow-y: auto; padding-right: 10px; }
+        .item-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 25px 0; 
+            border-bottom: 1px solid var(--border); 
+            animation: fadeIn 0.4s ease;
+        }
+        .item-info b { font-size: 28px; font-weight: 700; display: block; }
+        .item-info small { font-size: 18px; color: var(--text-gray); margin-top: 5px; display: block; }
+        .item-price { font-size: 30px; font-weight: 800; color: var(--blue); }
 
-        /* --- 💳 Right: Payment Area --- */
-        .payment-side { background: var(--navy); color: #fff; padding: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-radius: 60px 0 0 60px; box-shadow: -20px 0 60px rgba(0,0,0,0.1); }
+        /* --- 💳 ฝั่งขวา: สรุปยอดเงินและ QR --- */
+        .payment-side { 
+            background: var(--bg-light); 
+            padding: 60px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+        }
         
-        .brand-logo { width: 140px; margin-bottom: 40px; opacity: 0.9; }
-        .total-container { text-align: center; margin-bottom: 40px; }
-        .total-label { font-size: 28px; font-weight: 400; opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; }
-        .total-amount { font-size: 140px; font-weight: 800; color: #fff; line-height: 1; margin: 10px 0; letter-spacing: -5px; }
-        .total-amount span { color: var(--blue); }
+        .payment-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 420px;
+            padding: 50px 40px;
+            border-radius: 45px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border: 1px solid var(--white);
+        }
 
-        /* QR Payment Card */
-        .qr-section { background: var(--white); padding: 40px; border-radius: 45px; width: 100%; max-width: 380px; box-shadow: 0 40px 80px rgba(0,0,0,0.4); text-align: center; transform: translateY(0); animation: float 6s ease-in-out infinite; }
-        .qr-section img { width: 100%; aspect-ratio: 1/1; border-radius: 15px; }
-        .qr-text { color: var(--navy); font-weight: 800; font-size: 24px; margin-top: 25px; letter-spacing: 0.5px; }
-
-        .footer-note { position: absolute; bottom: 40px; font-size: 14px; opacity: 0.3; letter-spacing: 3px; }
-
-        /* Animations */
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .brand-logo { width: 120px; height: 120px; margin: 0 auto 30px auto; display: block; border-radius: 50%; border: 4px solid var(--bg-light); object-fit: cover; }
         
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .total-label { font-size: 22px; font-weight: 500; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; }
+        .total-amount { font-size: 110px; font-weight: 800; color: var(--text-dark); margin: 5px 0; line-height: 1; letter-spacing: -2px; }
+        .currency { font-size: 30px; vertical-align: middle; margin-left: 5px; color: var(--blue); }
+
+        /* QR Code Styling */
+        .qr-box { 
+            background: var(--bg-light); 
+            padding: 25px; 
+            border-radius: 30px; 
+            margin-top: 35px; 
+            display: inline-block;
+        }
+        .qr-box img { width: 220px; height: 220px; display: block; mix-blend-mode: multiply; }
+        .qr-hint { margin-top: 20px; font-size: 18px; font-weight: 700; color: var(--text-dark); }
+
+        .footer-text { margin-top: 40px; font-size: 12px; opacity: 0.3; letter-spacing: 2px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -71,40 +125,40 @@
             <source src="https://assets.mixkit.co/videos/preview/mixkit-coffee-beans-falling-into-a-grinder-41484-large.mp4" type="video/mp4">
         </video>
         <div class="video-overlay">
-            <h1 style="font-family: 'Prompt';">WITHU CAFE</h1>
-            <p>Better Coffee, Better Moments.</p>
+            <h1>WITHU CAFE</h1>
+            <p style="font-size: 24px; font-weight: 300;">Experience the perfect brew.</p>
         </div>
     </div>
 
     <div id="active-container">
         <div class="order-side">
             <div class="header-row">
-                <h1>Current Order</h1>
-                <div id="display-table-id" class="table-tag">Table -</div>
+                <h1>สรุปรายการสั่งซื้อ</h1>
+                <div id="display-table-id" class="table-tag">โต๊ะ -</div>
             </div>
             <div id="order-items-list" class="order-list">
                 </div>
         </div>
 
         <div class="payment-side">
-            <img src="https://img1.pic.in.th/images/-------2.png" class="brand-logo" alt="Logo">
-            
-            <div class="total-container">
-                <div class="total-label">Total Amount</div>
-                <div class="total-amount"><span id="total-val">0</span>฿</div>
+            <div class="payment-card">
+                <img src="https://img1.pic.in.th/images/-------2.png" class="brand-logo" alt="Logo">
+                
+                <div class="total-label">ยอดชำระสุทธิ</div>
+                <div class="total-amount"><span id="total-val">0</span><span class="currency">฿</span></div>
+                
+                <div class="qr-box">
+                    <img id="qr-img-cds" src="" alt="QR">
+                </div>
+                <div class="qr-hint">สแกนเพื่อชำระเงิน</div>
+                
+                <div class="footer-text">WITHU CUSTOMER DISPLAY SYSTEM</div>
             </div>
-            
-            <div class="qr-section">
-                <img id="qr-img-cds" src="" alt="Payment QR">
-                <div class="qr-text">Scan to Pay</div>
-            </div>
-
-            <div class="footer-note">POWERED BY WITHU POS</div>
         </div>
     </div>
 
 <script>
-    // ⚠️ อย่าลืมใส่ API URL ของน้องนะครับ
+    // ⚠️ ลิงก์ API เดิมของน้อง
     const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
 
     async function updateCDS() {
@@ -120,17 +174,17 @@
                 setTimeout(() => { idle.style.display = 'none'; }, 800);
                 active.style.display = 'grid';
                 
-                document.getElementById('display-table-id').innerText = "Table " + data.table;
+                document.getElementById('display-table-id').innerText = "โต๊ะ " + data.table;
                 
                 let total = 0;
                 let html = data.orders.map(o => {
                     let price = parseFloat(o.total.toString().replace(/,/g, '')) || 0;
                     total += price;
                     return `
-                        <div class="item-card">
+                        <div class="item-row">
                             <div class="item-info">
                                 <b>${o.qty}x ${o.menu}</b>
-                                <small>${o.details || 'Standard'}</small>
+                                <small>${o.details || '-'}</small>
                             </div>
                             <div class="item-price">฿${price.toLocaleString()}</div>
                         </div>`;
@@ -149,7 +203,6 @@
         } catch(e) { console.error("Sync Error:", e); }
     }
 
-    // เช็คข้อมูลทุก 2.5 วินาที
     setInterval(updateCDS, 2500);
 </script>
 </body>

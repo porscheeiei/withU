@@ -3,131 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WITHU Customer Display</title>
+    <title>WITHU CDS Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #1a1a1a; --accent: #10b981; --bg: #f8f9fa; --shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        :root { --p: #1a1a1a; --accent: #10b981; --bg: #f8f9fa; }
         body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--p); }
-        
-        /* ฝั่งซ้าย: รายการอาหาร (ขาวสะอาด) */
+
+        /* --- หน้าตั้งค่าครั้งแรก (Setup Screen) --- */
+        #setup-screen { position: fixed; inset: 0; background: #fff; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .setup-box { background: #fff; padding: 50px; border-radius: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.1); width: 80%; max-width: 400px; }
+        .setup-logo { width: 100px; margin-bottom: 20px; border-radius: 50%; border: 3px solid #eee; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+        .btn-table { padding: 20px; border: 2px solid #eee; border-radius: 20px; font-size: 20px; font-weight: 600; cursor: pointer; transition: 0.3s; background: #fff; }
+        .btn-table:hover { border-color: var(--p); background: #f9f9f9; }
+
+        /* --- จอแสดงผลหลัก (Main Display) --- */
         .order-side { flex: 1.2; padding: 60px; background: #fff; display: flex; flex-direction: column; border-radius: 0 40px 40px 0; box-shadow: 15px 0 50px rgba(0,0,0,0.02); z-index: 2; }
-        .order-list { flex: 1; overflow-y: auto; margin-top: 30px; padding-right: 15px; }
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 25px 0; border-bottom: 2px dashed #f1f1f1; animation: slideIn 0.4s ease-out; }
-        .item b { font-size: 28px; font-weight: 600; }
-        .item small { font-size: 18px; color: #999; display: block; margin-top: 5px; }
-        .item .item-price { font-size: 28px; font-weight: 800; color: var(--p); }
+        .order-list { flex: 1; overflow-y: auto; margin-top: 30px; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 25px 0; border-bottom: 2px dashed #f1f1f1; animation: slideIn 0.4s; }
+        .item b { font-size: 28px; }
+        .item small { font-size: 18px; color: #999; display: block; }
         
-        /* ฝั่งขวา: ยอดรวมและชำระเงิน (ธีมมินิมอลดำ) */
-        .payment-side { flex: 0.8; padding: 60px; background: var(--p); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
-        .logo { width: 160px; height: 160px; border-radius: 50%; border: 6px solid #fff; margin-bottom: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); object-fit: cover; }
+        .payment-side { flex: 0.8; padding: 60px; background: var(--p); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .total-amount { font-size: 110px; font-weight: 800; color: var(--accent); margin: 10px 0; }
         
-        .total-label { font-size: 32px; opacity: 0.7; font-weight: 300; }
-        .total-amount { font-size: 110px; font-weight: 800; color: var(--accent); margin: 10px 0; line-height: 1; }
-        .currency { font-size: 40px; margin-left: 10px; }
+        #qr-overlay { display: none; background: #fff; padding: 30px; border-radius: 40px; margin-top: 20px; animation: popUp 0.5s; }
+        #qr-overlay img { width: 280px; height: 280px; }
 
-        /* QR Overlay (เด้งขึ้นมาสวยๆ) */
-        #qr-overlay { display: none; background: #fff; padding: 40px; border-radius: 50px; margin-top: 30px; animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
-        #qr-overlay img { width: 320px; height: 320px; border-radius: 20px; }
-        .qr-label { color: #000; font-weight: 800; margin-top: 20px; font-size: 24px; }
+        #idle-screen { position: fixed; inset: 0; background: var(--p); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
+        .btn-reset { position: fixed; bottom: 20px; left: 20px; opacity: 0.1; background: none; border: none; color: #fff; cursor: pointer; z-index: 2000; }
 
-        /* หน้า Idle (ตอนไม่มีออเดอร์) */
-        #idle-screen { position: fixed; inset: 0; background: var(--p); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; }
-        .welcome-title { font-size: 60px; font-weight: 800; margin-top: 20px; letter-spacing: 2px; }
-        .welcome-sub { font-size: 28px; opacity: 0.5; font-weight: 300; }
-        .table-pill { margin-top: 50px; font-size: 30px; background: rgba(255,255,255,0.1); padding: 12px 40px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.2); }
-
-        /* Animations */
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes popUp { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
+        @keyframes slideIn { from { opacity:0; transform: translateX(-20px); } to { opacity:1; transform: translateX(0); } }
+        @keyframes popUp { from { opacity:0; scale: 0.8; } to { opacity:1; scale: 1; } }
     </style>
 </head>
 <body>
 
+    <button class="btn-reset" onclick="localStorage.removeItem('cds_table'); location.reload();">ล้างค่า</button>
+
+    <div id="setup-screen" style="display: none;">
+        <div class="setup-box">
+            <img src="https://img1.pic.in.th/images/-------2.png" class="setup-logo">
+            <h2>ตั้งค่าจอ CDS</h2>
+            <p>กรุณาเลือกหมายเลขโต๊ะสำหรับจอนี้</p>
+            <div class="btn-grid">
+                <script>
+                    for(let i=1; i<=10; i++) {
+                        document.write(`<button class="btn-table" onclick="setTable(${i})">โต๊ะ ${i}</button>`);
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+
     <div id="idle-screen">
-        <img src="https://img1.pic.in.th/images/-------2.png" class="logo" alt="Logo">
-        <div class="welcome-title">WITHU</div>
-        <div class="welcome-sub">ยินดีต้อนรับค่ะ</div>
-        <div id="display-table-id" class="table-pill">โต๊ะ -</div>
+        <img src="https://img1.pic.in.th/images/-------2.png" style="width: 150px; border-radius: 50%; margin-bottom: 20px;">
+        <h1 style="font-size: 50px;">WITHU</h1>
+        <p style="opacity: 0.5; font-size: 24px;">ยินดีต้อนรับค่ะ</p>
+        <div id="display-id-badge" style="margin-top: 30px; background: rgba(255,255,255,0.1); padding: 10px 30px; border-radius: 50px;">โต๊ะ -</div>
     </div>
 
     <div class="order-side">
-        <h1 style="font-size: 45px; margin: 0; font-weight: 800; border-left: 10px solid var(--p); padding-left: 20px;">รายการสั่งซื้อ</h1>
-        <div id="order-items" class="order-list">
-            </div>
+        <h1 style="font-size: 40px; margin: 0;">รายการที่สั่ง</h1>
+        <div id="order-items" class="order-list"></div>
     </div>
 
     <div class="payment-side">
-        <div class="total-label">ยอดชำระทั้งหมด</div>
-        <div class="total-amount"><span id="total-price">0</span><span class="currency">฿</span></div>
-        
+        <div style="font-size: 30px; opacity: 0.7;">ยอดชำระทั้งหมด</div>
+        <div class="total-amount">฿<span id="total-price">0</span></div>
         <div id="qr-overlay">
-            <img id="qr-img" src="" alt="PromptPay QR">
-            <div class="qr-label">สแกนจ่ายที่นี่</div>
+            <img id="qr-img" src="">
+            <div style="color: #000; font-weight: 800; margin-top: 15px;">สแกนเพื่อชำระเงิน</div>
         </div>
-
-        <div style="position: absolute; bottom: 40px; opacity: 0.3; font-weight: 300;">WITHU Customer Display System</div>
     </div>
 
 <script>
-    // ⚠️ ใส่ลิงก์ API จาก Apps Script ของคุณที่นี่
-    const API_URL = "https://script.google.com/macros/s/AKfycbyOiAoYnqb5ECoNxKui3-q764YQUHOg4nE8MFz_g63Ir7rE7fWZEPjloc42NkJuUhtHLg/exec"; 
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const tableId = urlParams.get('table') || "1"; // วิธีใช้: display.html?table=1
+    const API_URL = "ใส่_WEB_APP_URL_ของน้อง"; 
+    let tableId = localStorage.getItem('cds_table');
 
-    document.getElementById('display-table-id').innerText = "โต๊ะ " + tableId;
+    // เช็คว่าเคยตั้งค่าโต๊ะไว้หรือยัง
+    if (!tableId) {
+        document.getElementById('setup-screen').style.display = 'flex';
+    } else {
+        startSync();
+    }
+
+    function setTable(id) {
+        localStorage.setItem('cds_table', id);
+        tableId = id;
+        document.getElementById('setup-screen').style.display = 'none';
+        startSync();
+    }
+
+    function startSync() {
+        document.getElementById('display-id-badge').innerText = "โต๊ะ " + tableId;
+        setInterval(updateDisplay, 2000);
+    }
 
     async function updateDisplay() {
         try {
-            const response = await fetch(API_URL + "?action=getDisplayData&table=" + tableId);
-            const data = await response.json();
+            const r = await fetch(API_URL + "?action=getDisplayData&table=" + tableId);
+            const d = await r.json();
 
-            // ตรวจสอบว่ามีออเดอร์ค้างอยู่ไหม
-            if (data.orders && data.orders.length > 0) {
+            if (d.orders && d.orders.length > 0) {
                 document.getElementById('idle-screen').style.display = 'none';
-                
                 let total = 0;
-                let html = data.orders.map(o => {
-                    let price = parseFloat(o.total.toString().replace(/,/g, '')) || 0;
-                    total += price;
-                    return `
-                        <div class="item">
-                            <span>
-                                <b>${o.qty}x ${o.menu}</b>
-                                <small>${o.details}</small>
-                            </span>
-                            <span class="item-price">฿${price.toLocaleString()}</span>
-                        </div>`;
+                let html = d.orders.map(o => {
+                    let p = parseFloat(o.total.toString().replace(/,/g, '')) || 0;
+                    total += p;
+                    return `<div class="item"><span><b>${o.qty}x ${o.menu}</b><small>${o.details}</small></span><span style="font-weight:800; font-size:28px;">฿${p.toLocaleString()}</span></div>`;
                 }).join('');
-                
                 document.getElementById('order-items').innerHTML = html;
                 document.getElementById('total-price').innerText = total.toLocaleString();
 
-                // 🚩 โชว์ QR อัตโนมัติเมื่อ Admin กดสัญญาณ 'paying'
-                if (data.payStatus === 'paying') {
-                    // เปลี่ยนเบอร์พร้อมเพย์ร้านคุณตรงนี้
+                if (d.payStatus === 'paying') {
                     document.getElementById('qr-img').src = `https://promptpay.io/0931805507/${total}.png`;
                     document.getElementById('qr-overlay').style.display = 'block';
                 } else {
                     document.getElementById('qr-overlay').style.display = 'none';
                 }
             } else {
-                // ไม่มีออเดอร์ ให้โชว์หน้า Welcome
                 document.getElementById('idle-screen').style.display = 'flex';
-                document.getElementById('order-items').innerHTML = '';
-                document.getElementById('total-price').innerText = '0';
             }
-        } catch(e) {
-            console.error("CDS Sync Error:", e);
-        }
+        } catch(e) {}
     }
-
-    // เช็คข้อมูลทุกๆ 2 วินาทีเพื่อให้ทันใจ
-    setInterval(updateDisplay, 2000);
 </script>
 </body>
 </html>

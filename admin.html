@@ -2,58 +2,67 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WITHU Admin Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #f9fafb; --accent: #10b981; --red: #d63031; --blue: #007AFF; --navy: #1e3a8a; --text-main: #1f2937; --shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        :root { --bg: #f9fafb; --accent: #10b981; --red: #d63031; --blue: #2563eb; --navy: #0f172a; --text-main: #1f2937; --shadow: 0 10px 25px rgba(0,0,0,0.05); }
         body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; -webkit-font-smoothing: antialiased; }
         
-        .alert-bar { background: var(--red); color: #fff; padding: 16px; border-radius: 16px; margin-bottom: 25px; text-align: center; cursor: pointer; font-weight: 600; animation: pulse 2s infinite; box-shadow: 0 10px 20px rgba(214,48,49,0.2); }
+        /* Alert Bar */
+        .alert-bar { background: var(--red); color: #fff; padding: 18px; border-radius: 20px; margin-bottom: 25px; text-align: center; cursor: pointer; font-weight: 700; animation: pulse 2s infinite; box-shadow: 0 10px 25px rgba(214,48,49,0.3); }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
 
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
-        .revenue-pill { background: #fff; padding: 10px 20px; border-radius: 15px; box-shadow: var(--shadow); text-align: right; border: 1px solid #f3f4f6; }
+        .revenue-pill { background: #fff; padding: 12px 25px; border-radius: 20px; box-shadow: var(--shadow); text-align: right; border: 1px solid #f3f4f6; }
         
-        .nav-btn { padding: 12px 24px; border: none; border-radius: 12px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; transition: 0.3s; background: #fff; color: #000; border: 1px solid #eee; margin-right: 5px; }
-        .nav-btn.active { background: #000 !important; color: #fff !important; border-color: #000; }
+        .nav-group { margin-bottom: 30px; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .nav-btn { padding: 12px 28px; border: none; border-radius: 15px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; transition: 0.3s; background: #fff; color: #64748b; border: 1px solid #e2e8f0; white-space: nowrap; }
+        .nav-btn.active { background: var(--navy) !important; color: #fff !important; border-color: var(--navy); box-shadow: 0 10px 20px rgba(15,23,42,0.2); }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; }
-        .card { background: #fff; border-radius: 35px; padding: 30px; box-shadow: var(--shadow); border: 1px solid rgba(229,231,235,0.5); position: relative; }
-        .card-time { position: absolute; top: 30px; right: 30px; color: #BBB; font-size: 14px; font-weight: 500; }
+        /* Order Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        .card { background: #fff; border-radius: 40px; padding: 35px; box-shadow: var(--shadow); border: 1px solid rgba(229,231,235,0.5); position: relative; transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+        .card-time { position: absolute; top: 35px; right: 35px; color: #94a3b8; font-size: 14px; font-weight: 500; }
         
-        .order-item { border-bottom: 1px dashed #eee; padding: 10px 0; font-size: 14px; }
-        .status-group { display: flex; gap: 6px; margin: 20px 0; flex-wrap: wrap; }
-        .s-btn { flex:1; min-width: 80px; padding: 12px; font-size: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: 'Prompt'; transition: 0.2s; }
+        .member-badge { background: #eff6ff; color: var(--blue); padding: 5px 15px; border-radius: 10px; font-size: 13px; font-weight: 700; display: inline-block; margin-bottom: 15px; border: 1px solid #dbeafe; }
+        
+        .order-item { border-bottom: 1px solid #f1f5f9; padding: 15px 0; font-size: 15px; }
+        .order-item b { font-size: 18px; color: var(--navy); }
+        
+        .status-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 25px 0; }
+        .s-btn { padding: 10px; font-size: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: 'Prompt'; transition: 0.2s; }
         .s-btn:active { transform: scale(0.95); }
         
-        .btn-qr { width: 100%; background: #000; color: #fff; padding: 16px; border-radius: 18px; font-weight: 700; margin-top: 20px; border: none; cursor: pointer; font-size: 15px; }
-        .btn-cash { width: 100%; background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 16px; border-radius: 18px; font-weight: 700; margin-top: 10px; cursor: pointer; font-size: 15px; font-family: 'Prompt'; }
+        .btn-cds { width: 100%; background: var(--blue); color: #fff; padding: 14px; border-radius: 18px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 8px; font-size: 15px; }
+        .btn-qr { width: 100%; background: var(--navy); color: #fff; padding: 16px; border-radius: 18px; font-weight: 700; border: none; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .btn-cash { width: 100%; background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 16px; border-radius: 18px; font-weight: 700; margin-top: 10px; cursor: pointer; font-size: 16px; font-family: 'Prompt'; }
 
-        .stock-card { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 20px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 10px; border: 1px solid #f3f4f6; }
-
-        .report-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); }
-        .report-table th { background: #f1f3f5; padding: 15px; text-align: left; font-size: 14px; }
-        .report-table td { padding: 15px; border-top: 1px solid #eee; font-size: 15px; }
-        
-        #sound-unlock { position: fixed; bottom: 20px; right: 20px; z-index: 2000; background: #000; color: #fff; border: none; padding: 12px 20px; border-radius: 50px; cursor: pointer; font-size: 12px; font-family: 'Prompt'; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        /* Report Table */
+        .report-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 25px; overflow: hidden; box-shadow: var(--shadow); }
+        .report-table th { background: #f8fafc; padding: 20px; text-align: left; font-size: 14px; color: #64748b; }
+        .report-table td { padding: 20px; border-top: 1px solid #f1f5f9; font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <button id="sound-unlock" onclick="this.style.display='none'">🔔 คลิกเพื่อเปิดเสียงแจ้งเตือน</button>
+    <button id="sound-unlock" style="position:fixed; bottom:20px; right:20px; z-index:2000; background:var(--navy); color:#fff; border:none; padding:12px 25px; border-radius:50px; cursor:pointer; font-family:'Prompt';" onclick="this.style.display='none'">🔔 เปิดเสียงแจ้งเตือน</button>
 
     <div id="staff-alert" class="alert-bar" onclick="clearCallAlert()" style="display:none;">⚠️ โต๊ะ <span id="alert-table"></span> เรียกพนักงาน (คลิกเพื่อปิด)</div>
     
     <div class="header">
         <h1>WITHU Admin</h1>
-        <div class="revenue-pill"><small style="display:block; color:#6b7280; font-size:12px;">รายได้รวมวันนี้</small><b id="revenue">฿0</b></div>
+        <div class="revenue-pill">
+            <small style="display:block; color:#64748b;">รายได้รวมวันนี้</small>
+            <b id="revenue" style="font-size:24px;">฿0</b>
+        </div>
     </div>
     
-    <div style="margin-bottom: 30px;">
-        <button id="nav-orders" onclick="showSec('orders')" class="nav-btn active">ดูออเดอร์</button>
+    <div class="nav-group">
+        <button id="nav-orders" onclick="showSec('orders')" class="nav-btn active">ออเดอร์ค้าง</button>
         <button id="nav-stock" onclick="showSec('stock')" class="nav-btn">จัดการสต็อก</button>
-        <button id="nav-report" onclick="showSec('report')" class="nav-btn">รายงานสรุป</button>
+        <button id="nav-report" onclick="showSec('report')" class="nav-btn">สรุปยอดขาย</button>
     </div>
 
     <div id="container" class="grid"></div>
@@ -61,19 +70,20 @@
     <div id="stock-sec" style="display:none;" class="grid"></div>
 
     <div id="report-sec" style="display:none;">
-        <div class="card" style="margin-bottom:25px; text-align:center; background: #000; color: #fff; border-radius: 30px;">
-            <small>ยอดขายสุทธิวันนี้</small>
-            <h2 id="report-revenue-total" style="font-size:40px; margin:10px 0;">฿0</h2>
+        <div class="card" style="margin-bottom:25px; text-align:center; background: var(--navy); color: #fff; border-radius: 35px;">
+            <small style="opacity:0.7">ยอดขายสุทธิวันนี้</small>
+            <h2 id="report-revenue-total" style="font-size:50px; margin:10px 0;">฿0</h2>
         </div>
         <div id="report-list"></div>
     </div>
 
-    <div id="modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;z-index:1000;align-items:center;justify-content:center;" onclick="this.style.display='none'">
-        <div class="modal-box" style="background:#fff;padding:40px;border-radius:40px;text-align:center;max-width:400px;width:90%;" onclick="event.stopPropagation()">
-            <h3 id="m-table" style="margin:0;"></h3>
-            <img id="m-qr" style="width:100%; margin: 20px 0; border-radius: 20px; border: 1px solid #eee;">
-            <div id="m-total" style="font-size:36px;font-weight:800;"></div>
-            <button class="btn-qr" style="background:var(--accent); border-radius: 15px;" id="m-confirm">ยืนยันได้รับเงินแล้ว</button>
+    <div id="modal" style="position:fixed;inset:0;background:rgba(15,23,42,0.9);backdrop-filter:blur(5px);display:none;z-index:1000;align-items:center;justify-content:center;" onclick="this.style.display='none'">
+        <div class="modal-box" style="background:#fff;padding:45px;border-radius:45px;text-align:center;max-width:420px;width:90%;" onclick="event.stopPropagation()">
+            <h3 id="m-table" style="font-size:28px; margin-bottom:5px;"></h3>
+            <div id="m-member" style="color:var(--blue); font-weight:600; margin-bottom:20px;"></div>
+            <img id="m-qr" style="width:100%; margin: 10px 0; border-radius: 25px; border: 1px solid #f1f5f9;">
+            <div id="m-total" style="font-size:45px;font-weight:800; color:var(--navy); margin:15px 0;"></div>
+            <button class="btn-qr" style="background:var(--accent);" id="m-confirm">ยืนยันได้รับเงินแล้ว</button>
         </div>
     </div>
 
@@ -95,67 +105,72 @@
                 document.getElementById('revenue').innerText = "฿" + revenueText;
                 document.getElementById('report-revenue-total').innerText = "฿" + revenueText;
 
+                // ระบบแจ้งเตือนพนักงาน
                 if(d.calls && d.calls.length > 0) { 
                     cAlertT = d.calls[0][1]; 
                     document.getElementById('staff-alert').style.display='block'; 
                     document.getElementById('alert-table').innerText=cAlertT; 
-                    if(!isFirstLoad && d.calls.length > lastCallCount) {
-                        callSound.play().catch(e => console.log("Audio play blocked"));
-                    }
-                } else { 
-                    document.getElementById('staff-alert').style.display='none'; 
-                }
+                    if(!isFirstLoad && d.calls.length > lastCallCount) callSound.play().catch(e => {});
+                } else { document.getElementById('staff-alert').style.display='none'; }
                 lastCallCount = d.calls ? d.calls.length : 0;
 
+                // ระบบจัดการออเดอร์
                 const container = document.getElementById('container'); 
                 if(!d.orders || d.orders.length === 0){ 
-                    container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:100px;color:#9ca3af;'>ไม่มีออเดอร์ค้าง</div>"; 
+                    container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:100px;color:#94a3b8;'>ไม่มีออเดอร์ค้างในขณะนี้</div>"; 
                     lastOrderCount = 0; 
                 } else {
-                    if(!isFirstLoad && d.orders.length > lastOrderCount) {
-                        orderSound.play().catch(e => console.log("Audio play blocked"));
-                    }
+                    if(!isFirstLoad && d.orders.length > lastOrderCount) orderSound.play().catch(e => {});
                     lastOrderCount = d.orders.length;
 
                     let groups={}; d.orders.forEach(o=>{
-                        if(!groups[o.table]) groups[o.table]={items:[],total:0,rows:[],time:o.time}; 
+                        if(!groups[o.table]) groups[o.table]={items:[], total:0, rows:[], time:o.time, phone:o.phone}; 
                         groups[o.table].items.push(o); 
                         groups[o.table].total += parseFloat(o.total.toString().replace(/,/g,'')) || 0; 
                         groups[o.table].rows.push(o.rowNum);
+                        if(o.phone) groups[o.table].phone = o.phone; // เก็บเบอร์โทรล่าสุด
                     });
 
                     container.innerHTML = Object.keys(groups).map(t => `
                         <div class="card">
                             <div class="card-time">${groups[t].time}</div>
-                            <h2 style="margin:0 0 20px 0; font-size:22px; font-weight:800;">โต๊ะ ${t}</h2>
-                            ${groups[t].items.map(i=>`<div class="order-item"><b>${i.qty}x ${i.menu}</b><br><small style="color:var(--blue); font-weight:600;">${i.details} [${i.status}]</small></div>`).join('')}
-                            <div class="status-group">
-                                <button class="s-btn" style="background:#FEF3C7; color:#92400E;" onclick='upS(${JSON.stringify(groups[t].rows)},"กำลังทำ")'>กำลังทำ</button>
-                                <button class="s-btn" style="background:#DCFCE9; color:#166534;" onclick='upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ")'>รอเสิร์ฟ</button>
-                                <button class="s-btn" style="background:#E0F2FE; color:#0369A1;" onclick='upS(${JSON.stringify(groups[t].rows)},"สำเร็จ")'>เสิร์ฟแล้ว</button>
-                                <button class="s-btn" style="background:var(--navy); color:#fff;" onclick='triggerCDS("${t}")'>CDS</button>
+                            <h2 style="margin:0 0 10px 0; font-size:26px; font-weight:800; color:var(--navy);">โต๊ะ ${t}</h2>
+                            ${groups[t].phone ? `<div class="member-badge">👤 Member: ${groups[t].phone}</div>` : ''}
+                            
+                            <div style="margin-top:10px;">
+                                ${groups[t].items.map(i=>`<div class="order-item"><b>${i.qty}x ${i.menu}</b><br><small style="color:var(--blue); font-weight:600;">${i.details} • [${i.status}]</small></div>`).join('')}
                             </div>
-                            <div style="font-size:32px; font-weight:800; text-align:right; margin:15px 0;">฿${groups[t].total.toLocaleString()}</div>
-                            <button class="btn-qr" onclick='shQR("${t}",${groups[t].total},${JSON.stringify(groups[t].rows)})'>เก็บเงิน (QR)</button>
+
+                            <div class="status-group">
+                                <button class="s-btn" style="background:#fef3c7; color:#92400e;" onclick='upS(${JSON.stringify(groups[t].rows)},"กำลังทำ")'>กำลังทำ</button>
+                                <button class="s-btn" style="background:#dcfce9; color:#166534;" onclick='upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ")'>รอเสิร์ฟ</button>
+                                <button class="s-btn" style="background:#e0f2fe; color:#0369a1;" onclick='upS(${JSON.stringify(groups[t].rows)},"สำเร็จ")'>เสิร์ฟแล้ว</button>
+                            </div>
+
+                            <button class="btn-cds" onclick='triggerCDS("${t}")'>📡 ส่งข้อมูลขึ้นจอ CDS</button>
+                            
+                            <div style="font-size:36px; font-weight:800; text-align:right; margin:15px 0; color:var(--navy);">฿${groups[t].total.toLocaleString()}</div>
+                            
+                            <button class="btn-qr" onclick='shQR("${t}",${groups[t].total},${JSON.stringify(groups[t].rows)},"${groups[t].phone || ''}")'>เก็บเงิน (PromptPay)</button>
                             <button class="btn-cash" onclick='pay("${t}",${JSON.stringify(groups[t].rows)})'>ปิดโต๊ะ (เงินสด)</button>
                         </div>`).join('');
                 }
 
+                // สต็อก & รายงาน (คงเดิม)
                 if (d.menu) {
-                    let stockHTML = d.menu.map(m=>`<div class="stock-card"><span>${m[0]}</span><button style="padding:8px 15px; border-radius:10px; border:none; background:${m[5]=='หมด'?'#eee':'#1f2937'}; color:${m[5]=='หมด'?'#333':'#fff'}; cursor:pointer;" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เปิดขาย':'ปิด (หมด)'}</button></div>`).join('');
-                    document.getElementById('stock-sec').innerHTML = `<h3 style="grid-column:1/-1; padding-left:10px;">จัดการสต็อก</h3>${stockHTML}`;
+                    let stockHTML = d.menu.map(m=>`<div class="stock-card"><span><b>${m[0]}</b></span><button style="padding:10px 20px; border-radius:12px; border:none; background:${m[5]=='หมด'?'#f1f5f9':'var(--navy)'}; color:${m[5]=='หมด'?'#ef4444':'#fff'}; cursor:pointer; font-weight:700;" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เปิดขาย':'ปิด (หมด)'}</button></div>`).join('');
+                    document.getElementById('stock-sec').innerHTML = `<h2 style="grid-column:1/-1; padding-left:10px;">จัดการสต็อกสินค้า</h2>${stockHTML}`;
                 }
 
                 if (d.summary && d.summary.report) {
-                    let reportHTML = `<table class="report-table"><thead><tr><th>ชื่อเมนู</th><th style="text-align:center;">จำนวน</th><th style="text-align:right;">รวมเงิน</th></tr></thead><tbody>` + 
-                        d.summary.report.map(item => `<tr><td><b>${item.name}</b></td><td style="text-align:center;">${item.qty} แก้ว</td><td style="text-align:right;">฿${item.total.toLocaleString()}</td></tr>`).join('') + 
+                    let reportHTML = `<table class="report-table"><thead><tr><th>เมนู</th><th style="text-align:center;">จำนวน</th><th style="text-align:right;">ยอดรวม</th></tr></thead><tbody>` + 
+                        d.summary.report.map(item => `<tr><td><b>${item.name}</b></td><td style="text-align:center;">${item.qty} แก้ว</td><td style="text-align:right; font-weight:700;">฿${item.total.toLocaleString()}</td></tr>`).join('') + 
                         `</tbody></table>`;
-                    if(d.summary.report.length === 0) reportHTML = "<div style='text-align:center; padding:50px; color:#999;'>ยังไม่มีข้อมูลการขายในวันนี้</div>";
-                    document.getElementById('report-list').innerHTML = reportHTML;
+                    document.getElementById('report-list').innerHTML = (d.summary.report.length === 0) ? "<div style='text-align:center; padding:50px; color:#94a3b8;'>ไม่มีข้อมูลการขายในวันนี้</div>" : reportHTML;
                 }
 
                 isFirstLoad = false;
-            } catch(e){ console.error("Refresh Error:", e); }
+            } catch(e){ console.log(e); }
         }
 
         function showSec(n) { 
@@ -169,29 +184,25 @@
         async function upS(r, s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
         async function tgS(type, name, status) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStock',type:type,name:name,status:status})}); refresh(); }
         
-        // 🚩 ฟังก์ชันส่งข้อมูลขึ้นจอฝั่งลูกค้าโดยเฉพาะ
         async function triggerCDS(t) {
             await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'paying'})});
-            alert("ส่งข้อมูลโต๊ะ " + t + " ขึ้นจอหน้าบ้านแล้วค่ะ");
+            alert("ส่งข้อมูลโต๊ะ " + t + " ขึ้นจอหน้าบ้านเรียบร้อยค่ะ");
         }
 
-        async function shQR(t, a, r) { 
-            // เมื่อกดดู QR ในคอมแอดมิน ให้จอ CDS โชว์ตามด้วยทันที
+        async function shQR(t, a, r, phone) { 
             fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'paying'})});
-
-            document.getElementById('m-table').innerText = "โต๊ะ "+t; 
-            document.getElementById('m-total').innerText = "฿"+a.toLocaleString(); 
+            document.getElementById('m-table').innerText = "โต๊ะ " + t; 
+            document.getElementById('m-member').innerText = phone ? "👤 สมาชิก: " + phone : "";
+            document.getElementById('m-total').innerText = "฿" + a.toLocaleString(); 
             document.getElementById('m-qr').src = `https://promptpay.io/0931805507/${a}.png`; 
             document.getElementById('m-confirm').onclick = () => { document.getElementById('modal').style.display='none'; pay(t,r); }; 
             document.getElementById('modal').style.display = 'flex'; 
         }
 
         async function pay(t, r) { 
-            if(confirm("ยืนยันได้รับเงินและปิดโต๊ะ "+t+"?")){ 
-                // เมื่อปิดโต๊ะ ให้จอ CDS กลับไปหน้าวิดีโอ (idle)
+            if(confirm("ยืนยันได้รับเงินและปิดออเดอร์โต๊ะ "+t+"?\n(ระบบจะสะสมแต้มให้สมาชิกอัตโนมัติ)")){ 
                 await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'idle'})});
-
-                await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r})}); 
+                await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r, paymentMethod:'สำเร็จ'})}); 
                 refresh(); 
             }
         }

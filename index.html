@@ -53,7 +53,7 @@
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 25px; box-shadow: 0 -5px 25px rgba(0,0,0,0.08); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 35px 35px 0 0; }
         .btn-checkout { background: #000; color: #fff; border: none; padding: 15px 35px; border-radius: 25px; font-family: 'Prompt'; font-weight: 700; font-size: 16px; }
         
-        /* Order Status */
+        /* Status Tracking */
         .status-card { background: #fff; border-radius: 35px; padding: 45px 25px; text-align: center; border: 1px solid #eee; box-shadow: 0 10px 40px rgba(0,0,0,0.03); }
         .status-stepper { display: flex; justify-content: space-between; align-items: center; margin: 40px 0; position: relative; }
         .status-stepper::before { content: ''; position: absolute; top: 16px; left: 10%; right: 10%; height: 2px; background: #eee; z-index: 1; }
@@ -146,6 +146,7 @@
         let h = ""; 
         fullMenu.forEach((r, idx) => {
             if(f !== "ทั้งหมด" && r[2] !== f) return;
+            // r[5] คือ คอลัมน์ F (สถานะ)
             let isAvail = (r[5] !== "หมด"), cat = r[2] || "", 
                 isD = (cat === "เครื่องดื่ม" || cat === "สมูทตี้"), 
                 showSmoothieOpt = (cat === "เครื่องดื่ม"), 
@@ -172,7 +173,6 @@
                                 ${itemOpt[idx].smoothie ? '✓ ปั่น (+฿10)' : '+ เพิ่มปั่น (+฿10)'}
                             </div>
                         ` : ''}
-                        <br>
                         <div class="acc-btn" onclick="toggleAcc(${idx})">${isExp ? 'ปิดตัวเลือกเพิ่มเติม' : 'เลือกท็อปปิ้งเพิ่มเติม'}</div>
                         <div class="acc-content ${isExp ? 'open' : ''}">
                             <div class="top-grid">
@@ -210,7 +210,7 @@
             }); 
         }
         cart.push({name: n, price: p, qty: 1, total: fp, sweetness: det.join(", ")||'-'}); 
-        // Reset item options หลังใส่ตะกร้า
+        // Reset ตัวเลือก
         itemOpt[idx] = { toppings: [], smoothie: false }; 
         currentS[idx] = "100%";
         updateUI();
@@ -225,7 +225,7 @@
     }
 
     function openReceipt() {
-        let h = `<h3 style="margin-top:0; font-weight:700; font-size:22px;">ยืนยันออเดอร์</h3><div style="max-height:350px; overflow-y:auto; padding-right:5px;">`;
+        let h = `<h3 style="margin-top:0; font-weight:700; font-size:22px;">สรุปออเดอร์</h3><div style="max-height:350px; overflow-y:auto; padding-right:5px;">`;
         cart.forEach((i,idx) => h += `
             <div style="display:flex;justify-content:space-between;margin-bottom:18px; font-size:15px; border-bottom:1px solid #f1f1f1; padding-bottom:12px;">
                 <span><b>${i.name}</b><br><small style="color:#888">${i.sweetness}</small></span>
@@ -243,10 +243,7 @@
     async function sub() { 
         document.getElementById('modal-body').innerHTML = "<div style='text-align:center; padding:40px;'><h3 style='margin:0;'>กำลังส่งออเดอร์...</h3></div>";
         try {
-            await fetch(API_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) 
-            });
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) });
             showStatus(); cart=[]; updateUI(); 
         } catch(e) {
             alert("ส่งออเดอร์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
@@ -260,8 +257,8 @@
         document.getElementById('app-content').innerHTML = `
             <div class="app-container" style="padding-top:40px;">
                 <div class="status-card">
-                    <h2 style="font-weight:700; font-size:28px; margin-bottom:10px;">ขอบคุณที่ใช้บริการ</h2>
-                    <p style="color:#888;">ออเดอร์โต๊ะ ${currentTable} กำลังดำเนินการ</p>
+                    <h2 style="font-weight:700; font-size:28px;">ส่งออเดอร์เรียบร้อย</h2>
+                    <p style="color:#888;">โต๊ะ ${currentTable} กำลังรอคิวทำค่ะ</p>
                     <div class="status-stepper">
                         <div class="step-point" id="st-1"><div class="step-circle">1</div><div class="step-label">รับออเดอร์</div></div>
                         <div class="step-point" id="st-2"><div class="step-circle">2</div><div class="step-label">กำลังทำ</div></div>
@@ -269,7 +266,7 @@
                         <div class="step-point" id="st-4"><div class="step-circle">4</div><div class="step-label">สำเร็จ</div></div>
                     </div>
                     <div id="stat-list" style="margin:30px 0; text-align:left; border-top:1px solid #f8f8f8; padding-top:20px;"></div>
-                    <button class="btn-more" onclick="location.reload()">กลับหน้าสั่งอาหาร</button>
+                    <button class="btn-more" onclick="location.reload()">กลับหน้าหลัก</button>
                 </div>
             </div>`;
         chk(); sInterval = setInterval(chk, 5000);
@@ -280,7 +277,7 @@
             const r = await fetch(API_URL + "?action=getOrderStatus&table=" + currentTable); 
             const d = await r.json();
             if (!d || !d.length) { upS(4); clearInterval(sInterval); return; }
-            const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4, "เสิร์ฟเรียบร้อย":4};
+            const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4};
             let minVal = 4;
             d.forEach(o => { if (p[o.status] < minVal) minVal = p[o.status]; });
             upS(minVal); 

@@ -1,4 +1,4 @@
-ฃ<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -38,67 +38,41 @@
         .item-info small { font-size: 18px; color: var(--text-gray); margin-top: 5px; display: block; }
         .item-price { font-size: 30px; font-weight: 800; color: var(--blue); }
 
-        /* --- 💳 ฝั่งขวา: สรุปยอดเงินและสมาชิก --- */
+        /* --- 💳 ฝั่งขวา: สรุปยอดเงิน --- */
         .payment-side { background: var(--bg-light); padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
         .payment-card {
             background: var(--white);
             width: 100%;
             max-width: 440px;
-            padding: 40px;
+            padding: 50px;
             border-radius: 45px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
             text-align: center;
         }
 
-        .brand-logo { width: 100px; height: 100px; margin: 0 auto 20px auto; display: block; border-radius: 50%; object-fit: cover; }
-        .total-label { font-size: 20px; font-weight: 500; color: var(--text-gray); text-transform: uppercase; }
-        .total-amount { font-size: 90px; font-weight: 800; color: var(--text-dark); margin: 5px 0; line-height: 1; letter-spacing: -2px; }
-        .currency { font-size: 30px; color: var(--blue); margin-left: 5px; }
+        .brand-logo { width: 120px; height: 120px; margin: 0 auto 30px auto; display: block; border-radius: 50%; object-fit: cover; border: 4px solid var(--bg-light); }
+        .total-label { font-size: 20px; font-weight: 500; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; }
+        .total-amount { font-size: 100px; font-weight: 800; color: var(--text-dark); margin: 5px 0; line-height: 1; letter-spacing: -2px; }
+        .currency { font-size: 35px; color: var(--blue); margin-left: 8px; }
 
-        /* Member Section */
-        .member-box { 
-            background: #f8fafc; 
-            padding: 25px; 
-            border-radius: 30px; 
-            margin-top: 25px; 
-            border: 1px solid #f1f5f9;
+        /* QR Code Styling */
+        .qr-box { 
+            background: var(--bg-light); 
+            padding: 30px; 
+            border-radius: 35px; 
+            margin-top: 40px; 
+            display: inline-block;
         }
-        .member-input { 
-            width: 100%; 
-            padding: 15px; 
-            border: 2px solid #e2e8f0; 
-            border-radius: 15px; 
-            font-family: 'Prompt'; 
-            font-size: 22px; 
-            text-align: center; 
-            margin-bottom: 12px;
-            outline: none;
-            box-sizing: border-box;
-        }
-        .member-btn { 
-            width: 100%; 
-            background: var(--blue); 
-            color: #fff; 
-            border: none; 
-            padding: 12px; 
-            border-radius: 15px; 
-            font-family: 'Prompt'; 
-            font-weight: 700; 
-            font-size: 18px; 
-            cursor: pointer;
-        }
-        .point-display { text-align: left; animation: fadeIn 0.5s ease; }
-        .point-display b { font-size: 24px; color: var(--text-dark); }
-        .point-display p { font-size: 18px; color: var(--blue); margin: 5px 0 0 0; font-weight: 600; }
+        .qr-box img { width: 220px; height: 220px; display: block; mix-blend-mode: multiply; }
+        .qr-hint { margin-top: 20px; font-size: 20px; font-weight: 700; color: var(--text-dark); }
 
-        /* QR Code */
-        .qr-box { margin-top: 25px; }
-        .qr-box img { width: 180px; height: 180px; mix-blend-mode: multiply; }
-
-        .footer-text { margin-top: 20px; font-size: 11px; opacity: 0.3; letter-spacing: 2px; }
+        .footer-text { margin-top: 40px; font-size: 12px; opacity: 0.3; letter-spacing: 2px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -127,22 +101,9 @@
                 <div class="total-label">ยอดชำระสุทธิ</div>
                 <div class="total-amount"><span id="total-val">0</span><span class="currency">฿</span></div>
                 
-                <div class="member-box">
-                    <div id="member-input-area">
-                        <div style="font-size: 14px; margin-bottom: 8px; color: var(--text-gray);">สะสมแต้มเบอร์โทรศัพท์</div>
-                        <input type="tel" id="member-phone" placeholder="08XXXXXXXX" class="member-input">
-                        <button onclick="submitMember()" class="member-btn">ยืนยันสะสมแต้ม</button>
-                    </div>
-                    <div id="member-status-area" class="point-display" style="display:none;">
-                        <div style="font-size: 13px; color: var(--text-gray);">WITHU Member</div>
-                        <b id="active-phone">08x-xxx-xxxx</b>
-                        <p>แต้มสะสม: <span id="active-pts">0</span> <span style="color:#10b981;">(+<span id="earned-pts">0</span>)</span></p>
-                    </div>
-                </div>
-
                 <div class="qr-box">
                     <img id="qr-img-cds" src="" alt="QR">
-                    <div style="font-size: 16px; font-weight: 700; margin-top: 10px;">สแกนเพื่อชำระเงิน</div>
+                    <div class="qr-hint">สแกนเพื่อชำระเงิน</div>
                 </div>
                 
                 <div class="footer-text">WITHU CUSTOMER DISPLAY SYSTEM</div>
@@ -153,26 +114,6 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
 
-    // ฟังก์ชันส่งเบอร์สมาชิกจากจอ CDS
-    async function submitMember() {
-        const phone = document.getElementById('member-phone').value;
-        const tableTxt = document.getElementById('display-table-id').innerText;
-        const tableId = tableTxt.replace("โต๊ะ ", "");
-
-        if (!phone || phone.length < 9) {
-            alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง");
-            return;
-        }
-
-        try {
-            await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'linkMemberToOrder', table: tableId, phone: phone })
-            });
-            updateCDS(); // รีเฟรชหน้าจอเพื่อโชว์แต้ม
-        } catch(e) { console.error("Member Sync Error:", e); }
-    }
-
     async function updateCDS() {
         try {
             const response = await fetch(API_URL + "?action=getCDSActive");
@@ -182,6 +123,7 @@
             const active = document.getElementById('active-container');
 
             if (data.status === 'active' && data.orders.length > 0) {
+                // สลับหน้าจอจาก Idle เป็น Active
                 idle.style.opacity = '0';
                 setTimeout(() => { idle.style.display = 'none'; }, 800);
                 active.style.display = 'grid';
@@ -204,21 +146,11 @@
                 
                 document.getElementById('order-items-list').innerHTML = html;
                 document.getElementById('total-val').innerText = total.toLocaleString();
+                // สร้าง QR Code พร้อมยอดเงิน
                 document.getElementById('qr-img-cds').src = `https://promptpay.io/0931805507/${total}.png`;
 
-                // 🚩 จัดการส่วนแสดงผลสมาชิก
-                if (data.member && data.member.phone) {
-                    document.getElementById('member-input-area').style.display = 'none';
-                    document.getElementById('member-status-area').style.display = 'block';
-                    document.getElementById('active-phone').innerText = data.member.phone;
-                    document.getElementById('active-pts').innerText = data.member.points.toLocaleString();
-                    document.getElementById('earned-pts').innerText = Math.floor(total / 10);
-                } else {
-                    document.getElementById('member-input-area').style.display = 'block';
-                    document.getElementById('member-status-area').style.display = 'none';
-                }
-
             } else {
+                // กลับไปหน้า Idle
                 idle.style.display = 'flex';
                 setTimeout(() => { idle.style.opacity = '1'; }, 10);
                 active.style.display = 'none';
@@ -228,6 +160,7 @@
         } catch(e) { console.error("Sync Error:", e); }
     }
 
+    // อัปเดตข้อมูลทุก 2.5 วินาที
     setInterval(updateCDS, 2500);
 </script>
 </body>

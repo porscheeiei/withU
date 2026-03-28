@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>WITHU | Premium Ordering Experience</title>
+    <title>WITHU | Premium Ordering</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -13,7 +13,11 @@
             --radius-lg: 35px;
         }
 
-        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; color: var(--p); -webkit-font-smoothing: antialiased; }
+        /* 🚩 บังคับใช้ Prompt กับทุกองค์ประกอบ */
+        * { font-family: 'Prompt', sans-serif; }
+        body { background: var(--bg); margin: 0; color: var(--p); -webkit-font-smoothing: antialiased; }
+        input, button, select, textarea { font-family: 'Prompt', sans-serif !important; }
+
         .app-container { width: 100%; max-width: 550px; margin: 0 auto; padding: 0 20px 140px 20px; box-sizing: border-box; }
         
         /* --- ⏳ Loaders --- */
@@ -24,12 +28,14 @@
         /* --- 🔝 Header --- */
         .top-bar { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
         .brand { font-weight: 800; font-size: 24px; letter-spacing: 0.5px; }
-        .table-badge { background: var(--p); color: #fff; padding: 6px 16px; border-radius: 50px; font-size: 13px; font-weight: 700; }
-        .call-btn { background: var(--darkred); color: #fff !important; border: none; padding: 10px 22px; border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
+        
+        /* 🚩 ป้ายเลขโต๊ะขยายใหญ่ (Big Table Badge) */
+        .table-badge { background: var(--p); color: #fff; padding: 8px 24px; border-radius: 50px; font-size: 20px; font-weight: 800; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .call-btn { background: var(--darkred); color: #fff !important; border: none; padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
 
         /* --- 🔍 Search & Nav --- */
         .search-area { position: sticky; top: 65px; z-index: 950; background: var(--bg); padding: 15px 0 10px 0; }
-        .search-input { width: 100%; padding: 16px 20px 16px 55px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); font-family: 'Prompt'; font-size: 15px; outline: none; box-shadow: var(--shadow); box-sizing: border-box; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); font-size: 16px; outline: none; box-shadow: var(--shadow); box-sizing: border-box; }
         .search-icon { position: absolute; left: 22px; top: 32px; color: #b2bec3; display: flex; }
         #category-nav { display: flex; overflow-x: auto; padding: 10px 0 20px 25px; scrollbar-width: none; gap: 10px; margin-left: -20px; margin-right: -20px; }
         .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 10px 26px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; transition: 0.3s; }
@@ -47,8 +53,6 @@
         .sweet-selector { display: flex; gap: 5px; margin-bottom: 12px; }
         .sweet-btn { border: 1px solid #f1f1f1; padding: 8px 0; border-radius: 12px; font-size: 11px; cursor: pointer; background: #f8f9fa; flex: 1; text-align: center; color: var(--gray); font-weight: 600; transition: 0.2s; }
         .sweet-btn.active { background: var(--p); color: #fff; }
-        
-        /* 🚩 สำหรับปุ่มปั่น (Option Button) */
         .opt-btn { border: 1px solid var(--border); padding: 10px 20px; border-radius: 15px; font-size: 12px; width: fit-content; font-weight: 700; cursor: pointer; margin-bottom: 15px; background: #f8f9fa; color: var(--gray); transition: 0.3s; }
         .opt-btn.active { background: var(--p); color: #fff; border-color: var(--p); }
 
@@ -59,11 +63,11 @@
         .top-chip { border: 1px solid var(--border); padding: 12px; border-radius: 15px; font-size: 12px; text-align: center; cursor: pointer; font-weight: 700; background: #fff; }
         .top-chip.active { background: var(--p); color: #fff; }
         .sold-out { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
-        .note-input { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--border); background: #f8fafc; font-family: 'Prompt'; font-size: 13px; margin-bottom: 15px; outline: none; box-sizing: border-box; transition: 0.3s; }
+        .note-input { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--border); background: #f8fafc; font-size: 14px; margin-bottom: 15px; outline: none; box-sizing: border-box; transition: 0.3s; }
         .note-input:focus { border-color: var(--blue); background: #fff; }
 
-        /* --- 🛒 Buttons --- */
-        .btn-add { background: transparent; border: 2.5px solid #000; padding: 15px; border-radius: 50px; font-family: 'Prompt'; font-weight: 800; cursor: pointer; width: 100%; font-size: 16px; transition: 0.2s; }
+        /* --- 🛒 Bottom Elements --- */
+        .btn-add { background: transparent; border: 2.5px solid #000; padding: 15px; border-radius: 50px; font-weight: 800; cursor: pointer; width: 100%; font-size: 16px; transition: 0.2s; }
         .btn-add:active { transform: scale(0.95); background: #eee; }
         .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; cursor: pointer; }
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); padding: 25px 30px 45px 30px; box-shadow: 0 -15px 40px rgba(0,0,0,0.06); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 45px 45px 0 0; }
@@ -74,9 +78,9 @@
         .bell-icon { font-size: 60px; margin-bottom: 20px; display: inline-block; animation: ring 2s infinite; }
         @keyframes ring { 0%, 100% { transform: rotate(0); } 10%, 30%, 50% { transform: rotate(15deg); } 20%, 40%, 60% { transform: rotate(-15deg); } 80% { transform: rotate(0); } }
         .call-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--p); }
-        .call-sub { font-size: 15px; color: var(--gray); margin-bottom: 30px; line-height: 1.5; }
+        .call-sub { font-size: 16px; color: var(--gray); margin-bottom: 30px; line-height: 1.5; }
         .btn-confirm-call { background: var(--p); color: #fff; border: none; padding: 16px; border-radius: 50px; font-weight: 700; font-size: 16px; cursor: pointer; width: 100%; margin-bottom: 15px; }
-        .btn-cancel-call { background: transparent; color: var(--gray); border: none; font-weight: 600; cursor: pointer; font-family: 'Prompt'; }
+        .btn-cancel-call { background: transparent; color: var(--gray); border: none; font-weight: 600; cursor: pointer; }
 
         /* --- 🍳 Sending UI --- */
         .sending-container { text-align: center; padding: 30px 0; }
@@ -107,7 +111,7 @@
     <div class="brand">WITHU</div>
     <div style="display:flex; align-items:center; gap:12px;">
         <button class="call-btn" onclick="callStaff()">เรียกพนักงาน</button>
-        <span id="display-table" class="table-badge"></span>
+        <span id="display-table" class="table-badge">โต๊ะ -</span>
     </div>
 </div>
 
@@ -115,11 +119,13 @@
     <div class="table-box" style="background:#fff; padding:60px 40px; border-radius:50px; text-align:center; width:85%; max-width:400px; margin: 15% auto; box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.15);">
         <img src="https://img1.pic.in.th/images/-------2.png" style="width:120px; height:120px; border-radius:50%; margin-bottom:20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);" alt="Logo">
         <h2 style="font-weight:800; font-size:28px; margin:0 0 35px 0;">WITHU CAFE</h2>
-        <select id="table-select" style="width:100%; padding:20px; border-radius:22px; border:1px solid #e2e8f0; margin-bottom:30px; font-family:'Prompt'; text-align-last:center; font-size:17px; background:#f8fafc; outline:none; appearance:none; font-weight:600;">
+        
+        <select id="table-select" style="width:100%; padding:25px; border-radius:22px; border:2px solid #e2e8f0; margin-bottom:30px; text-align-last:center; font-size:22px; background:#f8fafc; outline:none; appearance:none; font-weight:800; color:var(--p);">
             <option value="" disabled selected>เลือกหมายเลขโต๊ะ</option>
             <script>for(let i=1;i<=15;i++) document.write(`<option value="${i}">โต๊ะ ${i}</option>`);</script>
         </select>
-        <button class="btn-checkout" style="width:100%; height:65px; font-size:18px;" onclick="lockTable()">เข้าสู่เมนูอาหาร</button>
+        
+        <button class="btn-checkout" style="width:100%; height:75px; font-size:20px;" onclick="lockTable()">เข้าสู่เมนูอาหาร</button>
     </div>
 </div>
 
@@ -161,7 +167,7 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
     let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentS = {}, itemOpt = {}, itemExpanded = {}, currentF = "ทั้งหมด", currentSearch = "", sInterval;
 
-    // 🚩 1. ระบบ Session Persistence & URL Detect
+    // ระบบ Session Persistence & URL Detect
     window.onload = async () => {
         const params = new URLSearchParams(window.location.search);
         const tParam = params.get('table');
@@ -226,9 +232,7 @@
                 <div class="menu-top"><img src="${r[4]||'https://via.placeholder.com/150'}" class="menu-img"><div class="menu-info"><h3>${r[0]}</h3><div class="price">฿${r[1]}</div></div></div>
                 ${isAvail && isD ? `
                     <div class="sweet-selector">${['0%','25%','50%','75%','100%'].map(l=>`<div class="sweet-btn ${currentS[originalIdx]===l?'active':''}" onclick="setS(${originalIdx},'${l}')">${l}</div>`).join('')}</div>
-                    
                     ${showSmoothieOpt ? `<div class="opt-btn ${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">+ เพิ่มปั่น (+฿10)</div>` : ''}
-                    
                     <div class="acc-btn" onclick="toggleAcc(${originalIdx})">เลือกท็อปปิ้งเพิ่มเติม</div>
                     <div class="acc-content ${isExp ? 'open' : ''}"><div class="top-grid">${toppingsData.map(t => `<div class="top-chip ${itemOpt[originalIdx].toppings.includes(t[0])?'active':''} ${t[2]==='หมด'?'sold-out':''}" onclick="tT(${originalIdx},'${t[0]}')">${t[0]} (+฿${t[1]})</div>`).join('')}</div></div>
                 ` : ''}
@@ -242,8 +246,6 @@
     function toggleAcc(idx) { itemExpanded[idx] = !itemExpanded[idx]; renderMenu(currentF); }
     function setS(i, l) { currentS[i] = l; renderMenu(currentF); }
     function tT(i, n) { let t = itemOpt[i].toppings; itemOpt[i].toppings = t.includes(n) ? t.filter(x => x !== n) : [...t, n]; renderMenu(currentF); }
-    
-    // 🚩 ปุ่มปั่นแก้สีไม่ได้ เพราะต้องเรียก renderMenu ใหม่
     function tS(i) { itemOpt[i].smoothie = !itemOpt[i].smoothie; renderMenu(currentF); }
 
     function addC(n, p, idx, isD) {
@@ -275,7 +277,7 @@
 
     function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
 
-    // 🚩 2. UI ส่งออเดอร์กระทะ 🍳 & บันทึกสถานะสั่งแล้ว
+    // UI ส่งออเดอร์กระทะ 🍳
     async function sub() { 
         const modalBody = document.getElementById('modal-body');
         modalBody.innerHTML = `<div class="sending-container"><div class="pulse-loader">🍳</div><div class="call-title">กำลังส่งออเดอร์งับ...</div><div class="call-sub">ออเดอร์ของอ้วนกำลังเดินทาง <br>กรุณารอสักครู่นะคะอ้วน</div></div>`;
@@ -287,7 +289,7 @@
         } catch(e) { alert("ส่งไม่สำเร็จ กรุณาลองใหม่"); openReceipt(); }
     }
 
-    // 🚩 3. เรียกพนักงานแบบพรีเมียม
+    // เรียกพนักงาน
     function callStaff() { document.getElementById('call-staff-modal').style.display = 'flex'; }
     function closeCallModal() { document.getElementById('call-staff-modal').style.display = 'none'; }
     async function sendCallRequest() {
@@ -318,8 +320,8 @@
                     <div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; margin-bottom:25px; padding:0 10px;">
                         <span>ยอดรวมออเดอร์:</span><span style="color:var(--blue)">฿<span id="stat-sum-val">0</span></span>
                     </div>
-                    <button class="btn-checkout" style="background:#f1f5f9; color:var(--p); width:100%; border:none; margin-bottom:10px;" onclick="location.reload()">สั่งเมนูเพิ่ม</button>
-                    <button class="btn-checkout" style="background:transparent; color:var(--gray); width:100%; border:1px solid #eee;" onclick="clearSession()">ล้างข้อมูลโต๊ะ</button>
+                    <button class="btn-add" style="margin-bottom:10px; width:100%;" onclick="location.reload()">สั่งเมนูเพิ่ม</button>
+                    <button class="btn-add" style="background:transparent; color:var(--gray); border:1px solid #eee; width:100%;" onclick="clearSession()">ล้างข้อมูลโต๊ะ</button>
                 </div>
             </div>`;
         chk(); sInterval = setInterval(chk, 5000);

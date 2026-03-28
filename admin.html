@@ -120,32 +120,34 @@
         let orderSound = null, callSound = null;
         let isSoundUnlocked = false; 
 
-        // 🚩 โหลดไฟล์เสียงแบบมีการป้องกัน Error (Try-Catch)
+        // โหลดไฟล์เสียงแบบป้องกันการค้าง
         try {
             orderSound = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_7325997672.mp3'); 
             callSound = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625624707.mp3');  
-            orderSound.preload = 'auto'; callSound.preload = 'auto';
-        } catch(e) {
-            console.log("Audio load blocked by browser:", e);
-        }
+            orderSound.preload = 'auto'; 
+            callSound.preload = 'auto';
+        } catch(e) { console.log("Audio load error:", e); }
         
         let lastOrderCount = 0, lastCallCount = 0, isFirstLoad = true, cAlertT = "";
         let currentPayingTotal = 0, currentPayingRows = [], currentPayingTable = "";
         let salesChartInst = null, cDataDaily = [], cDataMonthly = [], currentChartMode = 'day';
 
-        // 🚩 ฟังก์ชันปลดล็อกเสียง (ปรับให้ทำงานได้ 100% ไม่มีค้าง)
+        // 🚩 ฟังก์ชันปลดล็อกเสียงการแจ้งเตือน (รัดกุมที่สุด)
         function unlockSound() {
             isSoundUnlocked = true;
-            if (!orderSound || !callSound) return; // ถ้าโหลดเสียงไม่ได้ ให้ข้ามไปเลย ระบบจะได้ไม่พัง
+            if (!orderSound || !callSound) return; 
 
             try {
+                // เล่นเสียงเบาที่สุดแล้วหยุดทันที เพื่อหลอก Browser
+                orderSound.volume = 0;
                 orderSound.play().then(() => {
-                    orderSound.pause(); orderSound.currentTime = 0;
-                }).catch(e => {});
+                    orderSound.pause(); orderSound.currentTime = 0; orderSound.volume = 1;
+                }).catch(e => console.log("Unlock order sound failed", e));
                 
+                callSound.volume = 0;
                 callSound.play().then(() => {
-                    callSound.pause(); callSound.currentTime = 0;
-                }).catch(e => {});
+                    callSound.pause(); callSound.currentTime = 0; callSound.volume = 1;
+                }).catch(e => console.log("Unlock call sound failed", e));
             } catch(e) {}
         }
 
@@ -159,23 +161,23 @@
                 document.getElementById('stat-qr').innerText = "฿" + (d.summary.qr ? d.summary.qr.toLocaleString() : "0");
                 document.getElementById('stat-count').innerText = d.summary.orders || 0;
 
-                // แจ้งเตือนพนักงาน
+                // 🚩 ตรวจสอบเสียงพนักงาน
                 if(d.calls && d.calls.length > 0) { 
                     cAlertT = d.calls[0][1]; document.getElementById('staff-alert').style.display='block'; document.getElementById('alert-table').innerText=cAlertT; 
                     if(!isFirstLoad && d.calls.length > lastCallCount && isSoundUnlocked && callSound) {
-                        callSound.play().catch(e => {});
+                        callSound.play().catch(e => console.log("Play error", e));
                     }
                 } else { document.getElementById('staff-alert').style.display='none'; }
                 lastCallCount = d.calls ? d.calls.length : 0;
 
-                // จัดการออเดอร์
                 const container = document.getElementById('container'); 
                 if(!d.orders || d.orders.length === 0){ 
                     container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:100px;color:#94a3b8;'>ไม่มีออเดอร์ค้าง</div>"; 
                     lastOrderCount = 0; 
                 } else {
+                    // 🚩 ตรวจสอบเสียงออเดอร์
                     if(!isFirstLoad && d.orders.length > lastOrderCount && isSoundUnlocked && orderSound) {
-                        orderSound.play().catch(e => {});
+                        orderSound.play().catch(e => console.log("Play error", e));
                     }
                     lastOrderCount = d.orders.length;
                     
@@ -219,7 +221,6 @@
                 if (d.menu) renderStock(d.menu);
                 if (d.summary.report) renderReport(d.summary.report);
                 
-                // กราฟ
                 if (d.summary.chartDaily && d.summary.chartMonthly) {
                     cDataDaily = d.summary.chartDaily;
                     cDataMonthly = d.summary.chartMonthly;
@@ -230,7 +231,7 @@
             } catch(e){ console.log(e); }
         }
 
-        // --- ส่วน Chart ---
+        // --- ส่วนระบบ Chart.js ---
         function drawChart() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             if(salesChartInst) salesChartInst.destroy();
@@ -283,7 +284,7 @@
         // --- ส่วน Cash Assistant ---
         function openCashModal(t, total, rows) {
             currentPayingTotal = total; currentPayingRows = rows; currentPayingTable = t;
-            localStorage.setItem('cds_cash_received', 0); // Reset CDS
+            localStorage.setItem('cds_cash_received', 0); 
             document.getElementById('c-table').innerText = "ปิดโต๊ะ " + t; document.getElementById('c-total').innerText = "฿" + total.toLocaleString();
             document.getElementById('cash-received').value = ""; document.getElementById('change-display').style.display = "none"; document.getElementById('btn-finish-cash').style.display = "none";
             document.getElementById('cash-modal').style.display = 'flex'; setTimeout(()=> document.getElementById('cash-received').focus(), 100);
@@ -292,7 +293,7 @@
         function calcChange() {
             const received = parseFloat(document.getElementById('cash-received').value) || 0;
             const change = received - currentPayingTotal;
-            localStorage.setItem('cds_cash_received', received); // 🚩 Sync ไป CDS
+            localStorage.setItem('cds_cash_received', received); 
             const display = document.getElementById('change-display');
             const btn = document.getElementById('btn-finish-cash');
             if (received >= currentPayingTotal) {
@@ -315,7 +316,7 @@
 
         async function pay(t, r, method) { 
             if(confirm(`ยืนยันปิดโต๊ะ ${t} (${method})?`)){ 
-                localStorage.setItem('cds_cash_received', 0); // 🚩 เคลียร์หน้า CDS กลับไปเป็นแบบเดิม
+                localStorage.setItem('cds_cash_received', 0); 
                 await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'idle'})});
                 await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r, paymentMethod:method})}); refresh(); 
             }

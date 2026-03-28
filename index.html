@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>WITHU | Premium Ordering</title>
+    <title>WITHU | Ordering Experience</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -16,69 +16,61 @@
         body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; color: var(--p); -webkit-font-smoothing: antialiased; }
         .app-container { width: 100%; max-width: 550px; margin: 0 auto; padding: 0 20px 140px 20px; box-sizing: border-box; }
         
-        /* --- ⏳ Skeleton --- */
-        .skeleton { background: #f1f5f9; background-image: linear-gradient(90deg, #f1f5f9 0px, #f8fafc 40px, #f1f5f9 80px); background-size: 600px; animation: shine-lines 1.6s infinite linear; }
-        @keyframes shine-lines { 0% { background-position: -100px; } 100% { background-position: 500px; } }
-        .skeleton-card { height: 180px; border-radius: var(--radius-lg); margin-bottom: 20px; width: 100%; }
-
         /* --- 🔝 Top Bar & Call Button --- */
         .top-bar { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
         .brand { font-weight: 800; font-size: 24px; letter-spacing: 0.5px; }
         .table-badge { background: var(--p); color: #fff; padding: 6px 16px; border-radius: 50px; font-size: 13px; font-weight: 700; }
         .call-btn { background: var(--darkred); color: #fff !important; border: none; padding: 10px 22px; border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
-        .call-btn:active { transform: scale(0.92); }
 
         /* --- 🔍 Search Area --- */
         .search-area { position: sticky; top: 65px; z-index: 950; background: var(--bg); padding: 15px 0 10px 0; }
         .search-box { position: relative; display: flex; align-items: center; }
         .search-input { width: 100%; padding: 16px 20px 16px 55px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); font-family: 'Prompt'; font-size: 15px; outline: none; box-shadow: var(--shadow); transition: 0.3s; }
-        .search-icon { position: absolute; left: 22px; color: var(--gray); display: flex; }
+        .search-icon { position: absolute; left: 22px; color: #b2bec3; display: flex; }
 
-        /* --- 🏷 Category Nav (Slide from Right) --- */
+        /* --- 🏷 Category Nav --- */
         #category-nav { display: flex; overflow-x: auto; padding: 10px 0 20px 25px; scrollbar-width: none; gap: 10px; margin-left: -20px; margin-right: -20px; }
         #category-nav::-webkit-scrollbar { display: none; }
         .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 10px 26px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; transition: 0.3s; }
-        .nav-pill.active { background: var(--p); color: #fff; transform: scale(1.05); }
+        .nav-pill.active { background: var(--p); color: #fff; }
 
-        /* --- 🍽 Menu (Single Column + Image Left) --- */
-        #main-content { display: flex; flex-direction: column; gap: 15px; }
-        .menu-item { background: var(--card); border-radius: var(--radius-lg); padding: 25px; border: 1px solid var(--border); box-shadow: var(--shadow); animation: fadeIn 0.4s ease; display: flex; flex-direction: column; }
+        /* --- 🍽 Menu Card --- */
+        .menu-item { background: var(--card); border-radius: var(--radius-lg); padding: 25px; border: 1px solid var(--border); box-shadow: var(--shadow); animation: fadeIn 0.4s ease; display: flex; flex-direction: column; margin-bottom: 15px; }
         .menu-top { display: flex; align-items: flex-start; margin-bottom: 20px; }
         .menu-img { width: 110px; height: 110px; object-fit: cover; border-radius: 20px; margin-right: 20px; background: #f8fafc; }
         .menu-info { flex: 1; }
         .menu-item h3 { margin: 0; font-size: 20px; font-weight: 700; color: var(--p); }
         .price { font-weight: 800; font-size: 26px; color: var(--p); margin: 5px 0; }
 
-        /* --- 🎚 Hinge Options (Accordion) --- */
+        /* --- 🎚 Options --- */
         .sweet-selector { display: flex; gap: 5px; margin-bottom: 12px; }
         .sweet-btn { border: 1px solid #f1f1f1; padding: 8px 0; border-radius: 12px; font-size: 11px; cursor: pointer; background: #f8f9fa; flex: 1; text-align: center; color: var(--gray); font-weight: 600; }
         .sweet-btn.active { background: var(--p); color: #fff; }
-        .smoothie-btn { border: 1px solid var(--border); padding: 10px; border-radius: 15px; font-size: 13px; font-weight: 700; cursor: pointer; width: fit-content; margin-bottom: 15px; background: #fff; }
-        .smoothie-btn.active { background: var(--p); color: #fff; }
-        .acc-btn { font-size: 14px; color: var(--blue); font-weight: 600; cursor: pointer; margin-bottom: 15px; text-decoration: underline; text-underline-offset: 4px; width: fit-content; }
-        .acc-content { max-height: 0; overflow: hidden; transition: all 0.4s ease; opacity: 0; }
+        .acc-btn { font-size: 14px; color: var(--blue); font-weight: 600; cursor: pointer; margin-bottom: 15px; text-decoration: underline; text-underline-offset: 4px; }
+        .acc-content { max-height: 0; overflow: hidden; transition: 0.3s ease; opacity: 0; }
         .acc-content.open { max-height: 500px; opacity: 1; padding-bottom: 15px; }
         .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .top-chip { border: 1px solid var(--border); padding: 12px; border-radius: 15px; font-size: 12px; text-align: center; cursor: pointer; font-weight: 700; background: #fff; }
         .top-chip.active { background: var(--p); color: #fff; }
+        .sold-out { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
 
         /* --- 🛒 Add Button --- */
         .btn-add { background: transparent; border: 2.5px solid #000; padding: 15px; border-radius: 50px; font-family: 'Prompt'; font-weight: 800; cursor: pointer; width: 90%; margin: 10px auto 0 auto; font-size: 16px; }
-        .btn-add:active { background: #000; color: #fff; transform: scale(0.96); }
 
-        /* --- 🛒 Bottom Bar --- */
-        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); padding: 25px 30px 45px 30px; box-shadow: 0 -15px 40px rgba(0,0,0,0.06); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 45px 45px 0 0; }
-        .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; }
-
-        /* --- 🔢 Order Status Stepper --- */
+        /* --- 🔢 Status Stepper & Queue --- */
         .status-card { background: #fff; border-radius: 40px; padding: 40px 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
-        .status-stepper { display: flex; justify-content: space-between; align-items: center; margin: 40px 0; position: relative; }
+        .status-stepper { display: flex; justify-content: space-between; align-items: center; margin: 30px 0; position: relative; }
         .status-stepper::before { content: ''; position: absolute; top: 18px; left: 10%; right: 10%; height: 2px; background: #eee; z-index: 1; }
         .step-point { position: relative; z-index: 2; flex: 1; text-align: center; }
         .step-circle { width: 36px; height: 36px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; margin: 0 auto 10px auto; color: #aaa; transition: 0.3s; }
         .step-label { font-size: 11px; color: #ccc; font-weight: 700; }
         .step-point.active .step-circle { background: var(--p); color: #fff; transform: scale(1.1); }
         .step-point.active .step-label { color: var(--p); }
+        .queue-box { background: #f0f7ff; color: var(--blue); padding: 12px; border-radius: 20px; font-size: 14px; font-weight: 700; margin-bottom: 20px; }
+
+        /* --- 🛒 Bottom Bar --- */
+        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); padding: 25px 30px 45px 30px; box-shadow: 0 -15px 40px rgba(0,0,0,0.06); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 45px 45px 0 0; }
+        .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -94,7 +86,7 @@
 </div>
 
 <div id="table-overlay">
-    <div class="table-box" style="background:#fff; padding:60px 40px; border-radius:50px; text-align:center; width:85%; max-width:400px; margin: 10% auto; box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.15);">
+    <div class="table-box" style="background:#fff; padding:60px 40px; border-radius:50px; text-align:center; width:85%; max-width:400px; margin: 15% auto; box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.15);">
         <img src="https://img1.pic.in.th/images/-------2.png" style="width:120px; height:120px; border-radius:50%; margin-bottom:20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);" alt="Logo">
         <h2 style="font-weight:800; font-size:28px; margin:0 0 35px 0;">WITHU CAFE</h2>
         <select id="table-select" style="width:100%; padding:20px; border-radius:22px; border:1px solid #e2e8f0; margin-bottom:30px; font-family:'Prompt'; text-align-last:center; font-size:17px; background:#f8fafc; outline:none; appearance:none; font-weight:600;">
@@ -114,16 +106,13 @@
             </div>
         </div>
         <div id="category-nav"></div>
-        <div id="loading-skeleton"><div class="skeleton-card skeleton"></div><div class="skeleton-card skeleton"></div></div>
+        <div id="loading-skeleton" style="text-align:center; padding:50px; color:#bbb;">กำลังเตรียมเมนู...</div>
         <div id="main-content"></div>
     </div>
 </div>
 
 <div id="cart-bar" class="cart-bar">
-    <div>
-        <div style="font-size: 14px; color: var(--gray); font-weight: 600;">ออเดอร์ของคุณ</div>
-        <div style="font-weight:800; font-size: 24px;"><span id="cart-count">0</span> รายการ</div>
-    </div>
+    <div><div style="font-size: 14px; color: var(--gray); font-weight: 600;">ตะกร้าของคุณ</div><div style="font-weight:800; font-size: 24px;"><span id="cart-count">0</span> รายการ</div></div>
     <button onclick="openReceipt()" class="btn-checkout">ยืนยัน ฿<span id="cart-sum">0</span></button>
 </div>
 
@@ -181,7 +170,7 @@
                 <div class="menu-top"><img src="${r[4]||'https://via.placeholder.com/150'}" class="menu-img"><div class="menu-info"><h3>${r[0]}</h3><div class="price">฿${r[1]}</div></div></div>
                 ${isAvail && isD ? `
                     <div class="sweet-selector">${['0%','25%','50%','75%','100%'].map(l=>`<div class="sweet-btn ${currentS[originalIdx]===l?'active':''}" onclick="setS(${originalIdx},'${l}')">${l}</div>`).join('')}</div>
-                    ${showSmoothieOpt ? `<div class="smoothie-btn ${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">+ เพิ่มปั่น (+฿10)</div>` : ''}
+                    ${showSmoothieOpt ? `<div style="border:1px solid #eee; padding:10px; border-radius:15px; font-size:12px; width:fit-content; font-weight:700; cursor:pointer;" class="${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">+ เพิ่มปั่น (+฿10)</div>` : ''}
                     <div class="acc-btn" onclick="toggleAcc(${originalIdx})">เลือกท็อปปิ้งเพิ่มเติม</div>
                     <div class="acc-content ${isExp ? 'open' : ''}"><div class="top-grid">${toppingsData.map(t => `<div class="top-chip ${itemOpt[originalIdx].toppings.includes(t[0])?'active':''} ${t[2]==='หมด'?'sold-out':''}" onclick="tT(${originalIdx},'${t[0]}')">${t[0]} (+฿${t[1]})</div>`).join('')}</div></div>
                 ` : ''}
@@ -198,7 +187,11 @@
 
     function addC(n, p, idx, isD) {
         let fp = parseFloat(p), det = []; 
-        if(isD) { det.push("หวาน " + currentS[idx]); if(itemOpt[idx].smoothie) { fp += 10; det.push("ปั่น"); } itemOpt[idx].toppings.forEach(tn => { let tObj = toppingsData.find(x => x[0] === tn); if(tObj) { fp += parseFloat(tObj[1]); det.push(tn); } }); }
+        if(isD) { 
+            det.push("หวาน " + currentS[idx]); 
+            if(itemOpt[idx].smoothie) { fp += 10; det.push("ปั่น"); } 
+            itemOpt[idx].toppings.forEach(tn => { let tObj = toppingsData.find(x => x[0] === tn); if(tObj) { fp += parseFloat(tObj[1]); det.push(tn); } }); 
+        }
         cart.push({name: n, price: p, qty: 1, total: fp, sweetness: det.join(", ")||'-'}); 
         itemOpt[idx] = { toppings: [], smoothie: false }; currentS[idx] = "100%"; updateUI();
     }
@@ -234,15 +227,20 @@
             <div class="app-container" style="padding-top:40px; text-align:center;">
                 <div class="status-card">
                     <h2 style="font-weight:800; font-size:28px; margin-bottom:10px;">ออเดอร์โต๊ะ ${currentTable}</h2>
-                    <p style="color:var(--gray); margin-bottom:10px;">กรุณารอสักครู่นะคะ</p>
+                    <div id="queue-info" class="queue-box">กำลังคำนวณคิวของคุณ...</div>
+                    
                     <div class="status-stepper">
                         <div class="step-point" id="st-1"><div class="step-circle">1</div><div class="step-label">รับออเดอร์</div></div>
                         <div class="step-point" id="st-2"><div class="step-circle">2</div><div class="step-label">กำลังทำ</div></div>
                         <div class="step-point" id="st-3"><div class="step-circle">3</div><div class="step-label">รอเสิร์ฟ</div></div>
                         <div class="step-point" id="st-4"><div class="step-circle">4</div><div class="step-label">สำเร็จ</div></div>
                     </div>
+
                     <div id="stat-list" style="margin:30px 0; text-align:left; border-top:1px solid #f8fafc; padding-top:20px;"></div>
-                    <button class="btn-checkout" style="background:#f1f5f9; color:var(--p); width:100%; border:none;" onclick="location.reload()">สั่งเพิ่ม</button>
+                    <div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; margin-bottom:25px; padding:0 10px;">
+                        <span>ยอดรวมออเดอร์:</span><span style="color:var(--blue)">฿<span id="stat-sum-val">0</span></span>
+                    </div>
+                    <button class="btn-checkout" style="background:#f1f5f9; color:var(--p); width:100%; border:none;" onclick="location.reload()">สั่งเมนูเพิ่ม</button>
                 </div>
             </div>`;
         chk(); sInterval = setInterval(chk, 5000);
@@ -250,14 +248,30 @@
 
     async function chk() {
         try {
-            const r = await fetch(API_URL + "?action=getOrderStatus&table=" + currentTable); 
+            // 🚩 ดึงข้อมูล Admin Data เพื่อคำนวณคิว (หนักกว่าเล็กน้อยแต่ได้ข้อมูลครบ)
+            const r = await fetch(API_URL + "?action=getAdminData"); 
             const d = await r.json();
-            if (!d || !d.length) { upS(4); clearInterval(sInterval); return; }
+            
+            const myOrders = d.orders.filter(o => o.table == currentTable);
+            if (myOrders.length === 0) { upS(4); document.getElementById('queue-info').innerText = "ออเดอร์เสร็จสิ้นแล้ว"; return; }
+
+            // 🚩 คำนวณคิว
+            const uniqueTables = [...new Set(d.orders.map(o => o.table))];
+            const myRank = uniqueTables.indexOf(currentTable.toString());
+            const queueAhead = myRank > 0 ? myRank : 0;
+            document.getElementById('queue-info').innerText = queueAhead > 0 ? `เหลืออีก ${queueAhead} คิวก่อนหน้าคุณ` : "กำลังเตรียมออเดอร์ของคุณเป็นลำดับถัดไป";
+
+            // 🚩 อัปเดตยอดรวมและสถานะ
             const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4, "เสิร์ฟเรียบร้อย":4};
-            let minVal = 4;
-            d.forEach(o => { if (p[o.status] < minVal) minVal = p[o.status]; });
+            let minVal = 4; let totalSum = 0;
+            myOrders.forEach(o => { 
+                if (p[o.status] < minVal) minVal = p[o.status]; 
+                totalSum += parseFloat(o.total.toString().replace(/,/g,'')) || 0;
+            });
+            
             upS(minVal); 
-            document.getElementById('stat-list').innerHTML = d.map(o => `<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f8fafc;"><span><b>${o.qty}x</b> ${o.menu}</span><b style="color:var(--blue)">${o.status}</b></div>`).join('');
+            document.getElementById('stat-sum-val').innerText = totalSum.toLocaleString();
+            document.getElementById('stat-list').innerHTML = myOrders.map(o => `<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f8fafc;"><span><b>${o.qty}x</b> ${o.menu}</span><b style="color:var(--blue)">${o.status}</b></div>`).join('');
         } catch(e) {}
     }
 

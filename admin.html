@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WITHU Admin Portal | Professional</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -39,9 +38,9 @@
         .status-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 25px 0; }
         .s-btn { padding: 10px; font-size: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: 'Prompt'; }
         
+        /* Buttons */
         .btn-cds { width: 100%; background: var(--blue); color: #fff; padding: 14px; border-radius: 18px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 10px; font-size: 15px; transition: 0.2s; }
         .btn-cds:active { transform: scale(0.96); }
-
         .btn-qr { width: 100%; background: var(--navy); color: #fff; padding: 16px; border-radius: 18px; font-weight: 700; border: none; cursor: pointer; font-size: 16px; margin-top: 10px; }
         .btn-cash { width: 100%; background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 16px; border-radius: 18px; font-weight: 700; margin-top: 10px; cursor: pointer; font-size: 16px; font-family: 'Prompt'; }
 
@@ -50,27 +49,30 @@
         .modal-box { background:#fff; padding:40px; border-radius:45px; text-align:center; max-width:400px; width:90%; }
         .cash-input { width:100%; padding:15px; border-radius:15px; border:2px solid #eee; font-size:28px; text-align:center; font-family:'Prompt'; font-weight:700; margin:20px 0; outline:none; }
         
+        /* Alerts & Charts */
         .alert-bar { background: var(--red); color: #fff; padding: 18px; border-radius: 20px; margin-bottom: 25px; text-align: center; cursor: pointer; font-weight: 700; box-shadow: 0 10px 25px rgba(214,48,49,0.3); }
-
-        /* 🚩 Chart Styling */
         .chart-wrapper { background: #fff; padding: 30px; border-radius: 30px; box-shadow: var(--shadow); margin-bottom: 25px; }
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .toggle-btn { padding: 8px 16px; border-radius: 10px; border: none; font-family: 'Prompt'; font-weight: 700; cursor: pointer; background: #f1f5f9; color: var(--text-gray); }
         .toggle-btn.active { background: var(--blue); color: #fff; }
+
+        /* Sound Button Animation */
+        @keyframes bounceBtn { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .sound-btn { animation: bounceBtn 2s infinite; box-shadow: 0 10px 25px rgba(15,23,42,0.4); }
     </style>
 </head>
 <body>
 
-    <button id="sound-unlock" style="position:fixed; bottom:20px; right:20px; z-index:3000; background:var(--navy); color:#fff; border:none; padding:12px 25px; border-radius:50px; cursor:pointer;" onclick="this.style.display='none'">🔔 เปิดเสียงแจ้งเตือน</button>
+    <button id="sound-unlock" class="sound-btn" style="position:fixed; bottom:25px; right:25px; z-index:3000; background:var(--navy); color:#fff; border:none; padding:15px 30px; border-radius:50px; cursor:pointer; font-family:'Prompt'; font-size: 16px; font-weight: 700;" onclick="unlockSound()">🔔 กดเพื่อเปิดเสียงแจ้งเตือน</button>
 
     <div id="staff-alert" class="alert-bar" onclick="clearCallAlert()" style="display:none;">⚠️ โต๊ะ <span id="alert-table"></span> เรียกพนักงาน (คลิกเพื่อปิด)</div>
     
     <div class="header">
         <h1>WITHU Admin</h1>
         <div class="stat-group">
-            <div class="stat-card"><small>ออเดอร์วันนี้</small><b id="stat-count">0</b></div>
+            <div class="stat-card"><small>บิลวันนี้</small><b id="stat-count">0</b></div>
             <div class="stat-card"><small>PromptPay</small><b id="stat-qr" style="color:var(--blue);">฿0</b></div>
-            <div class="stat-card"><small>รวมทั้งหมด</small><b id="revenue" style="color:var(--accent);">฿0</b></div>
+            <div class="stat-card"><small>ยอดรวมทั้งหมด</small><b id="revenue" style="color:var(--accent);">฿0</b></div>
         </div>
     </div>
     
@@ -119,16 +121,31 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
+        
+        // 🚩 โหลดไฟล์เสียงไว้ล่วงหน้า
         const orderSound = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_7325997672.mp3'); 
         const callSound = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625624707.mp3');  
+        orderSound.preload = 'auto'; callSound.preload = 'auto';
+        
+        let isSoundUnlocked = false; 
         let lastOrderCount = 0, lastCallCount = 0, isFirstLoad = true, cAlertT = "";
         let currentPayingTotal = 0, currentPayingRows = [], currentPayingTable = "";
+        let salesChartInst = null, cDataDaily = [], cDataMonthly = [], currentChartMode = 'day';
 
-        // 🚩 ตัวแปรสำหรับกราฟ
-        let salesChartInst = null;
-        let cDataDaily = [];
-        let cDataMonthly = [];
-        let currentChartMode = 'day';
+        // 🚩 ฟังก์ชันปลดล็อกเสียงการแจ้งเตือน
+        function unlockSound() {
+            if (isSoundUnlocked) return;
+            orderSound.volume = 0;
+            orderSound.play().then(() => {
+                orderSound.pause(); orderSound.currentTime = 0; orderSound.volume = 1;
+                callSound.volume = 0;
+                callSound.play().then(() => {
+                    callSound.pause(); callSound.currentTime = 0; callSound.volume = 1;
+                });
+                isSoundUnlocked = true;
+                document.getElementById('sound-unlock').style.display = 'none';
+            }).catch(e => console.log("Sound Unlock Failed:", e));
+        }
 
         async function refresh() {
             try {
@@ -140,18 +157,20 @@
                 document.getElementById('stat-qr').innerText = "฿" + (d.summary.qr ? d.summary.qr.toLocaleString() : "0");
                 document.getElementById('stat-count').innerText = d.summary.orders || 0;
 
+                // แจ้งเตือนพนักงาน
                 if(d.calls && d.calls.length > 0) { 
                     cAlertT = d.calls[0][1]; document.getElementById('staff-alert').style.display='block'; document.getElementById('alert-table').innerText=cAlertT; 
-                    if(!isFirstLoad && d.calls.length > lastCallCount) callSound.play().catch(e => {});
+                    if(!isFirstLoad && d.calls.length > lastCallCount && isSoundUnlocked) callSound.play().catch(e => {});
                 } else { document.getElementById('staff-alert').style.display='none'; }
                 lastCallCount = d.calls ? d.calls.length : 0;
 
+                // จัดการออเดอร์
                 const container = document.getElementById('container'); 
                 if(!d.orders || d.orders.length === 0){ 
                     container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:100px;color:#94a3b8;'>ไม่มีออเดอร์ค้าง</div>"; 
                     lastOrderCount = 0; 
                 } else {
-                    if(!isFirstLoad && d.orders.length > lastOrderCount) orderSound.play().catch(e => {});
+                    if(!isFirstLoad && d.orders.length > lastOrderCount && isSoundUnlocked) orderSound.play().catch(e => {});
                     lastOrderCount = d.orders.length;
                     
                     let groups={}; d.orders.forEach(o=>{
@@ -190,10 +209,11 @@
                             <button class="btn-cash" onclick='openCashModal("${t}", ${groups[t].total}, ${JSON.stringify(groups[t].rows)})'>ปิดโต๊ะ (เงินสด)</button>
                         </div>`}).join('');
                 }
+                
                 if (d.menu) renderStock(d.menu);
                 if (d.summary.report) renderReport(d.summary.report);
                 
-                // 🚩 โหลดข้อมูลและวาดกราฟ
+                // กราฟ
                 if (d.summary.chartDaily && d.summary.chartMonthly) {
                     cDataDaily = d.summary.chartDaily;
                     cDataMonthly = d.summary.chartMonthly;
@@ -204,14 +224,12 @@
             } catch(e){ console.log(e); }
         }
 
-        // 🚩 ฟังก์ชันสร้างกราฟแท่ง (วันต่อวัน)
+        // --- ส่วน Chart ---
         function drawChart() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             if(salesChartInst) salesChartInst.destroy();
 
             let dataArr = currentChartMode === 'day' ? [...cDataDaily] : [...cDataMonthly];
-            
-            // เรียงลำดับวันที่จากเก่าไปใหม่
             dataArr.sort((a,b) => {
                let ap = a.date.split('/'), bp = b.date.split('/');
                let as = ap.length === 3 ? ap[2] + ap[1].padStart(2,'0') + ap[0].padStart(2,'0') : ap[1] + ap[0].padStart(2,'0');
@@ -219,46 +237,24 @@
                return as.localeCompare(bs);
             });
 
-            // ดึงมาโชว์ 30 วันล่าสุด สำหรับรายวัน หรือ 12 เดือนล่าสุด
             if(currentChartMode === 'day' && dataArr.length > 30) dataArr = dataArr.slice(-30);
             if(currentChartMode === 'month' && dataArr.length > 12) dataArr = dataArr.slice(-12);
 
             const labels = dataArr.map(i => i.date);
             const vals = dataArr.map(i => i.total);
-
-            // สีกราฟ: วันสีฟ้าสว่าง, เดือนสีกรมท่า
             const color = currentChartMode === 'day' ? '#3b82f6' : '#0f172a';
             const bgColor = currentChartMode === 'day' ? 'rgba(59, 130, 246, 0.7)' : 'rgba(15, 23, 42, 0.8)';
 
             salesChartInst = new Chart(ctx, {
-                type: 'bar', // บังคับเป็นกราฟแท่ง
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'ยอดขาย (บาท)',
-                        data: vals,
-                        backgroundColor: bgColor,
-                        borderColor: color,
-                        borderWidth: 1,
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                        x: { grid: { display: false } }
-                    }
-                }
+                type: 'bar',
+                data: { labels: labels, datasets: [{ label: 'ยอดขาย (บาท)', data: vals, backgroundColor: bgColor, borderColor: color, borderWidth: 1, borderRadius: 6 }] },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
             });
         }
 
-        // 🚩 ฟังก์ชันสลับโหมดกราฟ
         function switchChart(mode) {
             currentChartMode = mode;
-            document.getElementById('btn-day').classList.toggle('active', mode === 'day');
-            document.getElementById('btn-month').classList.toggle('active', mode === 'month');
+            document.getElementById('btn-day').classList.toggle('active', mode === 'day'); document.getElementById('btn-month').classList.toggle('active', mode === 'month');
             drawChart();
         }
 
@@ -278,27 +274,23 @@
             } catch(e) { alert("Error: " + e); }
         }
 
+        // --- ส่วน Cash Assistant ---
         function openCashModal(t, total, rows) {
             currentPayingTotal = total; currentPayingRows = rows; currentPayingTable = t;
-            localStorage.setItem('cds_cash_received', 0); // รีเซ็ตส่งไป CDS
-            document.getElementById('c-table').innerText = "ปิดโต๊ะ " + t;
-            document.getElementById('c-total').innerText = "฿" + total.toLocaleString();
-            document.getElementById('cash-received').value = "";
-            document.getElementById('change-display').style.display = "none";
-            document.getElementById('btn-finish-cash').style.display = "none";
-            document.getElementById('cash-modal').style.display = 'flex';
-            setTimeout(()=> document.getElementById('cash-received').focus(), 100);
+            localStorage.setItem('cds_cash_received', 0); // Reset CDS
+            document.getElementById('c-table').innerText = "ปิดโต๊ะ " + t; document.getElementById('c-total').innerText = "฿" + total.toLocaleString();
+            document.getElementById('cash-received').value = ""; document.getElementById('change-display').style.display = "none"; document.getElementById('btn-finish-cash').style.display = "none";
+            document.getElementById('cash-modal').style.display = 'flex'; setTimeout(()=> document.getElementById('cash-received').focus(), 100);
         }
 
         function calcChange() {
             const received = parseFloat(document.getElementById('cash-received').value) || 0;
             const change = received - currentPayingTotal;
-            localStorage.setItem('cds_cash_received', received); // 🚩 ส่งค่าไป CDS แบบ Real-time
+            localStorage.setItem('cds_cash_received', received); // 🚩 Sync ไป CDS
             const display = document.getElementById('change-display');
             const btn = document.getElementById('btn-finish-cash');
             if (received >= currentPayingTotal) {
-                display.innerText = "ทอน: ฿" + change.toLocaleString();
-                display.style.display = "block"; btn.style.display = "block";
+                display.innerText = "ทอน: ฿" + change.toLocaleString(); display.style.display = "block"; btn.style.display = "block";
                 btn.onclick = () => { document.getElementById('cash-modal').style.display='none'; pay(currentPayingTable, currentPayingRows, 'เงินสด'); };
             } else { display.style.display = "none"; btn.style.display = "none"; }
         }
@@ -309,8 +301,7 @@
         
         async function shQR(t, a, r) { 
             await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'paying'})});
-            document.getElementById('m-table').innerText = "โต๊ะ " + t; 
-            document.getElementById('m-total').innerText = "฿" + a.toLocaleString(); 
+            document.getElementById('m-table').innerText = "โต๊ะ " + t; document.getElementById('m-total').innerText = "฿" + a.toLocaleString(); 
             document.getElementById('m-qr').src = `https://promptpay.io/0931805507/${a}.png`; 
             document.getElementById('m-confirm').onclick = () => { document.getElementById('modal').style.display='none'; pay(t,r,'PromptPay'); }; 
             document.getElementById('modal').style.display = 'flex'; 
@@ -318,9 +309,9 @@
 
         async function pay(t, r, method) { 
             if(confirm(`ยืนยันปิดโต๊ะ ${t} (${method})?`)){ 
+                localStorage.setItem('cds_cash_received', 0); // 🚩 เคลียร์หน้า CDS กลับไปเป็นแบบเดิม
                 await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'idle'})});
-                await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r, paymentMethod:method})}); 
-                refresh(); 
+                await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r, paymentMethod:method})}); refresh(); 
             }
         }
 

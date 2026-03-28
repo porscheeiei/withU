@@ -11,79 +11,79 @@
             --bg: #f8fafc; 
             --card: #ffffff; 
             --border: #f1f5f9; 
-            --darkred: #ff0000; 
+            --darkred: #ff0000; /* แดงสดพิเศษ */
             --blue: #2563eb;
             --gray: #64748b;
-            --shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.05);
-            --radius-lg: 40px;
-            --radius-md: 25px;
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
+            --radius-lg: 35px;
         }
 
         body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; color: var(--p); -webkit-font-smoothing: antialiased; }
         
         /* --- ⏳ Skeleton Loader --- */
-        .skeleton { background: #f1f5f9; background-image: linear-gradient(90deg, #f1f5f9 0px, #f8fafc 40px, #f1f5f9 80px); background-size: 600px; animation: shine 1.6s infinite linear; }
-        @keyframes shine { 0% { background-position: -100px; } 100% { background-position: 500px; } }
-        .skeleton-card { height: 200px; border-radius: var(--radius-lg); margin-bottom: 20px; width: 100%; }
+        .skeleton { background: #f1f5f9; background-image: linear-gradient(90deg, #f1f5f9 0px, #f8fafc 40px, #f1f5f9 80px); background-size: 600px; animation: shine-lines 1.6s infinite linear; }
+        @keyframes shine-lines { 0% { background-position: -100px; } 100% { background-position: 500px; } }
+        .skeleton-card { height: 180px; border-radius: var(--radius-lg); margin-bottom: 20px; width: 100%; }
 
         /* --- 🏗 Layout --- */
         .app-container { width: 100%; max-width: 550px; margin: 0 auto; padding: 0 20px 140px 20px; box-sizing: border-box; }
         
         /* --- 🔝 Top Bar --- */
         .top-bar { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
-        .brand { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
+        .brand { font-weight: 800; font-size: 24px; letter-spacing: 0.5px; }
         .table-badge { background: var(--p); color: #fff; padding: 6px 16px; border-radius: 50px; font-size: 13px; font-weight: 700; }
-        .call-btn { background: var(--darkred); color: #fff !important; border: none; padding: 10px 20px; border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,0,0,0.2); }
-        .call-btn:active { transform: scale(0.92); }
+        .call-btn { background: var(--darkred); color: #fff !important; border: none; padding: 10px 22px; border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
 
-        /* --- 🔍 Search Bar --- */
-        .search-area { position: sticky; top: 62px; z-index: 950; background: var(--bg); padding: 15px 0 10px 0; }
+        /* --- 🔍 Search Area --- */
+        .search-area { position: sticky; top: 65px; z-index: 950; background: var(--bg); padding: 15px 0 10px 0; }
         .search-box { position: relative; display: flex; align-items: center; }
         .search-input { width: 100%; padding: 16px 20px 16px 55px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); font-family: 'Prompt'; font-size: 15px; outline: none; box-shadow: var(--shadow); transition: 0.3s; }
-        .search-input:focus { border-color: var(--p); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.08); }
+        .search-input:focus { border-color: var(--p); }
         .search-icon { position: absolute; left: 22px; color: var(--gray); display: flex; }
 
         /* --- 🏷 Category Nav --- */
-        #category-nav { display: flex; overflow-x: auto; padding: 10px 0 20px 25px; scrollbar-width: none; gap: 10px; margin-left: -20px; margin-right: -20px; }
+        #category-nav { display: flex; overflow-x: auto; padding: 10px 0 20px 25px; /* ดันปุ่มแรกไปทางขวา */ scrollbar-width: none; gap: 10px; margin-left: -20px; margin-right: -20px; }
         #category-nav::-webkit-scrollbar { display: none; }
-        .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 10px 26px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-        .nav-pill.active { background: var(--p); color: #fff; border-color: var(--p); transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 10px 26px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; transition: 0.3s; }
+        .nav-pill.active { background: var(--p); color: #fff; transform: scale(1.05); }
 
-        /* --- 🍽 Menu (Single Column) --- */
-        #main-content { display: flex; flex-direction: column; gap: 20px; }
-        .menu-item { background: var(--card); border-radius: var(--radius-lg); padding: 25px; border: 1px solid var(--border); box-shadow: var(--shadow); animation: fadeIn 0.5s ease; display: flex; flex-direction: column; }
-        .menu-img { width: 100%; height: 250px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 20px; background: #f8fafc; }
-        .menu-item h3 { margin: 0; font-size: 20px; font-weight: 700; color: var(--p); }
-        .price { font-weight: 800; font-size: 24px; color: var(--p); margin: 5px 0 15px 0; }
+        /* --- 🍽 Menu (Single Column + Image Left) --- */
+        #main-content { display: flex; flex-direction: column; gap: 15px; }
+        .menu-item { background: var(--card); border-radius: var(--radius-lg); padding: 25px; border: 1px solid var(--border); box-shadow: var(--shadow); animation: fadeIn 0.4s ease; display: flex; flex-direction: column; }
+        .menu-top { display: flex; align-items: flex-start; margin-bottom: 20px; }
+        .menu-img { width: 110px; height: 110px; object-fit: cover; border-radius: 20px; margin-right: 20px; background: #f8fafc; }
+        .menu-info { flex: 1; }
+        .menu-item h3 { margin: 0; font-size: 22px; font-weight: 700; color: var(--p); }
+        .price { font-weight: 800; font-size: 26px; color: var(--p); margin: 5px 0; }
 
-        /* --- 🎚 Hinge Options (บานพับ) --- */
-        .sweet-selector { display: flex; gap: 6px; margin-bottom: 12px; }
-        .sweet-btn { border: 1px solid var(--border); padding: 10px 0; border-radius: 15px; font-size: 12px; cursor: pointer; background: #f8fafc; flex: 1; text-align: center; color: var(--gray); font-weight: 600; }
+        /* --- 🎚 Options (Hinge Style) --- */
+        .sweet-selector { display: flex; gap: 5px; margin-bottom: 12px; }
+        .sweet-btn { border: 1px solid #f1f1f1; padding: 8px 0; border-radius: 12px; font-size: 11px; cursor: pointer; background: #f8f9fa; flex: 1; text-align: center; color: var(--gray); font-weight: 600; }
         .sweet-btn.active { background: var(--p); color: #fff; border-color: var(--p); }
         
-        .acc-btn { font-size: 13px; color: var(--blue); font-weight: 700; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 18px; background: #f0f7ff; }
-        .acc-content { max-height: 0; overflow: hidden; transition: all 0.4s ease-out; opacity: 0; }
-        .acc-content.open { max-height: 600px; opacity: 1; padding-bottom: 20px; }
+        .smoothie-btn { border: 1px solid var(--border); padding: 10px; border-radius: 15px; font-size: 13px; font-weight: 700; cursor: pointer; width: fit-content; margin-bottom: 15px; background: #fff; }
+        .smoothie-btn.active { background: var(--p); color: #fff; }
+
+        .acc-btn { font-size: 14px; color: var(--blue); font-weight: 600; cursor: pointer; margin-bottom: 15px; text-decoration: underline; text-underline-offset: 4px; width: fit-content; }
+        .acc-content { max-height: 0; overflow: hidden; transition: all 0.4s ease-in-out; opacity: 0; }
+        .acc-content.open { max-height: 500px; opacity: 1; padding-bottom: 15px; }
         
         .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .top-chip { border: 1px solid var(--border); padding: 12px; border-radius: 18px; font-size: 12px; text-align: center; cursor: pointer; font-weight: 700; background: #fff; transition: 0.2s; }
-        .top-chip.active { background: #eef2ff; border-color: var(--blue); color: var(--blue); }
-        
-        .btn-add { background: var(--p); color: #fff; border: none; padding: 20px; border-radius: 50px; font-family: 'Prompt'; font-weight: 800; cursor: pointer; width: 100%; font-size: 16px; transition: 0.3s; }
-        .btn-add:active { transform: scale(0.96); opacity: 0.9; }
-        .sold-out { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
+        .top-chip { border: 1px solid var(--border); padding: 12px; border-radius: 15px; font-size: 12px; text-align: center; cursor: pointer; font-weight: 700; background: #fff; }
+        .top-chip.active { background: var(--p); color: #fff; }
 
-        /* --- 🏠 Modern Table Selection --- */
-        #table-overlay { position: fixed; inset: 0; background: rgba(248, 249, 250, 0.96); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .table-box { background: var(--card); padding: 60px 40px; border-radius: 50px; text-align: center; width: 85%; max-width: 400px; box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.15); border: 1px solid #fff; }
-        .logo-top { width: 120px; height: 120px; border-radius: 50%; margin-bottom: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.12); border: 5px solid #fff; }
-        
-        .modern-select { width: 100%; padding: 20px; border-radius: 25px; border: 1px solid #e2e8f0; margin-bottom: 30px; font-family: 'Prompt'; text-align-last: center; font-size: 16px; background: #f8fafc; outline: none; appearance: none; font-weight: 600; cursor: pointer; color: var(--p); }
+        .btn-add { background: transparent; border: 2.5px solid #000; padding: 15px; border-radius: 50px; font-family: 'Prompt'; font-weight: 800; cursor: pointer; width: 90%; margin: 10px auto 0 auto; font-size: 16px; transition: 0.3s; }
+        .btn-add:active { background: #000; color: #fff; transform: scale(0.96); }
 
-        /* --- 🛒 Cart & Receipt --- */
+        /* --- 🛒 Bottom Bar --- */
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); padding: 25px 30px 45px 30px; box-shadow: 0 -15px 40px rgba(0,0,0,0.06); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 45px 45px 0 0; }
         .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; }
 
+        /* --- 🏠 Overlay --- */
+        #table-overlay { position: fixed; inset: 0; background: rgba(248, 249, 250, 0.96); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .table-box { background: var(--card); padding: 60px 40px; border-radius: 50px; text-align: center; width: 85%; max-width: 400px; box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.15); }
+        .logo-top { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -100,15 +100,12 @@
 <div id="table-overlay">
     <div class="table-box">
         <img src="https://img1.pic.in.th/images/-------2.png" class="logo-top" alt="Logo">
-        <h2 style="margin:0; font-weight:800; font-size: 30px; letter-spacing: -0.5px;">WITHU CAFE</h2>
-        <p style="color:var(--gray); font-size:14px; margin-bottom:35px; font-weight: 500;">ยินดีต้อนรับค่ะ เลือกโต๊ะเพื่อเริ่มสั่งอาหาร</p>
-        
-        <select id="table-select" class="modern-select">
-            <option value="" disabled selected>ระบุหมายเลขโต๊ะ</option>
+        <h2 style="font-weight:800; font-size:28px; margin:0 0 35px 0;">WITHU CAFE</h2>
+        <select id="table-select" style="width:100%; padding:20px; border-radius:22px; border:1px solid #e2e8f0; margin-bottom:30px; font-family:'Prompt'; text-align-last:center; font-size:17px; background:#f8fafc; outline:none; appearance:none; font-weight:600;">
+            <option value="" disabled selected>เลือกหมายเลขโต๊ะ</option>
             <script>for(let i=1;i<=15;i++) document.write(`<option value="${i}">โต๊ะ ${i}</option>`);</script>
         </select>
-        
-        <button class="btn-add" style="height:70px; font-size:18px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);" onclick="lockTable()">เริ่มต้นสั่งอาหาร</button>
+        <button class="btn-checkout" style="width:100%; height:65px; font-size:18px;" onclick="lockTable()">เริ่มต้นสั่งอาหาร</button>
     </div>
 </div>
 
@@ -120,7 +117,7 @@
                 <span class="search-icon">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </span>
-                <input type="text" id="menu-search" class="search-input" placeholder="ค้นหาเมนูที่ต้องการ..." oninput="handleSearch()">
+                <input type="text" id="menu-search" class="search-input" placeholder="ค้นหาเมนู..." oninput="handleSearch()">
             </div>
         </div>
 
@@ -137,14 +134,14 @@
 
 <div id="cart-bar" class="cart-bar">
     <div>
-        <div style="font-size: 14px; color: var(--gray); font-weight: 600;">ออเดอร์ทั้งหมด</div>
-        <div style="font-weight:800; font-size: 24px; letter-spacing: -0.5px;"><span id="cart-count">0</span> รายการ</div>
+        <div style="font-size: 14px; color: var(--gray); font-weight: 600;">ออเดอร์ของคุณ</div>
+        <div style="font-weight:800; font-size: 22px;"><span id="cart-count">0</span> รายการ</div>
     </div>
-    <button onclick="openReceipt()" class="btn-checkout">สรุปยอด ฿<span id="cart-sum">0</span></button>
+    <button onclick="openReceipt()" class="btn-checkout">ยืนยัน ฿<span id="cart-sum">0</span></button>
 </div>
 
-<div id="modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);display:none;z-index:2000;align-items:flex-end;justify-content:center;" onclick="if(event.target==this)this.style.display='none'">
-    <div id="modal-body" style="background:#fff;width:100%;max-width:550px;border-radius:50px 50px 0 0;padding:45px;box-sizing:border-box;"></div>
+<div id="modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:none;z-index:2000;align-items:flex-end;justify-content:center;" onclick="if(event.target==this)this.style.display='none'">
+    <div id="modal-body" style="background:#fff;width:100%;max-width:550px;border-radius:45px 45px 0 0;padding:40px;box-sizing:border-box;"></div>
 </div>
 
 <script>
@@ -153,7 +150,7 @@
 
     function lockTable() { 
         let s = document.getElementById("table-select"); 
-        if(!s.value) { alert("กรุณาเลือกหมายเลขโต๊ะก่อนค่ะ"); return; }
+        if(!s.value) return; 
         currentTable = s.value; 
         document.getElementById("display-table").innerText = "โต๊ะ " + currentTable; 
         document.getElementById("table-overlay").style.display = "none"; 
@@ -208,39 +205,38 @@
 
             h += `
             <div class="menu-item ${isAvail ? '' : 'sold-out'}">
-                <img src="${r[4]||'https://via.placeholder.com/400'}" class="menu-img">
-                <div style="flex:1;">
-                    <h3 style="font-size: 22px;">${r[0]}</h3>
-                    <div class="price">฿${r[1]}</div>
-                    ${isAvail && isD ? `
-                        <div class="sweet-selector">
-                            ${['0%','50%','100%'].map(l=>`
-                                <div class="sweet-btn ${currentS[originalIdx]===l?'active':''}" onclick="setS(${originalIdx},'${l}')">${l}</div>
-                            `).join('')}
-                        </div>
-                        ${showSmoothieOpt ? `
-                            <div style="border:1px solid var(--border);padding:14px;border-radius:18px;font-size:13px;text-align:center;margin-bottom:15px;font-weight:700; cursor:pointer;" 
-                                 class="${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">
-                                ${itemOpt[originalIdx].smoothie ? '✓ ปั่นเรียบร้อย' : '➕ เพิ่มปั่น (+฿10)'}
-                            </div>
-                        ` : ''}
-                        <div class="acc-btn" onclick="toggleAcc(${originalIdx})">
-                            ${isExp ? '❌ ปิดท็อปปิ้ง' : '➕ เลือกท็อปปิ้งเพิ่มเติม'}
-                        </div>
-                        <div class="acc-content ${isExp ? 'open' : ''}">
-                            <div class="top-grid">
-                                ${toppingsData.map(t => { 
-                                    let isTOut = (t[2] === "หมด"); 
-                                    return `<div class="top-chip ${itemOpt[originalIdx].toppings.includes(t[0])?'active':''} ${isTOut?'sold-out':''}" onclick="tT(${originalIdx},'${t[0]}')">${t[0]}<br><span style="color:var(--blue)">+฿${t[1]}</span></div>`; 
-                                }).join('')}
-                            </div>
+                <div class="menu-top">
+                    <img src="${r[4]||'https://via.placeholder.com/200'}" class="menu-img">
+                    <div class="menu-info">
+                        <h3>${r[0]}</h3>
+                        <div class="price">฿${r[1]}</div>
+                    </div>
+                </div>
+                ${isAvail && isD ? `
+                    <div class="sweet-selector">
+                        ${['0%','25%','50%','75%','100%'].map(l=>`
+                            <div class="sweet-btn ${currentS[originalIdx]===l?'active':''}" onclick="setS(${originalIdx},'${l}')">${l}</div>
+                        `).join('')}
+                    </div>
+                    ${showSmoothieOpt ? `
+                        <div class="smoothie-btn ${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">
+                            + เพิ่มปั่น (+฿10)
                         </div>
                     ` : ''}
-                    <button class="btn-add" onclick="addC('${r[0]}',${r[1]},${originalIdx},${isD})">เพิ่มลงตะกร้า</button>
-                </div>
+                    <div class="acc-btn" onclick="toggleAcc(${originalIdx})">เลือกท็อปปิ้งเพิ่มเติม</div>
+                    <div class="acc-content ${isExp ? 'open' : ''}">
+                        <div class="top-grid">
+                            ${toppingsData.map(t => { 
+                                let isTOut = (t[2] === "หมด"); 
+                                return `<div class="top-chip ${itemOpt[originalIdx].toppings.includes(t[0])?'active':''} ${isTOut?'sold-out':''}" onclick="tT(${originalIdx},'${t[0]}')">${t[0]} (+฿${t[1]})</div>`; 
+                            }).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                <button class="btn-add" onclick="addC('${r[0]}',${r[1]},${originalIdx},${isD})">ใส่ตะกร้า</button>
             </div>`;
         }); 
-        m.innerHTML = h || `<div style="text-align:center; padding:80px; color:var(--gray);">ไม่พบเมนูที่คุณต้องการค่ะ</div>`;
+        m.innerHTML = h || `<div style="text-align:center; padding:80px; color:var(--gray);">ไม่พบรายการที่ค้นหาค่ะ</div>`;
     }
 
     function toggleAcc(idx) { itemExpanded[idx] = !itemExpanded[idx]; renderMenu(currentF); }
@@ -277,15 +273,15 @@
     }
 
     function openReceipt() {
-        let h = `<h2 style="margin:0 0 25px 0; font-weight:800; font-size: 26px;">ตรวจสอบรายการ</h2><div style="max-height:45vh; overflow-y:auto; padding-right:10px;">`;
+        let h = `<h2 style="margin:0 0 20px 0; font-weight:800;">ตรวจสอบรายการ</h2><div style="max-height:45vh; overflow-y:auto; padding-right:10px;">`;
         cart.forEach((i,idx) => h += `
             <div style="display:flex;justify-content:space-between;margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
                 <span><b>${i.name}</b><br><small style="color:var(--gray); font-weight: 500;">${i.sweetness}</small></span>
-                <span style="text-align:right; font-weight:800;">฿${i.total.toLocaleString()}<br><span style="color:var(--darkred); font-size:12px; cursor:pointer;" onclick="rem(${idx})">ลบออก</span></span>
+                <span style="text-align:right; font-weight:700;">฿${i.total.toLocaleString()}<br><span style="color:var(--darkred); font-size:12px; cursor:pointer;" onclick="rem(${idx})">ลบออก</span></span>
             </div>`);
         let total = cart.reduce((s,i)=>s+i.total,0);
-        h += `</div><div style="margin-top:25px; display:flex; justify-content:space-between; font-weight:800; font-size:28px;"><span>ยอดรวมสุทธิ</span><span>฿${total.toLocaleString()}</span></div>
-              <button class="btn-add" style="margin-top:35px; height:70px; font-size:19px;" onclick="sub()">สั่งอาหารตอนนี้</button>`;
+        h += `</div><div style="margin-top:20px; display:flex; justify-content:space-between; font-weight:800; font-size:24px;"><span>ยอดรวม</span><span>฿${total.toLocaleString()}</span></div>
+              <button class="btn-checkout" style="margin-top:30px; width:100%; height:65px; font-size:18px;" onclick="sub()">สั่งอาหารตอนนี้</button>`;
         document.getElementById('modal-body').innerHTML = h; 
         document.getElementById('modal').style.display = 'flex';
     }
@@ -293,7 +289,7 @@
     function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
 
     async function sub() { 
-        document.getElementById('modal-body').innerHTML = "<div style='text-align:center; padding:60px;'><h3 style='margin:0; font-weight: 700;'>กำลังส่งออเดอร์...</h3><p style='color:var(--gray)'>กรุณารอสักครู่นะคะ</p></div>";
+        document.getElementById('modal-body').innerHTML = "<div style='text-align:center; padding:60px;'><h3 style='margin:0;'>กำลังบันทึกออเดอร์...</h3></div>";
         try {
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) });
             showStatus(); cart=[]; updateUI(); 
@@ -304,12 +300,11 @@
         document.getElementById('modal').style.display='none'; 
         document.getElementById('app-header').style.display='none';
         document.getElementById('app-content').innerHTML = `
-            <div class="app-container" style="padding-top:80px; text-align:center;">
-                <div style="font-size:70px; margin-bottom:20px;">☕️</div>
-                <h2 style="font-weight:800; font-size:32px; margin-bottom:10px;">สั่งเรียบร้อยแล้ว</h2>
-                <p style="color:var(--gray); margin-bottom:45px; font-weight: 500;">ออเดอร์โต๊ะ ${currentTable} กำลังรอคิวทำค่ะ</p>
-                <div id="stat-list" style="margin-bottom:40px; text-align:left; background:#fff; padding:30px; border-radius:35px; box-shadow:var(--shadow);"></div>
-                <button class="btn-add" style="background:#f1f5f9; color:var(--p);" onclick="location.reload()">สั่งเมนูอื่นเพิ่ม</button>
+            <div class="app-container" style="padding-top:60px; text-align:center;">
+                <h2 style="font-weight:800; font-size:32px;">สั่งเรียบร้อยแล้ว</h2>
+                <p style="color:var(--gray); margin-bottom:40px;">ออเดอร์โต๊ะ ${currentTable} กำลังรอคิวทำค่ะ</p>
+                <div id="stat-list" style="margin-bottom:35px; text-align:left; background:#fff; padding:25px; border-radius:35px; box-shadow:var(--shadow);"></div>
+                <button class="btn-checkout" style="background:#f1f5f9; color:var(--p);" onclick="location.reload()">กลับหน้าหลัก</button>
             </div>`;
         chk(); sInterval = setInterval(chk, 5000);
     }
@@ -321,7 +316,7 @@
             if (!d || !d.length) { clearInterval(sInterval); return; }
             document.getElementById('stat-list').innerHTML = d.map(o => `
                 <div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid #f8fafc;">
-                    <span style="font-weight:600;"><b>${o.qty}x</b> ${o.menu}</span>
+                    <span><b>${o.qty}x</b> ${o.menu}</span>
                     <span style="color:var(--blue); font-weight:800;">${o.status}</span>
                 </div>`).join('');
         } catch(e) {}

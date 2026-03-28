@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>WITHU | Premium Ordering</title>
+    <title>WITHU | Premium Ordering Experience</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -16,29 +16,26 @@
         body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; color: var(--p); -webkit-font-smoothing: antialiased; }
         .app-container { width: 100%; max-width: 550px; margin: 0 auto; padding: 0 20px 140px 20px; box-sizing: border-box; }
         
-        /* --- ⏳ Skeleton Loader --- */
+        /* --- ⏳ Loaders --- */
         .skeleton { background: #f1f5f9; background-image: linear-gradient(90deg, #f1f5f9 0px, #f8fafc 40px, #f1f5f9 80px); background-size: 600px; animation: shine-lines 1.6s infinite linear; }
         @keyframes shine-lines { 0% { background-position: -100px; } 100% { background-position: 500px; } }
         .skeleton-card { height: 180px; border-radius: var(--radius-lg); margin-bottom: 20px; width: 100%; }
 
-        /* --- 🔝 Top Bar --- */
+        /* --- 🔝 Header --- */
         .top-bar { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
         .brand { font-weight: 800; font-size: 24px; letter-spacing: 0.5px; }
         .table-badge { background: var(--p); color: #fff; padding: 6px 16px; border-radius: 50px; font-size: 13px; font-weight: 700; }
         .call-btn { background: var(--darkred); color: #fff !important; border: none; padding: 10px 22px; border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
 
-        /* --- 🔍 Search Area --- */
+        /* --- 🔍 Search & Nav --- */
         .search-area { position: sticky; top: 65px; z-index: 950; background: var(--bg); padding: 15px 0 10px 0; }
-        .search-box { position: relative; display: flex; align-items: center; }
-        .search-input { width: 100%; padding: 16px 20px 16px 55px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); font-family: 'Prompt'; font-size: 15px; outline: none; box-shadow: var(--shadow); transition: 0.3s; }
-        .search-icon { position: absolute; left: 22px; color: #b2bec3; display: flex; }
-
-        /* --- 🏷 Category Nav --- */
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); font-family: 'Prompt'; font-size: 15px; outline: none; box-shadow: var(--shadow); box-sizing: border-box; }
+        .search-icon { position: absolute; left: 22px; top: 32px; color: #b2bec3; display: flex; }
         #category-nav { display: flex; overflow-x: auto; padding: 10px 0 20px 25px; scrollbar-width: none; gap: 10px; margin-left: -20px; margin-right: -20px; }
         .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 10px 26px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; transition: 0.3s; }
         .nav-pill.active { background: var(--p); color: #fff; }
 
-        /* --- 🍽 Menu Card --- */
+        /* --- 🍽 Menu Cards --- */
         .menu-item { background: var(--card); border-radius: var(--radius-lg); padding: 25px; border: 1px solid var(--border); box-shadow: var(--shadow); animation: fadeIn 0.4s ease; display: flex; flex-direction: column; margin-bottom: 15px; }
         .menu-top { display: flex; align-items: flex-start; margin-bottom: 20px; }
         .menu-img { width: 110px; height: 110px; object-fit: cover; border-radius: 20px; margin-right: 20px; background: #f8fafc; }
@@ -48,7 +45,7 @@
 
         /* --- 🎚 Options --- */
         .sweet-selector { display: flex; gap: 5px; margin-bottom: 12px; }
-        .sweet-btn { border: 1px solid #f1f1f1; padding: 8px 0; border-radius: 12px; font-size: 11px; cursor: pointer; background: #f8f9fa; flex: 1; text-align: center; color: var(--gray); font-weight: 600; }
+        .sweet-btn { border: 1px solid #f1f1f1; padding: 8px 0; border-radius: 12px; font-size: 11px; cursor: pointer; background: #f8f9fa; flex: 1; text-align: center; color: var(--gray); font-weight: 600; transition: 0.2s; }
         .sweet-btn.active { background: var(--p); color: #fff; }
         
         /* 🚩 สำหรับปุ่มปั่น (Option Button) */
@@ -62,12 +59,10 @@
         .top-chip { border: 1px solid var(--border); padding: 12px; border-radius: 15px; font-size: 12px; text-align: center; cursor: pointer; font-weight: 700; background: #fff; }
         .top-chip.active { background: var(--p); color: #fff; }
         .sold-out { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
-
-        /* --- 📝 Note --- */
         .note-input { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--border); background: #f8fafc; font-family: 'Prompt'; font-size: 13px; margin-bottom: 15px; outline: none; box-sizing: border-box; transition: 0.3s; }
         .note-input:focus { border-color: var(--blue); background: #fff; }
 
-        /* --- 🛒 Bottom Elements --- */
+        /* --- 🛒 Buttons --- */
         .btn-add { background: transparent; border: 2.5px solid #000; padding: 15px; border-radius: 50px; font-family: 'Prompt'; font-weight: 800; cursor: pointer; width: 100%; font-size: 16px; transition: 0.2s; }
         .btn-add:active { transform: scale(0.95); background: #eee; }
         .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; cursor: pointer; }
@@ -77,13 +72,13 @@
         .call-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; z-index: 3000; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
         .call-modal { background: #fff; padding: 45px 30px; border-radius: 50px; text-align: center; width: 85%; max-width: 350px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .bell-icon { font-size: 60px; margin-bottom: 20px; display: inline-block; animation: ring 2s infinite; }
-        @keyframes ring { 0%, 100% { transform: rotate(0); } 10%, 30%, 50% { transform: rotate(15deg); } 20%, 40%, 60% { transform: rotate(-15deg); } }
+        @keyframes ring { 0%, 100% { transform: rotate(0); } 10%, 30%, 50% { transform: rotate(15deg); } 20%, 40%, 60% { transform: rotate(-15deg); } 80% { transform: rotate(0); } }
         .call-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--p); }
         .call-sub { font-size: 15px; color: var(--gray); margin-bottom: 30px; line-height: 1.5; }
         .btn-confirm-call { background: var(--p); color: #fff; border: none; padding: 16px; border-radius: 50px; font-weight: 700; font-size: 16px; cursor: pointer; width: 100%; margin-bottom: 15px; }
         .btn-cancel-call { background: transparent; color: var(--gray); border: none; font-weight: 600; cursor: pointer; font-family: 'Prompt'; }
 
-        /* --- 🚀 Order Sending UI --- */
+        /* --- 🍳 Sending UI --- */
         .sending-container { text-align: center; padding: 30px 0; }
         .pulse-loader { width: 80px; height: 80px; background: var(--p); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px auto; position: relative; color: #fff; font-size: 32px; }
         .pulse-loader::after { content: ''; position: absolute; inset: 0; border: 4px solid var(--p); border-radius: 50%; animation: pulse-ring 1.5s infinite; }
@@ -131,18 +126,14 @@
 <div id="app-content" style="display:none;">
     <div class="app-container">
         <div class="search-area">
-            <div class="search-box">
-                <span class="search-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
-                <input type="text" id="menu-search" class="search-input" placeholder="ค้นหาเมนู..." oninput="handleSearch()">
-            </div>
+            <span class="search-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+            <input type="text" id="menu-search" class="search-input" placeholder="ค้นหาเมนู..." oninput="handleSearch()">
         </div>
         <div id="category-nav"></div>
-        
         <div id="loading-skeleton">
             <div class="skeleton skeleton-card"></div>
             <div class="skeleton skeleton-card"></div>
         </div>
-        
         <div id="main-content"></div>
     </div>
 </div>
@@ -170,17 +161,29 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
     let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentS = {}, itemOpt = {}, itemExpanded = {}, currentF = "ทั้งหมด", currentSearch = "", sInterval;
 
-    // ระบบตรวจจับโต๊ะจาก URL (QR Code)
-    window.onload = () => {
+    // 🚩 1. ระบบ Session Persistence & URL Detect
+    window.onload = async () => {
         const params = new URLSearchParams(window.location.search);
-        const t = params.get('table');
-        if(t) { currentTable = t; startApp(); }
+        const tParam = params.get('table');
+        const savedTable = localStorage.getItem('withu_table');
+        const hasActiveOrder = localStorage.getItem('withu_order_active');
+
+        if(tParam) {
+            currentTable = tParam;
+            localStorage.setItem('withu_table', tParam);
+            startApp();
+        } else if(savedTable) {
+            currentTable = savedTable;
+            startApp();
+            if(hasActiveOrder === 'true') showStatus();
+        }
     }
 
     function lockTable() { 
         let s = document.getElementById("table-select"); 
         if(!s.value) return; 
         currentTable = s.value; 
+        localStorage.setItem('withu_table', currentTable);
         startApp();
     }
 
@@ -223,7 +226,9 @@
                 <div class="menu-top"><img src="${r[4]||'https://via.placeholder.com/150'}" class="menu-img"><div class="menu-info"><h3>${r[0]}</h3><div class="price">฿${r[1]}</div></div></div>
                 ${isAvail && isD ? `
                     <div class="sweet-selector">${['0%','25%','50%','75%','100%'].map(l=>`<div class="sweet-btn ${currentS[originalIdx]===l?'active':''}" onclick="setS(${originalIdx},'${l}')">${l}</div>`).join('')}</div>
+                    
                     ${showSmoothieOpt ? `<div class="opt-btn ${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">+ เพิ่มปั่น (+฿10)</div>` : ''}
+                    
                     <div class="acc-btn" onclick="toggleAcc(${originalIdx})">เลือกท็อปปิ้งเพิ่มเติม</div>
                     <div class="acc-content ${isExp ? 'open' : ''}"><div class="top-grid">${toppingsData.map(t => `<div class="top-chip ${itemOpt[originalIdx].toppings.includes(t[0])?'active':''} ${t[2]==='หมด'?'sold-out':''}" onclick="tT(${originalIdx},'${t[0]}')">${t[0]} (+฿${t[1]})</div>`).join('')}</div></div>
                 ` : ''}
@@ -237,6 +242,8 @@
     function toggleAcc(idx) { itemExpanded[idx] = !itemExpanded[idx]; renderMenu(currentF); }
     function setS(i, l) { currentS[i] = l; renderMenu(currentF); }
     function tT(i, n) { let t = itemOpt[i].toppings; itemOpt[i].toppings = t.includes(n) ? t.filter(x => x !== n) : [...t, n]; renderMenu(currentF); }
+    
+    // 🚩 ปุ่มปั่นแก้สีไม่ได้ เพราะต้องเรียก renderMenu ใหม่
     function tS(i) { itemOpt[i].smoothie = !itemOpt[i].smoothie; renderMenu(currentF); }
 
     function addC(n, p, idx, isD) {
@@ -268,18 +275,19 @@
 
     function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
 
-    // ฟังก์ชันส่งออเดอร์ (UI กระทะ 🍳)
+    // 🚩 2. UI ส่งออเดอร์กระทะ 🍳 & บันทึกสถานะสั่งแล้ว
     async function sub() { 
         const modalBody = document.getElementById('modal-body');
         modalBody.innerHTML = `<div class="sending-container"><div class="pulse-loader">🍳</div><div class="call-title">กำลังส่งออเดอร์งับ...</div><div class="call-sub">ออเดอร์ของอ้วนกำลังเดินทาง <br>กรุณารอสักครู่นะคะอ้วน</div></div>`;
         try { 
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) }); 
+            localStorage.setItem('withu_order_active', 'true');
             modalBody.innerHTML = `<div class="sending-container"><div class="success-check">✅</div><div class="call-title">ส่งออเดอร์เรียบร้อย!</div><div class="call-sub">ได้รับออเดอร์แล้วค่ะ <br>กำลังเตรียมความอร่อยให้คุณ...</div></div>`;
             setTimeout(() => { showStatus(); cart=[]; updateUI(); }, 2000);
         } catch(e) { alert("ส่งไม่สำเร็จ กรุณาลองใหม่"); openReceipt(); }
     }
 
-    // เรียกพนักงานแบบพรีเมียม
+    // 🚩 3. เรียกพนักงานแบบพรีเมียม
     function callStaff() { document.getElementById('call-staff-modal').style.display = 'flex'; }
     function closeCallModal() { document.getElementById('call-staff-modal').style.display = 'none'; }
     async function sendCallRequest() {
@@ -310,17 +318,31 @@
                     <div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; margin-bottom:25px; padding:0 10px;">
                         <span>ยอดรวมออเดอร์:</span><span style="color:var(--blue)">฿<span id="stat-sum-val">0</span></span>
                     </div>
-                    <button class="btn-checkout" style="background:#f1f5f9; color:var(--p); width:100%; border:none;" onclick="location.reload()">สั่งเมนูเพิ่ม</button>
+                    <button class="btn-checkout" style="background:#f1f5f9; color:var(--p); width:100%; border:none; margin-bottom:10px;" onclick="location.reload()">สั่งเมนูเพิ่ม</button>
+                    <button class="btn-checkout" style="background:transparent; color:var(--gray); width:100%; border:1px solid #eee;" onclick="clearSession()">ล้างข้อมูลโต๊ะ</button>
                 </div>
             </div>`;
         chk(); sInterval = setInterval(chk, 5000);
+    }
+
+    function clearSession() {
+        if(confirm("ต้องการล้างข้อมูลเพื่อเริ่มโต๊ะใหม่ใช่ไหมคะ?")) {
+            localStorage.removeItem('withu_table');
+            localStorage.removeItem('withu_order_active');
+            location.href = location.pathname;
+        }
     }
 
     async function chk() {
         try {
             const r = await fetch(API_URL + "?action=getAdminData"); const d = await r.json();
             const myOrders = d.orders.filter(o => o.table == currentTable);
-            if (myOrders.length === 0) { upS(4); document.getElementById('queue-info').innerText = "ออเดอร์เสร็จสิ้นแล้ว"; return; }
+            if (myOrders.length === 0) { 
+                upS(4); 
+                document.getElementById('queue-info').innerText = "ออเดอร์เสร็จสิ้นแล้ว"; 
+                localStorage.setItem('withu_order_active', 'false');
+                return; 
+            }
             const uniqueTables = [...new Set(d.orders.map(o => o.table))];
             const myRank = uniqueTables.indexOf(currentTable.toString());
             const queueAhead = myRank > 0 ? myRank : 0;

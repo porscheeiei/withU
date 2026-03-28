@@ -262,7 +262,7 @@
     function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
 
     async function sub() { 
-        document.getElementById('modal-body').innerHTML = "<h3 style='text-align:center; padding: 40px;'>🚀 กำลังส่งออเดอร์...</h3>";
+        document.getElementById('modal-body').innerHTML = "<h3 style='text-align:center; padding: 40px;'>กำลังส่งออเดอร์ครับอ้วน</h3>";
         try { 
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) }); 
             showStatus(); cart=[]; updateUI(); 

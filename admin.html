@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WITHU Admin Portal | Professional</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root { --bg: #f9fafb; --accent: #10b981; --red: #d63031; --blue: #2563eb; --navy: #0f172a; --text-main: #1f2937; --shadow: 0 10px 25px rgba(0,0,0,0.05); }
         body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; -webkit-font-smoothing: antialiased; }
@@ -36,7 +39,6 @@
         .status-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 25px 0; }
         .s-btn { padding: 10px; font-size: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: 'Prompt'; }
         
-        /* 📡 CDS Button Style */
         .btn-cds { width: 100%; background: var(--blue); color: #fff; padding: 14px; border-radius: 18px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 10px; font-size: 15px; transition: 0.2s; }
         .btn-cds:active { transform: scale(0.96); }
 
@@ -49,6 +51,12 @@
         .cash-input { width:100%; padding:15px; border-radius:15px; border:2px solid #eee; font-size:28px; text-align:center; font-family:'Prompt'; font-weight:700; margin:20px 0; outline:none; }
         
         .alert-bar { background: var(--red); color: #fff; padding: 18px; border-radius: 20px; margin-bottom: 25px; text-align: center; cursor: pointer; font-weight: 700; box-shadow: 0 10px 25px rgba(214,48,49,0.3); }
+
+        /* 🚩 Chart Styling */
+        .chart-wrapper { background: #fff; padding: 30px; border-radius: 30px; box-shadow: var(--shadow); margin-bottom: 25px; }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .toggle-btn { padding: 8px 16px; border-radius: 10px; border: none; font-family: 'Prompt'; font-weight: 700; cursor: pointer; background: #f1f5f9; color: var(--text-gray); }
+        .toggle-btn.active { background: var(--blue); color: #fff; }
     </style>
 </head>
 <body>
@@ -74,7 +82,20 @@
 
     <div id="container" class="grid"></div>
     <div id="stock-sec" style="display:none;" class="grid"></div>
-    <div id="report-sec" style="display:none;"><div id="report-list"></div></div>
+    
+    <div id="report-sec" style="display:none;">
+        <div class="chart-wrapper">
+            <div class="chart-header">
+                <h2 style="margin: 0; color: var(--navy);">กราฟยอดขาย</h2>
+                <div>
+                    <button class="toggle-btn active" id="btn-day" onclick="switchChart('day')">รายวัน</button>
+                    <button class="toggle-btn" id="btn-month" onclick="switchChart('month')">รายเดือน</button>
+                </div>
+            </div>
+            <canvas id="salesChart" height="100"></canvas>
+        </div>
+        <div id="report-list"></div>
+    </div>
 
     <div id="modal" onclick="this.style.display='none'">
         <div class="modal-box" onclick="event.stopPropagation()">
@@ -102,6 +123,12 @@
         const callSound = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625624707.mp3');  
         let lastOrderCount = 0, lastCallCount = 0, isFirstLoad = true, cAlertT = "";
         let currentPayingTotal = 0, currentPayingRows = [], currentPayingTable = "";
+
+        // 🚩 ตัวแปรสำหรับกราฟ
+        let salesChartInst = null;
+        let cDataDaily = [];
+        let cDataMonthly = [];
+        let currentChartMode = 'day';
 
         async function refresh() {
             try {
@@ -165,8 +192,74 @@
                 }
                 if (d.menu) renderStock(d.menu);
                 if (d.summary.report) renderReport(d.summary.report);
+                
+                // 🚩 โหลดข้อมูลและวาดกราฟ
+                if (d.summary.chartDaily && d.summary.chartMonthly) {
+                    cDataDaily = d.summary.chartDaily;
+                    cDataMonthly = d.summary.chartMonthly;
+                    drawChart();
+                }
+
                 isFirstLoad = false;
             } catch(e){ console.log(e); }
+        }
+
+        // 🚩 ฟังก์ชันสร้างกราฟแท่ง (วันต่อวัน)
+        function drawChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            if(salesChartInst) salesChartInst.destroy();
+
+            let dataArr = currentChartMode === 'day' ? [...cDataDaily] : [...cDataMonthly];
+            
+            // เรียงลำดับวันที่จากเก่าไปใหม่
+            dataArr.sort((a,b) => {
+               let ap = a.date.split('/'), bp = b.date.split('/');
+               let as = ap.length === 3 ? ap[2] + ap[1].padStart(2,'0') + ap[0].padStart(2,'0') : ap[1] + ap[0].padStart(2,'0');
+               let bs = bp.length === 3 ? bp[2] + bp[1].padStart(2,'0') + bp[0].padStart(2,'0') : bp[1] + bp[0].padStart(2,'0');
+               return as.localeCompare(bs);
+            });
+
+            // ดึงมาโชว์ 30 วันล่าสุด สำหรับรายวัน หรือ 12 เดือนล่าสุด
+            if(currentChartMode === 'day' && dataArr.length > 30) dataArr = dataArr.slice(-30);
+            if(currentChartMode === 'month' && dataArr.length > 12) dataArr = dataArr.slice(-12);
+
+            const labels = dataArr.map(i => i.date);
+            const vals = dataArr.map(i => i.total);
+
+            // สีกราฟ: วันสีฟ้าสว่าง, เดือนสีกรมท่า
+            const color = currentChartMode === 'day' ? '#3b82f6' : '#0f172a';
+            const bgColor = currentChartMode === 'day' ? 'rgba(59, 130, 246, 0.7)' : 'rgba(15, 23, 42, 0.8)';
+
+            salesChartInst = new Chart(ctx, {
+                type: 'bar', // บังคับเป็นกราฟแท่ง
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'ยอดขาย (บาท)',
+                        data: vals,
+                        backgroundColor: bgColor,
+                        borderColor: color,
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 🚩 ฟังก์ชันสลับโหมดกราฟ
+        function switchChart(mode) {
+            currentChartMode = mode;
+            document.getElementById('btn-day').classList.toggle('active', mode === 'day');
+            document.getElementById('btn-month').classList.toggle('active', mode === 'month');
+            drawChart();
         }
 
         function getTimeDiff(timeStr) {
@@ -187,6 +280,7 @@
 
         function openCashModal(t, total, rows) {
             currentPayingTotal = total; currentPayingRows = rows; currentPayingTable = t;
+            localStorage.setItem('cds_cash_received', 0); // รีเซ็ตส่งไป CDS
             document.getElementById('c-table').innerText = "ปิดโต๊ะ " + t;
             document.getElementById('c-total').innerText = "฿" + total.toLocaleString();
             document.getElementById('cash-received').value = "";
@@ -199,6 +293,7 @@
         function calcChange() {
             const received = parseFloat(document.getElementById('cash-received').value) || 0;
             const change = received - currentPayingTotal;
+            localStorage.setItem('cds_cash_received', received); // 🚩 ส่งค่าไป CDS แบบ Real-time
             const display = document.getElementById('change-display');
             const btn = document.getElementById('btn-finish-cash');
             if (received >= currentPayingTotal) {

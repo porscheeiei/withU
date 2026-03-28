@@ -11,19 +11,16 @@
         :root { --bg: #f9fafb; --accent: #10b981; --red: #d63031; --blue: #2563eb; --navy: #0f172a; --text-main: #1f2937; --shadow: 0 10px 25px rgba(0,0,0,0.05); }
         body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; -webkit-font-smoothing: antialiased; }
         
-        /* Dashboard Stats */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; flex-wrap: wrap; gap: 20px; }
         .stat-group { display: flex; gap: 15px; flex-wrap: wrap; }
         .stat-card { background: #fff; padding: 15px 25px; border-radius: 20px; box-shadow: var(--shadow); text-align: right; border: 1px solid #f3f4f6; min-width: 120px; }
         .stat-card small { display: block; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; }
         .stat-card b { font-size: 22px; }
 
-        /* Navigation */
         .nav-group { margin-bottom: 30px; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
         .nav-btn { padding: 12px 28px; border: none; border-radius: 15px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; transition: 0.3s; background: #fff; color: #64748b; border: 1px solid #e2e8f0; white-space: nowrap; }
         .nav-btn.active { background: var(--navy) !important; color: #fff !important; border-color: var(--navy); box-shadow: 0 10px 20px rgba(15,23,42,0.2); }
 
-        /* Order Cards */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
         .card { background: #fff; border-radius: 40px; padding: 35px; box-shadow: var(--shadow); border: 1px solid rgba(229,231,235,0.5); position: relative; transition: 0.3s; }
         .card-time-box { position: absolute; top: 35px; right: 35px; text-align: right; }
@@ -38,32 +35,30 @@
         .status-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 25px 0; }
         .s-btn { padding: 10px; font-size: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: 'Prompt'; }
         
-        /* Buttons */
         .btn-cds { width: 100%; background: var(--blue); color: #fff; padding: 14px; border-radius: 18px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 10px; font-size: 15px; transition: 0.2s; }
         .btn-cds:active { transform: scale(0.96); }
+
         .btn-qr { width: 100%; background: var(--navy); color: #fff; padding: 16px; border-radius: 18px; font-weight: 700; border: none; cursor: pointer; font-size: 16px; margin-top: 10px; }
         .btn-cash { width: 100%; background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 16px; border-radius: 18px; font-weight: 700; margin-top: 10px; cursor: pointer; font-size: 16px; font-family: 'Prompt'; }
 
-        /* Modals */
         #modal, #cash-modal { position:fixed; inset:0; background:rgba(15,23,42,0.9); backdrop-filter:blur(5px); display:none; z-index:2000; align-items:center; justify-content:center; }
         .modal-box { background:#fff; padding:40px; border-radius:45px; text-align:center; max-width:400px; width:90%; }
         .cash-input { width:100%; padding:15px; border-radius:15px; border:2px solid #eee; font-size:28px; text-align:center; font-family:'Prompt'; font-weight:700; margin:20px 0; outline:none; }
         
-        /* Alerts & Charts */
         .alert-bar { background: var(--red); color: #fff; padding: 18px; border-radius: 20px; margin-bottom: 25px; text-align: center; cursor: pointer; font-weight: 700; box-shadow: 0 10px 25px rgba(214,48,49,0.3); }
+
         .chart-wrapper { background: #fff; padding: 30px; border-radius: 30px; box-shadow: var(--shadow); margin-bottom: 25px; }
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .toggle-btn { padding: 8px 16px; border-radius: 10px; border: none; font-family: 'Prompt'; font-weight: 700; cursor: pointer; background: #f1f5f9; color: var(--text-gray); }
         .toggle-btn.active { background: var(--blue); color: #fff; }
 
-        /* Sound Button Animation */
         @keyframes bounceBtn { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .sound-btn { animation: bounceBtn 2s infinite; box-shadow: 0 10px 25px rgba(15,23,42,0.4); }
     </style>
 </head>
 <body>
 
-    <button id="sound-unlock" class="sound-btn" style="position:fixed; bottom:25px; right:25px; z-index:3000; background:var(--navy); color:#fff; border:none; padding:15px 30px; border-radius:50px; cursor:pointer; font-family:'Prompt'; font-size: 16px; font-weight: 700;" onclick="unlockSound()">🔔 กดเพื่อเปิดเสียงแจ้งเตือน</button>
+    <button id="sound-unlock" class="sound-btn" style="position:fixed; bottom:25px; right:25px; z-index:3000; background:var(--navy); color:#fff; border:none; padding:15px 30px; border-radius:50px; cursor:pointer; font-family:'Prompt'; font-size: 16px; font-weight: 700;" onclick="this.style.display='none'; unlockSound();">🔔 กดเพื่อเปิดเสียงแจ้งเตือน</button>
 
     <div id="staff-alert" class="alert-bar" onclick="clearCallAlert()" style="display:none;">⚠️ โต๊ะ <span id="alert-table"></span> เรียกพนักงาน (คลิกเพื่อปิด)</div>
     
@@ -122,29 +117,36 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
         
-        // 🚩 โหลดไฟล์เสียงไว้ล่วงหน้า
-        const orderSound = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_7325997672.mp3'); 
-        const callSound = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625624707.mp3');  
-        orderSound.preload = 'auto'; callSound.preload = 'auto';
-        
+        let orderSound = null, callSound = null;
         let isSoundUnlocked = false; 
+
+        // 🚩 โหลดไฟล์เสียงแบบมีการป้องกัน Error (Try-Catch)
+        try {
+            orderSound = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_7325997672.mp3'); 
+            callSound = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625624707.mp3');  
+            orderSound.preload = 'auto'; callSound.preload = 'auto';
+        } catch(e) {
+            console.log("Audio load blocked by browser:", e);
+        }
+        
         let lastOrderCount = 0, lastCallCount = 0, isFirstLoad = true, cAlertT = "";
         let currentPayingTotal = 0, currentPayingRows = [], currentPayingTable = "";
         let salesChartInst = null, cDataDaily = [], cDataMonthly = [], currentChartMode = 'day';
 
-        // 🚩 ฟังก์ชันปลดล็อกเสียงการแจ้งเตือน
+        // 🚩 ฟังก์ชันปลดล็อกเสียง (ปรับให้ทำงานได้ 100% ไม่มีค้าง)
         function unlockSound() {
-            if (isSoundUnlocked) return;
-            orderSound.volume = 0;
-            orderSound.play().then(() => {
-                orderSound.pause(); orderSound.currentTime = 0; orderSound.volume = 1;
-                callSound.volume = 0;
+            isSoundUnlocked = true;
+            if (!orderSound || !callSound) return; // ถ้าโหลดเสียงไม่ได้ ให้ข้ามไปเลย ระบบจะได้ไม่พัง
+
+            try {
+                orderSound.play().then(() => {
+                    orderSound.pause(); orderSound.currentTime = 0;
+                }).catch(e => {});
+                
                 callSound.play().then(() => {
-                    callSound.pause(); callSound.currentTime = 0; callSound.volume = 1;
-                });
-                isSoundUnlocked = true;
-                document.getElementById('sound-unlock').style.display = 'none';
-            }).catch(e => console.log("Sound Unlock Failed:", e));
+                    callSound.pause(); callSound.currentTime = 0;
+                }).catch(e => {});
+            } catch(e) {}
         }
 
         async function refresh() {
@@ -160,7 +162,9 @@
                 // แจ้งเตือนพนักงาน
                 if(d.calls && d.calls.length > 0) { 
                     cAlertT = d.calls[0][1]; document.getElementById('staff-alert').style.display='block'; document.getElementById('alert-table').innerText=cAlertT; 
-                    if(!isFirstLoad && d.calls.length > lastCallCount && isSoundUnlocked) callSound.play().catch(e => {});
+                    if(!isFirstLoad && d.calls.length > lastCallCount && isSoundUnlocked && callSound) {
+                        callSound.play().catch(e => {});
+                    }
                 } else { document.getElementById('staff-alert').style.display='none'; }
                 lastCallCount = d.calls ? d.calls.length : 0;
 
@@ -170,7 +174,9 @@
                     container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:100px;color:#94a3b8;'>ไม่มีออเดอร์ค้าง</div>"; 
                     lastOrderCount = 0; 
                 } else {
-                    if(!isFirstLoad && d.orders.length > lastOrderCount && isSoundUnlocked) orderSound.play().catch(e => {});
+                    if(!isFirstLoad && d.orders.length > lastOrderCount && isSoundUnlocked && orderSound) {
+                        orderSound.play().catch(e => {});
+                    }
                     lastOrderCount = d.orders.length;
                     
                     let groups={}; d.orders.forEach(o=>{

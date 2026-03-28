@@ -53,18 +53,28 @@
         .order-item b { font-size: 18px; }
         .btn-void { background: rgba(214,48,49,0.1); color: var(--red); border: none; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; }
 
-        .status-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 25px 0; }
+        .status-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
         .s-btn { padding: 10px; font-size: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: 'Prompt'; }
         
-        .btn-cds { width: 100%; background: var(--blue); color: #fff; padding: 14px; border-radius: 18px; font-weight: 700; border: none; cursor: pointer; margin-bottom: 10px; font-size: 15px; }
-        .btn-qr { width: 100%; background: var(--navy); color: #fff; padding: 16px; border-radius: 18px; font-weight: 700; border: none; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        .btn-cash { width: 100%; background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 16px; border-radius: 18px; font-weight: 700; margin-top: 10px; cursor: pointer; font-size: 16px; font-family: 'Prompt'; }
+        /* 🚩 ปุ่มเช็คบิลใหม่ */
+        .btn-check-bill { width: 100%; background: var(--navy); color: #fff; padding: 18px; border-radius: 20px; font-weight: 800; border: none; cursor: pointer; font-size: 18px; margin-top: 15px; transition: 0.2s; }
+        .btn-check-bill:active { transform: scale(0.98); }
 
-        #modal, #cash-modal { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); display:none; z-index:2000; align-items:center; justify-content:center; }
-        .modal-box { background:var(--card-bg); padding:40px; border-radius:45px; text-align:center; max-width:400px; width:90%; }
-        .cash-input { width:100%; padding:15px; border-radius:15px; border:2px solid var(--border); background:var(--bg); color:var(--text-main); font-size:28px; text-align:center; font-family:'Prompt'; font-weight:700; margin:20px 0; outline:none; }
+        /* 🧾 Unified Payment Modal */
+        #pay-modal { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); display:none; z-index:2000; align-items:center; justify-content:center; }
+        .pay-box { background: var(--card-bg); padding:40px; border-radius:45px; width:90%; max-width:450px; text-align:center; box-shadow: var(--shadow); max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); }
+        .bill-summary { text-align: left; margin: 20px 0; padding: 20px; background: var(--bg); border-radius: 25px; }
+        .bill-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; }
         
-        .alert-bar { background: var(--red); color: #fff; padding: 18px; border-radius: 20px; margin-bottom: 25px; text-align: center; cursor: pointer; font-weight: 700; box-shadow: 0 10px 25px rgba(214,48,49,0.3); }
+        .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .method-btn { padding: 20px; border-radius: 25px; border: 2px solid var(--border); background: var(--card-bg); cursor: pointer; transition: 0.3s; }
+        .method-btn:hover { border-color: var(--blue); background: rgba(37,99,235,0.05); }
+        .method-btn img { width: 45px; margin-bottom: 10px; }
+        .method-btn b { display: block; color: var(--text-main); }
+
+        .cash-input { width:100%; padding:15px; border-radius:15px; border:2px solid var(--blue); background:var(--bg); color:var(--text-main); font-size:28px; text-align:center; font-family:'Prompt'; font-weight:700; margin:20px 0; outline:none; }
+        
+        .alert-bar { background: var(--red); color: #fff; padding: 18px; border-radius: 20px; margin-bottom: 25px; text-align: center; font-weight: 700; box-shadow: 0 10px 25px rgba(214,48,49,0.3); }
 
         .chart-wrapper { background: var(--card-bg); padding: 30px; border-radius: 30px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid var(--border); }
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -91,7 +101,6 @@
         </div>
         <div class="stat-group">
             <div class="stat-card"><small>บิลวันนี้</small><b id="stat-count">0</b></div>
-            <div class="stat-card"><small>PromptPay</small><b id="stat-qr" style="color:var(--blue);">฿0</b></div>
             <div class="stat-card"><small>รวมทั้งหมด</small><b id="revenue" style="color:var(--accent);">฿0</b></div>
         </div>
     </div>
@@ -119,23 +128,39 @@
         <div id="report-list"></div>
     </div>
 
-    <div id="modal" onclick="this.style.display='none'">
-        <div class="modal-box" onclick="event.stopPropagation()">
-            <h3 id="m-table" style="font-size:28px; margin-bottom:10px;"></h3>
-            <img id="m-qr" style="width:100%; border-radius: 20px; border: 1px solid var(--border);">
-            <div id="m-total" style="font-size:40px; font-weight:800; margin:15px 0;"></div>
-            <button class="btn-qr" style="background:var(--accent);" id="m-confirm">ยืนยันได้รับเงินแล้ว</button>
-        </div>
-    </div>
+    <div id="pay-modal">
+        <div class="pay-box">
+            <h2 id="p-table-title" style="margin-top:0; color:var(--text-main);">เช็คบิล โต๊ะ -</h2>
+            
+            <div class="bill-summary" id="p-bill-items">
+                </div>
 
-    <div id="cash-modal">
-        <div class="modal-box">
-            <h3 id="c-table" style="margin-top:0;"></h3>
-            <div style="font-size:16px; color:var(--text-muted);">ยอดชำระ: <b id="c-total" style="color:var(--text-main); font-size:24px;"></b></div>
-            <input type="number" id="cash-received" class="cash-input" placeholder="ระบุเงินที่รับมา" oninput="calcChange()">
-            <div id="change-display" style="font-size:40px; font-weight:800; color:var(--accent); display:none; margin-bottom:20px;">ทอน: ฿0</div>
-            <button id="btn-finish-cash" class="btn-qr" style="background:var(--accent); display:none;">ปิดโต๊ะและบันทึก</button>
-            <button onclick="document.getElementById('cash-modal').style.display='none'" style="background:none; border:none; color:var(--text-muted); margin-top:15px; cursor:pointer;">ยกเลิก</button>
+            <div style="font-size: 18px; color: var(--text-muted); font-weight: 600;">ยอดชำระทั้งหมด</div>
+            <div id="p-total-price" style="font-size: 55px; font-weight: 800; color: var(--blue); line-height: 1.1; margin-bottom: 20px;">฿0</div>
+
+            <div id="p-methods" class="method-grid">
+                <div class="method-btn" onclick="selectPayMethod('qr')">
+                    <img src="https://img.icons8.com/color/96/qr-code.png" alt="QR">
+                    <b>PromptPay</b>
+                </div>
+                <div class="method-btn" onclick="selectPayMethod('cash')">
+                    <img src="https://img.icons8.com/color/96/money-box.png" alt="Cash">
+                    <b>เงินสด</b>
+                </div>
+            </div>
+
+            <div id="p-qr-area" style="display:none; margin-top:15px;">
+                <img id="p-qr-img" style="width:100%; border-radius:25px; border:1px solid var(--border); margin-bottom: 15px;">
+                <button class="btn-check-bill" style="background:var(--accent);" onclick="finalPay('PromptPay')">ยืนยันได้รับเงินแล้ว</button>
+            </div>
+
+            <div id="p-cash-area" style="display:none;">
+                <input type="number" id="p-cash-input" class="cash-input" placeholder="จำนวนเงินที่รับมา" oninput="calcChangeUnified()">
+                <div id="p-change-display" style="font-size:38px; font-weight:800; color:var(--accent); display:none; margin-bottom: 15px;">ทอน: ฿0</div>
+                <button id="p-cash-submit" class="btn-check-bill" style="background:var(--accent); display:none;" onclick="finalPay('เงินสด')">ปิดโต๊ะและบันทึก</button>
+            </div>
+
+            <button onclick="closePayModal()" style="margin-top:25px; background:none; border:none; color:var(--text-muted); cursor:pointer; font-family:'Prompt'; font-weight: 600;">ยกเลิก / ย้อนกลับ</button>
         </div>
     </div>
 
@@ -152,8 +177,10 @@
         } catch(e) {}
         
         let lastOrderCount = 0, lastCallCount = 0, isFirstLoad = true, cAlertT = "";
-        let currentPayingTotal = 0, currentPayingRows = [], currentPayingTable = "";
         let salesChartInst = null, cDataDaily = [], cDataMonthly = [], currentChartMode = 'day';
+
+        // ข้อมูลเช็คบิลปัจจุบัน
+        let pTable = "", pTotal = 0, pRows = [], pItems = [];
 
         // 🚩 โหลดการตั้งค่า UX/UI
         if(localStorage.getItem('withu_theme') === 'dark') toggleTheme(true);
@@ -177,7 +204,7 @@
                 document.documentElement.setAttribute('data-layout', target);
                 localStorage.setItem('withu_layout', target);
             } else { document.documentElement.setAttribute('data-layout', 'compact'); }
-            document.getElementById('btn-layout').innerText = document.documentElement.getAttribute('data-layout') === 'compact' ? '🖥️ ขยายการ์ด' : '🗜️ ย่อการ์ด';
+            document.getElementById('btn-layout').innerText = document.documentElement.getAttribute('data-layout') === 'compact' ? '🖥️ ขยาย' : '🗜️ ย่อ';
         }
 
         function unlockSound() {
@@ -196,17 +223,16 @@
                 if (!d) return;
 
                 document.getElementById('revenue').innerText = "฿" + (d.summary.revenue ? d.summary.revenue.toLocaleString() : "0");
-                document.getElementById('stat-qr').innerText = "฿" + (d.summary.qr ? d.summary.qr.toLocaleString() : "0");
                 document.getElementById('stat-count').innerText = d.summary.orders || 0;
 
-                if(d.calls && d.calls.length > 0) { 
+                if(d.calls?.length > 0) { 
                     cAlertT = d.calls[0][1]; document.getElementById('staff-alert').style.display='block'; document.getElementById('alert-table').innerText=cAlertT; 
                     if(!isFirstLoad && d.calls.length > lastCallCount && isSoundUnlocked && callSound) callSound.play().catch(e => {});
                 } else { document.getElementById('staff-alert').style.display='none'; }
-                lastCallCount = d.calls ? d.calls.length : 0;
+                lastCallCount = d.calls?.length || 0;
 
                 const container = document.getElementById('container'); 
-                if(!d.orders || d.orders.length === 0){ 
+                if(!d.orders?.length){ 
                     container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:100px;color:var(--text-muted);'>ไม่มีออเดอร์ค้าง</div>"; 
                     lastOrderCount = 0; 
                 } else {
@@ -242,23 +268,89 @@
                             <div class="status-group">
                                 <button class="s-btn" style="background:rgba(245,158,11,0.1); color:#d97706;" onclick='upS(${JSON.stringify(groups[t].rows)},"กำลังทำ")'>กำลังทำ</button>
                                 <button class="s-btn" style="background:rgba(16,185,129,0.1); color:#059669;" onclick='upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ")'>รอเสิร์ฟ</button>
-                                <button class="s-btn" style="background:rgba(37,99,235,0.1); color:#2563eb;" onclick='upS(${JSON.stringify(groups[t].rows)},"สำเร็จ")'>เสิร์ฟแล้ว</button>
+                                <button class="s-btn" style="background:rgba(37,99,235,0.1); color:#2563eb;" onclick='upS(${JSON.stringify(groups[t].rows)},"สำเร็จ")'>เสร็จสิ้น</button>
                             </div>
-                            <button class="btn-cds" onclick='triggerCDS("${t}")'>📡 ส่งข้อมูลขึ้นจอ CDS</button>
-                            <div style="font-size:38px; font-weight:800; text-align:right; margin:15px 0; color:var(--text-main);">฿${groups[t].total.toLocaleString()}</div>
-                            <button class="btn-qr" onclick='shQR("${t}",${groups[t].total},${JSON.stringify(groups[t].rows)})'>เก็บเงิน (PromptPay)</button>
-                            <button class="btn-cash" onclick='openCashModal("${t}", ${groups[t].total}, ${JSON.stringify(groups[t].rows)})'>ปิดโต๊ะ (เงินสด)</button>
+                            <div style="font-size:32px; font-weight:800; text-align:right; margin:15px 0; color:var(--text-main);">฿${groups[t].total.toLocaleString()}</div>
+                            
+                            <button class="btn-check-bill" onclick='openPayModal("${t}", ${groups[t].total}, ${JSON.stringify(groups[t].rows)}, ${JSON.stringify(groups[t].items)})'>เช็คบิล / เก็บเงิน</button>
                         </div>`}).join('');
                 }
                 if (d.menu) renderStock(d.menu);
                 if (d.summary.report) renderReport(d.summary.report);
-                if (d.summary.chartDaily && d.summary.chartMonthly) {
-                    cDataDaily = d.summary.chartDaily; cDataMonthly = d.summary.chartMonthly; drawChart();
-                }
+                if (d.summary.chartDaily) { cDataDaily = d.summary.chartDaily; cDataMonthly = d.summary.chartMonthly; drawChart(); }
                 isFirstLoad = false;
             } catch(e){ console.log(e); }
         }
 
+        // 🚩 ฟังก์ชันเปิดหน้าเช็คบิล (สรุปรายการก่อน)
+        async function openPayModal(table, total, rows, items) {
+            pTable = table; pTotal = total; pRows = rows; pItems = items;
+            
+            document.getElementById('p-table-title').innerText = "เช็คบิล โต๊ะ " + table;
+            document.getElementById('p-total-price').innerText = "฿" + total.toLocaleString();
+            
+            // แสดงรายการอาหารในบิล
+            document.getElementById('p-bill-items').innerHTML = items.map(i => `
+                <div class="bill-row">
+                    <span>${i.qty}x ${i.menu}</span>
+                    <b>฿${parseFloat(String(i.total).replace(/,/g,'')).toLocaleString()}</b>
+                </div>
+            `).join('');
+
+            // ส่งข้อมูลขึ้นจอ CDS ทันทีเพื่อให้ลูกค้าดูรายการ
+            await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:table, status:'paying'})});
+            
+            // Reset Modal
+            document.getElementById('p-methods').style.display = 'grid';
+            document.getElementById('p-qr-area').style.display = 'none';
+            document.getElementById('p-cash-area').style.display = 'none';
+            document.getElementById('pay-modal').style.display = 'flex';
+        }
+
+        function selectPayMethod(method) {
+            document.getElementById('p-methods').style.display = 'none';
+            if(method === 'qr') {
+                document.getElementById('p-qr-img').src = `https://promptpay.io/0931805507/${pTotal}.png`;
+                document.getElementById('p-qr-area').style.display = 'block';
+            } else {
+                document.getElementById('p-cash-input').value = "";
+                document.getElementById('p-change-display').style.display = "none";
+                document.getElementById('p-cash-submit').style.display = "none";
+                document.getElementById('p-cash-area').style.display = 'block';
+                setTimeout(() => document.getElementById('p-cash-input').focus(), 100);
+            }
+        }
+
+        function calcChangeUnified() {
+            const received = parseFloat(document.getElementById('p-cash-input').value) || 0;
+            const change = received - pTotal;
+            localStorage.setItem('cds_cash_received', received); // Sync ไป CDS
+            if (received >= pTotal) {
+                document.getElementById('p-change-display').innerText = "ทอน: ฿" + change.toLocaleString();
+                document.getElementById('p-change-display').style.display = "block";
+                document.getElementById('p-cash-submit').style.display = "block";
+            } else {
+                document.getElementById('p-change-display').style.display = "none";
+                document.getElementById('p-cash-submit').style.display = "none";
+            }
+        }
+
+        async function finalPay(method) {
+            if(confirm(`ยืนยันปิดโต๊ะ ${pTable} (${method})?`)) {
+                localStorage.setItem('cds_cash_received', 0);
+                await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:pTable, status:'idle'})});
+                await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:pRows, paymentMethod:method})});
+                closePayModal();
+                refresh();
+            }
+        }
+
+        function closePayModal() {
+            document.getElementById('pay-modal').style.display = 'none';
+            localStorage.setItem('cds_cash_received', 0);
+        }
+
+        // --- ระบบกราฟและจัดการอื่นๆ ---
         function drawChart() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             if(salesChartInst) salesChartInst.destroy();
@@ -269,69 +361,22 @@
                let bs = bp.length===3 ? bp[2]+bp[1].padStart(2,'0')+bp[0].padStart(2,'0') : bp[1]+bp[0].padStart(2,'0');
                return as.localeCompare(bs);
             });
-            if(currentChartMode === 'day' && dataArr.length > 30) dataArr = dataArr.slice(-30);
-            if(currentChartMode === 'month' && dataArr.length > 12) dataArr = dataArr.slice(-12);
-
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const color = currentChartMode === 'day' ? '#3b82f6' : (isDark ? '#60a5fa' : '#0f172a');
-            const bgColor = currentChartMode === 'day' ? 'rgba(59, 130, 246, 0.7)' : (isDark ? 'rgba(96, 165, 250, 0.6)' : 'rgba(15, 23, 42, 0.8)');
-
             salesChartInst = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: dataArr.map(i=>i.date), datasets: [{ label: 'ยอดขาย', data: dataArr.map(i=>i.total), backgroundColor: bgColor, borderColor: color, borderWidth: 1, borderRadius: 6 }] },
+                data: { labels: dataArr.map(i=>i.date), datasets: [{ label: 'ยอดขาย', data: dataArr.map(i=>i.total), backgroundColor: isDark ? 'rgba(96, 165, 250, 0.6)' : 'rgba(37,99,235,0.7)', borderRadius: 6 }] },
                 options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9' } }, x: { grid: { display: false } } } }
             });
         }
 
         function switchChart(mode) { currentChartMode = mode; document.getElementById('btn-day').classList.toggle('active', mode === 'day'); document.getElementById('btn-month').classList.toggle('active', mode === 'month'); drawChart(); }
         function getTimeDiff(timeStr) { const now = new Date(); const [date, time] = timeStr.split(' '); const [d, m, y] = date.split('/'); const [h, min, s] = time.split(':'); return Math.floor((now - new Date(y, m - 1, d, h, min, s)) / 60000); }
-        async function triggerCDS(t) { await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'paying'})}); alert("ส่งข้อมูลโต๊ะ " + t + " ขึ้นจอหน้าบ้านแล้ว"); }
-        
-        function openCashModal(t, total, rows) {
-            currentPayingTotal = total; currentPayingRows = rows; currentPayingTable = t;
-            localStorage.setItem('cds_cash_received', 0);
-            document.getElementById('c-table').innerText = "ปิดโต๊ะ " + t; document.getElementById('c-total').innerText = "฿" + total.toLocaleString();
-            document.getElementById('cash-received').value = ""; document.getElementById('change-display').style.display = "none"; document.getElementById('btn-finish-cash').style.display = "none";
-            document.getElementById('cash-modal').style.display = 'flex'; setTimeout(()=> document.getElementById('cash-received').focus(), 100);
-        }
-
-        function calcChange() {
-            const received = parseFloat(document.getElementById('cash-received').value) || 0;
-            const change = received - currentPayingTotal;
-            localStorage.setItem('cds_cash_received', received);
-            if (received >= currentPayingTotal) {
-                document.getElementById('change-display').innerText = "ทอน: ฿" + change.toLocaleString();
-                document.getElementById('change-display').style.display = "block"; document.getElementById('btn-finish-cash').style.display = "block";
-                document.getElementById('btn-finish-cash').onclick = () => { document.getElementById('cash-modal').style.display='none'; pay(currentPayingTable, currentPayingRows, 'เงินสด'); };
-            } else { document.getElementById('change-display').style.display = "none"; document.getElementById('btn-finish-cash').style.display = "none"; }
-        }
-
         async function voidIt(row, name) { if(confirm(`ลบรายการ "${name}"?`)) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'voidItem',rowNum:row})}); refresh(); } }
         async function upS(r, s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
         async function tgS(type, name, status) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStock',type:type,name:name,status:status})}); refresh(); }
-        async function shQR(t, a, r) { await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'paying'})}); document.getElementById('m-table').innerText = "โต๊ะ " + t; document.getElementById('m-total').innerText = "฿" + a.toLocaleString(); document.getElementById('m-qr').src = `https://promptpay.io/0931805507/${a}.png`; document.getElementById('m-confirm').onclick = () => { document.getElementById('modal').style.display='none'; pay(t,r,'PromptPay'); }; document.getElementById('modal').style.display = 'flex'; }
-        async function pay(t, r, method) { if(confirm(`ยืนยันปิดโต๊ะ ${t}?`)){ await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:t, status:'idle'})}); await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:r, paymentMethod:method})}); refresh(); } }
-
-        function renderStock(menu) {
-            document.getElementById('stock-sec').innerHTML = `<h2 style="grid-column:1/-1;">จัดการสต็อก</h2>` + menu.map(m=>`<div class="card" style="padding:20px; display:flex; justify-content:space-between; align-items:center;"><b>${m[0]}</b><button style="padding:10px 20px; border-radius:12px; border:none; background:${m[5]=='หมด'?'var(--bg)':'var(--navy)'}; color:${m[5]=='หมด'?'#ef4444':'#fff'}; cursor:pointer; font-weight:700;" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เปิดขาย':'ปิด (หมด)'}</button></div>`).join('');
-        }
-
-        function renderReport(report) {
-            let html = `<table style="width:100%; border-collapse:collapse; background:var(--card-bg); border-radius:25px; overflow:hidden; box-shadow:var(--shadow);">
-                <thead style="background:var(--bg);"><tr><th style="padding:20px; text-align:left;">เมนู</th><th style="padding:20px; text-align:center;">จำนวน</th><th style="padding:20px; text-align:right;">ยอดรวม</th></tr></thead>
-                <tbody>${report.map(item => `<tr style="border-top:1px solid var(--border);"><td style="padding:20px;"><b>${item.name}</b></td><td style="padding:20px; text-align:center;">${item.qty}</td><td style="padding:20px; text-align:right; font-weight:700;">฿${item.total.toLocaleString()}</td></tr>`).join('')}</tbody>
-            </table>`;
-            document.getElementById('report-list').innerHTML = (report.length === 0) ? "<div style='text-align:center; padding:50px;'>ไม่มีข้อมูล</div>" : html;
-        }
-
-        function showSec(n) { 
-            document.getElementById('container').style.display = (n==='orders'?'grid':'none'); 
-            document.getElementById('stock-sec').style.display = (n==='stock'?'grid':'none');
-            document.getElementById('report-sec').style.display = (n==='report'?'block':'none');
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('nav-'+n).classList.add('active');
-        }
-
+        function renderStock(menu) { document.getElementById('stock-sec').innerHTML = `<h2 style="grid-column:1/-1;">จัดการสต็อก</h2>` + menu.map(m=>`<div class="card" style="padding:20px; display:flex; justify-content:space-between; align-items:center;"><b>${m[0]}</b><button style="padding:10px 20px; border-radius:12px; border:none; background:${m[5]=='หมด'?'var(--bg)':'var(--navy)'}; color:${m[5]=='หมด'?'#ef4444':'#fff'}; cursor:pointer; font-weight:700;" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เปิดขาย':'ปิด (หมด)'}</button></div>`).join(''); }
+        function renderReport(report) { let html = `<table style="width:100%; border-collapse:collapse; background:var(--card-bg); border-radius:25px; overflow:hidden; box-shadow:var(--shadow);"><thead><tr style="background:var(--bg);"><th style="padding:20px; text-align:left;">เมนู</th><th style="padding:20px; text-align:center;">จำนวน</th><th style="padding:20px; text-align:right;">ยอดรวม</th></tr></thead><tbody>${report.map(item => `<tr style="border-top:1px solid var(--border);"><td style="padding:20px;"><b>${item.name}</b></td><td style="padding:20px; text-align:center;">${item.qty}</td><td style="padding:20px; text-align:right; font-weight:700;">฿${item.total.toLocaleString()}</td></tr>`).join('')}</tbody></table>`; document.getElementById('report-list').innerHTML = (report.length === 0) ? "ไม่มีข้อมูล" : html; }
+        function showSec(n) { document.getElementById('container').style.display = (n==='orders'?'grid':'none'); document.getElementById('stock-sec').style.display = (n==='stock'?'grid':'none'); document.getElementById('report-sec').style.display = (n==='report'?'block':'none'); document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active')); document.getElementById('nav-'+n).classList.add('active'); }
         async function clearCallAlert() { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'clearCall',table:cAlertT})}); refresh(); }
         setInterval(refresh, 5000); refresh();
     </script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>WITHU | Ordering Experience</title>
+    <title>WITHU | Premium Ordering</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -16,6 +16,11 @@
         body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; color: var(--p); -webkit-font-smoothing: antialiased; }
         .app-container { width: 100%; max-width: 550px; margin: 0 auto; padding: 0 20px 140px 20px; box-sizing: border-box; }
         
+        /* --- ⏳ Skeleton Loader --- */
+        .skeleton { background: #f1f5f9; background-image: linear-gradient(90deg, #f1f5f9 0px, #f8fafc 40px, #f1f5f9 80px); background-size: 600px; animation: shine-lines 1.6s infinite linear; }
+        @keyframes shine-lines { 0% { background-position: -100px; } 100% { background-position: 500px; } }
+        .skeleton-card { height: 180px; border-radius: var(--radius-lg); margin-bottom: 20px; width: 100%; }
+
         /* --- 🔝 Top Bar & Call Button --- */
         .top-bar { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
         .brand { font-weight: 800; font-size: 24px; letter-spacing: 0.5px; }
@@ -54,8 +59,13 @@
         .top-chip.active { background: var(--p); color: #fff; }
         .sold-out { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
 
+        /* --- 📝 Note Input --- */
+        .note-input { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--border); background: #f8fafc; font-family: 'Prompt'; font-size: 13px; margin-bottom: 15px; outline: none; box-sizing: border-box; transition: 0.3s; }
+        .note-input:focus { border-color: var(--blue); background: #fff; }
+
         /* --- 🛒 Add Button --- */
-        .btn-add { background: transparent; border: 2.5px solid #000; padding: 15px; border-radius: 50px; font-family: 'Prompt'; font-weight: 800; cursor: pointer; width: 90%; margin: 10px auto 0 auto; font-size: 16px; }
+        .btn-add { background: transparent; border: 2.5px solid #000; padding: 15px; border-radius: 50px; font-family: 'Prompt'; font-weight: 800; cursor: pointer; width: 100%; font-size: 16px; transition: 0.2s; }
+        .btn-add:active { transform: scale(0.95); background: #eee; }
 
         /* --- 🔢 Status Stepper & Queue --- */
         .status-card { background: #fff; border-radius: 40px; padding: 40px 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
@@ -70,7 +80,7 @@
 
         /* --- 🛒 Bottom Bar --- */
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); padding: 25px 30px 45px 30px; box-shadow: 0 -15px 40px rgba(0,0,0,0.06); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 45px 45px 0 0; }
-        .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; }
+        .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; cursor: pointer; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -106,7 +116,13 @@
             </div>
         </div>
         <div id="category-nav"></div>
-        <div id="loading-skeleton" style="text-align:center; padding:50px; color:#bbb;">กำลังเตรียมเมนู...</div>
+        
+        <div id="loading-skeleton">
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+        </div>
+        
         <div id="main-content"></div>
     </div>
 </div>
@@ -124,10 +140,24 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
     let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentS = {}, itemOpt = {}, itemExpanded = {}, currentF = "ทั้งหมด", currentSearch = "", sInterval;
 
+    // 🚩 1. ระบบ Auto-Detect Table จาก URL (QR Code)
+    window.onload = () => {
+        const params = new URLSearchParams(window.location.search);
+        const t = params.get('table');
+        if(t) {
+            currentTable = t;
+            startApp();
+        }
+    }
+
     function lockTable() { 
         let s = document.getElementById("table-select"); 
         if(!s.value) return; 
         currentTable = s.value; 
+        startApp();
+    }
+
+    function startApp() {
         document.getElementById("display-table").innerText = "โต๊ะ " + currentTable; 
         document.getElementById("table-overlay").style.display = "none"; 
         document.getElementById("app-content").style.display = "block"; 
@@ -139,7 +169,11 @@
         try {
             const r = await fetch(API_URL + "?action=getMenu");
             const d = await r.json();
-            if (d.menu) { fullMenu = d.menu; toppingsData = d.toppings; document.getElementById('loading-skeleton').style.display='none'; renderMenu("ทั้งหมด"); }
+            if (d.menu) { 
+                fullMenu = d.menu; toppingsData = d.toppings; 
+                document.getElementById('loading-skeleton').style.display='none'; 
+                renderMenu("ทั้งหมด"); 
+            }
         } catch(e) { console.error(e); }
     }
 
@@ -170,11 +204,14 @@
                 <div class="menu-top"><img src="${r[4]||'https://via.placeholder.com/150'}" class="menu-img"><div class="menu-info"><h3>${r[0]}</h3><div class="price">฿${r[1]}</div></div></div>
                 ${isAvail && isD ? `
                     <div class="sweet-selector">${['0%','25%','50%','75%','100%'].map(l=>`<div class="sweet-btn ${currentS[originalIdx]===l?'active':''}" onclick="setS(${originalIdx},'${l}')">${l}</div>`).join('')}</div>
-                    ${showSmoothieOpt ? `<div style="border:1px solid #eee; padding:10px; border-radius:15px; font-size:12px; width:fit-content; font-weight:700; cursor:pointer;" class="${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">+ เพิ่มปั่น (+฿10)</div>` : ''}
+                    ${showSmoothieOpt ? `<div style="border:1px solid #eee; padding:10px; border-radius:15px; font-size:12px; width:fit-content; font-weight:700; cursor:pointer; margin-bottom:15px;" class="${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">+ เพิ่มปั่น (+฿10)</div>` : ''}
                     <div class="acc-btn" onclick="toggleAcc(${originalIdx})">เลือกท็อปปิ้งเพิ่มเติม</div>
                     <div class="acc-content ${isExp ? 'open' : ''}"><div class="top-grid">${toppingsData.map(t => `<div class="top-chip ${itemOpt[originalIdx].toppings.includes(t[0])?'active':''} ${t[2]==='หมด'?'sold-out':''}" onclick="tT(${originalIdx},'${t[0]}')">${t[0]} (+฿${t[1]})</div>`).join('')}</div></div>
                 ` : ''}
-                <button class="btn-add" onclick="addC('${r[0]}',${r[1]},${originalIdx},${isD})">ใส่ตะกร้า</button>
+                
+                ${isAvail ? `<input type="text" id="note-${originalIdx}" class="note-input" placeholder="ระบุหมายเหตุ (เช่น หวานน้อยมาก, ไม่ใส่ไข่มุก)">` : ''}
+                
+                <button class="btn-add" onclick="addC('${r[0]}',${r[1]},${originalIdx},${isD})">${isAvail ? 'ใส่ตะกร้า' : 'สินค้าหมด'}</button>
             </div>`;
         }); 
         m.innerHTML = h || `<div style="text-align:center; padding:40px; color:var(--gray);">ไม่พบรายการที่ค้นหา</div>`;
@@ -187,13 +224,25 @@
 
     function addC(n, p, idx, isD) {
         let fp = parseFloat(p), det = []; 
+        
+        // ดึงค่า Note จาก input
+        let noteEl = document.getElementById(`note-${idx}`);
+        let userNote = noteEl ? noteEl.value.trim() : "";
+
         if(isD) { 
             det.push("หวาน " + currentS[idx]); 
             if(itemOpt[idx].smoothie) { fp += 10; det.push("ปั่น"); } 
             itemOpt[idx].toppings.forEach(tn => { let tObj = toppingsData.find(x => x[0] === tn); if(tObj) { fp += parseFloat(tObj[1]); det.push(tn); } }); 
         }
-        cart.push({name: n, price: p, qty: 1, total: fp, sweetness: det.join(", ")||'-'}); 
-        itemOpt[idx] = { toppings: [], smoothie: false }; currentS[idx] = "100%"; updateUI();
+        
+        // 🚩 3. เก็บ Note ลงใน Object ออเดอร์
+        cart.push({name: n, price: p, qty: 1, total: fp, sweetness: det.join(", ")||'-', note: userNote}); 
+        
+        // Reset ตัวเลือก
+        itemOpt[idx] = { toppings: [], smoothie: false }; 
+        currentS[idx] = "100%"; 
+        if(noteEl) noteEl.value = ""; 
+        updateUI();
     }
 
     function updateUI() { 
@@ -204,7 +253,7 @@
 
     function openReceipt() {
         let h = `<h2 style="margin:0 0 20px 0; font-weight:800; font-size:24px;">ตรวจสอบรายการ</h2>`;
-        cart.forEach((i,idx) => h += `<div style="display:flex;justify-content:space-between;margin-bottom:15px;"><span><b>${i.name}</b><br><small style="color:#888">${i.sweetness}</small></span><span style="text-align:right;">฿${i.total.toLocaleString()}<br><span style="color:red; font-size:12px; cursor:pointer;" onclick="rem(${idx})">ลบ</span></span></div>`);
+        cart.forEach((i,idx) => h += `<div style="display:flex;justify-content:space-between;margin-bottom:15px;"><span><b>${i.name}</b><br><small style="color:#888">${i.sweetness}${i.note ? ' | '+i.note : ''}</small></span><span style="text-align:right;">฿${i.total.toLocaleString()}<br><span style="color:red; font-size:12px; cursor:pointer;" onclick="rem(${idx})">ลบ</span></span></div>`);
         let total = cart.reduce((s,i)=>s+i.total,0);
         h += `<div style="border-top:2px solid #eee; padding-top:15px; margin-top:15px; display:flex; justify-content:space-between; font-weight:800; font-size:22px;"><span>ยอดรวม</span><span>฿${total.toLocaleString()}</span></div><button class="btn-checkout" style="margin-top:30px; width:100%; height:60px;" onclick="sub()">สั่งอาหารตอนนี้</button>`;
         document.getElementById('modal-body').innerHTML = h; document.getElementById('modal').style.display = 'flex';
@@ -213,16 +262,16 @@
     function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
 
     async function sub() { 
-        document.getElementById('modal-body').innerHTML = "<h3 style='text-align:center;'>กำลังส่งออเดอร์...</h3>";
-        try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) }); showStatus(); cart=[]; updateUI(); } catch(e) { alert("ส่งไม่สำเร็จ"); openReceipt(); }
+        document.getElementById('modal-body').innerHTML = "<h3 style='text-align:center; padding: 40px;'>🚀 กำลังส่งออเดอร์...</h3>";
+        try { 
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) }); 
+            showStatus(); cart=[]; updateUI(); 
+        } catch(e) { alert("ส่งไม่สำเร็จ กรุณาลองใหม่"); openReceipt(); }
     }
 
     function showStatus() {
         document.getElementById('modal').style.display='none'; 
         document.getElementById('app-header').style.display='flex';
-        const searchArea = document.querySelector('.search-area');
-        if(searchArea) searchArea.style.display = 'none';
-
         document.getElementById('app-content').innerHTML = `
             <div class="app-container" style="padding-top:40px; text-align:center;">
                 <div class="status-card">
@@ -248,25 +297,23 @@
 
     async function chk() {
         try {
-            // 🚩 ดึงข้อมูล Admin Data เพื่อคำนวณคิว (หนักกว่าเล็กน้อยแต่ได้ข้อมูลครบ)
             const r = await fetch(API_URL + "?action=getAdminData"); 
             const d = await r.json();
             
             const myOrders = d.orders.filter(o => o.table == currentTable);
             if (myOrders.length === 0) { upS(4); document.getElementById('queue-info').innerText = "ออเดอร์เสร็จสิ้นแล้ว"; return; }
 
-            // 🚩 คำนวณคิว
+            // 🚩 4. คำนวณอันดับคิว (นับจำนวนโต๊ะที่สั่งก่อนหน้า)
             const uniqueTables = [...new Set(d.orders.map(o => o.table))];
             const myRank = uniqueTables.indexOf(currentTable.toString());
             const queueAhead = myRank > 0 ? myRank : 0;
             document.getElementById('queue-info').innerText = queueAhead > 0 ? `เหลืออีก ${queueAhead} คิวก่อนหน้าคุณ` : "กำลังเตรียมออเดอร์ของคุณเป็นลำดับถัดไป";
 
-            // 🚩 อัปเดตยอดรวมและสถานะ
-            const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4, "เสิร์ฟเรียบร้อย":4};
+            const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4};
             let minVal = 4; let totalSum = 0;
             myOrders.forEach(o => { 
                 if (p[o.status] < minVal) minVal = p[o.status]; 
-                totalSum += parseFloat(o.total.toString().replace(/,/g,'')) || 0;
+                totalSum += parseFloat(String(o.total).replace(/,/g,'')) || 0;
             });
             
             upS(minVal); 

@@ -82,7 +82,18 @@
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); padding: 25px 30px 45px 30px; box-shadow: 0 -15px 40px rgba(0,0,0,0.06); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 45px 45px 0 0; }
         .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; cursor: pointer; }
 
+        /* --- 🔔 🚩 NEW: Call Staff Premium UI --- */
+        .call-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; z-index: 3000; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+        .call-modal { background: #fff; padding: 45px 30px; border-radius: 50px; text-align: center; width: 85%; max-width: 350px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bell-icon { font-size: 60px; margin-bottom: 20px; display: inline-block; animation: ring 2s infinite; }
+        @keyframes ring { 0%, 100% { transform: rotate(0); } 10%, 30%, 50% { transform: rotate(15deg); } 20%, 40%, 60% { transform: rotate(-15deg); } 80% { transform: rotate(0); } }
+        .call-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--p); }
+        .call-sub { font-size: 15px; color: var(--gray); margin-bottom: 30px; line-height: 1.5; }
+        .btn-confirm-call { background: var(--p); color: #fff; border: none; padding: 16px; border-radius: 50px; font-weight: 700; font-size: 16px; cursor: pointer; width: 100%; margin-bottom: 15px; }
+        .btn-cancel-call { background: transparent; color: var(--gray); border: none; font-weight: 600; cursor: pointer; font-family: 'Prompt'; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -134,6 +145,16 @@
 
 <div id="modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);display:none;z-index:2000;align-items:flex-end;justify-content:center;" onclick="if(event.target==this)this.style.display='none'">
     <div id="modal-body" style="background:#fff;width:100%;max-width:550px;border-radius:45px 45px 0 0;padding:40px;box-sizing:border-box;"></div>
+</div>
+
+<div id="call-staff-modal" class="call-overlay">
+    <div class="call-modal" id="call-modal-content">
+        <div class="bell-icon">🔔</div>
+        <div class="call-title">เรียกพนักงาน</div>
+        <div class="call-sub">ต้องการความช่วยเหลือด้านใดคะ? <br>พนักงานจะรีบไปที่โต๊ะของคุณค่ะ</div>
+        <button class="btn-confirm-call" onclick="sendCallRequest()">ยืนยันการเรียก</button>
+        <button class="btn-cancel-call" onclick="closeCallModal()">ยกเลิก</button>
+    </div>
 </div>
 
 <script>
@@ -224,21 +245,14 @@
 
     function addC(n, p, idx, isD) {
         let fp = parseFloat(p), det = []; 
-        
-        // ดึงค่า Note จาก input
         let noteEl = document.getElementById(`note-${idx}`);
         let userNote = noteEl ? noteEl.value.trim() : "";
-
         if(isD) { 
             det.push("หวาน " + currentS[idx]); 
             if(itemOpt[idx].smoothie) { fp += 10; det.push("ปั่น"); } 
             itemOpt[idx].toppings.forEach(tn => { let tObj = toppingsData.find(x => x[0] === tn); if(tObj) { fp += parseFloat(tObj[1]); det.push(tn); } }); 
         }
-        
-        // 🚩 3. เก็บ Note ลงใน Object ออเดอร์
         cart.push({name: n, price: p, qty: 1, total: fp, sweetness: det.join(", ")||'-', note: userNote}); 
-        
-        // Reset ตัวเลือก
         itemOpt[idx] = { toppings: [], smoothie: false }; 
         currentS[idx] = "100%"; 
         if(noteEl) noteEl.value = ""; 
@@ -269,6 +283,21 @@
         } catch(e) { alert("ส่งไม่สำเร็จ กรุณาลองใหม่"); openReceipt(); }
     }
 
+    // --- 🚩 NEW: ฟังก์ชันจัดการเรียกพนักงานแบบพรีเมียม ---
+    function callStaff() { document.getElementById('call-staff-modal').style.display = 'flex'; }
+    function closeCallModal() { document.getElementById('call-staff-modal').style.display = 'none'; }
+
+    async function sendCallRequest() {
+        const modal = document.getElementById('call-modal-content');
+        const originalHtml = modal.innerHTML;
+        modal.innerHTML = `<div class="bell-icon">⏳</div><div class="call-title">กำลังแจ้งพนักงาน...</div><div class="call-sub">กรุณารอสักครู่นะคะ</div>`;
+        try {
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'callStaff', table:currentTable, reason:'ทั่วไป'}) });
+            modal.innerHTML = `<div class="bell-icon">✅</div><div class="call-title">เรียบร้อยค่ะ</div><div class="call-sub">พนักงานได้รับแจ้งแล้ว <br>กำลังเดินทางไปที่โต๊ะ ${currentTable} ค่ะ</div>`;
+            setTimeout(() => { closeCallModal(); modal.innerHTML = originalHtml; }, 3000);
+        } catch(e) { alert("เกิดข้อผิดพลาด"); closeCallModal(); modal.innerHTML = originalHtml; }
+    }
+
     function showStatus() {
         document.getElementById('modal').style.display='none'; 
         document.getElementById('app-header').style.display='flex';
@@ -277,14 +306,12 @@
                 <div class="status-card">
                     <h2 style="font-weight:800; font-size:28px; margin-bottom:10px;">ออเดอร์โต๊ะ ${currentTable}</h2>
                     <div id="queue-info" class="queue-box">กำลังคำนวณคิวของคุณ...</div>
-                    
                     <div class="status-stepper">
                         <div class="step-point" id="st-1"><div class="step-circle">1</div><div class="step-label">รับออเดอร์</div></div>
                         <div class="step-point" id="st-2"><div class="step-circle">2</div><div class="step-label">กำลังทำ</div></div>
                         <div class="step-point" id="st-3"><div class="step-circle">3</div><div class="step-label">รอเสิร์ฟ</div></div>
                         <div class="step-point" id="st-4"><div class="step-circle">4</div><div class="step-label">สำเร็จ</div></div>
                     </div>
-
                     <div id="stat-list" style="margin:30px 0; text-align:left; border-top:1px solid #f8fafc; padding-top:20px;"></div>
                     <div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; margin-bottom:25px; padding:0 10px;">
                         <span>ยอดรวมออเดอร์:</span><span style="color:var(--blue)">฿<span id="stat-sum-val">0</span></span>
@@ -299,23 +326,18 @@
         try {
             const r = await fetch(API_URL + "?action=getAdminData"); 
             const d = await r.json();
-            
             const myOrders = d.orders.filter(o => o.table == currentTable);
             if (myOrders.length === 0) { upS(4); document.getElementById('queue-info').innerText = "ออเดอร์เสร็จสิ้นแล้ว"; return; }
-
-            // 🚩 4. คำนวณอันดับคิว (นับจำนวนโต๊ะที่สั่งก่อนหน้า)
             const uniqueTables = [...new Set(d.orders.map(o => o.table))];
             const myRank = uniqueTables.indexOf(currentTable.toString());
             const queueAhead = myRank > 0 ? myRank : 0;
             document.getElementById('queue-info').innerText = queueAhead > 0 ? `เหลืออีก ${queueAhead} คิวก่อนหน้าคุณ` : "กำลังเตรียมออเดอร์ของคุณเป็นลำดับถัดไป";
-
             const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4};
             let minVal = 4; let totalSum = 0;
             myOrders.forEach(o => { 
                 if (p[o.status] < minVal) minVal = p[o.status]; 
                 totalSum += parseFloat(String(o.total).replace(/,/g,'')) || 0;
             });
-            
             upS(minVal); 
             document.getElementById('stat-sum-val').innerText = totalSum.toLocaleString();
             document.getElementById('stat-list').innerHTML = myOrders.map(o => `<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f8fafc;"><span><b>${o.qty}x</b> ${o.menu}</span><b style="color:var(--blue)">${o.status}</b></div>`).join('');
@@ -323,12 +345,6 @@
     }
 
     function upS(s) { for(let i=1;i<=4;i++) { const el = document.getElementById('st-'+i); if(el) el.classList.toggle('active',i<=s); } }
-
-    function callStaff() { 
-        if(confirm("ต้องการเรียกพนักงานใช่ไหมคะ?")) { 
-            fetch(API_URL,{method:'POST',body:JSON.stringify({action:'callStaff',table:currentTable,reason:'ทั่วไป'})}); alert("แจ้งพนักงานเรียบร้อยค่ะ"); 
-        } 
-    }
 </script>
 </body>
 </html>

@@ -3,109 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WITHU Admin Portal | Pro Analytics</title>
+    <title>WITHU Admin | Smart Analytics</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root { 
-            --bg: #f9fafb; --card-bg: #fff; --text-main: #1f2937; --text-muted: #64748b;
-            --accent: #10b981; --red: #d63031; --blue: #2563eb; --navy: #0f172a; 
-            --shadow: 0 10px 25px rgba(0,0,0,0.05); --border: #f3f4f6;
+            --bg: #f8fafc; --card: #ffffff; --p: #1e293b; --muted: #64748b;
+            --accent: #10b981; --red: #ef4444; --blue: #3b82f6; --navy: #0f172a; 
+            --border: #e2e8f0; --shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
         [data-theme="dark"] {
-            --bg: #0f172a; --card-bg: #1e293b; --text-main: #f1f5f9; --text-muted: #94a3b8;
-            --border: rgba(255,255,255,0.05); --shadow: 0 10px 25px rgba(0,0,0,0.4);
+            --bg: #0f172a; --card: #1e293b; --p: #f1f5f9; --muted: #94a3b8;
+            --border: rgba(255,255,255,0.05); --shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
             --navy: #334155;
         }
 
-        /* 🗜️ Compact Layout */
-        [data-layout="compact"] .card { padding: 20px; border-radius: 25px; }
-        [data-layout="compact"] .grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        * { font-family: 'Prompt', sans-serif; box-sizing: border-box; transition: all 0.2s ease; }
+        body { background: var(--bg); color: var(--p); margin: 0; padding: 20px; }
 
-        * { font-family: 'Prompt', sans-serif; box-sizing: border-box; }
-        body { background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; transition: 0.3s; }
+        /* --- 🔝 Dashboard Header --- */
+        .header-wrapper { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; gap: 20px; flex-wrap: wrap; }
+        .page-title h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; flex-wrap: wrap; gap: 20px; }
-        .ux-controls { display: flex; gap: 10px; margin-top: 10px; }
-        .ux-btn { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); padding: 8px 15px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 12px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; flex: 1; max-width: 600px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; overflow: hidden; }
+        .stat-card::after { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--blue); }
+        .stat-card.profit::after { background: var(--accent); }
+        .stat-card small { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; display: block; }
+        .stat-card b { font-size: 22px; font-weight: 800; color: var(--p); }
 
-        .stat-group { display: flex; gap: 12px; flex-wrap: wrap; }
-        .stat-card { background: var(--card-bg); padding: 15px 20px; border-radius: 20px; box-shadow: var(--shadow); text-align: right; border: 1px solid var(--border); min-width: 140px; }
-        .stat-card small { display: block; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        .stat-card b { font-size: 20px; color: var(--text-main); }
+        /* --- 🏷 Navigation --- */
+        .nav-group { display: flex; gap: 10px; background: var(--border); padding: 5px; border-radius: 18px; width: fit-content; margin-bottom: 30px; }
+        .nav-btn { padding: 10px 25px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); font-size: 14px; }
+        .nav-btn.active { background: var(--card); color: var(--p); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
 
-        .nav-group { margin-bottom: 30px; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .nav-btn { padding: 12px 28px; border: none; border-radius: 15px; font-weight: 600; cursor: pointer; transition: 0.3s; background: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border); white-space: nowrap; }
-        .nav-btn.active { background: var(--navy) !important; color: #fff !important; box-shadow: 0 10px 20px rgba(15,23,42,0.2); }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
-        .card { background: var(--card-bg); border-radius: 40px; padding: 35px; box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; transition: 0.3s; }
-        .card-time-box { position: absolute; top: 35px; right: 35px; text-align: right; }
-        .time-elapsed { font-size: 18px; font-weight: 800; }
-        .time-warning { color: var(--red); animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
+        /* --- 📦 Order Cards Grid --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; }
+        .card { background: var(--card); border-radius: 32px; padding: 30px; box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; }
+        .card:hover { transform: translateY(-5px); }
         
-        .order-item { border-bottom: 1px solid var(--border); padding: 12px 0; display: flex; justify-content: space-between; align-items: center; }
-        .order-item b { font-size: 16px; }
-        .btn-void { background: rgba(214,48,49,0.05); color: var(--red); border: none; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; }
+        .table-no { font-size: 44px; font-weight: 900; margin: 0; color: var(--p); line-height: 1; }
+        .elapsed { font-size: 13px; font-weight: 700; color: var(--muted); background: var(--bg); padding: 4px 12px; border-radius: 10px; }
+        .elapsed.warning { color: #fff; background: var(--red); animation: pulse 1s infinite; }
 
-        .status-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
-        .s-btn { padding: 10px; font-size: 11px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; }
+        .order-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .order-item:last-child { border: none; }
+        .order-item b { font-size: 16px; color: var(--p); }
+        .order-item small { color: var(--blue); font-weight: 600; }
+
+        .status-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
+        .s-btn { padding: 10px; border: none; border-radius: 12px; font-weight: 800; font-size: 12px; cursor: pointer; opacity: 0.8; }
+        .s-btn:hover { opacity: 1; transform: scale(1.05); }
+
+        .btn-pay { width: 100%; background: var(--p); color: var(--card); padding: 18px; border-radius: 20px; font-weight: 800; border: none; cursor: pointer; font-size: 16px; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2); }
+
+        /* --- 🧾 Modal Custom UI --- */
+        #pay-modal { position:fixed; inset:0; background:rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); display:none; z-index:9000; align-items:center; justify-content:center; }
+        .pay-box { background: var(--card); padding: 40px; border-radius: 40px; width: 90%; max-width: 440px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .bill-list { background: var(--bg); padding: 20px; border-radius: 24px; margin: 20px 0; max-height: 200px; overflow-y: auto; }
         
-        .btn-check-bill { width: 100%; background: var(--navy); color: #fff; padding: 18px; border-radius: 20px; font-weight: 800; border: none; cursor: pointer; font-size: 18px; transition: 0.2s; }
+        .method-select { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .m-btn { padding: 20px; border-radius: 20px; border: 2px solid var(--border); background: var(--card); cursor: pointer; font-weight: 800; text-align: center; }
+        .m-btn:hover { border-color: var(--blue); background: rgba(59, 130, 246, 0.05); }
 
-        #pay-modal { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); display:none; z-index:2000; align-items:center; justify-content:center; }
-        .pay-box { background: var(--card-bg); padding:40px; border-radius:45px; width:90%; max-width:450px; text-align:center; max-height: 90vh; overflow-y: auto; }
-        .bill-summary { text-align: left; margin: 20px 0; padding: 20px; background: var(--bg); border-radius: 25px; }
-        
-        .chart-wrapper { background: var(--card-bg); padding: 30px; border-radius: 30px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid var(--border); }
-        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .toggle-btn { padding: 8px 16px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; background: var(--bg); color: var(--text-muted); }
-        .toggle-btn.active { background: var(--blue); color: #fff; }
+        /* --- 📈 Analytics Section --- */
+        .analytics-card { background: var(--card); padding: 30px; border-radius: 32px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 30px; }
+        .chart-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
+        .t-btn { padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-weight: 700; font-size: 12px; }
+        .t-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
-        .sound-btn { animation: bounceBtn 2s infinite; position:fixed; bottom:25px; right:25px; z-index:3000; background:var(--blue); color:#fff; border:none; padding:15px 30px; border-radius:50px; cursor:pointer; font-weight: 700; }
-        @keyframes bounceBtn { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .sound-unlock { position: fixed; bottom: 30px; right: 30px; background: var(--blue); color: #fff; padding: 15px 30px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; z-index: 10000; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4); }
     </style>
 </head>
 <body>
 
-    <button id="sound-unlock" class="sound-btn" onclick="this.style.display='none'; unlockSound();">🔔 กดเพื่อเปิดเสียงแจ้งเตือน</button>
+    <button id="s-unlock" class="sound-unlock" onclick="unlockSound(); this.style.display='none';">🔔 เปิดเสียงแจ้งเตือน</button>
 
-    <div id="staff-alert" class="alert-bar" onclick="clearCallAlert()" style="display:none; background: var(--red); color: #fff; padding: 18px; border-radius: 20px; margin-bottom: 25px; text-align: center; font-weight: 700;">⚠️ โต๊ะ <span id="alert-table"></span> เรียกพนักงาน (คลิกเพื่อปิด)</div>
-    
-    <div class="header">
-        <div>
-            <h1 style="margin:0;">WITHU Admin</h1>
-            <div class="ux-controls">
-                <button class="ux-btn" id="btn-theme" onclick="toggleTheme()">🌙 กลางคืน</button>
-                <button class="ux-btn" id="btn-layout" onclick="toggleLayout()">🗜️ ย่อการ์ด</button>
+    <div class="header-wrapper">
+        <div class="page-title">
+            <small style="font-weight: 700; color: var(--blue);">WITHU MANAGEMENT</small>
+            <h1>Admin Portal</h1>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="t-btn" onclick="toggleTheme()">🌓 Theme</button>
+                <button class="t-btn" onclick="toggleLayout()">📱 Compact</button>
             </div>
         </div>
-        <div class="stat-group">
-            <div class="stat-card"><small>ยอดขาย (วันนี้)</small><b id="revenue">฿0</b></div>
-            <div class="stat-card"><small>กำไรขั้นต้น</small><b id="gross-profit" style="color:var(--accent);">฿0</b></div>
-            <div class="stat-card"><small>จำนวนบิล</small><b id="stat-count">0</b></div>
+        <div class="stat-grid">
+            <div class="stat-card">
+                <small>ยอดขายวันนี้</small>
+                <b id="revenue">฿0</b>
+            </div>
+            <div class="stat-card profit">
+                <small>กำไรสุทธิ</small>
+                <b id="gross-profit" style="color:var(--accent);">฿0</b>
+            </div>
+            <div class="stat-card">
+                <small>บิลทั้งหมด</small>
+                <b id="stat-count">0</b>
+            </div>
         </div>
     </div>
-    
+
     <div class="nav-group">
-        <button id="nav-orders" onclick="showSec('orders')" class="nav-btn active">ออเดอร์ค้าง</button>
-        <button id="nav-stock" onclick="showSec('stock')" class="nav-btn">จัดการสต็อก</button>
-        <button id="nav-report" onclick="showSec('report')" class="nav-btn">สรุปยอด & กำไร</button>
+        <button id="nav-orders" onclick="showSec('orders')" class="nav-btn active">Active Orders</button>
+        <button id="nav-stock" onclick="showSec('stock')" class="nav-btn">Inventory</button>
+        <button id="nav-report" onclick="showSec('report')" class="nav-btn">Pro Analytics</button>
     </div>
 
     <div id="container" class="grid"></div>
+
     <div id="stock-sec" style="display:none;" class="grid"></div>
-    
+
     <div id="report-sec" style="display:none;">
-        <div class="chart-wrapper">
-            <div class="chart-header">
-                <h2 style="margin: 0; color: var(--navy);">วิเคราะห์ยอดขาย</h2>
-                <div>
-                    <button class="toggle-btn active" id="btn-peak" onclick="switchChart('peak')">ช่วงเวลาขายดี</button>
-                    <button class="toggle-btn" id="btn-day" onclick="switchChart('day')">ยอดรายวัน</button>
+        <div class="analytics-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                <h3 style="margin:0;">Sales Performance</h3>
+                <div class="chart-toggle">
+                    <button class="t-btn active" id="btn-peak" onclick="switchChart('peak')">ช่วงเวลาขายดี</button>
+                    <button class="t-btn" id="btn-day" onclick="switchChart('day')">ยอดขายรายวัน</button>
                 </div>
             </div>
             <canvas id="salesChart" height="100"></canvas>
@@ -115,40 +133,47 @@
 
     <div id="pay-modal">
         <div class="pay-box">
-            <h2 id="p-table-title">เช็คบิล โต๊ะ -</h2>
-            <div class="bill-summary" id="p-bill-items"></div>
-            <div style="font-size: 16px; color: var(--text-muted); font-weight: 600;">ยอดชำระทั้งหมด</div>
-            <div id="p-total-price" style="font-size: 55px; font-weight: 800; color: var(--blue); margin-bottom: 20px;">฿0</div>
-            <div id="p-methods" style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <button class="ux-btn" style="padding:20px; font-size:16px;" onclick="selectPayMethod('qr')">PROMPTPAY</button>
-                <button class="ux-btn" style="padding:20px; font-size:16px;" onclick="selectPayMethod('cash')">เงินสด</button>
+            <h2 id="p-table-title" style="margin:0; font-size:32px; font-weight:800;">Table -</h2>
+            <div class="bill-list" id="p-bill-items"></div>
+            <div style="color:var(--muted); font-weight:700; font-size:14px; text-transform:uppercase;">ยอดรวมที่ต้องชำระ</div>
+            <div id="p-total-price" style="font-size:64px; font-weight:900; color:var(--blue); margin-bottom:20px; letter-spacing:-2px;">฿0</div>
+
+            <div id="p-methods" class="method-select">
+                <div class="m-btn" onclick="selectPayMethod('qr')">
+                    <img src="https://img.icons8.com/color/48/qr-code.png" style="display:block; margin: 0 auto 10px;"><br>PROMPTPAY
+                </div>
+                <div class="m-btn" onclick="selectPayMethod('cash')">
+                    <img src="https://img.icons8.com/color/48/banknotes.png" style="display:block; margin: 0 auto 10px;"><br>CASH
+                </div>
             </div>
-            <div id="p-qr-area" style="display:none; margin-top:15px;">
-                <img id="p-qr-img" style="width:100%; border-radius:25px; border:1px solid #eee;">
-                <button class="btn-check-bill" style="background:var(--accent); margin-top:15px;" onclick="finalPay('PromptPay')">ยืนยันได้รับเงินแล้ว</button>
+
+            <div id="p-qr-area" style="display:none; margin-top:20px;">
+                <img id="p-qr-img" style="width:100%; border-radius:24px; border:1px solid var(--border); margin-bottom:15px;">
+                <button class="btn-pay" style="background:var(--accent);" onclick="finalPay('PromptPay')">Confirm Payment</button>
             </div>
-            <div id="p-cash-area" style="display:none;">
-                <input type="number" id="p-cash-input" class="cash-input" placeholder="เงินที่รับมา" oninput="calcChangeUnified()">
-                <div id="p-change-display" style="font-size:32px; font-weight:800; color:var(--accent); margin: 15px 0;">ทอน: ฿0</div>
-                <button id="p-cash-submit" class="btn-check-bill" style="background:var(--accent);" onclick="finalPay('เงินสด')">ปิดโต๊ะและบันทึก</button>
+
+            <div id="p-cash-area" style="display:none; margin-top:20px;">
+                <input type="number" id="p-cash-input" style="width:100%; padding:20px; border-radius:20px; border:2px solid var(--blue); font-size:32px; text-align:center; font-weight:800; outline:none;" placeholder="รับเงินสดมา..." oninput="calcChangeUnified()">
+                <div id="p-change-display" style="font-size:36px; font-weight:900; color:var(--accent); margin:15px 0; display:none;">ทอน: ฿0</div>
+                <button id="p-cash-submit" class="btn-pay" style="background:var(--accent); display:none;" onclick="finalPay('เงินสด')">Close Table</button>
             </div>
-            <button onclick="closePayModal()" style="margin-top:25px; background:none; border:none; color:var(--text-muted); cursor:pointer; font-weight: 600;">ย้อนกลับ</button>
+
+            <button onclick="closePayModal()" style="margin-top:25px; background:none; border:none; color:var(--muted); cursor:pointer; font-weight:700;">Cancel / Go Back</button>
         </div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
+        let salesChartInst = null, currentChartMode = 'peak', fullData = null;
+        let pTable = "", pTotal = 0, pRows = [];
         let orderSound = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_7325997672.mp3');
-        let isSoundUnlocked = false; 
-        let salesChartInst = null, currentChartMode = 'peak';
-        let fullData = null;
 
-        function unlockSound() { isSoundUnlocked = true; orderSound.play().then(()=>orderSound.pause()); }
+        function unlockSound() { orderSound.play().then(()=>orderSound.pause()); }
 
         async function refresh() {
             try {
-                const response = await fetch(API_URL + "?action=getAdminData");
-                const d = await response.json();
+                const r = await fetch(API_URL + "?action=getAdminData");
+                const d = await r.json();
                 if (!d) return;
                 fullData = d;
 
@@ -156,57 +181,126 @@
                 document.getElementById('gross-profit').innerText = "฿" + (d.summary.grossProfit || 0).toLocaleString();
                 document.getElementById('stat-count').innerText = d.summary.orders || 0;
 
-                // ออเดอร์ค้าง
-                const container = document.getElementById('container');
-                if(!d.orders?.length) { container.innerHTML="<p style='grid-column:1/-1; text-align:center; padding:100px;'>ไม่มีออเดอร์ค้าง</p>"; }
-                else {
+                const container = document.getElementById('container'); 
+                if(!d.orders?.length){ 
+                    container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:80px;color:var(--muted);'>No Pending Orders</div>"; 
+                } else {
                     let groups={}; d.orders.forEach(o=>{
                         if(!groups[o.table]) groups[o.table]={items:[], total:0, rows:[], time:o.time}; 
                         groups[o.table].items.push(o); 
                         groups[o.table].total += parseFloat(String(o.total).replace(/,/g,'')) || 0; 
                         groups[o.table].rows.push(o.rowNum);
                     });
+
                     container.innerHTML = Object.keys(groups).map(t => {
                         const wait = getTimeDiff(groups[t].time);
-                        return `<div class="card ${wait > 15 ? 'warning' : ''}">
-                            <div class="card-time-box"><div class="time-elapsed ${wait > 15 ? 'time-warning' : ''}">${wait} นาที</div></div>
-                            <h2 style="margin:0 0 15px 0; font-size:28px;">โต๊ะ ${t}</h2>
-                            <div>${groups[t].items.map(i=>`<div class="order-item"><b>${i.qty}x ${i.menu}</b><button class="btn-void" onclick="voidIt(${i.rowNum})">ลบ</button></div>`).join('')}</div>
-                            <div class="status-group">
-                                <button class="s-btn" style="background:#fef3c7;" onclick='upS(${JSON.stringify(groups[t].rows)},"กำลังทำ")'>ทำ</button>
-                                <button class="s-btn" style="background:#dcfce9;" onclick='upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ")'>เสิร์ฟ</button>
-                                <button class="s-btn" style="background:#e0f2fe;" onclick='upS(${JSON.stringify(groups[t].rows)},"สำเร็จ")'>จบ</button>
+                        return `
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+                                <h2 class="table-no">T${t}</h2>
+                                <span class="elapsed ${wait > 15 ? 'warning' : ''}">${wait} min ago</span>
                             </div>
-                            <div style="font-size:28px; font-weight:800; text-align:right;">฿${groups[t].total.toLocaleString()}</div>
-                            <button class="btn-check-bill" onclick='openPayModal("${t}", ${groups[t].total}, ${JSON.stringify(groups[t].rows)}, ${JSON.stringify(groups[t].items)})'>เช็คบิล</button>
+                            <div style="min-height:100px;">
+                                ${groups[t].items.map(i=>`
+                                    <div class="order-item">
+                                        <div><b>${i.qty}x ${i.menu}</b><br><small>${i.details}</small></div>
+                                        <button style="color:var(--red); background:none; border:none; font-weight:800; cursor:pointer;" onclick="voidIt(${i.rowNum})">Void</button>
+                                    </div>`).join('')}
+                            </div>
+                            <div class="status-strip">
+                                <button class="s-btn" style="background:#fef3c7; color:#92400e;" onclick='upS(${JSON.stringify(groups[t].rows)},"กำลังทำ")'>PREP</button>
+                                <button class="s-btn" style="background:#dcfce9; color:#166534;" onclick='upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ")'>READY</button>
+                                <button class="s-btn" style="background:#e0f2fe; color:#0369a1;" onclick='upS(${JSON.stringify(groups[t].rows)},"สำเร็จ")'>DONE</button>
+                            </div>
+                            <div style="font-size:28px; font-weight:900; text-align:right; margin-bottom:15px;">฿${groups[t].total.toLocaleString()}</div>
+                            <button class="btn-pay" onclick='openPayModal("${t}", ${groups[t].total}, ${JSON.stringify(groups[t].rows)}, ${JSON.stringify(groups[t].items)})'>CHECKOUT</button>
                         </div>`}).join('');
                 }
-                
                 renderStock(d.menu);
                 renderReport(d.summary.report);
                 drawChart();
             } catch(e){}
         }
 
+        async function openPayModal(table, total, rows, items) {
+            pTable = table; pTotal = total; pRows = rows;
+            document.getElementById('p-table-title').innerText = "Checkout T" + table;
+            document.getElementById('p-total-price').innerText = "฿" + total.toLocaleString();
+            document.getElementById('p-bill-items').innerHTML = items.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;"><span>${i.qty}x ${i.menu}</span><b>฿${parseFloat(String(i.total).replace(/,/g,'')).toLocaleString()}</b></div>`).join('');
+            
+            fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:table, status:'paying'})});
+            document.getElementById('p-methods').style.display = 'grid';
+            document.getElementById('p-qr-area').style.display = 'none';
+            document.getElementById('p-cash-area').style.display = 'none';
+            document.getElementById('pay-modal').style.display = 'flex';
+        }
+
+        function selectPayMethod(m) {
+            document.getElementById('p-methods').style.display = 'none';
+            if(m === 'qr') {
+                document.getElementById('p-qr-img').src = `https://promptpay.io/0931805507/${pTotal}.png`;
+                document.getElementById('p-qr-area').style.display = 'block';
+            } else {
+                document.getElementById('p-cash-input').value = "";
+                document.getElementById('p-change-display').style.display = 'none';
+                document.getElementById('p-cash-submit').style.display = 'none';
+                document.getElementById('p-cash-area').style.display = 'block';
+                setTimeout(()=>document.getElementById('p-cash-input').focus(), 100);
+            }
+        }
+
+        function calcChangeUnified() {
+            const received = parseFloat(document.getElementById('p-cash-input').value) || 0;
+            const change = received - pTotal;
+            localStorage.setItem('cds_cash_received', received);
+            if(received >= pTotal) {
+                document.getElementById('p-change-display').innerText = "ทอน: ฿" + change.toLocaleString();
+                document.getElementById('p-change-display').style.display = 'block';
+                document.getElementById('p-cash-submit').style.display = 'block';
+            } else {
+                document.getElementById('p-change-display').style.display = 'none';
+                document.getElementById('p-cash-submit').style.display = 'none';
+            }
+        }
+
+        async function finalPay(method) {
+            if(confirm(`Confirm closing Table ${pTable}?`)) {
+                localStorage.setItem('cds_cash_received', 0);
+                await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:pTable, status:'idle'})});
+                await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:pRows, paymentMethod:method})});
+                closePayModal(); refresh();
+            }
+        }
+
+        function closePayModal() { document.getElementById('pay-modal').style.display = 'none'; localStorage.setItem('cds_cash_received', 0); }
+
         function drawChart() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             if(salesChartInst) salesChartInst.destroy();
-            
             let labels = [], data = [], title = "";
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            
             if(currentChartMode === 'peak') {
                 labels = Array.from({length: 24}, (_, i) => i + ":00");
                 data = fullData.summary.peakHours;
-                title = "ยอดขายตามช่วงเวลา (บาท)";
+                title = "Sales by Time";
             } else {
                 labels = fullData.summary.chartDaily.map(i => i.date);
                 data = fullData.summary.chartDaily.map(i => i.total);
-                title = "ยอดขายรายวัน";
+                title = "Daily Sales";
             }
 
             salesChartInst = new Chart(ctx, {
                 type: 'bar',
-                data: { labels, datasets: [{ label: title, data, backgroundColor: '#2563eb', borderRadius: 8 }] },
-                options: { responsive: true, plugins: { legend: { display: false } } }
+                data: { labels, datasets: [{ label: title, data, backgroundColor: '#3b82f6', borderRadius: 12 }] },
+                options: { 
+                    responsive: true, 
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { grid: { color: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
             });
         }
 
@@ -217,27 +311,36 @@
             drawChart();
         }
 
-        function renderReport(report) {
-            let html = `<table style="width:100%; border-collapse:collapse; background:#fff; border-radius:25px; overflow:hidden;">
-                <tr style="background:#f8fafc;"><th style="padding:15px;text-align:left;">รายการ</th><th style="padding:15px;">จำนวน</th><th style="padding:15px;text-align:right;">กำไร</th></tr>
-                ${report.map(i => `<tr style="border-top:1px solid #eee;"><td style="padding:15px;">${i.name}</td><td style="padding:15px;text-align:center;">${i.qty}</td><td style="padding:15px;text-align:right;font-weight:700;color:var(--accent);">฿${i.profit.toLocaleString()}</td></tr>`).join('')}
-            </table>`;
-            document.getElementById('report-list').innerHTML = html;
+        function renderStock(menu) { 
+            document.getElementById('stock-sec').innerHTML = menu.map(m=>`
+                <div class="card" style="padding:25px; display:flex; justify-content:space-between; align-items:center;">
+                    <div><b style="font-size:18px;">${m[0]}</b><br><small style="color:var(--muted)">Cost: ฿${m[6]||0}</small></div>
+                    <button style="padding:12px 25px; border-radius:15px; border:none; background:${m[5]=='หมด'?'var(--bg)':'var(--navy)'}; color:${m[5]=='หมด'?'var(--red)':'#fff'}; cursor:pointer; font-weight:800;" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'RE-STOCK':'OUT'}</button>
+                </div>`).join(''); 
         }
 
-        // ฟังก์ชันมาตรฐานคงเดิม
-        function getTimeDiff(timeStr) { const now = new Date(); const [d, t] = timeStr.split(' '); const [day, month, year] = d.split('/'); const [h, m, s] = t.split(':'); return Math.floor((now - new Date(year, month-1, day, h, m, s)) / 60000); }
-        function showSec(n) { document.getElementById('container').style.display = (n==='orders'?'grid':'none'); document.getElementById('stock-sec').style.display = (n==='stock'?'grid':'none'); document.getElementById('report-sec').style.display = (n==='report'?'block':'none'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.id==='nav-'+n)); }
-        async function openPayModal(t, tot, rows, items) { pTable=t; pTotal=tot; pRows=rows; document.getElementById('p-table-title').innerText="โต๊ะ "+t; document.getElementById('p-total-price').innerText="฿"+tot.toLocaleString(); document.getElementById('p-bill-items').innerHTML = items.map(i=>`<div style="display:flex;justify-content:space-between;"><span>${i.menu}</span><b>฿${i.total}</b></div>`).join(''); document.getElementById('pay-modal').style.display='flex'; fetch(API_URL,{method:'POST',body:JSON.stringify({action:'setPaymentStatus',table:t,status:'paying'})}); }
-        function selectPayMethod(m) { document.getElementById('p-methods').style.display='none'; if(m==='qr'){ document.getElementById('p-qr-img').src=`https://promptpay.io/0931805507/${pTotal}.png`; document.getElementById('p-qr-area').style.display='block'; }else{ document.getElementById('p-cash-area').style.display='block'; } }
-        async function finalPay(m) { if(confirm("ปิดโต๊ะ?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:pRows,paymentMethod:m})}); closePayModal(); refresh(); } }
-        function closePayModal() { document.getElementById('pay-modal').style.display='none'; }
-        function renderStock(menu) { document.getElementById('stock-sec').innerHTML = menu.map(m=>`<div class="card" style="padding:20px; display:flex; justify-content:space-between; align-items:center;"><b>${m[0]}</b><button style="padding:10px 20px; border-radius:10px; border:none; background:${m[5]=='หมด'?'#eee':'var(--navy)'}; color:${m[5]=='หมด'?'red':'#fff'};" onclick="tgS('${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เปิดขาย':'ของหมด'}</button></div>`).join(''); }
-        async function tgS(n,s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStock',type:'menu',name:n,status:s})}); refresh(); }
-        async function voidIt(r) { if(confirm("ลบ?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'voidItem',rowNum:r})}); refresh(); } }
-        async function upS(r,s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
+        function renderReport(report) { 
+            document.getElementById('report-list').innerHTML = `<table style="width:100%; border-collapse:collapse; background:var(--card); border-radius:24px; overflow:hidden; border: 1px solid var(--border);"><thead><tr style="background:var(--bg);"><th style="padding:20px;text-align:left;">Product</th><th style="padding:20px;">Qty</th><th style="padding:20px;text-align:right;">Profit</th></tr></thead><tbody>${report.map(i => `<tr style="border-top:1px solid var(--border);"><td style="padding:20px; font-weight:700;">${i.name}</td><td style="padding:20px;text-align:center;">${i.qty}</td><td style="padding:20px;text-align:right;font-weight:800;color:var(--accent);">฿${i.profit.toLocaleString()}</td></tr>`).join('')}</tbody></table>`; 
+        }
 
-        setInterval(refresh, 5000); refresh();
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+            if(salesChartInst) drawChart();
+        }
+
+        function toggleLayout() {
+            const current = document.documentElement.getAttribute('data-layout');
+            document.documentElement.setAttribute('data-layout', current === 'compact' ? 'normal' : 'compact');
+        }
+
+        function getTimeDiff(timeStr) { const now = new Date(); const [d, t] = timeStr.split(' '); const [day, month, year] = d.split('/'); const [h, m, s] = t.split(':'); return Math.floor((now - new Date(year, month-1, day, h, m, s)) / 60000); }
+        function showSec(n) { document.getElementById('container').style.display=(n==='orders'?'grid':'none'); document.getElementById('stock-sec').style.display=(n==='stock'?'grid':'none'); document.getElementById('report-sec').style.display=(n==='report'?'block':'none'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.id==='nav-'+n)); }
+        async function voidIt(r) { if(confirm("Void item?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'voidItem',rowNum:r})}); refresh(); } }
+        async function upS(r,s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
+        async function tgS(type,name,status) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStock',type:type,name:name,status:status})}); refresh(); }
+
+        refresh(); setInterval(refresh, 5000);
     </script>
 </body>
 </html>

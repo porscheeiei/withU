@@ -9,7 +9,7 @@
         :root { 
             --p: #1a1a1a; --bg: #f8fafc; --card: #ffffff; --border: #f1f5f9; 
             --darkred: #ff0000; --blue: #2563eb; --gray: #64748b; --accent: #10b981;
-            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
+            --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
             --radius-lg: 45px;
         }
 
@@ -25,12 +25,12 @@
         .table-badge { background: var(--p); color: #fff; padding: 8px 24px; border-radius: 50px; font-size: 20px; font-weight: 800; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .call-btn { background: var(--darkred); color: #fff !important; border: none; padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
 
-        /* --- 🔍 Search & Nav --- */
+        /* --- 🔍 Search Area --- */
         .search-area { position: sticky; top: 65px; z-index: 950; background: var(--bg); padding: 15px 0 10px 0; }
         .search-input { width: 100%; padding: 16px 20px 16px 55px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); font-size: 16px; outline: none; box-shadow: var(--shadow); box-sizing: border-box; }
         .search-icon { position: absolute; left: 22px; top: 32px; color: #b2bec3; display: flex; }
         #category-nav { display: flex; overflow-x: auto; padding: 10px 0 20px 25px; scrollbar-width: none; gap: 10px; margin-left: -20px; margin-right: -20px; }
-        .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 10px 26px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; transition: 0.3s; }
+        .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 10px 26px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; }
         .nav-pill.active { background: var(--p); color: #fff; }
 
         /* --- 🍽 Menu Cards --- */
@@ -45,19 +45,20 @@
         .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; cursor: pointer; }
 
         /* --- 🔢 Premium Status UI --- */
-        .status-card { background: #fff; border-radius: 50px; padding: 40px 25px; border: 1px solid var(--border); box-shadow: var(--shadow); }
-        .status-stepper { display: flex; justify-content: space-between; align-items: center; margin: 30px 0; position: relative; }
-        .status-stepper::before { content: ''; position: absolute; top: 18px; left: 10%; right: 10%; height: 2px; background: #eee; z-index: 1; }
+        .status-card { background: #fff; border-radius: 50px; padding: 45px 25px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .status-stepper { display: flex; justify-content: space-between; align-items: center; margin: 40px 0; position: relative; }
+        .status-stepper::before { content: ''; position: absolute; top: 20px; left: 10%; right: 10%; height: 2px; background: #f1f5f9; z-index: 1; }
         .step-point { position: relative; z-index: 2; flex: 1; text-align: center; }
-        .step-circle { width: 36px; height: 36px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; margin: 0 auto 10px auto; color: #aaa; transition: 0.3s; }
-        .step-label { font-size: 11px; color: #ccc; font-weight: 700; }
-        .step-point.active .step-circle { background: var(--p); color: #fff; transform: scale(1.1); }
-        .step-point.active .step-label { color: var(--p); }
-        .queue-box { background: #f0f7ff; color: var(--blue); padding: 12px; border-radius: 20px; font-size: 14px; font-weight: 700; margin-bottom: 20px; }
+        .step-circle { width: 40px; height: 40px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; margin: 0 auto 10px auto; color: #cbd5e1; transition: 0.4s; }
+        .step-label { font-size: 11px; color: #cbd5e1; font-weight: 700; transition: 0.3s; }
+        .step-point.active .step-circle { background: var(--p); color: #fff; transform: scale(1.15); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .step-point.active .step-label { color: var(--p); font-weight: 800; }
 
-        /* --- 🧾 Custom Confirmation Modal --- */
-        .custom-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; z-index: 5000; align-items: center; justify-content: center; }
-        .custom-modal { background: #fff; width: 85%; max-width: 380px; padding: 40px 30px; border-radius: 45px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.2); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .queue-box { background: rgba(37, 99, 235, 0.05); color: var(--blue); padding: 15px; border-radius: 20px; font-size: 15px; font-weight: 800; margin-bottom: 25px; }
+
+        /* --- 🧾 Custom Confirm Modal --- */
+        .custom-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; z-index: 5000; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+        .custom-modal { background: #fff; width: 85%; max-width: 380px; padding: 40px 30px; border-radius: 45px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.25); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .m-title { font-size: 22px; font-weight: 800; margin-bottom: 10px; line-height: 1.3; }
         .m-sub { font-size: 15px; color: var(--gray); margin-bottom: 30px; }
         .m-btn-confirm { background: #ffaa99; color: #4a1d1d; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; width: 100%; margin-bottom: 10px; cursor: pointer; }
@@ -73,7 +74,7 @@
     <div class="custom-modal">
         <div style="font-size: 50px; margin-bottom: 15px;">☕️</div>
         <div class="m-title">ยืนยันจบการสั่งซื้อ<br>และออกจากโต๊ะนี้ใช่ไหมคะ?</div>
-        <div class="m-sub">ตรวจสอบรายการและยอดเงินให้เรียบร้อย<br>ก่อนกดจบออเดอร์นะคะอ้วน</div>
+        <div class="m-sub">ประวัติการสั่งซื้อจะถูกล้างออกจากเครื่อง<br>ตรวจสอบยอดเงินก่อนนะคะอ้วน</div>
         <button class="m-btn-confirm" onclick="executeClearSession()">จบการสั่งซื้อ</button>
         <button class="m-btn-cancel" onclick="closeConfirmModal()">กลับไปหน้าเดิม</button>
     </div>
@@ -83,7 +84,7 @@
     <div class="brand">WITHU</div>
     <div style="display:flex; align-items:center; gap:12px;">
         <button class="call-btn" onclick="callStaff()">เรียกพนักงาน</button>
-        <span id="display-table" class="table-badge">โต๊ะ -</span>
+        <span id="display-table" class="table-badge"></span>
     </div>
 </div>
 
@@ -102,11 +103,10 @@
 <div id="menu-view" style="display:none;">
     <div class="app-container">
         <div class="search-area">
-            <span class="search-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+            <span class="search-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" i="21" x2="16.65" y2="16.65"></line></svg></span>
             <input type="text" id="menu-search" class="search-input" placeholder="ค้นหาเมนู..." oninput="handleSearch()">
         </div>
         <div id="category-nav"></div>
-        <div id="loading-skeleton" style="display:none;"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
         <div id="main-content"></div>
     </div>
 </div>
@@ -114,7 +114,7 @@
 <div id="status-view" style="display:none;">
     <div class="app-container" style="padding-top:40px; text-align:center;">
         <div class="status-card">
-            <h2 id="status-table-title" style="font-weight:900; font-size:32px; margin-bottom:10px;">ออเดอร์โต๊ะ -</h2>
+            <h2 id="status-table-title" style="font-weight:900; font-size:32px; margin-bottom:10px; letter-spacing:-1px;">ออเดอร์โต๊ะ -</h2>
             <div id="queue-info" class="queue-box">กำลังคำนวณคิวของคุณ...</div>
             <div class="status-stepper">
                 <div class="step-point" id="st-1"><div class="step-circle">1</div><div class="step-label">รับออเดอร์</div></div>
@@ -144,7 +144,7 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
-    let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentS = {}, itemOpt = {}, currentF = "ทั้งหมด", currentSearch = "", sInterval, autoCloseTimer;
+    let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentF = "ทั้งหมด", currentSearch = "", sInterval, autoCloseTimer;
 
     window.onload = async () => {
         const params = new URLSearchParams(window.location.search);
@@ -197,16 +197,14 @@
 
     async function sub() { 
         const modalBody = document.getElementById('modal-body');
-        modalBody.innerHTML = `<div class="sending-container"><div class="pulse-loader">🍳</div><div class="call-title">กำลังส่งออเดอร์...</div></div>`;
+        modalBody.innerHTML = `<div class="sending-container" style="text-align:center; padding:30px;"><div class="queue-box">กำลังส่งออเดอร์...</div></div>`;
         try { 
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) }); 
             localStorage.setItem('withu_order_active', 'true');
-            modalBody.innerHTML = `<div class="sending-container"><div class="success-check">✅</div><div class="call-title">สั่งอาหารสำเร็จ!</div></div>`;
-            setTimeout(() => { showStatus(); cart=[]; updateUI(); }, 2000);
+            showStatus(); cart=[]; updateUI();
         } catch(e) { alert("ส่งไม่สำเร็จ"); }
     }
 
-    // 🚩 ฟังก์ชันสั่งเพิ่ม (กลับหน้าเมนู)
     function orderMore() {
         document.getElementById('status-view').style.display = 'none';
         document.getElementById('menu-view').style.display = 'block';
@@ -214,7 +212,6 @@
         document.getElementById('auto-close-msg').innerText = "";
     }
 
-    // 🚩 ฟังก์ชันจบการสั่งซื้อ
     function clearSession() { document.getElementById('confirm-modal').style.display = 'flex'; }
     function closeConfirmModal() { document.getElementById('confirm-modal').style.display = 'none'; }
     function executeClearSession() {
@@ -228,7 +225,7 @@
         document.getElementById('menu-view').style.display='none';
         document.getElementById('status-view').style.display='block';
         document.getElementById('status-table-title').innerText = "ออเดอร์โต๊ะ " + currentTable;
-        chk(); sInterval = setInterval(chk, 5000);
+        chk(); if(!sInterval) sInterval = setInterval(chk, 5000);
     }
 
     async function chk() {
@@ -243,7 +240,7 @@
                     let sec = 300;
                     autoCloseTimer = setInterval(() => {
                         sec--; let m = Math.floor(sec/60), s = sec%60;
-                        document.getElementById('auto-close-msg').innerText = `ระบบจะจบการสั่งซื้ออัตโนมัติใน ${m}:${s<10?'0':''}${s}`;
+                        document.getElementById('auto-close-msg').innerText = `ระบบจะกลับสู่หน้าหลักอัตโนมัติใน ${m}:${s<10?'0':''}${s}`;
                         if(sec <= 0) executeClearSession();
                     }, 1000);
                 }
@@ -273,7 +270,7 @@
         document.getElementById('modal-body').innerHTML = h; document.getElementById('modal').style.display = 'flex';
     }
     function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
-    async function callStaff() { if(confirm("เรียกพนักงาน?")) { await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'callStaff', table:currentTable, reason:'ทั่วไป'}) }); alert("แจ้งแล้วค่ะ"); } }
+    async function callStaff() { alert("แจ้งพนักงานแล้วค่ะ"); await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'callStaff', table:currentTable, reason:'ทั่วไป'}) }); }
 </script>
 </body>
 </html>

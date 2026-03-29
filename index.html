@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>WITHU | Premium Ordering</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root { 
             --p: #1a1a1a; --bg: #f8fafc; --card: #ffffff; --border: #f1f5f9; 
@@ -28,8 +28,6 @@
         /* --- 🔝 Header --- */
         .top-bar { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
         .brand { font-weight: 800; font-size: 24px; letter-spacing: 0.5px; }
-        
-        /* 🚩 ป้ายเลขโต๊ะขยายใหญ่ (Big Table Badge) */
         .table-badge { background: var(--p); color: #fff; padding: 8px 24px; border-radius: 50px; font-size: 20px; font-weight: 800; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .call-btn { background: var(--darkred); color: #fff !important; border: none; padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
 
@@ -66,21 +64,20 @@
         .note-input { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--border); background: #f8fafc; font-size: 14px; margin-bottom: 15px; outline: none; box-sizing: border-box; transition: 0.3s; }
         .note-input:focus { border-color: var(--blue); background: #fff; }
 
-        /* --- 🛒 Bottom Elements --- */
+        /* --- 🛒 Buttons --- */
         .btn-add { background: transparent; border: 2.5px solid #000; padding: 15px; border-radius: 50px; font-weight: 800; cursor: pointer; width: 100%; font-size: 16px; transition: 0.2s; }
         .btn-add:active { transform: scale(0.95); background: #eee; }
         .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; cursor: pointer; }
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); padding: 25px 30px 45px 30px; box-shadow: 0 -15px 40px rgba(0,0,0,0.06); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 45px 45px 0 0; }
 
-        /* --- 🔔 Call Staff UI --- */
-        .call-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; z-index: 3000; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+        /* --- 🔔 Call UI --- */
+        .call-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; z-index: 3000; align-items: center; justify-content: center; }
         .call-modal { background: #fff; padding: 45px 30px; border-radius: 50px; text-align: center; width: 85%; max-width: 350px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .bell-icon { font-size: 60px; margin-bottom: 20px; display: inline-block; animation: ring 2s infinite; }
-        @keyframes ring { 0%, 100% { transform: rotate(0); } 10%, 30%, 50% { transform: rotate(15deg); } 20%, 40%, 60% { transform: rotate(-15deg); } 80% { transform: rotate(0); } }
-        .call-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--p); }
+        @keyframes ring { 0%, 100% { transform: rotate(0); } 10%, 30%, 50% { transform: rotate(15deg); } 20%, 40%, 60% { transform: rotate(-15deg); } }
+        .call-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
         .call-sub { font-size: 16px; color: var(--gray); margin-bottom: 30px; line-height: 1.5; }
         .btn-confirm-call { background: var(--p); color: #fff; border: none; padding: 16px; border-radius: 50px; font-weight: 700; font-size: 16px; cursor: pointer; width: 100%; margin-bottom: 15px; }
-        .btn-cancel-call { background: transparent; color: var(--gray); border: none; font-weight: 600; cursor: pointer; }
 
         /* --- 🍳 Sending UI --- */
         .sending-container { text-align: center; padding: 30px 0; }
@@ -111,7 +108,7 @@
     <div class="brand">WITHU</div>
     <div style="display:flex; align-items:center; gap:12px;">
         <button class="call-btn" onclick="callStaff()">เรียกพนักงาน</button>
-        <span id="display-table" class="table-badge">โต๊ะ -</span>
+        <span id="display-table" class="table-badge"></span>
     </div>
 </div>
 
@@ -119,12 +116,10 @@
     <div class="table-box" style="background:#fff; padding:60px 40px; border-radius:50px; text-align:center; width:85%; max-width:400px; margin: 15% auto; box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.15);">
         <img src="https://img1.pic.in.th/images/-------2.png" style="width:120px; height:120px; border-radius:50%; margin-bottom:20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);" alt="Logo">
         <h2 style="font-weight:800; font-size:28px; margin:0 0 35px 0;">WITHU CAFE</h2>
-        
         <select id="table-select" style="width:100%; padding:25px; border-radius:22px; border:2px solid #e2e8f0; margin-bottom:30px; text-align-last:center; font-size:22px; background:#f8fafc; outline:none; appearance:none; font-weight:800; color:var(--p);">
             <option value="" disabled selected>เลือกหมายเลขโต๊ะ</option>
             <script>for(let i=1;i<=15;i++) document.write(`<option value="${i}">โต๊ะ ${i}</option>`);</script>
         </select>
-        
         <button class="btn-checkout" style="width:100%; height:75px; font-size:20px;" onclick="lockTable()">เข้าสู่เมนูอาหาร</button>
     </div>
 </div>
@@ -167,7 +162,6 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
     let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentS = {}, itemOpt = {}, itemExpanded = {}, currentF = "ทั้งหมด", currentSearch = "", sInterval;
 
-    // ระบบ Session Persistence & URL Detect
     window.onload = async () => {
         const params = new URLSearchParams(window.location.search);
         const tParam = params.get('table');
@@ -175,12 +169,9 @@
         const hasActiveOrder = localStorage.getItem('withu_order_active');
 
         if(tParam) {
-            currentTable = tParam;
-            localStorage.setItem('withu_table', tParam);
-            startApp();
+            currentTable = tParam; localStorage.setItem('withu_table', tParam); startApp();
         } else if(savedTable) {
-            currentTable = savedTable;
-            startApp();
+            currentTable = savedTable; startApp();
             if(hasActiveOrder === 'true') showStatus();
         }
     }
@@ -188,9 +179,7 @@
     function lockTable() { 
         let s = document.getElementById("table-select"); 
         if(!s.value) return; 
-        currentTable = s.value; 
-        localStorage.setItem('withu_table', currentTable);
-        startApp();
+        currentTable = s.value; localStorage.setItem('withu_table', currentTable); startApp();
     }
 
     function startApp() {
@@ -212,27 +201,21 @@
     function handleSearch() { currentSearch = document.getElementById('menu-search').value.toLowerCase(); renderMenu(currentF); }
 
     function renderMenu(f) {
-        currentF = f; 
-        const m = document.getElementById('main-content'); 
-        const n = document.getElementById('category-nav');
+        currentF = f; const m = document.getElementById('main-content'); const n = document.getElementById('category-nav');
         let cats = [...new Set(fullMenu.map(r => r[2] || "อื่นๆ"))];
-        n.innerHTML = `<button onclick="renderMenu('ทั้งหมด')" class="nav-pill ${f==='ทั้งหมด'?'active':''}"> ทั้งหมด </button>` + 
-                      cats.map(c => `<button onclick="renderMenu('${c}')" class="nav-pill ${f===c?'active':''}">${c}</button>`).join('');
-        
+        n.innerHTML = `<button onclick="renderMenu('ทั้งหมด')" class="nav-pill ${f==='ทั้งหมด'?'active':''}"> ทั้งหมด </button>` + cats.map(c => `<button onclick="renderMenu('${c}')" class="nav-pill ${f===c?'active':''}">${c}</button>`).join('');
         const filtered = fullMenu.filter(r => (f === "ทั้งหมด" || r[2] === f) && r[0].toLowerCase().includes(currentSearch));
-
         let h = ""; 
         filtered.forEach((r) => {
             const originalIdx = fullMenu.findIndex(item => item[0] === r[0]);
-            let isAvail = (r[5] !== "หมด"), cat = r[2] || "", isD = (cat === "เครื่องดื่ม" || cat === "สมูทตี้"), showSmoothieOpt = (cat === "เครื่องดื่ม"), isExp = itemExpanded[originalIdx] || false;
+            let isAvail = (r[5] !== "หมด"), cat = r[2] || "", isD = (cat === "เครื่องดื่ม" || cat === "สมูทตี้"), isExp = itemExpanded[originalIdx] || false;
             if(isD && !currentS[originalIdx]) currentS[originalIdx] = "100%"; 
             if(!itemOpt[originalIdx]) itemOpt[originalIdx] = { toppings: [], smoothie: false };
-
             h += `<div class="menu-item ${isAvail ? '' : 'sold-out'}">
                 <div class="menu-top"><img src="${r[4]||'https://via.placeholder.com/150'}" class="menu-img"><div class="menu-info"><h3>${r[0]}</h3><div class="price">฿${r[1]}</div></div></div>
                 ${isAvail && isD ? `
                     <div class="sweet-selector">${['0%','25%','50%','75%','100%'].map(l=>`<div class="sweet-btn ${currentS[originalIdx]===l?'active':''}" onclick="setS(${originalIdx},'${l}')">${l}</div>`).join('')}</div>
-                    ${showSmoothieOpt ? `<div class="opt-btn ${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">+ เพิ่มปั่น (+฿10)</div>` : ''}
+                    ${cat === "เครื่องดื่ม" ? `<div class="opt-btn ${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">+ เพิ่มปั่น (+฿10)</div>` : ''}
                     <div class="acc-btn" onclick="toggleAcc(${originalIdx})">เลือกท็อปปิ้งเพิ่มเติม</div>
                     <div class="acc-content ${isExp ? 'open' : ''}"><div class="top-grid">${toppingsData.map(t => `<div class="top-chip ${itemOpt[originalIdx].toppings.includes(t[0])?'active':''} ${t[2]==='หมด'?'sold-out':''}" onclick="tT(${originalIdx},'${t[0]}')">${t[0]} (+฿${t[1]})</div>`).join('')}</div></div>
                 ` : ''}
@@ -250,8 +233,7 @@
 
     function addC(n, p, idx, isD) {
         let fp = parseFloat(p), det = []; 
-        let noteEl = document.getElementById(`note-${idx}`);
-        let userNote = noteEl ? noteEl.value.trim() : "";
+        let noteEl = document.getElementById(`note-${idx}`); let userNote = noteEl ? noteEl.value.trim() : "";
         if(isD) { 
             det.push("หวาน " + currentS[idx]); 
             if(itemOpt[idx].smoothie) { fp += 10; det.push("ปั่น"); } 
@@ -277,29 +259,21 @@
 
     function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
 
-    // UI ส่งออเดอร์กระทะ 🍳
     async function sub() { 
         const modalBody = document.getElementById('modal-body');
-        modalBody.innerHTML = `<div class="sending-container"><div class="pulse-loader">🍳</div><div class="call-title">กำลังส่งออเดอร์งับ...</div><div class="call-sub">ออเดอร์ของอ้วนกำลังเดินทาง <br>กรุณารอสักครู่นะคะอ้วน</div></div>`;
+        modalBody.innerHTML = `<div class="sending-container"><div class="pulse-loader">🍳</div><div class="call-title">กำลังส่งออเดอร์งับ...</div><div class="call-sub">ออเดอร์ของอ้วนกำลังเดินทาง...</div></div>`;
         try { 
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) }); 
             localStorage.setItem('withu_order_active', 'true');
-            modalBody.innerHTML = `<div class="sending-container"><div class="success-check">✅</div><div class="call-title">ส่งออเดอร์เรียบร้อย!</div><div class="call-sub">ได้รับออเดอร์แล้วค่ะ <br>กำลังเตรียมความอร่อยให้คุณ...</div></div>`;
+            modalBody.innerHTML = `<div class="sending-container"><div class="success-check">✅</div><div class="call-title">ส่งออเดอร์เรียบร้อย!</div><div class="call-sub">ได้รับออเดอร์แล้วค่ะ...</div></div>`;
             setTimeout(() => { showStatus(); cart=[]; updateUI(); }, 2000);
         } catch(e) { alert("ส่งไม่สำเร็จ กรุณาลองใหม่"); openReceipt(); }
     }
 
-    // เรียกพนักงาน
-    function callStaff() { document.getElementById('call-staff-modal').style.display = 'flex'; }
-    function closeCallModal() { document.getElementById('call-staff-modal').style.display = 'none'; }
-    async function sendCallRequest() {
-        const modal = document.getElementById('call-modal-content'); const originalHtml = modal.innerHTML;
-        modal.innerHTML = `<div class="bell-icon">⏳</div><div class="call-title">กำลังแจ้งพนักงาน...</div><div class="call-sub">กรุณารอสักครู่นะคะ</div>`;
-        try {
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'callStaff', table:currentTable, reason:'ทั่วไป'}) });
-            modal.innerHTML = `<div class="bell-icon">✅</div><div class="call-title">เรียบร้อยค่ะ</div><div class="call-sub">พนักงานได้รับแจ้งแล้ว <br>กำลังเดินทางไปที่โต๊ะ ${currentTable} ค่ะ</div>`;
-            setTimeout(() => { closeCallModal(); modal.innerHTML = originalHtml; }, 3000);
-        } catch(e) { alert("เกิดข้อผิดพลาด"); closeCallModal(); modal.innerHTML = originalHtml; }
+    // 🚩 ฟังก์ชันแก้บัค: สั่งเมนูเพิ่ม
+    function orderMore() {
+        localStorage.setItem('withu_order_active', 'false');
+        location.reload(); // รีโหลดเพื่อกลับไปแสดงหน้าเมนูตามเงื่อนไข onload
     }
 
     function showStatus() {
@@ -320,15 +294,15 @@
                     <div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; margin-bottom:25px; padding:0 10px;">
                         <span>ยอดรวมออเดอร์:</span><span style="color:var(--blue)">฿<span id="stat-sum-val">0</span></span>
                     </div>
-                    <button class="btn-add" style="margin-bottom:10px; width:100%;" onclick="location.reload()">สั่งเมนูเพิ่ม</button>
-                    <button class="btn-add" style="background:transparent; color:var(--gray); border:1px solid #eee; width:100%;" onclick="clearSession()">ล้างข้อมูลโต๊ะ</button>
+                    <button class="btn-add" style="margin-bottom:12px; width:100%; border:2.5px solid #000;" onclick="orderMore()">สั่งเมนูเพิ่ม</button>
+                    <button class="btn-add" style="background:transparent; color:var(--gray); border:1px solid #eee; width:100%;" onclick="clearSession()">จบการสั่งซื้อ</button>
                 </div>
             </div>`;
         chk(); sInterval = setInterval(chk, 5000);
     }
 
     function clearSession() {
-        if(confirm("ต้องการล้างข้อมูลเพื่อเริ่มโต๊ะใหม่ใช่ไหมคะ?")) {
+        if(confirm("ยืนยันจบการสั่งซื้อและออกจากโต๊ะนี้ใช่ไหมคะ?")) {
             localStorage.removeItem('withu_table');
             localStorage.removeItem('withu_order_active');
             location.href = location.pathname;
@@ -340,15 +314,12 @@
             const r = await fetch(API_URL + "?action=getAdminData"); const d = await r.json();
             const myOrders = d.orders.filter(o => o.table == currentTable);
             if (myOrders.length === 0) { 
-                upS(4); 
-                document.getElementById('queue-info').innerText = "ออเดอร์เสร็จสิ้นแล้ว"; 
-                localStorage.setItem('withu_order_active', 'false');
+                upS(4); document.getElementById('queue-info').innerText = "ออเดอร์เสร็จสิ้นแล้ว"; 
                 return; 
             }
             const uniqueTables = [...new Set(d.orders.map(o => o.table))];
             const myRank = uniqueTables.indexOf(currentTable.toString());
-            const queueAhead = myRank > 0 ? myRank : 0;
-            document.getElementById('queue-info').innerText = queueAhead > 0 ? `เหลืออีก ${queueAhead} คิวก่อนหน้าคุณ` : "กำลังเตรียมออเดอร์ของคุณเป็นลำดับถัดไป";
+            document.getElementById('queue-info').innerText = myRank > 0 ? `เหลืออีก ${myRank} คิวก่อนหน้าคุณ` : "กำลังเตรียมออเดอร์ของคุณเป็นลำดับถัดไป";
             const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4};
             let minVal = 4; let totalSum = 0;
             myOrders.forEach(o => { 
@@ -361,6 +332,18 @@
     }
 
     function upS(s) { for(let i=1;i<=4;i++) { const el = document.getElementById('st-'+i); if(el) el.classList.toggle('active',i<=s); } }
+    
+    function callStaff() { document.getElementById('call-staff-modal').style.display = 'flex'; }
+    function closeCallModal() { document.getElementById('call-staff-modal').style.display = 'none'; }
+    async function sendCallRequest() {
+        const modal = document.getElementById('call-modal-content'); const originalHtml = modal.innerHTML;
+        modal.innerHTML = `<div class="bell-icon">⏳</div><div class="call-title">กำลังแจ้งพนักงาน...</div>`;
+        try {
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'callStaff', table:currentTable, reason:'ทั่วไป'}) });
+            modal.innerHTML = `<div class="bell-icon">✅</div><div class="call-title">เรียบร้อยค่ะ</div>`;
+            setTimeout(() => { closeCallModal(); modal.innerHTML = originalHtml; }, 2000);
+        } catch(e) { alert("เกิดข้อผิดพลาด"); closeCallModal(); modal.innerHTML = originalHtml; }
+    }
 </script>
 </body>
 </html>

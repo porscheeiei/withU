@@ -15,17 +15,16 @@
 
         * { font-family: 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); margin: 0; color: var(--p); -webkit-font-smoothing: antialiased; }
-        input, button, select, textarea { font-family: 'Prompt', sans-serif !important; }
-
-        .app-container { width: 100%; max-width: 550px; margin: 0 auto; padding: 0 20px 140px 20px; box-sizing: border-box; }
         
+        .app-container { width: 100%; max-width: 550px; margin: 0 auto; padding: 0 20px 140px 20px; box-sizing: border-box; }
+
         /* --- 🔝 Header --- */
         .top-bar { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
         .brand { font-weight: 800; font-size: 24px; letter-spacing: 0.5px; }
         .table-badge { background: var(--p); color: #fff; padding: 8px 24px; border-radius: 50px; font-size: 20px; font-weight: 800; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .call-btn { background: var(--darkred); color: #fff !important; border: none; padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
 
-        /* --- 🔍 Search Area --- */
+        /* --- 🔍 Search & Nav --- */
         .search-area { position: sticky; top: 65px; z-index: 950; background: var(--bg); padding: 15px 0 10px 0; }
         .search-input { width: 100%; padding: 16px 20px 16px 55px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); font-size: 16px; outline: none; box-shadow: var(--shadow); box-sizing: border-box; }
         .search-icon { position: absolute; left: 22px; top: 32px; color: #b2bec3; display: flex; }
@@ -33,36 +32,42 @@
         .nav-pill { background: var(--card); border: 1px solid var(--border); padding: 10px 26px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; color: var(--gray); font-weight: 600; }
         .nav-pill.active { background: var(--p); color: #fff; }
 
-        /* --- 🍽 Menu Cards --- */
-        .menu-item { background: var(--card); border-radius: 35px; padding: 25px; border: 1px solid var(--border); box-shadow: var(--shadow); animation: fadeIn 0.4s ease; display: flex; flex-direction: column; margin-bottom: 15px; }
+        /* --- 🍽 Menu Items --- */
+        .menu-item { background: var(--card); border-radius: var(--radius-lg); padding: 25px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; flex-direction: column; margin-bottom: 15px; animation: fadeIn 0.4s ease; }
         .menu-top { display: flex; align-items: flex-start; margin-bottom: 20px; }
         .menu-img { width: 110px; height: 110px; object-fit: cover; border-radius: 20px; margin-right: 20px; background: #f8fafc; }
+        .menu-info { flex: 1; }
         .menu-item h3 { margin: 0; font-size: 20px; font-weight: 700; color: var(--p); }
         .price { font-weight: 800; font-size: 26px; color: var(--p); margin: 5px 0; }
 
-        /* --- 🛒 Bottom Bar --- */
-        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); padding: 25px 30px 45px 30px; box-shadow: 0 -15px 40px rgba(0,0,0,0.06); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 45px 45px 0 0; }
+        /* --- 🛒 Buttons --- */
+        .btn-add { background: transparent; border: 2.5px solid #000; padding: 15px; border-radius: 50px; font-weight: 800; cursor: pointer; width: 100%; font-size: 16px; transition: 0.2s; }
+        .btn-add:active { transform: scale(0.95); background: #eee; }
         .btn-checkout { background: var(--p); color: #fff; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; font-size: 17px; cursor: pointer; }
+        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); padding: 25px 30px 45px 30px; box-shadow: 0 -15px 40px rgba(0,0,0,0.06); display: none; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 1100; border-radius: 45px 45px 0 0; }
 
-        /* --- 🔢 Premium Status UI --- */
-        .status-card { background: #fff; border-radius: 50px; padding: 45px 25px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        /* --- 🔢 Premium Status Card --- */
+        .status-card { background: #fff; border-radius: 50px; padding: 50px 30px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-top: 20px; }
         .status-stepper { display: flex; justify-content: space-between; align-items: center; margin: 40px 0; position: relative; }
-        .status-stepper::before { content: ''; position: absolute; top: 20px; left: 10%; right: 10%; height: 2px; background: #f1f5f9; z-index: 1; }
+        .status-stepper::before { content: ''; position: absolute; top: 20px; left: 10%; right: 10%; height: 2px; background: #eee; z-index: 1; }
         .step-point { position: relative; z-index: 2; flex: 1; text-align: center; }
-        .step-circle { width: 40px; height: 40px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; margin: 0 auto 10px auto; color: #cbd5e1; transition: 0.4s; }
-        .step-label { font-size: 11px; color: #cbd5e1; font-weight: 700; transition: 0.3s; }
-        .step-point.active .step-circle { background: var(--p); color: #fff; transform: scale(1.15); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .step-circle { width: 40px; height: 40px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; margin: 0 auto 10px auto; color: #cbd5e1; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .step-label { font-size: 12px; color: #cbd5e1; font-weight: 700; transition: 0.3s; }
+        .step-point.active .step-circle { background: var(--p); color: #fff; transform: scale(1.15); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
         .step-point.active .step-label { color: var(--p); font-weight: 800; }
 
-        .queue-box { background: rgba(37, 99, 235, 0.05); color: var(--blue); padding: 15px; border-radius: 20px; font-size: 15px; font-weight: 800; margin-bottom: 25px; }
+        .queue-box { background: rgba(37, 99, 235, 0.05); color: var(--blue); padding: 15px; border-radius: 20px; font-size: 15px; font-weight: 800; margin-bottom: 25px; border: 1px solid rgba(37, 99, 235, 0.1); }
+        .auto-close-timer { font-size: 12px; color: var(--gray); margin-top: 15px; font-weight: 600; opacity: 0.8; }
 
-        /* --- 🧾 Custom Confirm Modal --- */
+        /* --- 🧾 Custom Modal (Confirm) --- */
         .custom-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; z-index: 5000; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
-        .custom-modal { background: #fff; width: 85%; max-width: 380px; padding: 40px 30px; border-radius: 45px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.25); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .m-title { font-size: 22px; font-weight: 800; margin-bottom: 10px; line-height: 1.3; }
-        .m-sub { font-size: 15px; color: var(--gray); margin-bottom: 30px; }
-        .m-btn-confirm { background: #ffaa99; color: #4a1d1d; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; width: 100%; margin-bottom: 10px; cursor: pointer; }
-        .m-btn-cancel { background: #f1f5f9; color: var(--gray); border: none; padding: 18px; border-radius: 20px; font-weight: 700; width: 100%; cursor: pointer; }
+        .custom-modal { background: #fff; width: 85%; max-width: 380px; padding: 40px 30px; border-radius: 45px; text-align: center; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-icon { font-size: 50px; margin-bottom: 20px; display: block; }
+        .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 10px; line-height: 1.3; }
+        .modal-sub { font-size: 15px; color: var(--gray); margin-bottom: 30px; }
+        .modal-btns { display: flex; flex-direction: column; gap: 10px; }
+        .btn-m-confirm { background: #ffaa99; color: #4a1d1d; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; cursor: pointer; }
+        .btn-m-cancel { background: #f1f5f9; color: var(--gray); border: none; padding: 18px; border-radius: 20px; font-weight: 700; font-size: 15px; cursor: pointer; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
@@ -72,11 +77,13 @@
 
 <div id="confirm-modal" class="custom-overlay">
     <div class="custom-modal">
-        <div style="font-size: 50px; margin-bottom: 15px;">☕️</div>
-        <div class="m-title">ยืนยันจบการสั่งซื้อ<br>และออกจากโต๊ะนี้ใช่ไหมคะ?</div>
-        <div class="m-sub">ประวัติการสั่งซื้อจะถูกล้างออกจากเครื่อง<br>ตรวจสอบยอดเงินก่อนนะคะอ้วน</div>
-        <button class="m-btn-confirm" onclick="executeClearSession()">จบการสั่งซื้อ</button>
-        <button class="m-btn-cancel" onclick="closeConfirmModal()">กลับไปหน้าเดิม</button>
+        <span class="modal-icon">☕️</span>
+        <div class="modal-title">ยืนยันการจบออเดอร์<br>และออกจากโต๊ะ?</div>
+        <div class="modal-sub">ประวัติการสั่งซื้อจะถูกล้างออกจากเครื่อง<br>ตรวจสอบยอดเงินก่อนนะคะอ้วน</div>
+        <div class="modal-btns">
+            <button class="btn-m-confirm" onclick="executeClearSession()">จบการสั่งซื้อ</button>
+            <button class="btn-m-cancel" onclick="closeConfirmModal()">กลับไปหน้าเดิม</button>
+        </div>
     </div>
 </div>
 
@@ -84,15 +91,15 @@
     <div class="brand">WITHU</div>
     <div style="display:flex; align-items:center; gap:12px;">
         <button class="call-btn" onclick="callStaff()">เรียกพนักงาน</button>
-        <span id="display-table" class="table-badge"></span>
+        <span id="display-table" class="table-badge">โต๊ะ -</span>
     </div>
 </div>
 
 <div id="table-overlay">
     <div class="table-box" style="background:#fff; padding:60px 40px; border-radius:50px; text-align:center; width:85%; max-width:400px; margin: 15% auto; box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.15);">
-        <img src="https://img1.pic.in.th/images/-------2.png" style="width:120px; height:120px; border-radius:50%; margin-bottom:20px;">
+        <img src="https://img1.pic.in.th/images/-------2.png" style="width:120px; height:120px; border-radius:50%; margin-bottom:20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);" alt="Logo">
         <h2 style="font-weight:800; font-size:28px; margin:0 0 35px 0;">WITHU CAFE</h2>
-        <select id="table-select" style="width:100%; padding:25px; border-radius:22px; border:2px solid #e2e8f0; margin-bottom:30px; text-align-last:center; font-size:22px; background:#f8fafc; outline:none; appearance:none; font-weight:800;">
+        <select id="table-select" style="width:100%; padding:25px; border-radius:22px; border:2px solid #e2e8f0; margin-bottom:30px; text-align-last:center; font-size:22px; background:#f8fafc; outline:none; appearance:none; font-weight:800; color:var(--p);">
             <option value="" disabled selected>เลือกหมายเลขโต๊ะ</option>
             <script>for(let i=1;i<=15;i++) document.write(`<option value="${i}">โต๊ะ ${i}</option>`);</script>
         </select>
@@ -100,36 +107,14 @@
     </div>
 </div>
 
-<div id="menu-view" style="display:none;">
+<div id="app-content" style="display:none;">
     <div class="app-container">
         <div class="search-area">
-            <span class="search-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" i="21" x2="16.65" y2="16.65"></line></svg></span>
+            <span class="search-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
             <input type="text" id="menu-search" class="search-input" placeholder="ค้นหาเมนู..." oninput="handleSearch()">
         </div>
         <div id="category-nav"></div>
         <div id="main-content"></div>
-    </div>
-</div>
-
-<div id="status-view" style="display:none;">
-    <div class="app-container" style="padding-top:40px; text-align:center;">
-        <div class="status-card">
-            <h2 id="status-table-title" style="font-weight:900; font-size:32px; margin-bottom:10px; letter-spacing:-1px;">ออเดอร์โต๊ะ -</h2>
-            <div id="queue-info" class="queue-box">กำลังคำนวณคิวของคุณ...</div>
-            <div class="status-stepper">
-                <div class="step-point" id="st-1"><div class="step-circle">1</div><div class="step-label">รับออเดอร์</div></div>
-                <div class="step-point" id="st-2"><div class="step-circle">2</div><div class="step-label">กำลังทำ</div></div>
-                <div class="step-point" id="st-3"><div class="step-circle">3</div><div class="step-label">รอเสิร์ฟ</div></div>
-                <div class="step-point" id="st-4"><div class="step-circle">4</div><div class="step-label">สำเร็จ</div></div>
-            </div>
-            <div id="stat-list" style="margin:30px 0; text-align:left; border-top:1px solid #f8fafc; padding-top:20px;"></div>
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:22px; margin-bottom:30px; padding:0 10px;">
-                <span>ยอดรวมออเดอร์:</span><span style="color:var(--blue)">฿<span id="stat-sum-val">0</span></span>
-            </div>
-            <button class="btn-checkout" style="width:100%; height:70px; border:2.5px solid #000; background:transparent; color:#000; margin-bottom:12px;" onclick="orderMore()">สั่งเมนูเพิ่ม</button>
-            <button class="btn-checkout" style="width:100%; height:60px; background:transparent; color:var(--gray); border:1px solid #eee; font-size:14px;" onclick="clearSession()">จบการสั่งซื้อ / เช็คบิล</button>
-            <div id="auto-close-msg" style="margin-top:20px; font-size:12px; color:#aaa; font-weight:600;"></div>
-        </div>
     </div>
 </div>
 
@@ -144,12 +129,16 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
-    let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentF = "ทั้งหมด", currentSearch = "", sInterval, autoCloseTimer;
+    let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentS = {}, itemOpt = {}, itemExpanded = {}, currentF = "ทั้งหมด", currentSearch = "", sInterval;
+    let autoCloseTimer = null;
 
     window.onload = async () => {
         const params = new URLSearchParams(window.location.search);
-        const t = params.get('table') || localStorage.getItem('withu_table');
-        if(t) { currentTable = t; localStorage.setItem('withu_table', t); startApp(); if(localStorage.getItem('withu_order_active') === 'true') showStatus(); }
+        const tParam = params.get('table');
+        const savedTable = localStorage.getItem('withu_table');
+        const hasActiveOrder = localStorage.getItem('withu_order_active');
+        if(tParam) { currentTable = tParam; localStorage.setItem('withu_table', tParam); startApp(); }
+        else if(savedTable) { currentTable = savedTable; startApp(); if(hasActiveOrder === 'true') showStatus(); }
     }
 
     function lockTable() { 
@@ -160,7 +149,7 @@
     function startApp() {
         document.getElementById("display-table").innerText = "โต๊ะ " + currentTable; 
         document.getElementById("table-overlay").style.display = "none"; 
-        document.getElementById("menu-view").style.display = "block"; 
+        document.getElementById("app-content").style.display = "block"; 
         document.getElementById("app-header").style.display = "flex"; 
         loadMenu(); 
     }
@@ -173,45 +162,86 @@
         } catch(e) {}
     }
 
+    function handleSearch() { currentSearch = document.getElementById('menu-search').value.toLowerCase(); renderMenu(currentF); }
+
     function renderMenu(f) {
         currentF = f; const m = document.getElementById('main-content'); const n = document.getElementById('category-nav');
         let cats = [...new Set(fullMenu.map(r => r[2] || "อื่นๆ"))];
         n.innerHTML = `<button onclick="renderMenu('ทั้งหมด')" class="nav-pill ${f==='ทั้งหมด'?'active':''}"> ทั้งหมด </button>` + cats.map(c => `<button onclick="renderMenu('${c}')" class="nav-pill ${f===c?'active':''}">${c}</button>`).join('');
         const filtered = fullMenu.filter(r => (f === "ทั้งหมด" || r[2] === f) && r[0].toLowerCase().includes(currentSearch));
-        m.innerHTML = filtered.map((r, i) => {
-            const idx = fullMenu.findIndex(item => item[0] === r[0]);
-            let isAvail = (r[5] !== "หมด");
-            return `<div class="menu-item ${isAvail ? '' : 'sold-out'}">
-                <div class="menu-top"><img src="${r[4]||''}" class="menu-img"><div><h3>${r[0]}</h3><div class="price">฿${r[1]}</div></div></div>
-                <button class="btn-add" onclick="addC('${r[0]}',${r[1]},${idx})">${isAvail ? 'ใส่ตะกร้า' : 'สินค้าหมด'}</button>
+        let h = ""; 
+        filtered.forEach((r) => {
+            const originalIdx = fullMenu.findIndex(item => item[0] === r[0]);
+            let isAvail = (r[5] !== "หมด"), cat = r[2] || "", isD = (cat === "เครื่องดื่ม" || cat === "สมูทตี้"), isExp = itemExpanded[originalIdx] || false;
+            if(isD && !currentS[originalIdx]) currentS[originalIdx] = "100%"; 
+            if(!itemOpt[originalIdx]) itemOpt[originalIdx] = { toppings: [], smoothie: false };
+            h += `<div class="menu-item ${isAvail ? '' : 'sold-out'}">
+                <div class="menu-top"><img src="${r[4]||'https://via.placeholder.com/150'}" class="menu-img"><div class="menu-info"><h3>${r[0]}</h3><div class="price">฿${r[1]}</div></div></div>
+                ${isAvail && isD ? `
+                    <div class="sweet-selector">${['0%','25%','50%','75%','100%'].map(l=>`<div class="sweet-btn ${currentS[originalIdx]===l?'active':''}" onclick="setS(${originalIdx},'${l}')">${l}</div>`).join('')}</div>
+                    ${cat === "เครื่องดื่ม" ? `<div class="opt-btn ${itemOpt[originalIdx].smoothie?'active':''}" onclick="tS(${originalIdx})">+ เพิ่มปั่น (+฿10)</div>` : ''}
+                    <div class="acc-btn" onclick="toggleAcc(${originalIdx})">เลือกท็อปปิ้งเพิ่มเติม</div>
+                    <div class="acc-content ${isExp ? 'open' : ''}"><div class="top-grid">${toppingsData.map(t => `<div class="top-chip ${itemOpt[originalIdx].toppings.includes(t[0])?'active':''} ${t[2]==='หมด'?'sold-out':''}" onclick="tT(${originalIdx},'${t[0]}')">${t[0]} (+฿${t[1]})</div>`).join('')}</div></div>
+                ` : ''}
+                ${isAvail ? `<input type="text" id="note-${originalIdx}" class="note-input" placeholder="ระบุหมายเหตุ (เช่น หวานน้อยมาก)">` : ''}
+                <button class="btn-add" onclick="addC('${r[0]}',${r[1]},${originalIdx},${isD})">${isAvail ? 'ใส่ตะกร้า' : 'สินค้าหมด'}</button>
             </div>`;
-        }).join('');
+        }); 
+        m.innerHTML = h || `<div style="text-align:center; padding:40px; color:var(--gray);">ไม่พบรายการที่ค้นหา</div>`;
     }
 
-    function addC(n, p, idx) { cart.push({name: n, price: p, qty: 1, total: p}); updateUI(); }
+    function toggleAcc(idx) { itemExpanded[idx] = !itemExpanded[idx]; renderMenu(currentF); }
+    function setS(i, l) { currentS[i] = l; renderMenu(currentF); }
+    function tT(i, n) { let t = itemOpt[i].toppings; itemOpt[i].toppings = t.includes(n) ? t.filter(x => x !== n) : [...t, n]; renderMenu(currentF); }
+    function tS(i) { itemOpt[i].smoothie = !itemOpt[i].smoothie; renderMenu(currentF); }
+
+    function addC(n, p, idx, isD) {
+        let fp = parseFloat(p), det = []; 
+        let noteEl = document.getElementById(`note-${idx}`); let userNote = noteEl ? noteEl.value.trim() : "";
+        if(isD) { 
+            det.push("หวาน " + currentS[idx]); 
+            if(itemOpt[idx].smoothie) { fp += 10; det.push("ปั่น"); } 
+            itemOpt[idx].toppings.forEach(tn => { let tObj = toppingsData.find(x => x[0] === tn); if(tObj) { fp += parseFloat(tObj[1]); det.push(tn); } }); 
+        }
+        cart.push({name: n, price: p, qty: 1, total: fp, sweetness: det.join(", ")||'-', note: userNote}); 
+        itemOpt[idx] = { toppings: [], smoothie: false }; currentS[idx] = "100%"; if(noteEl) noteEl.value = ""; updateUI();
+    }
+
     function updateUI() { 
         let b = document.getElementById('cart-bar'); b.style.display = cart.length > 0 ? 'flex' : 'none'; 
         let total = cart.reduce((s,i)=>s+i.total,0); document.getElementById('cart-sum').innerText = total.toLocaleString(); 
         document.getElementById('cart-count').innerText = cart.length; 
     }
 
+    function openReceipt() {
+        let h = `<h2 style="margin:0 0 20px 0; font-weight:800; font-size:24px;">รายการในตะกร้า</h2>`;
+        cart.forEach((i,idx) => h += `<div style="display:flex;justify-content:space-between;margin-bottom:15px;"><span><b>${i.name}</b><br><small style="color:#888">${i.sweetness}${i.note ? ' | '+i.note : ''}</small></span><span style="text-align:right;">฿${i.total.toLocaleString()}<br><span style="color:red; font-size:12px; cursor:pointer;" onclick="rem(${idx})">ลบ</span></span></div>`);
+        let total = cart.reduce((s,i)=>s+i.total,0);
+        h += `<div style="border-top:2px solid #eee; padding-top:15px; margin-top:15px; display:flex; justify-content:space-between; font-weight:900; font-size:24px;"><span>ยอดรวม</span><span>฿${total.toLocaleString()}</span></div><button class="btn-checkout" style="margin-top:30px; width:100%; height:65px;" onclick="sub()">ยืนยันและส่งออเดอร์</button>`;
+        document.getElementById('modal-body').innerHTML = h; document.getElementById('modal').style.display = 'flex';
+    }
+
+    function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
+
     async function sub() { 
         const modalBody = document.getElementById('modal-body');
-        modalBody.innerHTML = `<div class="sending-container" style="text-align:center; padding:30px;"><div class="queue-box">กำลังส่งออเดอร์...</div></div>`;
+        modalBody.innerHTML = `<div class="sending-container"><div class="pulse-loader">🍳</div><div class="call-title">กำลังส่งออเดอร์...</div></div>`;
         try { 
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'submitOrder', table:currentTable, cart:cart}) }); 
             localStorage.setItem('withu_order_active', 'true');
-            showStatus(); cart=[]; updateUI();
-        } catch(e) { alert("ส่งไม่สำเร็จ"); }
+            modalBody.innerHTML = `<div class="sending-container"><div class="success-check">✅</div><div class="call-title">สั่งอาหารสำเร็จ!</div></div>`;
+            setTimeout(() => { showStatus(); cart=[]; updateUI(); }, 2000);
+        } catch(e) { alert("ส่งไม่สำเร็จ กรุณาลองใหม่"); openReceipt(); }
     }
 
+    // 🚩 ฟังก์ชันเปิดเมนูเพิ่ม
     function orderMore() {
-        document.getElementById('status-view').style.display = 'none';
-        document.getElementById('menu-view').style.display = 'block';
-        if(autoCloseTimer) clearInterval(autoCloseTimer);
-        document.getElementById('auto-close-msg').innerText = "";
+        localStorage.setItem('withu_order_active', 'false');
+        if(autoCloseTimer) clearTimeout(autoCloseTimer);
+        location.reload();
     }
 
+    // 🚩 ฟังก์ชัน Custom Modal
     function clearSession() { document.getElementById('confirm-modal').style.display = 'flex'; }
     function closeConfirmModal() { document.getElementById('confirm-modal').style.display = 'none'; }
     function executeClearSession() {
@@ -222,10 +252,28 @@
 
     function showStatus() {
         document.getElementById('modal').style.display='none'; 
-        document.getElementById('menu-view').style.display='none';
-        document.getElementById('status-view').style.display='block';
-        document.getElementById('status-table-title').innerText = "ออเดอร์โต๊ะ " + currentTable;
-        chk(); if(!sInterval) sInterval = setInterval(chk, 5000);
+        document.getElementById('app-header').style.display='flex';
+        document.getElementById('app-content').innerHTML = `
+            <div class="app-container" style="padding-top:20px; text-align:center;">
+                <div class="status-card">
+                    <h2 style="font-weight:900; font-size:32px; margin-bottom:10px; letter-spacing:-1px;">ออเดอร์โต๊ะ ${currentTable}</h2>
+                    <div id="queue-info" class="queue-box">กำลังตรวจสอบสถานะ...</div>
+                    <div class="status-stepper">
+                        <div class="step-point" id="st-1"><div class="step-circle">1</div><div class="step-label">รับออเดอร์</div></div>
+                        <div class="step-point" id="st-2"><div class="step-circle">2</div><div class="step-label">กำลังทำ</div></div>
+                        <div class="step-point" id="st-3"><div class="step-circle">3</div><div class="step-label">รอเสิร์ฟ</div></div>
+                        <div class="step-point" id="st-4"><div class="step-circle">4</div><div class="step-label">สำเร็จ</div></div>
+                    </div>
+                    <div id="stat-list" style="margin:30px 0; text-align:left; border-top:1px solid #f8fafc; padding-top:20px;"></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:800; font-size:22px; margin-bottom:25px; padding:0 5px;">
+                        <span>ยอดรวมออเดอร์:</span><span style="color:var(--blue)">฿<span id="stat-sum-val">0</span></span>
+                    </div>
+                    <button class="btn-add" style="margin-bottom:15px; width:100%; border:2.5px solid #000; height:65px;" onclick="orderMore()">สั่งเมนูเพิ่ม</button>
+                    <button class="btn-add" style="background:transparent; color:var(--gray); border:1px solid #e2e8f0; width:100%; height:55px; font-size:14px;" onclick="clearSession()">จบการสั่งซื้อ / เช็คบิล</button>
+                    <div id="auto-close-msg" class="auto-close-timer"></div>
+                </div>
+            </div>`;
+        chk(); sInterval = setInterval(chk, 5000);
     }
 
     async function chk() {
@@ -233,44 +281,48 @@
             const r = await fetch(API_URL + "?action=getAdminData"); const d = await r.json();
             const myOrders = d.orders.filter(o => o.table == currentTable);
             
-            // 🚩 ระบบ Auto-Close 5 นาที
+            // 🚩 เงื่อนไขปิดโต๊ะอัตโนมัติ
             if (myOrders.length === 0) { 
-                upS(4); document.getElementById('queue-info').innerText = "ขอบคุณที่ใช้บริการค่ะ";
+                upS(4); 
+                document.getElementById('queue-info').innerText = "ขอบคุณที่ใช้บริการค่ะ";
+                document.getElementById('queue-info').style.background = "rgba(16, 185, 129, 0.1)";
+                document.getElementById('queue-info').style.color = "var(--accent)";
+                
                 if(!autoCloseTimer) {
-                    let sec = 300;
+                    let timeLeft = 300; // 5 นาที (300 วินาที)
                     autoCloseTimer = setInterval(() => {
-                        sec--; let m = Math.floor(sec/60), s = sec%60;
-                        document.getElementById('auto-close-msg').innerText = `ระบบจะกลับสู่หน้าหลักอัตโนมัติใน ${m}:${s<10?'0':''}${s}`;
-                        if(sec <= 0) executeClearSession();
+                        timeLeft--;
+                        let m = Math.floor(timeLeft / 60);
+                        let s = timeLeft % 60;
+                        document.getElementById('auto-close-msg').innerText = `ระบบจะกลับสู่หน้าหลักอัตโนมัติใน ${m}:${s < 10 ? '0' : ''}${s}`;
+                        if(timeLeft <= 0) { clearInterval(autoCloseTimer); executeClearSession(); }
                     }, 1000);
                 }
                 return; 
             }
 
-            const myRank = [...new Set(d.orders.map(o => o.table))].indexOf(currentTable.toString());
-            document.getElementById('queue-info').innerText = myRank > 0 ? `เหลืออีก ${myRank} คิวก่อนหน้าคุณ` : "กำลังเตรียมออเดอร์ลำดับถัดไป";
-            let minVal = 4, totalSum = 0;
+            const uniqueTables = [...new Set(d.orders.map(o => o.table))];
+            const myRank = uniqueTables.indexOf(currentTable.toString());
+            document.getElementById('queue-info').innerText = myRank > 0 ? `เหลืออีก ${myRank} คิวก่อนหน้าคุณ` : "กำลังเตรียมออเดอร์เป็นลำดับถัดไป";
+            
+            const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4};
+            let minVal = 4; let totalSum = 0;
             myOrders.forEach(o => { 
-                const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4};
                 if (p[o.status] < minVal) minVal = p[o.status]; 
                 totalSum += parseFloat(String(o.total).replace(/,/g,'')) || 0;
             });
-            upS(minVal); document.getElementById('stat-sum-val').innerText = totalSum.toLocaleString();
+            upS(minVal); 
+            document.getElementById('stat-sum-val').innerText = totalSum.toLocaleString();
             document.getElementById('stat-list').innerHTML = myOrders.map(o => `<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f8fafc;"><span><b>${o.qty}x</b> ${o.menu}</span><b style="color:var(--blue)">${o.status}</b></div>`).join('');
         } catch(e) {}
     }
 
     function upS(s) { for(let i=1;i<=4;i++) { const el = document.getElementById('st-'+i); if(el) el.classList.toggle('active',i<=s); } }
-    function handleSearch() { currentSearch = document.getElementById('menu-search').value.toLowerCase(); renderMenu(currentF); }
-    function openReceipt() {
-        let h = `<h2 style="margin:0 0 20px 0; font-weight:800; font-size:24px;">รายการสั่งซื้อ</h2>`;
-        cart.forEach((i,idx) => h += `<div style="display:flex;justify-content:space-between;margin-bottom:15px;"><span><b>${i.name}</b><br>฿${i.price}</span><span>฿${i.total}<br><span style="color:red; font-size:12px; cursor:pointer;" onclick="rem(${idx})">ลบ</span></span></div>`);
-        let total = cart.reduce((s,i)=>s+i.total,0);
-        h += `<div style="border-top:2px solid #eee; padding-top:15px; margin-top:15px; display:flex; justify-content:space-between; font-weight:900; font-size:24px;"><span>ยอดรวม</span><span>฿${total.toLocaleString()}</span></div><button class="btn-checkout" style="margin-top:30px; width:100%; height:65px;" onclick="sub()">สั่งอาหารตอนนี้</button>`;
-        document.getElementById('modal-body').innerHTML = h; document.getElementById('modal').style.display = 'flex';
+    
+    async function callStaff() {
+        if(!confirm("ต้องการเรียกพนักงานใช่ไหมคะ?")) return;
+        try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'callStaff', table:currentTable, reason:'ทั่วไป'}) }); alert("แจ้งพนักงานแล้วค่ะ"); } catch(e) {}
     }
-    function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
-    async function callStaff() { alert("แจ้งพนักงานแล้วค่ะ"); await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'callStaff', table:currentTable, reason:'ทั่วไป'}) }); }
 </script>
 </body>
 </html>

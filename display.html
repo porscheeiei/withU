@@ -7,18 +7,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --blue: #2563eb; 
-            --bg-light: #f8fafc; 
-            --white: #ffffff;
-            --text-dark: #0f172a;
-            --text-gray: #64748b;
-            --border: #f1f5f9;
-            --accent: #10b981;
+            --blue: #2563eb; --bg-light: #f8fafc; --white: #ffffff;
+            --text-dark: #0f172a; --text-gray: #64748b; --border: #f1f5f9; --accent: #10b981; --red: #ef4444;
         }
+        /* 🚩 บังคับใช้ Prompt ทั้งหมด */
+        * { font-family: 'Prompt', sans-serif; box-sizing: border-box; }
+        body { background: var(--bg-light); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--text-dark); }
         
-        body { font-family: 'Prompt', sans-serif; background: var(--bg-light); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--text-dark); }
-        
-        /* --- 📹 1. Video Idle Screen (Clean 100%) --- */
+        /* --- 📹 1. Video Idle Screen --- */
         #idle-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease-in-out; }
         #promo-video { width: 100%; height: 100%; object-fit: cover; }
 
@@ -48,12 +44,10 @@
         .total-label { font-size: 22px; font-weight: 500; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
         .total-amount { font-size: 110px; font-weight: 800; color: #fff; margin: 0 0 30px 0; line-height: 1; letter-spacing: -3px; }
 
-        /* QR Code */
         .qr-box { background: #fff; padding: 35px; border-radius: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); display: inline-block; transition: 0.5s; }
         .qr-box img { width: 280px; height: 280px; display: block; }
         .qr-hint { margin-top: 25px; font-size: 24px; font-weight: 700; color: var(--text-dark); }
 
-        /* 🚩 Cash Display Area */
         .cash-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); padding: 40px; border-radius: 40px; width: 100%; box-sizing: border-box; text-align: left; animation: slideUp 0.5s ease-out; }
         .cash-row { display: flex; justify-content: space-between; align-items: center; font-size: 26px; font-weight: 600; }
         .change-row { font-size: 42px; font-weight: 800; margin-top: 20px; padding-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); }
@@ -125,15 +119,15 @@
             const active = document.getElementById('active-container');
 
             if (data.status === 'active' && data.orders.length > 0) {
-                // เปลี่ยนหน้าจอจากวิดีโอเป็นบิล
-                if(idle.style.opacity !== '0') {
+                // 1. จัดการการเปลี่ยนหน้าจอ Video -> Bill
+                if(idle.style.display !== 'none') {
                     idle.style.opacity = '0';
                     setTimeout(() => { idle.style.display = 'none'; }, 800);
                     active.style.display = 'grid';
                 }
                 
+                // 2. แสดงข้อมูลโต๊ะและรายการอาหาร
                 document.getElementById('display-table-id').innerText = "โต๊ะ " + data.table;
-                
                 let total = 0;
                 let html = data.orders.map(o => {
                     let price = parseFloat(String(o.total).replace(/,/g, '')) || 0;
@@ -154,39 +148,50 @@
                 document.getElementById('qr-img-cds').src = `https://promptpay.io/0931805507/${total}.png`;
                 currentTotal = total;
 
+                // 🚩 3. ตรวจสอบการซิงค์เงินสด (Sync จากหน้า Admin)
+                // ดึงค่าล่าสุดจาก localStorage มาเช็คทุกครั้งที่ loop ทำงาน
+                const received = parseFloat(localStorage.getItem('cds_cash_received')) || 0;
+                renderPaymentView(received);
+
             } else {
-                // กลับเข้าโหมดวิดีโอ
-                if(idle.style.display !== 'flex') {
+                // 4. กลับเข้าโหมดวิดีโอ (Idle)
+                if(idle.style.display === 'none') {
                     idle.style.display = 'flex';
                     setTimeout(() => { idle.style.opacity = '1'; }, 10);
                     active.style.display = 'none';
-                    // รีเซ็ตสถานะเงินสดเมื่อเข้าสู่โหมดพัก
+                    // ล้างสถานะเงินสด
                     localStorage.setItem('cds_cash_received', 0);
-                    document.getElementById('qr-section').style.display = 'inline-block';
-                    document.getElementById('cash-section').style.display = 'none';
                 }
             }
         } catch(e) { console.error("CDS Sync Error:", e); }
     }
 
-    // 🚩 Real-time Change Sync: ดักฟังจากหน้า Admin
+    // 🚩 ฟังก์ชันคุมการแสดงผลโหมดจ่ายเงิน (QR vs Cash)
+    function renderPaymentView(received) {
+        const qrSec = document.getElementById('qr-section');
+        const cashSec = document.getElementById('cash-section');
+        
+        if (received > 0 && currentTotal > 0) {
+            qrSec.style.display = 'none';
+            cashSec.style.display = 'block';
+            document.getElementById('cds-received').innerText = '฿' + received.toLocaleString();
+            const change = received - currentTotal;
+            document.getElementById('cds-change').innerText = '฿' + (change > 0 ? change : 0).toLocaleString();
+        } else {
+            qrSec.style.display = 'inline-block';
+            cashSec.style.display = 'none';
+        }
+    }
+
+    // 🚩 ดักฟังเหตุการณ์เปลี่ยนค่าจากหน้า Admin (Instant Sync)
     window.addEventListener('storage', (e) => {
         if (e.key === 'cds_cash_received') {
-            const received = parseFloat(e.newValue);
-            if (received > 0 && currentTotal > 0) {
-                document.getElementById('qr-section').style.display = 'none';
-                document.getElementById('cash-section').style.display = 'block';
-                document.getElementById('cds-received').innerText = '฿' + received.toLocaleString();
-                const change = received - currentTotal;
-                document.getElementById('cds-change').innerText = '฿' + (change > 0 ? change : 0).toLocaleString();
-            } else {
-                document.getElementById('qr-section').style.display = 'inline-block';
-                document.getElementById('cash-section').style.display = 'none';
-            }
+            const received = parseFloat(e.newValue) || 0;
+            renderPaymentView(received);
         }
     });
 
-    setInterval(updateCDS, 2500); // อัปเดตทุก 2.5 วินาที
+    setInterval(updateCDS, 2500); 
 </script>
 </body>
 </html>

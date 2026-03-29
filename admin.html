@@ -9,11 +9,11 @@
 
     <style>
         :root { 
-            --bg: #fdfdfe; --card: #ffffff; --p: #0f172a; --muted: #94a3b8;
-            --blue: #2563eb; --indigo: #4f46e5; --emerald: #10b981; --rose: #ef4444; --amber: #f59e0b;
-            --border: #f1f5f9; --radius: 20px;
-            --shadow-soft: 0 4px 20px -5px rgba(0,0,0,0.05);
-            --shadow-hard: 0 20px 25px -5px rgba(0,0,0,0.1);
+            --bg: #f8fabb; --card: #ffffff; --p: #0f172a; --muted: #94a3b8;
+            --blue: #2563eb; --indigo: #4f46e5; --emerald: #10b981; --rose: #ff0000; --amber: #f59e0b;
+            --border: #f1f5f9; --radius: 24px;
+            --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.04);
+            --shadow-hard: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
         }
 
         [data-theme="dark"] {
@@ -21,84 +21,83 @@
             --border: #1e2638;
         }
 
-        * { font-family: 'Prompt', sans-serif; box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-        body { background: var(--bg); color: var(--p); margin: 0; padding: 20px; -webkit-font-smoothing: antialiased; }
+        * { font-family: 'Prompt', sans-serif; box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { background: var(--bg); color: var(--p); margin: 0; padding: 25px; -webkit-font-smoothing: antialiased; }
 
-        /* --- 🔔 ระบบแจ้งเตือนเรียกพนักงาน --- */
-        .alert-banner { display: none; background: var(--rose); color: #fff; padding: 18px; border-radius: 18px; margin-bottom: 25px; text-align: center; font-weight: 800; animation: pulseRed 1.5s infinite; cursor: pointer; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); }
-        @keyframes pulseRed { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.02); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        /* --- 🚨 ระบบแจ้งเตือนเรียกพนักงาน --- */
+        .alert-banner { display: none; background: var(--rose); color: #fff; padding: 18px; border-radius: 20px; margin-bottom: 25px; text-align: center; font-weight: 800; animation: blinkRed 1.2s infinite; cursor: pointer; box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3); }
+        @keyframes blinkRed { 50% { opacity: 0.7; transform: scale(1.01); } }
 
-        /* --- 🔝 Header Section --- */
-        .header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
-        .logo-area h1 { margin: 0; font-size: 28px; font-weight: 900; letter-spacing: -1px; }
-        .logo-area span { color: var(--blue); }
-
-        .stat-inline { display: flex; gap: 12px; }
-        .s-mini { background: var(--card); padding: 15px 22px; border-radius: 18px; border: 1px solid var(--border); box-shadow: var(--shadow-soft); min-width: 150px; }
-        .s-mini small { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; }
-        .s-mini b { font-size: 22px; font-weight: 900; }
-
-        /* --- 🏷 Navigation --- */
-        .nav-pill-box { background: var(--card); padding: 6px; border-radius: 18px; display: inline-flex; border: 1px solid var(--border); margin-bottom: 30px; box-shadow: var(--shadow-soft); }
-        .nav-item { padding: 10px 24px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); font-size: 14px; }
-        .nav-item.active { background: var(--p); color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
-        /* --- 📦 Card Grid & Interactive Effects --- */
-        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; }
-        .order-card { background: var(--card); border-radius: 30px; padding: 30px; border: 1px solid var(--border); box-shadow: var(--shadow-soft); position: relative; }
-        .order-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hard); border-color: var(--blue); }
+        /* --- 🔝 Header Section (Clean Style) --- */
+        .header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+        .logo-area h1 { margin: 0; font-size: 30px; font-weight: 900; letter-spacing: -1.5px; color: #000; }
+        .logo-area h1 span { color: var(--blue); font-weight: 700; }
         
-        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
-        .table-id { font-size: 38px; font-weight: 900; letter-spacing: -2px; color: var(--p); }
-        .time-pill { font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 10px; background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
-        .time-pill.late { background: var(--rose); color: #fff; border: none; animation: blink 1s infinite; }
+        .stat-inline { display: flex; gap: 15px; }
+        .s-mini { background: var(--card); padding: 15px 25px; border-radius: 20px; box-shadow: var(--shadow-soft); border: 1px solid var(--border); text-align: right; min-width: 150px; }
+        .s-mini small { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; display: block; }
+        .s-mini b { font-size: 24px; font-weight: 900; color: var(--p); letter-spacing: -1px; }
 
-        .item-box { margin-bottom: 22px; border-top: 1px solid var(--border); padding-top: 15px; }
-        .row-item { display: flex; justify-content: space-between; padding: 10px 0; align-items: flex-start; }
+        /* --- 🏷 Nav Pill --- */
+        .nav-pill-box { background: rgba(0,0,0,0.03); padding: 5px; border-radius: 18px; display: inline-flex; margin-bottom: 35px; }
+        .nav-item { padding: 10px 28px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); font-size: 14px; }
+        .nav-item.active { background: #fff; color: var(--p); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* --- 📦 Order Cards --- */
+        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; }
+        .order-card { background: var(--card); border-radius: 35px; padding: 35px; box-shadow: var(--shadow-soft); position: relative; border: 1px solid var(--border); }
+        .order-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-hard); border-color: var(--blue); }
+        
+        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .table-id { font-size: 40px; font-weight: 900; letter-spacing: -2px; color: var(--p); }
+        .time-pill { font-size: 11px; font-weight: 700; color: var(--muted); background: var(--bg); padding: 5px 12px; border-radius: 10px; }
+        .time-pill.late { background: var(--rose); color: #fff; animation: pulse 1s infinite; }
+
+        .item-box { margin-bottom: 25px; border-top: 1px solid #f8fafc; padding-top: 20px; }
+        .row-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #fbfcfe; }
         .row-item b { font-size: 16px; }
-        .row-item small { color: var(--muted); font-weight: 500; font-size: 12px; line-height: 1.4; }
+        .row-item small { color: var(--muted); font-weight: 500; font-size: 13px; line-height: 1.4; }
 
-        /* --- ✨ Button Flash Effects (พอกดแล้วกระพริบ) --- */
-        .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-        .btn-s { padding: 12px; border: none; border-radius: 14px; font-weight: 800; font-size: 11px; cursor: pointer; background: var(--bg); color: var(--muted); position: relative; overflow: hidden; }
+        /* --- ✨ Button & Glow Flash --- */
+        .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+        .btn-s { padding: 12px; border: none; border-radius: 14px; font-weight: 800; font-size: 11px; cursor: pointer; background: var(--bg); color: var(--muted); }
         .btn-s:active { transform: scale(0.92); }
 
-        .flash-emerald { animation: flashEmerald 0.5s ease-out; background: var(--emerald) !important; color: #fff !important; }
-        @keyframes flashEmerald { 0% { box-shadow: 0 0 0 0px rgba(16, 185, 129, 0.5); } 100% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); } }
-        .flash-amber { animation: flashAmber 0.5s ease-out; background: var(--amber) !important; color: #fff !important; }
-        @keyframes flashAmber { 0% { box-shadow: 0 0 0 0px rgba(245, 158, 11, 0.5); } 100% { box-shadow: 0 0 0 20px rgba(245, 158, 11, 0); } }
-        .flash-blue { animation: flashBlue 0.5s ease-out; background: var(--blue) !important; color: #fff !important; }
-        @keyframes flashBlue { 0% { box-shadow: 0 0 0 0px rgba(37, 99, 235, 0.5); } 100% { box-shadow: 0 0 0 20px rgba(37, 99, 235, 0); } }
+        .flash-emerald { background: var(--emerald) !important; color: #fff !important; box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
+        .flash-amber { background: var(--amber) !important; color: #fff !important; box-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
+        .flash-blue { background: var(--blue) !important; color: #fff !important; box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); }
 
-        .btn-pay-now { width: 100%; padding: 20px; border-radius: 20px; border: none; background: var(--p); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .btn-pay-now { width: 100%; padding: 20px; border-radius: 20px; border: none; background: var(--rose); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(255, 0, 0, 0.2); }
 
-        /* --- 📋 Modal Receipts --- */
-        #pay-modal { position:fixed; inset:0; background:rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); display:none; z-index:9999; align-items:center; justify-content:center; }
-        .receipt-inner { background: var(--card); width: 90%; max-width: 440px; padding: 45px; border-radius: 40px; box-shadow: var(--shadow-hard); border: 1px solid var(--border); text-align: center; }
-        .receipt-list { background: var(--bg); padding: 22px; border-radius: 25px; margin: 25px 0; text-align: left; max-height: 180px; overflow-y: auto; }
+        /* --- 📊 Analytics Widget --- */
+        .chart-card { background: #fff; padding: 35px; border-radius: 35px; box-shadow: var(--shadow-soft); border: 1px solid var(--border); margin-bottom: 30px; }
+        .table-widget { width: 100%; border-collapse: collapse; background: #fff; border-radius: 25px; overflow: hidden; }
+        .table-widget th { padding: 20px; text-align: left; background: var(--bg); color: var(--muted); font-size: 11px; text-transform: uppercase; }
+        .table-widget td { padding: 20px; border-top: 1px solid var(--border); }
+
+        /* --- 📋 Receipt Modal --- */
+        #pay-modal { position:fixed; inset:0; background:rgba(15, 23, 42, 0.7); backdrop-filter: blur(15px); display:none; z-index:9999; align-items:center; justify-content:center; }
+        .receipt-inner { background: #fff; width: 90%; max-width: 440px; padding: 45px; border-radius: 45px; box-shadow: var(--shadow-hard); text-align: center; }
+        .receipt-list { background: var(--bg); padding: 25px; border-radius: 25px; margin: 25px 0; text-align: left; max-height: 200px; overflow-y: auto; }
         
-        .pay-method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
-        .pay-btn { padding: 25px 15px; border-radius: 25px; border: 2.5px solid var(--border); background: var(--card); cursor: pointer; font-weight: 800; font-size: 14px; }
-        .pay-btn:hover { border-color: var(--blue); background: rgba(37, 99, 235, 0.05); }
-
-        @keyframes blink { 50% { opacity: 0.5; } }
-        .sound-toggle { position: fixed; bottom: 30px; right: 30px; background: var(--blue); color: #fff; padding: 15px 30px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; z-index: 1000; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4); }
+        @keyframes pulse { 50% { opacity: 0.5; } }
+        .sound-btn { position: fixed; bottom: 30px; right: 30px; background: var(--p); color: #fff; padding: 15px 30px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
-    <button id="s-unlock" class="sound-toggle" onclick="unlockSound(); this.remove();">🔔 เปิดเสียงระบบ</button>
+    <button id="s-unlock" class="sound-btn" onclick="unlockSound(); this.remove();">🔔 เปิดเสียงแจ้งเตือน</button>
 
     <div id="call-banner" class="alert-banner" onclick="clearSpecificCall()">
-        ⚠️ โต๊ะ <span id="call-table-no">-</span> เรียกพนักงาน! (คลิกเพื่อปิด)
+        ⚠️ โต๊ะ <span id="call-table-no">-</span> เรียกพนักงาน! (กดเพื่อรับทราบ)
     </div>
 
     <div class="header-box">
         <div class="logo-area">
-            <h1>WITHU <span>PRO</span></h1>
+            <h1>WITHU <span>Admin</span></h1>
             <div style="display:flex; gap:10px; margin-top:10px;">
-                <button class="nav-item" style="padding:4px 12px; font-size:11px; border: 1px solid var(--border);" onclick="toggleTheme()">🌓 สลับโหมด</button>
-                <button class="nav-item" style="padding:4px 12px; font-size:11px; border: 1px solid var(--border);" onclick="toggleLayout()">📱 มุมมองย่อ</button>
+                <button class="nav-item" style="padding:5px 15px; font-size:11px; background:rgba(0,0,0,0.05);" onclick="toggleTheme()">Dark Mode</button>
+                <button class="nav-item" style="padding:5px 15px; font-size:11px; background:rgba(0,0,0,0.05);" onclick="toggleLayout()">Compact View</button>
             </div>
         </div>
         <div class="stat-inline">
@@ -114,20 +113,21 @@
     </div>
 
     <div class="nav-pill-box">
-        <button id="nav-orders" onclick="showSec('orders')" class="nav-item active">คำสั่งซื้อ</button>
-        <button id="nav-stock" onclick="showSec('stock')" class="nav-item">คลังสินค้า</button>
-        <button id="nav-report" onclick="showSec('report')" class="nav-item">สถิติและวิเคราะห์</button>
+        <button id="nav-orders" onclick="showSec('orders')" class="nav-item active">ออเดอร์ปัจจุบัน</button>
+        <button id="nav-stock" onclick="showSec('stock')" class="nav-item">สต็อกเมนู</button>
+        <button id="nav-report" onclick="showSec('report')" class="nav-item">รายงานยอดขาย</button>
     </div>
 
     <div id="container" class="order-grid"></div>
+
     <div id="stock-sec" style="display:none;" class="order-grid"></div>
 
     <div id="report-sec" style="display:none;">
-        <div class="chart-card" style="background:var(--card); padding:35px; border-radius:35px; border:1px solid var(--border); box-shadow:var(--shadow-soft); margin-bottom:30px;">
+        <div class="chart-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-                <h3 style="margin:0; font-size:20px; font-weight:800;">ประสิทธิภาพการขาย</h3>
+                <h3 style="margin:0; font-size:20px; font-weight:800;">วิเคราะห์ประสิทธิภาพร้าน</h3>
                 <div style="display:flex; gap:8px;">
-                    <button class="nav-item active" style="font-size:11px; padding:8px 18px;" id="btn-peak" onclick="switchChart('peak')">ชั่วโมงยอดฮิต</button>
+                    <button class="nav-item active" style="font-size:11px; padding:8px 18px;" id="btn-peak" onclick="switchChart('peak')">ช่วงเวลาขายดี</button>
                     <button class="nav-item" style="font-size:11px; padding:8px 18px;" id="btn-day" onclick="switchChart('day')">ยอดขายรายวัน</button>
                 </div>
             </div>
@@ -140,30 +140,26 @@
         <div class="receipt-inner">
             <h2 id="p-table-title" style="margin:0; font-size:42px; font-weight:900; letter-spacing:-2px;">โต๊ะ -</h2>
             <div class="receipt-list" id="p-bill-items"></div>
-            <small style="color:var(--muted); font-weight:800; letter-spacing:1px;">ยอดรวมสุทธิ</small>
+            <small style="color:var(--muted); font-weight:800; letter-spacing:1px;">ยอดเงินที่ต้องชำระ</small>
             <div id="p-total-price" style="font-size:68px; font-weight:900; color:var(--p); margin-bottom:20px; letter-spacing:-3px;">฿0</div>
 
-            <div id="p-methods" class="pay-method-grid">
-                <div class="pay-btn" onclick="selectPayMethod('qr')">
-                    <img src="https://img.icons8.com/fluency/48/qr-code.png" style="width:40px; margin-bottom:8px;"><br>แสกนจ่าย
-                </div>
-                <div class="pay-btn" onclick="selectPayMethod('cash')">
-                    <img src="https://img.icons8.com/fluency/48/money-bag.png" style="width:40px; margin-bottom:8px;"><br>เงินสด
-                </div>
+            <div id="p-methods" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div class="pay-btn" onclick="selectPayMethod('qr')">PROMPTPAY</div>
+                <div class="pay-btn" onclick="selectPayMethod('cash')">CASH (เงินสด)</div>
             </div>
 
             <div id="p-qr-area" style="display:none; margin-top:25px;">
                 <img id="p-qr-img" style="width:100%; border-radius:30px; border:2px solid var(--border); margin-bottom:20px;">
-                <button class="btn-pay-now" style="background:var(--emerald);" onclick="finalPay('PromptPay')">ยืนยันรับเงินแล้ว</button>
+                <button class="btn-pay-now" style="background:var(--emerald);" onclick="finalPay('PromptPay')">ยืนยันได้รับเงินแล้ว</button>
             </div>
 
             <div id="p-cash-area" style="display:none; margin-top:25px;">
-                <input type="number" id="p-cash-input" style="width:100%; padding:22px; border-radius:22px; border:3px solid var(--blue); font-size:42px; text-align:center; font-weight:900; outline:none;" placeholder="0" oninput="calcChangeUnified()">
+                <input type="number" id="p-cash-input" style="width:100%; padding:22px; border-radius:20px; border:2px solid var(--blue); font-size:42px; text-align:center; font-weight:900; outline:none;" placeholder="0" oninput="calcChangeUnified()">
                 <div id="p-change-display" style="font-size:45px; font-weight:900; color:var(--emerald); margin:20px 0; display:none;">ทอน: ฿0</div>
-                <button id="p-cash-submit" class="btn-pay-now" style="background:var(--rose);" onclick="finalPay('เงินสด')">ปิดโต๊ะทันที</button>
+                <button id="p-cash-submit" class="btn-pay-now" onclick="finalPay('เงินสด')">ปิดโต๊ะทันที</button>
             </div>
 
-            <button onclick="closePayModal()" style="margin-top:25px; background:none; border:none; color:var(--muted); cursor:pointer; font-weight:700; font-size:13px;">← ยกเลิก</button>
+            <button onclick="closePayModal()" style="margin-top:35px; background:none; border:none; color:var(--muted); cursor:pointer; font-weight:700; font-size:14px;">ยกเลิกรายการ</button>
         </div>
     </div>
 
@@ -186,7 +182,7 @@
                 document.getElementById('revenue').innerText = "฿" + d.summary.revenue.toLocaleString();
                 document.getElementById('gross-profit').innerText = "฿" + (d.summary.grossProfit || 0).toLocaleString();
 
-                // 🔔 จัดการการเรียกพนักงาน
+                // 🔔 ระบบแจ้งเตือนเรียกพนักงาน
                 if (d.calls && d.calls.length > 0) {
                     activeAlertTable = d.calls[d.calls.length - 1].table;
                     document.getElementById('call-table-no').innerText = activeAlertTable;
@@ -198,7 +194,7 @@
 
                 const container = document.getElementById('container'); 
                 if(!d.orders?.length){ 
-                    container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:120px;color:var(--muted);font-weight:700;'>ยังไม่มีออเดอร์ในขณะนี้ ☕️</div>"; 
+                    container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:120px;color:var(--muted);font-weight:700;'>ร้านว่างอยู่ค่ะ ออเดอร์จะโชว์ตรงนี้ ☕️</div>"; 
                 } else {
                     let groups={}; d.orders.forEach(o=>{
                         if(!groups[o.table]) groups[o.table]={items:[], total:0, rows:[], time:o.time}; 
@@ -225,10 +221,10 @@
                             <div class="btn-group">
                                 <button class="btn-s" onclick='applyEffect(this, "amber", () => upS(${JSON.stringify(groups[t].rows)},"กำลังทำ"))'>เตรียม</button>
                                 <button class="btn-s" onclick='applyEffect(this, "emerald", () => upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ"))'>เสิร์ฟ</button>
-                                <button class="btn-s" onclick='applyEffect(this, "blue", () => upS(${JSON.stringify(groups[t].rows)},"สำเร็จ"))'>จบ</button>
+                                <button class="btn-s" onclick='applyEffect(this, "blue", () => upS(${JSON.stringify(groups[t].rows)},"สำเร็จ"))'>จบงาน</button>
                             </div>
-                            <div style="font-size:28px; font-weight:900; text-align:right; margin-bottom:15px; letter-spacing:-1px;">฿${groups[t].total.toLocaleString()}</div>
-                            <button class="btn-pay-now" onclick='openPayModal("${t}", ${groups[t].total}, ${JSON.stringify(groups[t].rows)}, ${JSON.stringify(groups[t].items)})'>เช็คบิล / ปิดโต๊ะ</button>
+                            <div style="font-size:28px; font-weight:900; text-align:right; margin-bottom:15px; letter-spacing:-1.5px;">฿${groups[t].total.toLocaleString()}</div>
+                            <button class="btn-pay-now" onclick='openPayModal("${t}", ${groups[t].total}, ${JSON.stringify(groups[t].rows)}, ${JSON.stringify(groups[t].items)})'>จบการสั่งซื้อ / เช็คบิล</button>
                         </div>`}).join('');
                 }
                 renderStock(d.menu);
@@ -237,13 +233,9 @@
             } catch(e){}
         }
 
-        // ✨ เอฟเฟกต์กะพริบแสง
         function applyEffect(el, color, callback) {
             el.classList.add('flash-' + color);
-            setTimeout(() => { 
-                el.classList.remove('flash-' + color);
-                callback();
-            }, 450);
+            setTimeout(() => { el.classList.remove('flash-' + color); callback(); }, 450);
         }
 
         async function clearSpecificCall() {
@@ -284,7 +276,7 @@
             const change = received - pTotal;
             localStorage.setItem('cds_cash_received', received);
             if(received >= pTotal) {
-                document.getElementById('p-change-display').innerText = "ทอน: ฿" + change.toLocaleString();
+                document.getElementById('p-change-display').innerText = "เงินทอน: ฿" + change.toLocaleString();
                 document.getElementById('p-change-display').style.display = 'block';
                 document.getElementById('p-cash-submit').style.display = 'block';
             } else {
@@ -312,7 +304,7 @@
             if(currentChartMode === 'peak') {
                 labels = Array.from({length: 24}, (_, i) => i + ":00");
                 data = fullData.summary.peakHours;
-                title = "ยอดขายรายชั่วโมง";
+                title = "ยอดขายตามช่วงเวลา";
             } else {
                 labels = fullData.summary.chartDaily.map(i => i.date);
                 data = fullData.summary.chartDaily.map(i => i.total);
@@ -320,12 +312,12 @@
             }
             salesChartInst = new Chart(ctx, {
                 type: 'bar',
-                data: { labels, datasets: [{ label: title, data, backgroundColor: '#2563eb', borderRadius: 10 }] },
+                data: { labels, datasets: [{ label: title, data, backgroundColor: '#4f46e5', borderRadius: 12 }] },
                 options: { 
                     responsive: true, 
                     plugins: { legend: { display: false } },
                     scales: { 
-                        y: { border: { display: false }, grid: { color: isDark ? 'rgba(255,255,255,0.03)' : '#f1f5f9' } },
+                        y: { border: { display: false }, grid: { color: isDark ? 'rgba(255,255,255,0.03)' : '#f8fafc' } },
                         x: { grid: { display: false } }
                     }
                 }
@@ -341,20 +333,20 @@
 
         function renderStock(menu) { 
             document.getElementById('stock-sec').innerHTML = menu.map(m=>`
-                <div class="order-card" style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
-                    <div><b style="font-size:16px;">${m[0]}</b><br><small style="color:var(--muted)">ต้นทุน ฿${m[6]||0}</small></div>
-                    <button style="padding:10px 20px; border-radius:12px; border:none; background:${m[5]=='หมด'?'var(--rose)':'var(--p)'}; color:#fff; cursor:pointer; font-weight:800; font-size:11px;" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เปิดขาย':'หมด'}</button>
+                <div class="order-card" style="padding:25px; display:flex; justify-content:space-between; align-items:center; border-radius:30px;">
+                    <div><b style="font-size:18px;">${m[0]}</b><br><small style="color:var(--muted)">ต้นทุน ฿${m[6]||0}</small></div>
+                    <button style="padding:12px 25px; border-radius:18px; border:none; background:${m[5]=='หมด'?'var(--rose)':'var(--p)'}; color:#fff; cursor:pointer; font-weight:800;" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เติมของ':'ของหมด'}</button>
                 </div>`).join(''); 
         }
 
         function renderReport(report) { 
-            document.getElementById('report-list').innerHTML = `<table style="width:100%; border-collapse: collapse; background:var(--card); border-radius:20px; overflow:hidden; border: 1px solid var(--border);"><thead><tr style="background:var(--bg);"><th style="padding:15px;text-align:left;font-size:11px;color:var(--muted);">รายการสินค้า</th><th style="padding:15px;text-align:center;font-size:11px;color:var(--muted);">จำนวน</th><th style="padding:15px;text-align:right;font-size:11px;color:var(--muted);">กำไรสุทธิ</th></tr></thead><tbody>${report.map(i => `<tr style="border-top:1px solid var(--border);"><td style="padding:15px; font-weight:700;">${i.name}</td><td style="padding:15px;text-align:center; font-weight:800; color:var(--blue);">${i.qty}</td><td style="padding:15px;text-align:right;font-weight:900;color:var(--emerald);">฿${i.profit.toLocaleString()}</td></tr>`).join('')}</tbody></table>`; 
+            document.getElementById('report-list').innerHTML = `<table class="table-widget"><thead><tr style="background:#fdfdfe;"><th style="padding:22px;text-align:left;">รายการสินค้า</th><th style="padding:22px;text-align:center;">จำนวน</th><th style="padding:22px;text-align:right;">กำไรสุทธิ</th></tr></thead><tbody>${report.map(i => `<tr><td style="padding:22px; font-weight:700;">${i.name}</td><td style="padding:22px;text-align:center; font-weight:900; color:var(--indigo);">${i.qty}</td><td style="padding:22px;text-align:right;font-weight:900;color:var(--emerald);">฿${i.profit.toLocaleString()}</td></tr>`).join('')}</tbody></table>`; 
         }
 
         function toggleTheme() {
             const current = document.documentElement.getAttribute('data-theme');
             document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-            if(salesChartInst) drawChart();
+            if(salesChartInst) setTimeout(drawChart, 100);
         }
 
         function toggleLayout() {
@@ -364,7 +356,7 @@
 
         function getTimeDiff(timeStr) { const now = new Date(); const [d, t] = timeStr.split(' '); const [day, month, year] = d.split('/'); const [h, m, s] = t.split(':'); return Math.floor((now - new Date(year, month-1, day, h, m, s)) / 60000); }
         function showSec(n) { document.getElementById('container').style.display=(n==='orders'?'grid':'none'); document.getElementById('stock-sec').style.display=(n==='stock'?'grid':'none'); document.getElementById('report-sec').style.display=(n==='report'?'block':'none'); document.querySelectorAll('.nav-item').forEach(b => { if(b.id.startsWith('nav-')) b.classList.toggle('active', b.id==='nav-'+n); }); }
-        async function voidIt(r) { if(confirm("ต้องการลบรายการนี้ใช่ไหม?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'voidItem',rowNum:r})}); refresh(); } }
+        async function voidIt(r) { if(confirm("ต้องการลบ?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'voidItem',rowNum:r})}); refresh(); } }
         async function upS(r,s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
         async function tgS(type,name,status) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStock',type:type,name:name,status:status})}); refresh(); }
 

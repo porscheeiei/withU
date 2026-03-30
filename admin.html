@@ -22,152 +22,156 @@
         }
 
         * { font-family: 'Prompt', sans-serif; box-sizing: border-box; letter-spacing: -0.01em; }
-        body { background: var(--bg); color: var(--p); margin: 0; padding: 30px; -webkit-font-smoothing: antialiased; transition: 0.3s; }
+        body { background: var(--bg); color: var(--p); margin: 0; padding: 20px; -webkit-font-smoothing: antialiased; transition: 0.3s; }
 
-        /* --- 🔔 Call Staff Alert (Floating Glass) --- */
-        .alert-toast { display: none; position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; background: rgba(239, 68, 68, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 18px 36px; border-radius: 50px; font-weight: 800; box-shadow: 0 15px 30px rgba(239, 68, 68, 0.4); animation: slideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
-        @keyframes slideDown { from { top: -100px; opacity: 0; } to { top: 30px; opacity: 1; } }
+        /* --- 📱 Responsive Container --- */
+        .admin-wrapper { max-width: 1400px; margin: 0 auto; }
+
+        /* --- 🔔 Call Staff Alert --- */
+        .alert-toast { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; background: var(--rose); color: #fff; padding: 15px 30px; border-radius: 50px; font-weight: 800; box-shadow: 0 15px 30px rgba(239, 68, 68, 0.4); animation: slideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        @keyframes slideDown { from { top: -100px; opacity: 0; } to { top: 20px; opacity: 1; } }
 
         /* --- 🔝 Formal Header --- */
-        .header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; }
-        .brand h1 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -1px; }
+        .header-box { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 40px; }
+        .brand h1 { margin: 0; font-size: 28px; font-weight: 900; letter-spacing: -1.5px; }
         .brand span { color: var(--blue); }
         
-        .stat-wrap { display: flex; gap: 15px; }
-        .s-card { background: var(--card); padding: 18px 35px; border-radius: 25px; border: 1px solid var(--border); box-shadow: var(--shadow-lux); display: flex; flex-direction: column; text-align: center; }
-        .s-card small { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .s-card b { font-size: 26px; font-weight: 800; color: var(--p); }
+        .stat-wrap { display: flex; gap: 12px; flex-wrap: wrap; }
+        .s-card { background: var(--card); padding: 15px 25px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-lux); flex: 1; min-width: 150px; text-align: center; }
+        .s-card small { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
+        .s-card b { font-size: 22px; font-weight: 800; display: block; margin-top: 5px; }
 
         /* --- 🏷 Nav --- */
-        .nav-sc { background: var(--slate); padding: 6px; border-radius: 18px; display: inline-flex; margin-bottom: 40px; }
-        .nav-sc button { padding: 10px 30px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); font-size: 14px; transition: 0.2s; }
+        .nav-sc { background: var(--slate); padding: 5px; border-radius: 15px; display: inline-flex; margin-bottom: 30px; overflow-x: auto; width: 100%; max-width: fit-content; }
+        .nav-sc button { padding: 10px 20px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); font-size: 13px; white-space: nowrap; }
         .nav-sc button.active { background: #fff; color: var(--p); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        /* --- 📦 Order Grid & Cards --- */
-        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 25px; }
-        .order-card { background: var(--card); border-radius: 35px; padding: 40px; border: 1px solid var(--border); box-shadow: var(--shadow-lux); position: relative; }
-        .order-card:hover { border-color: var(--blue); box-shadow: var(--shadow-float); transform: translateY(-5px); }
+        /* --- 📦 Order Grid --- */
+        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .order-card { background: var(--card); border-radius: 30px; padding: 30px; border: 1px solid var(--border); box-shadow: var(--shadow-lux); display: flex; flex-direction: column; transition: 0.3s; }
+        .order-card:hover { border-color: var(--blue); box-shadow: var(--shadow-float); }
         
-        /* 📱 มุมมองย่อ (Compact Mode) */
-        [data-layout="compact"] .order-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
-        [data-layout="compact"] .order-card { padding: 25px; border-radius: 25px; }
-        [data-layout="compact"] .table-id { font-size: 28px; }
-        [data-layout="compact"] .item-row b { font-size: 14px; }
+        .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .table-id { font-size: 32px; font-weight: 900; margin: 0; letter-spacing: -1.5px; }
+        .wait-time { font-size: 11px; font-weight: 800; color: var(--muted); background: var(--slate); padding: 5px 12px; border-radius: 50px; }
 
-        .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .table-id { font-size: 40px; font-weight: 900; margin: 0; letter-spacing: -2px; }
+        /* 🔵 Status Label (ชัดเจนขึ้น) */
+        .status-badge { background: var(--blue); color: #fff; padding: 6px 12px; border-radius: 10px; font-size: 12px; font-weight: 800; display: inline-block; margin-bottom: 15px; width: fit-content; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+
+        .items-list { margin: 15px 0; border-top: 1px solid var(--slate); padding-top: 15px; flex-grow: 1; }
+        .item-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.02); }
+        .item-row b { font-size: 15px; font-weight: 700; }
+
+        .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+        .btn-s { padding: 10px; border: none; border-radius: 12px; font-weight: 800; font-size: 11px; cursor: pointer; background: var(--slate); color: var(--muted); }
         
-        .wait-time { font-size: 11px; font-weight: 800; color: var(--muted); background: var(--slate); padding: 6px 14px; border-radius: 50px; }
-        .wait-time.urgent { background: var(--rose); color: #fff; animation: blinkRed 1s infinite; }
-        @keyframes blinkRed { 50% { opacity: 0.6; } }
+        .flash-emerald { background: var(--emerald) !important; color: #fff !important; }
+        .flash-amber { background: #f59e0b !important; color: #fff !important; }
+        .flash-blue { background: var(--blue) !important; color: #fff !important; }
 
-        .last-action-label { font-size: 10px; font-weight: 800; color: var(--blue); margin-bottom: 15px; display: block; opacity: 0.8; }
+        .btn-checkout { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--p); color: #fff; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.2s; }
 
-        .items-list { margin: 20px 0; border-top: 1px solid var(--slate); padding-top: 15px; min-height: 80px; }
-        .item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.02); }
-        .item-row b { font-size: 16px; font-weight: 700; }
+        /* --- 📊 Report Styling (ดูง่ายขึ้น) --- */
+        .report-card { background: var(--card); padding: 30px; border-radius: 30px; border: 1px solid var(--border); box-shadow: var(--shadow-lux); margin-top: 30px; overflow-x: auto; }
+        .table-pro { width: 100%; border-collapse: collapse; min-width: 500px; }
+        .table-pro th { text-align: left; padding: 15px; font-size: 12px; color: var(--muted); border-bottom: 2px solid var(--slate); text-transform: uppercase; }
+        .table-pro td { padding: 20px 15px; border-bottom: 1px solid var(--slate); font-size: 14px; }
+        .table-pro tr:last-child td { border: none; }
 
-        /* --- ✨ Button & Effects --- */
-        .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
-        .btn-s { padding: 12px; border: none; border-radius: 15px; font-weight: 800; font-size: 11px; cursor: pointer; background: var(--slate); color: var(--muted); transition: 0.2s; }
-        
-        .flash-emerald { background: var(--emerald) !important; color: #fff !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
-        .flash-amber { background: var(--amber) !important; color: #fff !important; box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
-        .flash-blue { background: var(--blue) !important; color: #fff !important; box-shadow: 0 0 20px rgba(37, 99, 235, 0.4); }
-
-        .btn-checkout { width: 100%; padding: 22px; border-radius: 20px; border: none; background: var(--p); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        .btn-checkout:active { transform: scale(0.96); }
-
-        /* --- 📋 Receipt Modal --- */
-        #pay-modal { position:fixed; inset:0; background:rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); display:none; z-index:9999; align-items:center; justify-content:center; }
-        .modal-content { background: #fff; width: 90%; max-width: 460px; padding: 50px; border-radius: 45px; box-shadow: 0 40px 100px rgba(0,0,0,0.1); border: 1px solid var(--border); text-align: center; }
-        
-        .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 30px 0; }
-        .pay-tile { padding: 25px 15px; border: 2.5px solid var(--border); border-radius: 25px; cursor: pointer; transition: 0.3s; background: #fff; }
+        /* --- 📋 Modal --- */
+        #pay-modal { position:fixed; inset:0; background:rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px); display:none; z-index:9999; align-items:center; justify-content:center; padding: 20px; }
+        .modal-content { background: #fff; width: 100%; max-width: 440px; padding: 40px; border-radius: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.2); text-align: center; }
+        .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+        .pay-tile { padding: 20px; border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: 0.2s; }
         .pay-tile:hover { border-color: var(--blue); background: var(--slate); }
-        .pay-tile b { display: block; margin-top: 10px; font-size: 14px; color: var(--p); font-weight: 800; }
-        .pay-tile img { width: 40px; }
+        .pay-tile.active { border-color: var(--blue); background: rgba(37, 99, 235, 0.05); }
 
-        .sound-fixed { position: fixed; bottom: 30px; right: 30px; background: var(--p); color: #fff; padding: 15px 30px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        /* --- 📱 Mobile Styles --- */
+        @media (max-width: 480px) {
+            body { padding: 15px; }
+            .header-box { margin-bottom: 20px; }
+            .brand h1 { font-size: 22px; }
+            .table-id { font-size: 28px; }
+            .modal-content { padding: 30px 20px; }
+        }
     </style>
 </head>
 <body data-layout="normal">
 
     <div id="call-toast" class="alert-toast" onclick="clearSpecificCall()">
-        🚨 โต๊ะ <span id="call-table-no">-</span> เรียกพนักงาน! (กดเพื่อรับทราบ)
+        🚨 โต๊ะ <span id="call-table-no">-</span> เรียกพนักงาน! (แตะเพื่อปิด)
     </div>
 
-    <div class="header-box">
-        <div class="brand">
-            <h1>WITHU <span>Admin</span></h1>
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button class="wait-time" onclick="toggleTheme()" style="cursor:pointer; border:none;">สลับโหมด</button>
-                <button class="wait-time" onclick="toggleLayout()" style="cursor:pointer; border:none;">มุมมองย่อ/ปกติ</button>
-            </div>
-        </div>
-        <div class="stat-wrap">
-            <div class="s-card">
-                <small>กำไรสุทธิวันนี้</small>
-                <b id="gross-profit" style="color:var(--emerald);">฿0</b>
-            </div>
-            <div class="s-card">
-                <small>รายได้ทั้งหมด</small>
-                <b id="revenue" style="color:var(--blue);">฿0</b>
-            </div>
-        </div>
-    </div>
-
-    <div class="nav-sc">
-        <button id="nav-orders" onclick="showSec('orders')" class="active">ออเดอร์ค้าง</button>
-        <button id="nav-stock" onclick="showSec('stock')">คลังสินค้า</button>
-        <button id="nav-report" onclick="showSec('report')">รายงานสรุป</button>
-    </div>
-
-    <div id="container" class="order-grid"></div>
-    <div id="stock-sec" style="display:none;" class="order-grid"></div>
-
-    <div id="report-sec" style="display:none;">
-        <div style="background:#fff; padding:40px; border-radius:40px; box-shadow:var(--shadow-lux); border:1px solid var(--border); margin-bottom:30px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-                <h3 style="margin:0; font-size:22px; font-weight:800;">วิเคราะห์ประสิทธิภาพการขาย</h3>
-                <div style="display:flex; gap:8px;">
-                    <button class="wait-time active" id="btn-peak" onclick="switchChart('peak')" style="cursor:pointer; border:none;">รายชั่วโมง</button>
-                    <button class="wait-time" id="btn-day" onclick="switchChart('day')" style="cursor:pointer; border:none;">รายวัน</button>
+    <div class="admin-wrapper">
+        <div class="header-box">
+            <div class="brand">
+                <h1>WITHU <span>Admin</span></h1>
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <button class="wait-time" onclick="toggleTheme()" style="cursor:pointer; border:none;">ธีม</button>
+                    <button class="wait-time" onclick="toggleLayout()" style="cursor:pointer; border:none;">ย่อ/ขยาย</button>
                 </div>
             </div>
-            <canvas id="salesChart" height="110"></canvas>
+            <div class="stat-wrap">
+                <div class="s-card"><small>กำไรวันนี้</small><b id="gross-profit" style="color:var(--emerald);">฿0</b></div>
+                <div class="s-card"><small>ยอดขายวันนี้</small><b id="revenue" style="color:var(--blue);">฿0</b></div>
+            </div>
         </div>
-        <div id="report-list"></div>
+
+        <div class="nav-sc">
+            <button id="nav-orders" onclick="showSec('orders')" class="active">ออเดอร์ค้าง</button>
+            <button id="nav-stock" onclick="showSec('stock')">คลังสินค้า</button>
+            <button id="nav-report" onclick="showSec('report')">รายงานสรุป</button>
+        </div>
+
+        <div id="container" class="order-grid"></div>
+        <div id="stock-sec" style="display:none;" class="order-grid"></div>
+
+        <div id="report-sec" style="display:none;">
+            <div style="background:#fff; padding:30px; border-radius:30px; box-shadow:var(--shadow-lux); border:1px solid var(--border); margin-bottom:30px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h3 style="margin:0; font-size:18px; font-weight:800;">ประสิทธิภาพการขาย</h3>
+                    <div style="display:flex; gap:8px;">
+                        <button class="wait-time active" id="btn-peak" onclick="switchChart('peak')" style="cursor:pointer; border:none;">ชั่วโมง</button>
+                        <button class="wait-time" id="btn-day" onclick="switchChart('day')" style="cursor:pointer; border:none;">รายวัน</button>
+                    </div>
+                </div>
+                <canvas id="salesChart" height="120"></canvas>
+            </div>
+            <div id="report-list-container" class="report-card">
+                <h3 style="margin:0 0 20px 0; font-size:18px; font-weight:800;">สินค้าที่ขายได้วันนี้</h3>
+                <div id="report-list"></div>
+            </div>
+        </div>
     </div>
 
     <div id="pay-modal">
         <div class="modal-content">
-            <h2 id="p-table-title" style="margin:0; font-size:48px; font-weight:900; letter-spacing:-3px;">โต๊ะ -</h2>
-            <div id="p-bill-items" style="background:var(--slate); padding:25px; border-radius:25px; margin:25px 0; text-align:left;"></div>
-            <small style="color:var(--muted); font-weight:800; letter-spacing:1px;">ยอดเงินที่ต้องชำระ</small>
-            <div id="p-total-price" style="font-size:75px; font-weight:900; color:var(--p); margin-bottom:20px; letter-spacing:-4px;">฿0</div>
+            <h2 id="p-table-title" style="margin:0; font-size:32px; font-weight:900;">โต๊ะ -</h2>
+            <div id="p-bill-items" style="background:var(--slate); padding:15px; border-radius:15px; margin:20px 0; text-align:left;"></div>
+            <small style="color:var(--muted); font-weight:800;">ยอดที่ต้องชำระ</small>
+            <div id="p-total-price" style="font-size:54px; font-weight:900; color:var(--p); margin-bottom:10px;">฿0</div>
 
             <div id="p-methods" class="pay-grid">
-                <div class="pay-tile" onclick="selectPayMethod('qr')">
-                    <img src="https://img.icons8.com/fluency/48/qr-code.png"><br><b>PROMPTPAY</b>
+                <div class="pay-tile" onclick="selectPayMethod('qr')" id="tile-qr">
+                    <img src="https://img.icons8.com/fluency/48/qr-code.png" width="32"><br><b>พร้อมเพย์</b>
                 </div>
-                <div class="pay-tile" onclick="selectPayMethod('cash')">
-                    <img src="https://img.icons8.com/fluency/48/money-bag.png"><br><b>CASH</b>
+                <div class="pay-tile" onclick="selectPayMethod('cash')" id="tile-cash">
+                    <img src="https://img.icons8.com/fluency/48/money-bag.png" width="32"><br><b>เงินสด</b>
                 </div>
             </div>
 
-            <div id="p-qr-area" style="display:none; margin-top:25px;">
-                <img id="p-qr-img" style="width:100%; border-radius:30px; border:2px solid var(--border); margin-bottom:20px;">
-                <button class="btn-checkout" style="background:var(--emerald);" onclick="finalPay('PromptPay')">ยืนยันได้รับเงินแล้ว</button>
+            <div id="p-qr-area" style="display:none; margin-top:20px;">
+                <img id="p-qr-img" style="width:220px; border-radius:20px; border:1px solid #eee; margin-bottom:20px;">
+                <button class="btn-checkout" style="background:var(--emerald);" onclick="finalPay('พร้อมเพย์')">ได้รับเงิน (พร้อมเพย์) แล้ว</button>
             </div>
 
-            <div id="p-cash-area" style="display:none; margin-top:25px;">
-                <input type="number" id="p-cash-input" style="width:100%; padding:25px; border-radius:20px; border:2px solid var(--blue); font-size:42px; text-align:center; font-weight:900; outline:none;" placeholder="0" oninput="calcChangeUnified()">
-                <div id="p-change-display" style="font-size:48px; font-weight:900; color:var(--emerald); margin:20px 0; display:none;">ทอน: ฿0</div>
-                <button id="p-cash-submit" class="btn-checkout" style="background:var(--rose);" onclick="finalPay('เงินสด')">ปิดโต๊ะทันที</button>
+            <div id="p-cash-area" style="display:none; margin-top:20px;">
+                <input type="number" id="p-cash-input" style="width:100%; padding:15px; border-radius:15px; border:2px solid var(--blue); font-size:32px; text-align:center; font-weight:900; outline:none;" placeholder="รับเงินมา..." oninput="calcChangeUnified()">
+                <div id="p-change-display" style="font-size:32px; font-weight:900; color:var(--emerald); margin:15px 0; display:none;">ทอน: ฿0</div>
+                <button id="p-cash-submit" class="btn-checkout" style="background:var(--rose); display:none;" onclick="finalPay('เงินสด')">ปิดโต๊ะ (เงินสด)</button>
             </div>
 
-            <button onclick="closePayModal()" style="margin-top:35px; background:none; border:none; color:var(--muted); cursor:pointer; font-weight:700; font-size:14px;">← ยกเลิกรายการ</button>
+            <button onclick="closePayModal()" style="margin-top:25px; background:none; border:none; color:var(--muted); cursor:pointer; font-weight:700; font-size:13px;">ยกเลิก</button>
         </div>
     </div>
 
@@ -177,7 +181,7 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
         let salesChartInst = null, currentChartMode = 'peak', fullData = null, activeAlertTable = null;
         let pTable = "", pTotal = 0, pRows = [];
-        let lastActionMap = {}; // เก็บสถานะล่าสุดแต่ละโต๊ะ
+        let lastActionMap = {}; 
         let orderSound = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_7325997672.mp3');
         let isSoundUnlocked = false;
 
@@ -193,6 +197,7 @@
                 document.getElementById('revenue').innerText = "฿" + d.summary.revenue.toLocaleString();
                 document.getElementById('gross-profit').innerText = "฿" + (d.summary.grossProfit || 0).toLocaleString();
 
+                // Alert ระบบเรียกพนักงาน
                 if (d.calls?.length > 0) {
                     activeAlertTable = d.calls[d.calls.length - 1].table;
                     document.getElementById('call-table-no').innerText = activeAlertTable;
@@ -204,7 +209,7 @@
 
                 const container = document.getElementById('container'); 
                 if(!d.orders?.length){ 
-                    container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:120px;color:var(--muted);font-weight:700;'>ไม่มีออเดอร์ค้างในขณะนี้ ☕️</div>"; 
+                    container.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:120px;color:var(--muted);font-weight:700;'>ไม่มีออเดอร์ค้างค่ะ ☕️</div>"; 
                 } else {
                     let groups={}; d.orders.forEach(o=>{
                         if(!groups[o.table]) groups[o.table]={items:[], total:0, rows:[], time:o.time}; 
@@ -215,27 +220,27 @@
 
                     container.innerHTML = Object.keys(groups).map(t => {
                         const wait = getTimeDiff(groups[t].time);
-                        const lastAction = lastActionMap[t] || "ยังไม่มีการดำเนินการ";
+                        const lastAction = lastActionMap[t] || "รอเตรียม";
                         return `
                         <div class="order-card">
                             <div class="card-head">
-                                <h2 class="table-id">T${t}</h2>
-                                <span class="wait-time ${wait > 15 ? 'urgent' : ''}">${wait} นาทีที่แล้ว</span>
+                                <h2 class="table-id">โต๊ะ ${t}</h2>
+                                <span class="wait-time ${wait > 15 ? 'urgent' : ''}">${wait}m ago</span>
                             </div>
-                            <span class="last-action-label">● ล่าสุด: ${lastAction}</span>
+                            <div class="status-badge">สถานะ: ${lastAction}</div>
                             <div class="items-list">
                                 ${groups[t].items.map(i=>`
                                     <div class="item-row">
-                                        <div><b>${i.qty}x ${i.menu}</b><br><small>${i.details}</small></div>
-                                        <button style="color:var(--rose); background:none; border:none; font-weight:800; cursor:pointer;" onclick="voidIt(${i.rowNum})">ลบ</button>
+                                        <div><b>${i.qty}x ${i.menu}</b><br><small style="color:var(--muted)">${i.details}</small></div>
+                                        <button style="color:var(--rose); background:none; border:none; font-weight:800; cursor:pointer; font-size:12px;" onclick="voidIt(${i.rowNum})">ลบ</button>
                                     </div>`).join('')}
                             </div>
                             <div class="btn-group">
-                                <button class="btn-s" onclick='applyEffect(this, "amber", "${t}", "เตรียม", () => upS(${JSON.stringify(groups[t].rows)},"กำลังทำ"))'>เตรียม</button>
+                                <button class="btn-s" onclick='applyEffect(this, "amber", "${t}", "กำลังทำ", () => upS(${JSON.stringify(groups[t].rows)},"กำลังทำ"))'>เตรียม</button>
                                 <button class="btn-s" onclick='applyEffect(this, "emerald", "${t}", "รอเสิร์ฟ", () => upS(${JSON.stringify(groups[t].rows)},"รอเสิร์ฟ"))'>เสิร์ฟ</button>
                                 <button class="btn-s" onclick='applyEffect(this, "blue", "${t}", "สำเร็จ", () => upS(${JSON.stringify(groups[t].rows)},"สำเร็จ"))'>จบงาน</button>
                             </div>
-                            <div style="font-size:28px; font-weight:900; text-align:right; margin-bottom:25px; letter-spacing:-1.5px;">฿${groups[t].total.toLocaleString()}</div>
+                            <div style="font-size:24px; font-weight:900; text-align:right; margin-bottom:20px;">฿${groups[t].total.toLocaleString()}</div>
                             <button class="btn-checkout" onclick='openPayModal("${t}", ${groups[t].total}, ${JSON.stringify(groups[t].rows)}, ${JSON.stringify(groups[t].items)})'>เช็คบิล / ปิดโต๊ะ</button>
                         </div>`}).join('');
                 }
@@ -248,13 +253,12 @@
         function applyEffect(el, color, table, actionName, callback) {
             lastActionMap[table] = actionName;
             el.classList.add('flash-' + color);
-            setTimeout(() => { el.classList.remove('flash-' + color); callback(); }, 450);
+            setTimeout(() => { el.classList.remove('flash-' + color); callback(); }, 400);
         }
 
         async function clearSpecificCall() {
             if (!activeAlertTable) return;
             const targetTable = activeAlertTable;
-            activeAlertTable = null; // เคลียร์สถานะในหน้าจอทันที
             document.getElementById('call-toast').style.display = 'none';
             await fetch(API_URL + "?action=clearCall&table=" + targetTable);
             refresh();
@@ -264,24 +268,24 @@
             pTable = table; pTotal = total; pRows = rows;
             document.getElementById('p-table-title').innerText = "โต๊ะ " + table;
             document.getElementById('p-total-price').innerText = "฿" + total.toLocaleString();
-            document.getElementById('p-bill-items').innerHTML = items.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px;"><span>${i.qty}x ${i.menu}</span><b>฿${parseFloat(String(i.total).replace(/,/g,'')).toLocaleString()}</b></div>`).join('');
-            fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:table, status:'paying'})});
-            document.getElementById('p-methods').style.display = 'grid';
+            document.getElementById('p-bill-items').innerHTML = items.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;"><span>${i.qty}x ${i.menu}</span><b>฿${parseFloat(String(i.total).replace(/,/g,'')).toLocaleString()}</b></div>`).join('');
+            
+            // รีเซ็ต Modal
             document.getElementById('p-qr-area').style.display = 'none';
             document.getElementById('p-cash-area').style.display = 'none';
+            document.getElementById('p-methods').style.display = 'grid';
             document.getElementById('pay-modal').style.display = 'flex';
         }
 
         function selectPayMethod(m) {
-            document.getElementById('p-methods').style.display = 'none';
+            document.getElementById('p-qr-area').style.display = (m === 'qr' ? 'block' : 'none');
+            document.getElementById('p-cash-area').style.display = (m === 'cash' ? 'block' : 'none');
             if(m === 'qr') {
                 document.getElementById('p-qr-img').src = `https://promptpay.io/0931805507/${pTotal}.png`;
-                document.getElementById('p-qr-area').style.display = 'block';
             } else {
                 document.getElementById('p-cash-input').value = "";
                 document.getElementById('p-change-display').style.display = 'none';
                 document.getElementById('p-cash-submit').style.display = 'none';
-                document.getElementById('p-cash-area').style.display = 'block';
                 setTimeout(()=>document.getElementById('p-cash-input').focus(), 100);
             }
         }
@@ -289,7 +293,6 @@
         function calcChangeUnified() {
             const received = parseFloat(document.getElementById('p-cash-input').value) || 0;
             const change = received - pTotal;
-            localStorage.setItem('cds_cash_received', received);
             if(received >= pTotal) {
                 document.getElementById('p-change-display').innerText = "เงินทอน: ฿" + change.toLocaleString();
                 document.getElementById('p-change-display').style.display = 'block';
@@ -301,41 +304,31 @@
         }
 
         async function finalPay(method) {
-            if(confirm(`ยืนยันการรับชำระและปิดโต๊ะ T${pTable}?`)) {
-                localStorage.setItem('cds_cash_received', 0);
-                await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:pTable, status:'idle'})});
+            if(confirm(`ยืนยันการรับชำระและปิดโต๊ะ ${pTable}?`)) {
                 await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'markMultipleDone',rowNums:pRows, paymentMethod:method})});
                 closePayModal(); refresh();
             }
         }
 
-        function closePayModal() { document.getElementById('pay-modal').style.display = 'none'; localStorage.setItem('cds_cash_received', 0); }
+        function closePayModal() { document.getElementById('pay-modal').style.display = 'none'; }
 
         function drawChart() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             if(salesChartInst) salesChartInst.destroy();
             let labels = [], data = [], title = "";
-            const isDark = document.body.getAttribute('data-theme') === 'dark';
             if(currentChartMode === 'peak') {
                 labels = Array.from({length: 24}, (_, i) => i + ":00");
                 data = fullData.summary.peakHours;
-                title = "ยอดขายรายชั่วโมง";
+                title = "ยอดขายวันนี้ (บาท)";
             } else {
                 labels = fullData.summary.chartDaily.map(i => i.date);
                 data = fullData.summary.chartDaily.map(i => i.total);
-                title = "ยอดขายรายวัน";
+                title = "ยอดขายย้อนหลัง";
             }
             salesChartInst = new Chart(ctx, {
                 type: 'bar',
-                data: { labels, datasets: [{ label: title, data, backgroundColor: '#4f46e5', borderRadius: 12 }] },
-                options: { 
-                    responsive: true, 
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { border: { display: false }, grid: { color: isDark ? '#1f2937' : '#f1f5f9' } },
-                        x: { grid: { display: false } }
-                    }
-                }
+                data: { labels, datasets: [{ data, backgroundColor: '#4f46e5', borderRadius: 8 }] },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } } }
             });
         }
 
@@ -348,14 +341,24 @@
 
         function renderStock(menu) { 
             document.getElementById('stock-sec').innerHTML = menu.map(m=>`
-                <div class="order-card" style="padding:25px; display:flex; justify-content:space-between; align-items:center;">
-                    <div><b style="font-size:17px;">${m[0]}</b><br><small style="color:var(--muted)">ต้นทุน ฿${m[6]||0}</small></div>
-                    <button style="padding:10px 22px; border-radius:12px; border:none; background:${m[5]=='หมด'?'var(--rose)':'var(--p)'}; color:#fff; cursor:pointer; font-weight:800;" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'ของหมด':'ปกติ'}</button>
+                <div class="order-card" style="padding:20px; flex-direction:row; justify-content:space-between; align-items:center;">
+                    <div><b style="font-size:16px;">${m[0]}</b><br><small style="color:var(--muted)">ต้นทุน ฿${m[6]||0}</small></div>
+                    <button style="padding:8px 16px; border-radius:10px; border:none; background:${m[5]=='หมด'?'var(--rose)':'var(--p)'}; color:#fff; cursor:pointer; font-weight:800; font-size:12px;" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]=='หมด'?'เติมของ':'ปกติ'}</button>
                 </div>`).join(''); 
         }
 
         function renderReport(report) { 
-            document.getElementById('report-list').innerHTML = `<table class="table-pro"><thead><tr><th>สินค้า</th><th style="text-align:center;">จำนวน</th><th style="text-align:right;">กำไรสุทธิ</th></tr></thead><tbody>${report.map(i => `<tr><td style="font-weight:700;">${i.name}</td><td style="text-align:center; font-weight:800; color:var(--indigo);">${i.qty}</td><td style="text-align:right;font-weight:900;color:var(--emerald);">฿${i.profit.toLocaleString()}</td></tr>`).join('')}</tbody></table>`; 
+            document.getElementById('report-list').innerHTML = `
+            <table class="table-pro">
+                <thead><tr><th>ชื่อสินค้า</th><th style="text-align:center;">จำนวน</th><th style="text-align:right;">กำไรสุทธิ</th></tr></thead>
+                <tbody>${report.map(i => `
+                    <tr>
+                        <td style="font-weight:700;">${i.name}</td>
+                        <td style="text-align:center; font-weight:800; color:var(--indigo);">${i.qty} ชิ้น</td>
+                        <td style="text-align:right; font-weight:900; color:var(--emerald);">฿${i.profit.toLocaleString()}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>`; 
         }
 
         function toggleTheme() {
@@ -370,8 +373,8 @@
         }
 
         function getTimeDiff(timeStr) { const now = new Date(); const [d, t] = timeStr.split(' '); const [day, month, year] = d.split('/'); const [h, m, s] = t.split(':'); return Math.floor((now - new Date(year, month-1, day, h, m, s)) / 60000); }
-        function showSec(n) { document.getElementById('container').style.display=(n==='orders'?'grid':'none'); document.getElementById('stock-sec').style.display=(n==='stock'?'grid':'none'); document.getElementById('report-sec').style.display=(n==='report'?'block':'none'); document.querySelectorAll('.nav-sc button').forEach(b => { if(b.id.startsWith('nav-')) b.classList.toggle('active', b.id==='nav-'+n); }); }
-        async function voidIt(r) { if(confirm("ต้องการลบ?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'voidItem',rowNum:r})}); refresh(); } }
+        function showSec(n) { document.getElementById('container').style.display=(n==='orders'?'grid':'none'); document.getElementById('stock-sec').style.display=(n==='stock'?'grid':'none'); document.getElementById('report-sec').style.display=(n==='report'?'block':'none'); document.querySelectorAll('.nav-sc button').forEach(b => b.classList.toggle('active', b.id==='nav-'+n)); }
+        async function voidIt(r) { if(confirm("ลบรายการนี้?")){ await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'voidItem',rowNum:r})}); refresh(); } }
         async function upS(r,s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
         async function tgS(type,name,status) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStock',type:type,name:name,status:status})}); refresh(); }
 

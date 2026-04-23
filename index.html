@@ -29,7 +29,7 @@
         .search-input { width: 100%; padding: 16px 25px 16px 55px; border-radius: 50px; border: none; background: #fff; font-size: 15px; outline: none; box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
         .search-icon { position: absolute; left: 22px; top: 32px; color: #94a3b8; display: flex; pointer-events: none; }
         
-        /* --- 🏷 Navigation (Double Layer) --- */
+        /* --- 🏷 Navigation --- */
         #category-nav { display: flex; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; gap: 12px; }
         .nav-pill { background: #fff; color: var(--gray); border: 1px solid var(--border); padding: 10px 28px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; font-weight: 600; transition: 0.3s; }
         .nav-pill.active { background: #000; color: #fff; border-color: #000; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
@@ -45,13 +45,13 @@
         .menu-item h3 { margin: 0; font-size: 22px; font-weight: 800; color: #000; line-height: 1.3; }
         .price { font-weight: 900; font-size: 26px; margin-top: 5px; color: #000; }
 
-        /* --- ➕ Qty Selector (ชิดขวา พร้อมข้อความจำนวน) --- */
+        /* --- ➕ Qty Selector ชิดขวา --- */
         .qty-row { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-bottom: 20px; }
         .qty-label { font-size: 14px; font-weight: 700; color: var(--gray); }
         .qty-box { display: flex; align-items: center; gap: 15px; background: #f8fafc; padding: 6px 12px; border-radius: 50px; border: 1px solid var(--border); }
         .qty-btn { width: 30px; height: 30px; background: #fff; border: none; border-radius: 50%; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
 
-        /* --- 🎚 Options UI (ปุ่มปั่นเด่นชัด) --- */
+        /* --- 🎚 Options UI 🥤 ปั่นเด่นชัด --- */
         .sweet-selector { display: flex; gap: 6px; margin-bottom: 15px; }
         .sweet-btn { background: #f8fafc; padding: 12px 0; border-radius: 18px; font-size: 12px; cursor: pointer; flex: 1; text-align: center; color: var(--gray); font-weight: 800; transition: 0.2s; }
         .sweet-btn.active { background: #000; color: #fff; }
@@ -59,7 +59,7 @@
         .smoothie-btn { display: inline-flex; background: #f8fafc; padding: 12px 20px; border-radius: 15px; font-size: 14px; font-weight: 900; color: var(--p); cursor: pointer; border: 2px solid rgba(0,0,0,0.1); margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: 0.2s; }
         .smoothie-btn.active { background: #000; color: #fff; border-color: #000; }
 
-        /* 🍭 ท็อปปิ้งใหญ่ขึ้น จัด Grid */
+        /* 🍭 ท็อปปิ้ง (ใหญ่ขึ้น จัด Grid) */
         .acc-btn { font-size: 14px; color: #000; font-weight: 700; cursor: pointer; margin-bottom: 15px; text-decoration: underline; text-underline-offset: 5px; opacity: 0.6; text-align: center; display: block; }
         .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; width: 90%; margin-left: auto; }
         .top-chip { border: 1.5px solid var(--border); padding: 15px; border-radius: 20px; font-size: 13px; text-align: center; cursor: pointer; font-weight: 700; background: #fff; transition: 0.2s; }
@@ -74,7 +74,7 @@
         /* --- 🧾 Global Note --- */
         .cart-note { width: 100%; padding: 18px; border-radius: 20px; border: 1.5px solid var(--border); background: #f8fafc; font-size: 14px; margin: 15px 0; outline: none; resize: none; line-height: 1.6; }
 
-        /* --- 🔢 Status UI (กู้คืน Stepper & Spacing) --- */
+        /* --- 🔢 Status UI (กู้คืน Stepper & Header Spacing) --- */
         .status-card { background: #fff; border-radius: 50px; padding: 50px 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); text-align: center; border: 1px solid var(--border); }
         .status-header { font-weight: 900; font-size: 34px; letter-spacing: -1.5px; line-height: 1.6; margin-bottom: 10px; }
         .queue-badge { color: var(--blue); font-weight: 800; font-size: 15px; background: rgba(37, 99, 235, 0.04); padding: 12px; border-radius: 15px; margin-bottom: 25px; display: inline-block; width: 100%; border: 1px solid rgba(37,99,235,0.1); }
@@ -112,7 +112,7 @@
     <div class="custom-modal" id="call-modal-content">
         <div class="bell-shake">🔔</div>
         <h2 style="font-weight:900; margin-bottom:10px; letter-spacing:-1px;">เรียกพนักงาน?</h2>
-        <p style="color:var(--gray); margin-bottom:35px; font-size:15px;">เดี๋ยวพี่ๆ จะรีบไปหาที่โต๊ะนะคะอ้วน</p>
+        <p style="color:var(--gray); margin-bottom:35px; font-size:15px; line-height:1.6;">เดี๋ยวพี่ๆ จะรีบไปหาที่โต๊ะนะคะอ้วน</p>
         <button class="btn-add" onclick="confirmCall()">ยืนยันการเรียก</button>
         <button onclick="document.getElementById('call-modal').style.display='none'" style="margin-top:20px; background:none; border:none; color:var(--gray); font-weight:700; cursor:pointer; width:100%;">ไว้ก่อนค่ะ</button>
     </div>
@@ -181,7 +181,7 @@
         <div style="font-size:11px; opacity:0.6; font-weight:700;">รายการที่เลือก</div>
         <div style="font-size:22px; font-weight:900;"><span id="cart-count">0</span> อย่าง</div>
     </div>
-    <button class="btn-checkout-pill" onclick="openReceipt()">สั่งออเดอร์ ฿<span id="cart-sum-val">0</span></button>
+    <button class="btn-checkout-pill" onclick="openReceipt()">สั่งซื้อ ฿<span id="cart-sum-val">0</span></button>
 </div>
 
 <div id="modal" class="custom-overlay" onclick="if(event.target==this)this.style.display='none'">
@@ -192,7 +192,7 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec"; 
     let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentS = {}, itemOpt = {}, itemExpanded = {}, itemQty = {}, currentF = "ทั้งหมด", currentSubF = "ทั้งหมด", currentSearch = "", sInterval, autoCloseTimer;
 
-    // --- 🔄 ระบบ QR Auto-Lock & Persistence ---
+    // --- 🚩 ระบบ QR Auto-Lock (คืนชีพ) ---
     window.onload = async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const urlTable = urlParams.get('table');
@@ -265,7 +265,7 @@
         let h = `<h2 style="font-weight:900; font-size:28px; margin-bottom:20px; letter-spacing:-1px;">รายการออเดอร์</h2>`;
         cart.forEach((i,idx) => h += `<div style="display:flex;justify-content:space-between;margin-bottom:15px;text-align:left;"><span><b>${i.qty}x ${i.name}</b><br><small style="color:var(--gray); font-size:12px;">${i.sweetness}</small></span><span style="text-align:right;"><b style="font-size:18px;">฿${i.total.toLocaleString()}</b><br><span style="color:var(--bright-red); font-size:12px; font-weight:800; cursor:pointer;" onclick="rem(${idx})">ลบออก</span></span></div>`);
         h += `<textarea id="global-note" class="cart-note" rows="2" placeholder="ระบุหมายเหตุถึงร้าน (เช่น ไม่ใส่ไข่มุก, แยกน้ำตาล)"></textarea>`;
-        h += `<div style="border-top:1.5px solid #eee; padding-top:20px; display:flex; justify-content:space-between; font-weight:900; font-size:24px;"><span>รวมทั้งหมด</span><span>฿${cart.reduce((s,i)=>s+i.total,0).toLocaleString()}</span></div><button class="btn-add" style="margin-top:35px;" onclick="sub()">สั่งออเดอร์ตอนนี้</button>`;
+        h += `<div style="border-top:1.5px solid #eee; padding-top:20px; display:flex; justify-content:space-between; font-weight:900; font-size:24px;"><span>รวมทั้งหมด</span><span>฿${cart.reduce((s,i)=>s+i.total,0).toLocaleString()}</span></div><button class="btn-add" style="margin-top:35px;" onclick="sub()">สั่งซื้อตอนนี้</button>`;
         document.getElementById('modal-body').innerHTML = h; document.getElementById('modal').style.display = 'flex';
     }
     

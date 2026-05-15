@@ -254,7 +254,7 @@
             <input type="text" id="staff-name" placeholder="Staff Name" style="text-align:center; padding:12px; font-size:15px; border-radius:6px; margin-bottom:15px;">
             
             <div style="display:grid; grid-template-columns: 1fr; gap:10px; margin-bottom:15px;">
-                <div id="btn-scan-face" class="btn-black" style="text-align:center; cursor:default; background:var(--slate); color:var(--text-main); border:1px solid var(--border); transition: 0.3s;">SCANNING AUTOMATICALLY...</div>
+                <button id="btn-scan-face" class="btn-black" onclick="startFaceRecognition()" style="margin-top:0;">SCAN FACE TO CLOCK</button>
             </div>
             
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -287,8 +287,8 @@
                 status_normal: "ปกติ", status_out: "หมด", toggle: "สลับสถานะ", live_map: "แผนผังร้านแบบ Real-time",
                 heat_title: "อันดับเมนูขายดี (Heat Menu)", ai_title: "AI วิเคราะห์ธุรกิจ", manual_title: "สร้างออเดอร์นอกระบบ",
                 perf_title: "รายงานสรุปยอดขาย", btn_peak: "รายชั่วโมง", btn_day: "รายวัน", staff_title: "ตอกบัตรพนักงาน",
-                ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI พร้อมค้นหาใบหน้าอัตโนมัติ", scan_btn: "ระบบสแกนอัตโนมัติกำลังทำงาน...", reg_btn: "ลงทะเบียนใบหน้า",
-                mistake: "ตรวจพบข้อมูลผิดปกติ", no_face: "ไม่พบข้อมูลใบหน้าพนักงานในคลังระบบ"
+                ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI พร้อมใช้งาน", scan_btn: "สแกนใบหน้าตอกบัตร", reg_btn: "ลงทะเบียนใบหน้า",
+                mistake: "ตรวจพบข้อมูลผิดปกติ", no_face: "ไม่พบข้อมูลใบหน้าพนักงานในระบบ (กรุณาลงทะเบียนพนักงานก่อน)"
             },
             en: {
                 btn_add: "ADD ORDER", btn_staff: "STAFF", btn_export: "EXPORT PDF",
@@ -300,7 +300,7 @@
                 status_normal: "NORMAL", status_out: "OUT OF STOCK", toggle: "TOGGLE", live_map: "Live Restaurant Map",
                 heat_title: "Heat Menu (Best Sellers)", ai_title: "AI Business Advisor", manual_title: "CREATE MANUAL ORDER",
                 perf_title: "DAILY PERFORMANCE REPORT", btn_peak: "HOURLY", btn_day: "DAILY", staff_title: "STAFF CLOCK",
-                ai_loading: "AI MODELS LOADING...", ai_ready: "AI SYSTEM SCANNING AUTOMATICALLY...", scan_btn: "SCANNING AUTOMATICALLY...", reg_btn: "REGISTER FACE",
+                ai_loading: "AI MODELS LOADING...", ai_ready: "AI SYSTEM READY", scan_btn: "SCAN FACE TO CLOCK", reg_btn: "REGISTER FACE",
                 mistake: "MISTAKE DETECTED", no_face: "NO REGISTERED FACES IN DATABASE"
             }
         };
@@ -641,7 +641,7 @@
             drawChart();
         }
 
-        // --- 🕒 AI AUTOMATED FACIAL RECOGNITION ENGINE (STABLE EMBEDDED QUEUE) ---
+        // --- 🕒 AI FACIAL RECOGNITION ENGINE (STABLE ONE-CLICK MANUAL SENSING) ---
         async function loadFaceApiModels() {
             if (isAiModelsLoaded) return;
             const l = langPack[currentLang];
@@ -654,10 +654,8 @@
                 
                 const faceCount = (fullData && fullData.faceProfiles) ? fullData.faceProfiles.length : 0;
                 document.getElementById('ai-status').innerText = currentLang === 'th' 
-                    ? `ระบบ AI พร้อมทำงาน (คลังใบหน้า: ${faceCount} คน)` 
+                    ? `ระบบ AI พร้อมทำงาน (คลังใบหน้าพนักงาน: ${faceCount} คน)` 
                     : `AI SYSTEM READY (${faceCount} face profiles loaded)`;
-                    
-                runAutoFaceDetection(); 
             } catch (e) {
                 document.getElementById('ai-status').innerText = "AI MODEL ERROR";
                 console.error(e);
@@ -690,90 +688,68 @@
             document.getElementById('webcam').srcObject = null;
         }
 
-        // 🔥 [แก้ไขจุดแครชสะสม] ปรับโครงสร้างลูปเดี่ยวแบบจำกัดคิว (Sequential Execution Queue) แก้อาการค้างแบบถาวร
-        async function runAutoFaceDetection() {
-            const modal = document.getElementById('att-modal');
-            const l = langPack[currentLang];
+        async function startFaceRecognition() {
+            if (!isAiModelsLoaded) return alert("AI SYSTEM NOT READY");
+            if (!fullData || !fullData.faceProfiles || fullData.faceProfiles.length === 0) {
+                return alert("NO BASE FACE PROFILES IN SHEET DATABASE");
+            }
+
             const scanBtn = document.getElementById('btn-scan-face');
-            
-            if (!isAiModelsLoaded || !localStream || isScanningLocked || modal.style.display !== 'flex') return;
+            const originalText = scanBtn.innerText;
+            scanBtn.innerText = currentLang === 'th' ? "กำลังสแกนวิเคราะห์..." : "SCANNING...";
+            scanBtn.style.background = '#333333';
 
             try {
                 const video = document.getElementById('webcam');
-                if (!video || video.paused || video.ended || video.readyState !== 4) {
-                    setTimeout(runAutoFaceDetection, 800); 
-                    return;
-                }
-
-                if (!fullData) {
-                    scanBtn.innerText = currentLang === 'th' ? "กำลังซิงค์ระบบคลังข้อมูลพนักงาน..." : "SYNCING STAFF DIRECTORY...";
-                    setTimeout(runAutoFaceDetection, 800);
-                    return;
-                }
-
-                if (!fullData.faceProfiles || fullData.faceProfiles.length === 0) {
-                    scanBtn.innerText = l.no_face;
-                    scanBtn.style.background = '#333333';
-                    scanBtn.style.color = '#ffffff';
-                    setTimeout(runAutoFaceDetection, 1200);
-                    return;
-                }
-
-                scanBtn.innerText = currentLang === 'th' ? "กล้องกำลังค้นหาใบหน้าพนักงานอัตโนมัติ..." : "SCANNING AUTOMATICALLY...";
-                scanBtn.style.background = 'var(--slate)';
-                scanBtn.style.color = 'var(--text-main)';
-
                 const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
 
-                if (detection) {
-                    scanBtn.innerText = currentLang === 'th' ? "ตรวจพบใบหน้า...กำลังสแกนตัวตน" : "FACE DETECTED... VERIFYING";
+                if (!detection) {
+                    alert(currentLang === 'th' ? "ไม่พบใบหน้า กรุณาจัดระเบียบตำแหน่งแล้วกดใหม่อีกครั้ง" : "FACE NOT DETECTED. PLEASE TRY AGAIN.");
+                    scanBtn.innerText = originalText;
                     scanBtn.style.background = '#000000';
-                    scanBtn.style.color = '#ffffff';
+                    return;
+                }
 
-                    const labeledDescriptors = [];
-                    fullData.faceProfiles.forEach(p => {
-                        if (p.descriptor && p.descriptor.length > 0) {
-                            try {
-                                labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(p.name, [new Float32Array(p.descriptor)]));
-                            } catch(err) {}
-                        }
-                    });
-
-                    if (labeledDescriptors.length > 0) {
-                        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.60); 
-                        const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-
-                        if (bestMatch.label !== 'unknown') {
-                            isScanningLocked = true; 
-                            
-                            const staffId = bestMatch.label;
-                            document.getElementById('staff-name').value = staffId;
-                            document.getElementById('ai-status').innerText = currentLang === 'th' ? `ตอกบัตรสำเร็จ: ${staffId.toUpperCase()}` : `SAVING RECORD: ${staffId.toUpperCase()}`;
-                            
-                            scanBtn.innerText = `MATCHED: ${staffId.toUpperCase()}`;
-
-                            const records = fullData.attendance ? fullData.attendance.filter(a => a.name === staffId) : [];
-                            let type = "เข้างาน";
-                            if (records.length > 0 && records[records.length - 1].type === "เข้างาน") { type = "ออกงาน"; }
-
-                            await actionCall('staffClock', { name: staffId, type: type });
-                            alert(`CLOCK RECORDED: ${staffId.toUpperCase()} (${type === 'เข้างาน' ? 'IN' : 'OUT'})`);
-                            
-                            toggleAttendance(); 
-                            return;
-                        } else {
-                            scanBtn.innerText = currentLang === 'th' ? "ไม่พบใบหน้านี้ในระบบพนักงาน" : "UNKNOWN FACE (NOT REGISTERED)";
-                            scanBtn.style.background = '#ef4444'; 
-                            scanBtn.style.color = '#ffffff';
-                        }
+                const labeledDescriptors = [];
+                fullData.faceProfiles.forEach(p => {
+                    if (p.descriptor && p.descriptor.length > 0) {
+                        try {
+                            labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(p.name, [new Float32Array(p.descriptor)]));
+                        } catch(err) {}
                     }
+                });
+
+                if (labeledDescriptors.length === 0) {
+                    alert("NO REGISTERED FACES FOUND");
+                    scanBtn.innerText = originalText;
+                    scanBtn.style.background = '#000000';
+                    return;
+                }
+
+                const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.60); 
+                const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+
+                if (bestMatch.label !== 'unknown') {
+                    const staffId = bestMatch.label;
+                    document.getElementById('staff-name').value = staffId;
+                    
+                    const records = fullData.attendance ? fullData.attendance.filter(a => a.name === staffId) : [];
+                    let type = "เข้างาน";
+                    if (records.length > 0 && records[records.length - 1].type === "เข้างาน") { type = "ออกงาน"; }
+
+                    await actionCall('staffClock', { name: staffId, type: type });
+                    alert(`CLOCK RECORDED: ${staffId.toUpperCase()} (${type === 'เข้างาน' ? 'IN' : 'OUT'})`);
+                    toggleAttendance(); 
+                } else {
+                    alert(currentLang === 'th' ? "ไม่พบข้อมูลพนักงานคนนี้ในระบบ" : "UNKNOWN FACE (NOT REGISTERED)");
+                    scanBtn.innerText = originalText;
+                    scanBtn.style.background = '#000000';
                 }
             } catch (err) {
-                console.warn("AI Loop Execution Interrupted:", err);
-            }
-
-            if (!isScanningLocked && modal.style.display === 'flex') {
-                setTimeout(runAutoFaceDetection, 800);
+                console.error(err);
+                alert("SCAN ERROR");
+                scanBtn.innerText = originalText;
+                scanBtn.style.background = '#000000';
             }
         }
 

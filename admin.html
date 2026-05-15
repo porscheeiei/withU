@@ -268,7 +268,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyncWDRtr2BHvU8qlqV-zTPUEZFXYqSQWDAnIrYsxpObT7DfEUeQE6ACNk0paCZURZ-tQ/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec";
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
         let lastActionMap = {};
@@ -287,8 +287,8 @@
                 status_normal: "ปกติ", status_out: "หมด", toggle: "สลับสถานะ", live_map: "แผนผังร้านแบบ Real-time",
                 heat_title: "อันดับเมนูขายดี (Heat Menu)", ai_title: "AI วิเคราะห์ธุรกิจ", manual_title: "สร้างออเดอร์นอกระบบ",
                 perf_title: "รายงานสรุปยอดขาย", btn_peak: "รายชั่วโมง", btn_day: "รายวัน", staff_title: "ตอกบัตรพนักงาน",
-                ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI กำลังค้นหาใบหน้าอัตโนมัติ...", scan_btn: "ระบบสแกนอัตโนมัติกำลังทำงาน...", reg_btn: "ลงทะเบียนใบหน้า",
-                mistake: "ตรวจพบข้อมูลผิดปกติ", no_face: "ไม่พบข้อมูลใบหน้าพนักงานในระบบ (กรุณาลงทะเบียนพนักงานก่อน)"
+                ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI พร้อมค้นหาใบหน้าอัตโนมัติ", scan_btn: "ระบบสแกนอัตโนมัติกำลังทำงาน...", reg_btn: "ลงทะเบียนใบหน้า",
+                mistake: "ตรวจพบข้อมูลผิดปกติ", no_face: "ไม่พบข้อมูลใบหน้าพนักงานในคลังระบบ"
             },
             en: {
                 btn_add: "ADD ORDER", btn_staff: "STAFF", btn_export: "EXPORT PDF",
@@ -641,7 +641,7 @@
             drawChart();
         }
 
-        // --- 🕒 AI AUTOMATED FACIAL RECOGNITION ENGINE (ANTI-RACE CONDITION BLOCK) ---
+        // --- 🕒 AI AUTOMATED FACIAL RECOGNITION ENGINE (STABLE EMBEDDED QUEUE) ---
         async function loadFaceApiModels() {
             if (isAiModelsLoaded) return;
             const l = langPack[currentLang];
@@ -654,8 +654,8 @@
                 
                 const faceCount = (fullData && fullData.faceProfiles) ? fullData.faceProfiles.length : 0;
                 document.getElementById('ai-status').innerText = currentLang === 'th' 
-                    ? `ระบบ AI พร้อมทำงาน (ฐานข้อมูลพนักงาน: ${faceCount} คน)` 
-                    : `AI SYSTEM READY (${faceCount} staff profiles loaded)`;
+                    ? `ระบบ AI พร้อมทำงาน (คลังใบหน้า: ${faceCount} คน)` 
+                    : `AI SYSTEM READY (${faceCount} face profiles loaded)`;
                     
                 runAutoFaceDetection(); 
             } catch (e) {
@@ -680,7 +680,6 @@
 
         function startWebcam() {
             const video = document.getElementById('webcam');
-            // เพิ่มความยืดหยุ่นในกรณีเปิดกล้องบนอุปกรณ์พกพาหน้าร้าน
             navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: "user" } })
                 .then(stream => { localStream = stream; video.srcObject = stream; })
                 .catch(err => console.error("Webcam blocked:", err));
@@ -691,6 +690,7 @@
             document.getElementById('webcam').srcObject = null;
         }
 
+        // 🔥 [แก้ไขจุดแครชสะสม] ปรับโครงสร้างลูปเดี่ยวแบบจำกัดคิว (Sequential Execution Queue) แก้อาการค้างแบบถาวร
         async function runAutoFaceDetection() {
             const modal = document.getElementById('att-modal');
             const l = langPack[currentLang];
@@ -700,15 +700,14 @@
 
             try {
                 const video = document.getElementById('webcam');
-                if (!video || video.paused || video.ended || !video.srcObject) {
-                    setTimeout(runAutoFaceDetection, 400);
+                if (!video || video.paused || video.ended || video.readyState !== 4) {
+                    setTimeout(runAutoFaceDetection, 800); 
                     return;
                 }
 
-                // 🔥 [แก้ไขจุดบกพร่อง] Sentry ป้องกันฐานข้อมูลว่างเปล่า/ข้ามปัญหาระบบ Race Condition ตอนเพิ่งเปิดหน้าเว็บ
                 if (!fullData) {
                     scanBtn.innerText = currentLang === 'th' ? "กำลังซิงค์ระบบคลังข้อมูลพนักงาน..." : "SYNCING STAFF DIRECTORY...";
-                    setTimeout(runAutoFaceDetection, 400);
+                    setTimeout(runAutoFaceDetection, 800);
                     return;
                 }
 
@@ -716,14 +715,18 @@
                     scanBtn.innerText = l.no_face;
                     scanBtn.style.background = '#333333';
                     scanBtn.style.color = '#ffffff';
-                    setTimeout(runAutoFaceDetection, 1000);
+                    setTimeout(runAutoFaceDetection, 1200);
                     return;
                 }
+
+                scanBtn.innerText = currentLang === 'th' ? "กล้องกำลังค้นหาใบหน้าพนักงานอัตโนมัติ..." : "SCANNING AUTOMATICALLY...";
+                scanBtn.style.background = 'var(--slate)';
+                scanBtn.style.color = 'var(--text-main)';
 
                 const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
 
                 if (detection) {
-                    scanBtn.innerText = currentLang === 'th' ? "ตรวจพบใบหน้า...กำลังระบุชื่อ" : "FACE DETECTED... VERIFYING";
+                    scanBtn.innerText = currentLang === 'th' ? "ตรวจพบใบหน้า...กำลังสแกนตัวตน" : "FACE DETECTED... VERIFYING";
                     scanBtn.style.background = '#000000';
                     scanBtn.style.color = '#ffffff';
 
@@ -745,7 +748,7 @@
                             
                             const staffId = bestMatch.label;
                             document.getElementById('staff-name').value = staffId;
-                            document.getElementById('ai-status').innerText = currentLang === 'th' ? `กำลังบันทึกข้อมูล: ${staffId.toUpperCase()}` : `SAVING RECORD: ${staffId.toUpperCase()}`;
+                            document.getElementById('ai-status').innerText = currentLang === 'th' ? `ตอกบัตรสำเร็จ: ${staffId.toUpperCase()}` : `SAVING RECORD: ${staffId.toUpperCase()}`;
                             
                             scanBtn.innerText = `MATCHED: ${staffId.toUpperCase()}`;
 
@@ -759,21 +762,18 @@
                             toggleAttendance(); 
                             return;
                         } else {
-                            scanBtn.innerText = currentLang === 'th' ? "ไม่พบข้อมูลพนักงานคนนี้" : "UNKNOWN FACE (NOT REGISTERED)";
+                            scanBtn.innerText = currentLang === 'th' ? "ไม่พบใบหน้านี้ในระบบพนักงาน" : "UNKNOWN FACE (NOT REGISTERED)";
                             scanBtn.style.background = '#ef4444'; 
+                            scanBtn.style.color = '#ffffff';
                         }
                     }
-                } else {
-                    scanBtn.innerText = l.scan_btn;
-                    scanBtn.style.background = 'var(--slate)';
-                    scanBtn.style.color = 'var(--text-main)';
                 }
             } catch (err) {
-                console.warn("AI Loop Skip Context:", err);
+                console.warn("AI Loop Execution Interrupted:", err);
             }
 
             if (!isScanningLocked && modal.style.display === 'flex') {
-                setTimeout(runAutoFaceDetection, 400);
+                setTimeout(runAutoFaceDetection, 800);
             }
         }
 
@@ -794,8 +794,12 @@
             const descriptorArray = Array.from(detection.descriptor);
             document.getElementById('ai-status').innerText = "SAVING MATRIX...";
             
-            // เปลี่ยนวิธีการเซฟข้อมูลผ่านท่อคำสั่งหลักเพื่ออัปเดตอาร์เรย์ตัวแปรได้ทันที
             await actionCall('saveFaceProfile', { name: name, descriptor: descriptorArray });
+
+            if (!fullData) fullData = { faceProfiles: [] };
+            if (!fullData.faceProfiles) fullData.faceProfiles = [];
+            fullData.faceProfiles = fullData.faceProfiles.filter(p => p.name.toLowerCase() !== name.toLowerCase());
+            fullData.faceProfiles.push({ name: name, descriptor: descriptorArray });
 
             document.getElementById('ai-status').innerText = "REGISTERED SUCCESSFULLY";
             alert(`FACE PROFILE LOGGED FOR: ${name.toUpperCase()}`);

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WITHU | EXECUTIVE CONTROL V6.7</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>WITHU | EXECUTIVE CONTROL V6.8</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #fcfcfc; --surface: #ffffff; --text-main: #000000; --text-muted: #737373;
             --accent: #000000; --border: #e5e5e5; --slate: #f5f5f5;
-            --radius: 8px; --shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --radius: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         [data-theme="dark"] {
             --bg: #0a0a0a; --surface: #121212; --text-main: #ffffff; --text-muted: #a3a3a3;
@@ -20,51 +20,62 @@
         * { font-family: 'Inter', 'Prompt', sans-serif; box-sizing: border-box; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
         body { background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 60px; overflow-x: hidden; }
 
-        .op-bar { background: #000; color: #fff; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: 1px; position: sticky; top: 0; z-index: 1100; font-weight: 600; text-transform: uppercase; }
-        .cleanup-alert { color: #fff; border: 1px solid #fff; padding: 2px 8px; border-radius: 4px; display: none; }
+        /* --- OPERATIONS BAR --- */
+        .op-bar { background: #000000; color: #ffffff; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: 1px; position: sticky; top: 0; z-index: 1100; font-weight: 600; text-transform: uppercase; }
+        .cleanup-alert { color: #ffffff; border: 1px solid #ffffff; padding: 2px 8px; border-radius: 4px; display: none; }
 
-        .top-nav { background: var(--surface); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 41px; z-index: 1000; }
+        /* --- NAVIGATION --- */
+        .top-nav { background: var(--surface); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 35px; z-index: 1000; }
         .logo { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; text-transform: uppercase; }
 
         .container { max-width: 1450px; margin: 25px auto; padding: 0 20px; }
 
+        /* --- STATS GRID --- */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: var(--surface); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
         .stat-card small { color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
         .stat-card h3 { margin: 0; font-size: 24px; font-weight: 700; }
 
+        /* --- TAB NAVIGATION --- */
         .tab-bar { display: flex; gap: 4px; margin-bottom: 25px; background: var(--border); padding: 4px; border-radius: 8px; width: fit-content; }
         .tab-btn { padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: var(--text-muted); font-weight: 600; font-size: 12px; transition: 0.2s; text-transform: uppercase; }
         .tab-btn.active { background: var(--surface); color: var(--text-main); }
 
+        /* --- ORDER CARDS & STEPS --- */
         .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
         .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); }
         .card-head { padding: 18px; background: rgba(0,0,0,0.01); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
-        
-        .status-line { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; width: fit-content; }
-        .status-dot { width: 5px; height: 5px; border-radius: 50%; background: #000; }
+        .card-body { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; }
+
+        /* แถบสถานะความคืบหน้าของออเดอร์ */
+        .track-bar { display: flex; justify-content: space-between; width: 100%; font-size: 10px; margin-top: 10px; padding-top: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .track-step { padding-bottom: 3px; border-bottom: 2px solid transparent; color: var(--text-muted); opacity: 0.4; }
+        .track-step.active { color: var(--text-main); opacity: 1; border-bottom-color: #000000; }
 
         .item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; align-items: center; }
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 600; }
         .item-info small { display: block; color: var(--text-muted); font-size: 11px; margin-top: 1px; }
 
-        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 10px; text-decoration: underline; padding: 0; }
-        .btn-void:hover { color: #000; }
+        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; }
+        .btn-void:hover { color: #000000; }
 
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        .btn-black { background: #000; color: #fff; border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 12px; font-size: 13px; text-transform: uppercase; }
+        .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: var(--text-main); }
+        .btn-outline:hover { background: #000000; color: #ffffff; border-color: #000000; }
+        .btn-black { background: #000000; color: #ffffff; border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 12px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
 
+        /* --- REPORT STYLE --- */
         .report-table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-        .report-table th { text-align: left; padding: 12px; border-bottom: 2px solid #000; font-size: 11px; text-transform: uppercase; background: var(--slate); }
-        .report-table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .report-table th { text-align: left; padding: 12px; border-bottom: 2px solid var(--text-main); font-size: 11px; text-transform: uppercase; background: var(--slate); color: var(--text-muted); }
+        .report-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
+        /* --- MODALS --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
         .modal-card { background: var(--surface); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
 
         .pay-tile { padding: 15px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; text-align: center; font-weight: 700; font-size: 12px; text-transform: uppercase; }
-        .pay-tile:hover { background: #000; color: #fff; }
+        .pay-tile:hover { background: #000000; color: #ffffff; }
 
         input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; background: var(--surface); color: var(--text-main); }
         .toast-notify { position: fixed; bottom: 20px; left: 20px; background: #000; color: #fff; padding: 15px 25px; border-radius: 4px; display: none; font-size: 12px; font-weight: 600; z-index: 10000; text-transform: uppercase; cursor: pointer; }
@@ -162,7 +173,7 @@
                     <span>TOTAL</span><span id="manual-total-price">฿0</span>
                 </div>
             </div>
-            <div class="btn-group">
+            <div class="btn-group" style="grid-template-columns: 1fr 1fr; margin-top:15px;">
                 <button class="btn-outline" onclick="document.getElementById('manual-order-modal').style.display='none'">CANCEL</button>
                 <button class="btn-black" onclick="submitManualOrder()" style="margin:0;">CONFIRM</button>
             </div>
@@ -184,9 +195,10 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxYc-5SV7ayKsLpAUUrILqSAU7wUIMf1q_dQfef5tkvDcjJo1AoYa_2zH6-gdX6mP9pnQ/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec";
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
+        let lastActionMap = {};
 
         function updateClock() {
             const now = new Date();
@@ -229,7 +241,7 @@
             const takeaway = document.getElementById('takeaway-sec');
             let groups = {};
             orders.forEach(o => {
-                if(!groups[o.table]) groups[o.table] = {items:[], total:0, rows:[], time:o.time, status: o.status};
+                if(!groups[o.table]) groups[o.table] = {items:[], total:0, rows:[], time:o.time};
                 groups[o.table].items.push(o);
                 groups[o.table].total += parseFloat(String(o.total).replace(/,/g,'')) || 0;
                 groups[o.table].rows.push(o.rowNum);
@@ -239,17 +251,32 @@
                 let html = "";
                 Object.keys(groups).filter(t => isStore ? !isNaN(t) : isNaN(t)).forEach(t => {
                     const wait = getTimeDiff(groups[t].time);
+                    const status = lastActionMap[t] || groups[t].items[0].status || "รับออเดอร์";
+                    
+                    // ระบบดึงแถบสเต็ปสถานะ
+                    const s1 = (status === "รับออเดอร์" || status === "PENDING") ? "active" : "";
+                    const s2 = (status === "กำลังทำ") ? "active" : "";
+                    const s3 = (status === "รอเสิร์ฟ") ? "active" : "";
+
                     html += `<div class="order-card">
                         <div class="card-head">
-                            <div><b style="font-size:20px;">${isNaN(t)?t:'TABLE '+t}</b><br>
-                            <span class="status-line"><div class="status-dot"></div>${groups[t].status}</span></div>
-                            <small style="color:var(--text-muted); font-weight:700;">${wait} MINS</small>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <b style="font-size:20px;">${isNaN(t)?t:'TABLE '+t}</b>
+                                    <small style="color:var(--text-muted); font-weight:700;">${wait} MINS AGO</small>
+                                </div>
+                                <div class="track-bar">
+                                    <span class="track-step ${s1}">1. NEW</span>
+                                    <span class="track-step ${s2}">2. COOKING</span>
+                                    <span class="track-step ${s3}">3. SERVING</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div style="flex-grow:1;">
                                 ${groups[t].items.map(i => `<div class="item-row">
                                     <div class="item-info"><b>${i.qty}x ${i.menu}</b><small>${i.details}</small>
-                                    <button class="btn-void" onclick="actionCall('voidItem', {rowNum: ${i.rowNum}})">VOID</button></div>
+                                    <button class="btn-void" onclick="handleVoidItem(${i.rowNum})">VOID</button></div>
                                     <b style="font-size:14px;">฿${i.total}</b>
                                 </div>`).join('')}
                             </div>
@@ -257,8 +284,8 @@
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-size:20px; font-weight:800;">฿${groups[t].total.toLocaleString()}</span>
                                 <div style="display:flex; gap:5px;">
-                                    <button class="btn-outline" onclick="actionCall('updateStatus', {rowNums: ${JSON.stringify(groups[t].rows)}, nextStatus: 'กำลังทำ'})">COOK</button>
-                                    <button class="btn-outline" onclick="actionCall('updateStatus', {rowNums: ${JSON.stringify(groups[t].rows)}, nextStatus: 'รอเสิร์ฟ'})">SERVE</button>
+                                    <button class="btn-outline" onclick="handleStatusUpdate('${t}', 'กำลังทำ')">COOK</button>
+                                    <button class="btn-outline" onclick="handleStatusUpdate('${t}', 'รอเสิร์ฟ')">SERVE</button>
                                 </div>
                             </div>
                             <button class="btn-black" onclick="openPayModal('${t}')">COLLECT PAYMENT</button>
@@ -270,7 +297,7 @@
             takeaway.innerHTML = genCards(false);
         }
 
-        // --- 💰 PAYMENT & DISPLAY SYNC (FASTEST) ---
+        // --- 💰 PAYMENT & DISPLAY (CDS) SYNC ---
         function openPayModal(tableId) {
             const orders = fullData.orders.filter(o => o.table.toString() === tableId.toString());
             if(!orders.length) return;
@@ -280,9 +307,10 @@
             document.getElementById('p-total-price').innerText = "฿" + pTotal.toLocaleString();
             document.getElementById('p-bill-items').innerHTML = orders.map(i => `<div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;"><span>${i.qty}x ${i.menu}</span><b>฿${i.total}</b></div>`).join('');
             
-            // ยิงจอ Display ด้วย mode no-cors เพื่อความไว
-            fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'setPaymentStatus', table: tableId, status: 'paying'})});
-            
+            // ยิงข้อมูลเข้าหน้าจอตัวแสดงผลฝั่งลูกค้า (Display) โดยไม่มีคำสั่ง await ให้หน่วงระบบ
+            fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table: tableId, status: 'paying'})});
+            localStorage.setItem('cds_cash_received', '0');
+
             document.getElementById('p-qr-area').style.display = 'none';
             document.getElementById('p-cash-area').style.display = 'none';
             document.getElementById('p-methods').style.display = 'grid';
@@ -298,6 +326,7 @@
         function calcChange() {
             const rec = parseFloat(document.getElementById('p-cash-input').value) || 0;
             const diff = rec - pTotal;
+            localStorage.setItem('cds_cash_received', rec.toString());
             const display = document.getElementById('p-change-display');
             const submit = document.getElementById('p-cash-submit');
             if(rec >= pTotal) { display.innerText = "CHANGE: ฿" + diff.toLocaleString(); display.style.display = 'block'; submit.style.display = 'block'; }
@@ -306,22 +335,45 @@
 
         async function finalPay(method) {
             if(!confirm(`Confirm payment?`)) return;
-            await actionCall('setPaymentStatus', {table: pTable, status: 'idle'});
-            await actionCall('markMultipleDone', {rowNums: pRows, paymentMethod: method});
+            fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table: pTable, status: 'idle'})});
+            await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'markMultipleDone', rowNums: pRows, paymentMethod: method})});
+            localStorage.setItem('cds_cash_received', '0');
             document.getElementById('pay-modal').style.display = 'none';
+            refresh();
         }
-        function closePayModal() { actionCall('setPaymentStatus', {table: pTable, status: 'idle'}); document.getElementById('pay-modal').style.display = 'none'; }
+        function closePayModal() { fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table: pTable, status: 'idle'})}); localStorage.setItem('cds_cash_received', '0'); document.getElementById('pay-modal').style.display = 'none'; }
 
-        // --- 📊 PERFORMANCE & OTHERS ---
+        // --- 📋 DIRECT SEAMLESS UPDATES (ZERO-LAG) ---
+        function handleStatusUpdate(tableId, status) {
+            lastActionMap[tableId] = status;
+            // ไฮไลต์เปลี่ยนสเต็ปบนหน้าจอทันที (Optimistic UI)
+            if(fullData && fullData.orders) {
+                fullData.orders.forEach(o => { if(o.table.toString() === tableId.toString()) o.status = status; });
+                renderOrders(fullData.orders);
+            }
+            const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
+            if (rows.length === 0) return;
+            fetch(API_URL, {method:'POST', body: JSON.stringify({action:'updateStatus', rowNums: rows, nextStatus: status})});
+        }
+
+        async function handleVoidItem(rowNum) {
+            if(!confirm("Confirm VOID this item?")) return;
+            await fetch(API_URL, {method:'POST', body: JSON.stringify({action:'voidItem', rowNum: rowNum})});
+            refresh();
+        }
+
+        // --- 📊 REPORTS ---
         function renderPerformance(report) {
             document.getElementById('report-date-text').innerText = new Date().toLocaleDateString('en-GB', {dateStyle:'full'}).toUpperCase();
-            document.getElementById('report-content').innerHTML = `<table class="report-table"><thead><tr><th>Product</th><th style="text-align:center;">Sold</th><th style="text-align:right;">Profit</th></tr></thead><tbody>${report.map(i => `<tr><td><b>${i.name}</b></td><td style="text-align:center;">${i.qty}</td><td style="text-align:right; font-weight:700;">฿${(i.profit || 0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`;
+            document.getElementById('report-content').innerHTML = `<table class="report-table"><thead><tr><th>Product Name</th><th style="text-align:center;">Sold</th><th style="text-align:right;">Profit</th></tr></thead><tbody>${report.map(i => `<tr><td><b>${i.name}</b></td><td style="text-align:center;">${i.qty}</td><td style="text-align:right; font-weight:700;">฿${(i.profit || 0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`;
         }
-        function renderStock(menu) { document.getElementById('stock-list-body').innerHTML = menu.map(m => `<div style="display:flex; justify-content:space-between; padding:15px 20px; border-bottom:1px solid var(--border); align-items:center;"><span><b>${m[0]}</b><br><small style="color:var(--text-muted);">Cost ฿${m[6]||0}</small></span><button class="btn-outline" onclick="actionCall('updateStock', {type:'menu', name:'${m[0]}', status:'${m[5]=='หมด'?'ปกติ':'หมด'}'})">${m[5]||'NORMAL'}</button></div>`).join(''); }
+        function renderStock(menu) { document.getElementById('stock-list-body').innerHTML = menu.map(m => `<div style="display:flex; justify-content:space-between; padding:15px 20px; border-bottom:1px solid var(--border); align-items:center;"><span><b>${m[0]}</b><br><small style="color:var(--text-muted);">Cost ฿${m[6]||0}</small></span><button class="btn-outline" onclick="handleStockToggle('${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${m[5]||'NORMAL'}</button></div>`).join(''); }
+        async function handleStockToggle(name, status) { await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status})}); refresh(); }
 
+        // --- 🕒 ATTENDANCE & MANUAL ORDERS ---
         function openManualOrderModal() {
             manualCart = []; updateManualUI();
-            document.getElementById('manual-menu-list').innerHTML = fullData.menu.map(m => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; align-items:center;"><span style="font-size:13px;">${m[0]} (฿${m[1]})</span><button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-size:10px; cursor:pointer;">SELECT</button></div>`).join('');
+            document.getElementById('manual-menu-list').innerHTML = fullData.menu.map(m => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;"><span style="font-size:13px;">${m[0]} (฿${m[1]})</span><button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-size:10px; cursor:pointer;">SELECT</button></div>`).join('');
             document.getElementById('manual-order-modal').style.display = 'flex';
         }
         function addToManual(n, p) { manualCart.push({name:n, price:p, qty:1, total:p}); updateManualUI(); }
@@ -331,22 +383,21 @@
         }
         async function submitManualOrder() {
             if(!manualCart.length) return;
-            await actionCall('submitOrder', {table: document.getElementById('manual-channel').value, cart: manualCart});
-            document.getElementById('manual-order-modal').style.display = 'none';
+            await fetch(API_URL, {method:'POST', body: JSON.stringify({action: 'submitOrder', table: document.getElementById('manual-channel').value, cart: manualCart})});
+            document.getElementById('manual-order-modal').style.display = 'none'; refresh();
         }
 
         async function clockStaff(type) {
             const name = document.getElementById('staff-name').value; if(!name) return alert("NAME?");
-            await actionCall('staffClock', {name: name, type: type}); alert("LOGGED"); toggleAttendance();
+            await fetch(API_URL, {method:'POST', body: JSON.stringify({action: 'staffClock', name: name, type: type})}); toggleAttendance(); refresh();
         }
         function renderAttendanceLog(att) { document.getElementById('att-log').innerHTML = (att||[]).map(a => `<div style="padding:5px 0; border-bottom:1px dashed #eee;"><b>${a.name}</b> ${a.type} @ ${a.time}</div>`).join(''); }
         function toggleAttendance() { let m = document.getElementById('att-modal'); m.style.display = m.style.display === 'none' ? 'flex' : 'none'; }
         function toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
         function showSec(n) { ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec'].forEach(s => document.getElementById(s).style.display = 'none'); document.getElementById(n + '-sec').style.display = (n === 'report' ? 'block' : 'grid'); document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); }
         function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }
-        async function actionCall(action, params) { try { await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action, ...params})}); refresh(); } catch(e) { console.error(e); } }
         function drawChart(data) { const ctx = document.getElementById('salesChart').getContext('2d'); salesChartInst = new Chart(ctx, {type:'bar', data:{labels:Array.from({length:24},(_,i)=>i+":00"), datasets:[{data:data, backgroundColor:'#000', borderRadius:2}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}}); }
-        function clearCallNotify() { const t = document.getElementById('call-table-no').innerText; fetch(API_URL+"?action=clearCall&table="+t, {mode:'no-cors'}); document.getElementById('call-notify').style.display='none'; }
+        function clearCallNotify() { const t = document.getElementById('call-table-no').innerText; fetch(API_URL+"?action=clearCall&table="+t); document.getElementById('call-notify').style.display='none'; }
 
         setInterval(updateClock, 1000); refresh(); setInterval(refresh, 10000);
     </script>

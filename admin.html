@@ -6,6 +6,7 @@
     <title>WITHU ADMIN | CONTROL CENTER</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <style>
         :root {
             --bg: #fcfcfd; --surface: #ffffff; --text-main: #000000; --text-muted: #737373;
@@ -126,7 +127,7 @@
             <div class="map-grid" id="live-map-grid">
                 <script>
                     for(let i=1; i<=15; i++) {
-                        document.write(`<div class="map-table" id="map-t-${i}">T-${i}</div>`);
+                        document.write(`<div class="map-table" id="map-t-${i}" onclick="handleMapTableClick('${i}')" style="cursor:pointer;">T-${i}</div>`);
                     }
                 </script>
             </div>
@@ -242,16 +243,27 @@
     </div>
 
     <div id="att-modal" class="modal-overlay">
-        <div class="modal-card" style="max-width:380px; text-align:center;">
-            <h2 style="margin:0; font-size:18px;" id="lbl-staff-title">STAFF CLOCK</h2>
-            <input type="text" id="staff-name" placeholder="Staff Name" style="text-align:center; margin:15px 0;">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button class="btn-black" onclick="clockStaff('เข้างาน')">IN</button>
-                <button class="btn-black" onclick="clockStaff('ออกงาน')">OUT</button>
+        <div class="modal-card" style="max-width:420px; text-align:center;">
+            <h2 style="margin-top:0; font-size:18px;" id="lbl-staff-title">STAFF CLOCK</h2>
+            <p style="color:var(--text-muted); font-size:11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 5px 0 0 0;" id="ai-status">AI MODELS LOADING...</p>
+            
+            <div style="position:relative; width:100%; max-width:320px; height:240px; margin:15px auto; background:#000000; border-radius:8px; overflow:hidden; border:1px solid var(--border);">
+                <video id="webcam" autoplay muted playsinline width="320" height="240" style="object-fit: cover; width:100%; height:100%;"></video>
             </div>
-            <hr style="border:none; border-top:1px solid var(--border); margin:15px 0;">
-            <div id="att-log" style="text-align:left; font-size:12px; max-height:150px; overflow-y:auto;"></div>
-            <button onclick="toggleAttendance()" style="margin-top:15px; border:none; background:none; color:var(--text-muted); font-size:12px; cursor:pointer;" id="btn-staff-close">CLOSE</button>
+
+            <input type="text" id="staff-name" placeholder="Staff Name" style="text-align:center; padding:12px; font-size:15px; border-radius:6px; margin-bottom:15px;">
+            
+            <div style="display:grid; grid-template-columns: 1fr; gap:10px; margin-bottom:15px;">
+                <button class="btn-black" onclick="startFaceRecognition()" style="margin-top:0;" id="btn-scan-face">SCAN FACE TO CLOCK</button>
+            </div>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button class="btn-outline" onclick="registerFaceProfile()" id="btn-reg-face">REGISTER FACE</button>
+                <button class="btn-outline" onclick="toggleAttendance()" id="btn-staff-close">CLOSE</button>
+            </div>
+            
+            <hr style="border:none; border-top:1px solid var(--border); margin:20px 0;">
+            <div id="att-log" style="text-align:left; font-size:12px; max-height:120px; overflow-y:auto;"></div>
         </div>
     </div>
 
@@ -261,6 +273,7 @@
         let pTable = "", pTotal = 0, pRows = [];
         let lastActionMap = {};
         let currentLang = localStorage.getItem('withu_lang') || 'th';
+        let isAiModelsLoaded = false, localStream = null, currentChartMode = 'peak';
 
         const langPack = {
             th: {
@@ -272,7 +285,9 @@
                 th_name: "ชื่อเมนู", th_cost: "ต้นทุน", th_status: "สถานะ", th_ctrl: "จัดการ", void: "ลบรายการ",
                 status_normal: "ปกติ", status_out: "หมด", toggle: "สลับสถานะ", live_map: "แผนผังร้านแบบ Real-time",
                 heat_title: "อันดับเมนูขายดี (Heat Menu)", ai_title: "AI วิเคราะห์ธุรกิจ", manual_title: "สร้างออเดอร์นอกระบบ",
-                perf_title: "รายงานสรุปยอดขาย", btn_peak: "รายชั่วโมง", btn_day: "รายวัน", staff_title: "ตอกบัตรพนักงาน"
+                perf_title: "รายงานสรุปยอดขาย", btn_peak: "รายชั่วโมง", btn_day: "รายวัน", staff_title: "ตอกบัตรพนักงาน",
+                ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI พร้อมใช้งาน", scan_btn: "สแกนใบหน้าตอกบัตร", reg_btn: "ลงทะเบียนใบหน้า",
+                mistake: "ตรวจพบข้อมูลผิดปกติ"
             },
             en: {
                 btn_add: "ADD ORDER", btn_staff: "STAFF", btn_export: "EXPORT PDF",
@@ -283,7 +298,9 @@
                 th_name: "Item Name", th_cost: "Cost", th_status: "Status", th_ctrl: "Control", void: "VOID",
                 status_normal: "NORMAL", status_out: "OUT OF STOCK", toggle: "TOGGLE", live_map: "Live Restaurant Map",
                 heat_title: "Heat Menu (Best Sellers)", ai_title: "AI Business Advisor", manual_title: "CREATE MANUAL ORDER",
-                perf_title: "DAILY PERFORMANCE REPORT", btn_peak: "HOURLY", btn_day: "DAILY", staff_title: "STAFF CLOCK"
+                perf_title: "DAILY PERFORMANCE REPORT", btn_peak: "HOURLY", btn_day: "DAILY", staff_title: "STAFF CLOCK",
+                ai_loading: "AI MODELS LOADING...", ai_ready: "AI SYSTEM READY", scan_btn: "SCAN FACE TO CLOCK", reg_btn: "REGISTER FACE",
+                mistake: "MISTAKE DETECTED"
             }
         };
 
@@ -324,6 +341,10 @@
             document.getElementById('btn-peak').innerText = l.btn_peak;
             document.getElementById('btn-day').innerText = l.btn_day;
             document.getElementById('lbl-staff-title').innerText = l.staff_title;
+            document.getElementById('btn-scan-face').innerText = l.scan_btn;
+            document.getElementById('btn-reg-face').innerText = l.reg_btn;
+            document.getElementById('mistake-log').innerText = l.mistake;
+            if(!isAiModelsLoaded) document.getElementById('ai-status').innerText = l.ai_loading;
         }
 
         function updateClock() {
@@ -332,7 +353,7 @@
             let diff = close - now;
             if(diff < 0) { document.getElementById('close-timer').innerText = "CLOSED"; return; }
             let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-            document.getElementById('close-timer').innerText = `${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
+            document.getElementById('close-timer').innerText = `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
             document.getElementById('cleanup-reminder').style.display = (h == 0 && m <= 30) ? 'block' : 'none';
             document.getElementById('date-now').innerText = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase();
         }
@@ -351,13 +372,13 @@
                     document.getElementById('call-notify').style.display = 'block';
                 } else { document.getElementById('call-notify').style.display = 'none'; }
 
-                // Reset Map Grid Statuses
+                // รีเซ็ตสถานะ Live Map แผนผังโต๊ะ
                 for(let i=1; i<=15; i++) {
                     let tile = document.getElementById(`map-t-${i}`);
                     if(tile) tile.className = "map-table";
                 }
 
-                // ดึงข้อมูลการเรียกพนักงานมาสั่งกะพริบบนแผนผังจำลอง (Live Map)
+                // ซิงค์สเตตัสกระพริบแดงทันทีเมื่อโต๊ะกดเรียกพนักงาน
                 if(data.calls && data.calls.length > 0) {
                     data.calls.forEach(c => {
                         let tile = document.getElementById(`map-t-${c.table}`);
@@ -374,7 +395,6 @@
                 const avg = (data.orders.reduce((s,o) => s + getTimeDiff(o.time), 0) / (data.orders.length || 1)).toFixed(1);
                 document.getElementById('avg-speed').innerText = avg + " MINS";
                 
-                // สั่งวาด/อัปเดตกราฟแท่งทุกๆ 5 วินาที
                 drawChart();
             } catch(e) { console.error("Sync Failure:", e); }
         }
@@ -392,14 +412,12 @@
                 groups[o.table].total += parseFloat(String(o.total).replace(/,/g,'')) || 0;
                 groups[o.table].rows.push(o.rowNum);
 
-                // ซิงค์สเตตัสเปิดโต๊ะปกติลง Live Map
                 if(!isNaN(o.table)) {
                     let tile = document.getElementById(`map-t-${o.table}`);
                     if(tile && !tile.classList.contains("alert-trigger")) tile.classList.add("active");
                 }
             });
 
-            // ตรวจสอบโต๊ะที่แอดมินกำลังสั่งชำระเงิน ให้กะพริบสถานะบน Live Map
             for(let i=1; i<=15; i++) {
                 if(localStorage.getItem('cds_paying_table') == i) {
                     let tile = document.getElementById(`map-t-${i}`);
@@ -417,7 +435,6 @@
                     const s2 = (status === "กำลังทำ") ? "active" : "";
                     const s3 = (status === "รอเสิร์ฟ") ? "active" : "";
 
-                    // ระบบตรวจจับโต๊ะรอนานเกินมาตรฐาน (SLA Trigger > 15 นาที)
                     let isSlaLate = wait > 15;
 
                     html += `<div class="order-card ${isSlaLate ? 'sla-trigger' : ''}">
@@ -437,9 +454,7 @@
                         <div class="card-body">
                             <div style="flex-grow:1;">
                                 ${groups[t].items.map(i => {
-                                    // Human Mistake Detection (จำนวนไอเทมโดดผิดปกติ > 10 ชิ้น)
                                     if(i.qty > 10) globalMistakeDetected = true;
-                                    
                                     const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
                                     return `
                                     <div class="item-row">
@@ -471,6 +486,13 @@
             document.getElementById('mistake-log').style.display = globalMistakeDetected ? 'block' : 'none';
         }
 
+        // เพิ่มคำสั่งดักฟังเพื่อเปิด Modal ชำระเงินเมื่อแอดมินคลิกโต๊ะบน Live Map ผังร้านโดยตรง
+        function handleMapTableClick(tableId) {
+            if(!fullData || !fullData.orders) return;
+            const hasActiveOrder = fullData.orders.some(o => o.table.toString() === tableId.toString());
+            if(hasActiveOrder) openPayModal(tableId);
+        }
+
         // --- 💰 PAYMENT & DISPLAY (CDS) SYNC ---
         function openPayModal(tableId) {
             const orders = fullData.orders.filter(o => o.table.toString() === tableId.toString());
@@ -481,8 +503,9 @@
             document.getElementById('p-total-price').innerText = "฿" + pTotal.toLocaleString();
             document.getElementById('p-bill-items').innerHTML = orders.map(i => `<div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;"><span>${i.qty}x ${i.menu}</span><b>฿${i.total}</b></div>`).join('');
             
+            // ยิงสเตตัสอัปเดตแบบ POST ไปยังจอแสดงผลฝั่งลูกค้าแบบ Zero-Lag
             localStorage.setItem('cds_paying_table', tableId.toString());
-            fetch(API_URL + "?action=setPaymentStatus&table=" + tableId + "&status=paying", {method:'GET', mode:'no-cors'});
+            actionCall('setPaymentStatus', {table: tableId, status: 'paying'});
             localStorage.setItem('cds_cash_received', '0');
 
             document.getElementById('p-qr-area').style.display = 'none';
@@ -510,15 +533,15 @@
         async function finalPay(method) {
             if(!confirm(`Confirm payment?`)) return;
             localStorage.removeItem('cds_paying_table');
-            fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'setPaymentStatus', table: pTable, status: 'idle'})});
-            await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'markMultipleDone', rowNums: pRows, paymentMethod: method})});
+            await actionCall('setPaymentStatus', {table: pTable, status: 'idle'});
+            await actionCall('markMultipleDone', {rowNums: pRows, paymentMethod: method});
             localStorage.setItem('cds_cash_received', '0');
             document.getElementById('pay-modal').style.display = 'none';
             refresh();
         }
         function closePayModal() { 
             localStorage.removeItem('cds_paying_table');
-            fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'setPaymentStatus', table: pTable, status: 'idle'})}); 
+            actionCall('setPaymentStatus', {table: pTable, status: 'idle'}); 
             localStorage.setItem('cds_cash_received', '0'); 
             document.getElementById('pay-modal').style.display = 'none'; 
             refresh();
@@ -546,7 +569,7 @@
         function renderAIInsights(summary, activeOrders) {
             const topProducts = summary.report.slice(0, 3);
             document.getElementById('heat-menu-list').innerHTML = topProducts.map((p, index) => `
-                <div style="font-size:13px; font-weight:600; padding:6px 0; border-bottom:1px dashed var(--border);">
+                <div style="font-size:13px; font-weight:600; padding:4px 0; border-bottom:1px dashed var(--border);">
                     ${index+1}. ${p.name} (${p.qty} ชิ้น)
                 </div>`).join('') || "ไม่มีข้อมูล";
 
@@ -593,10 +616,8 @@
         function drawChart() {
             if(!fullData || !fullData.summary) return;
             const ctx = document.getElementById('salesChart').getContext('2d');
-            
             let labels = [], data = [];
             const isDark = document.body.getAttribute('data-theme') === 'dark';
-            
             if(currentChartMode === 'peak') {
                 labels = Array.from({length: 24}, (_, i) => i + ":00");
                 data = fullData.summary.peakHours;
@@ -604,9 +625,7 @@
                 labels = fullData.summary.chartDaily.map(i => i.date);
                 data = fullData.summary.chartDaily.map(i => i.total);
             }
-
-            if(salesChartInst) salesChartInst.destroy(); // ทำลายอินสแตนซ์เก่าก่อนวาดใหม่ เพื่อกันค้าง/ซ้อน
-
+            if(salesChartInst) salesChartInst.destroy();
             salesChartInst = new Chart(ctx, {
                 type: 'bar',
                 data: { labels, datasets: [{ data, backgroundColor: isDark ? '#ffffff' : '#000000', borderRadius: 2 }] },
@@ -621,7 +640,121 @@
             drawChart();
         }
 
-        // --- 🕒 OTHER MODALS ENGINE ---
+        // --- 🕒 AI FACIAL ATTENDANCE LOGIC ENGINE ---
+        async function loadFaceApiModels() {
+            if (isAiModelsLoaded) return;
+            const l = langPack[currentLang];
+            const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights/';
+            try {
+                await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+                isAiModelsLoaded = true;
+                document.getElementById('ai-status').innerText = l.ai_ready;
+            } catch (e) {
+                document.getElementById('ai-status').innerText = "AI ERROR";
+                console.error(e);
+            }
+        }
+
+        async function toggleAttendance() {
+            let m = document.getElementById('att-modal');
+            if (m.style.display === 'none' || m.style.display === '') {
+                m.style.display = 'flex';
+                applyLanguagePack();
+                await loadFaceApiModels();
+                startWebcam();
+            } else {
+                m.style.display = 'none';
+                stopWebcam();
+            }
+        }
+
+        function startWebcam() {
+            const video = document.getElementById('webcam');
+            navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } })
+                .then(stream => { localStream = stream; video.srcObject = stream; })
+                .catch(err => console.error("Webcam blocked:", err));
+        }
+
+        function stopWebcam() {
+            if (localStream) { localStream.getTracks().forEach(track => track.stop()); localStream = null; }
+            document.getElementById('webcam').srcObject = null;
+        }
+
+        async function registerFaceProfile() {
+            const name = document.getElementById('staff-name').value.trim();
+            if (!name) return alert("ENTER STAFF NAME");
+            if (!isAiModelsLoaded) return alert("AI NOT READY");
+
+            document.getElementById('ai-status').innerText = "CAPTURING FACE...";
+            const video = document.getElementById('webcam');
+            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+
+            if (!detection) {
+                document.getElementById('ai-status').innerText = "RE-TRY FACE POSITION";
+                return alert("FACE NOT DETECTED. POSITION IN CENTER.");
+            }
+
+            const descriptorArray = Array.from(detection.descriptor);
+            document.getElementById('ai-status').innerText = "SAVING MATRIX...";
+            await fetch(API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: 'saveFaceProfile', name: name, descriptor: descriptorArray })
+            });
+
+            document.getElementById('ai-status').innerText = "REGISTERED SUCCESSFULLY";
+            alert(`FACE PROFILE LOGGED FOR: ${name.toUpperCase()}`);
+            refresh();
+        }
+
+        async function startFaceRecognition() {
+            if (!isAiModelsLoaded) return alert("AI SYSTEM DOWN");
+            if (!fullData || !fullData.faceProfiles || fullData.faceProfiles.length === 0) {
+                return alert("NO BASE FACE PROFILES IN SHEET DATABASE");
+            }
+
+            document.getElementById('ai-status').innerText = "PROCESSING PROFILE...";
+            const video = document.getElementById('webcam');
+            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+
+            if (!detection) {
+                document.getElementById('ai-status').innerText = "SCAN FAILED";
+                return alert("COULD NOT EXTRACT DESCRIPTOR.");
+            }
+
+            const labeledDescriptors = fullData.faceProfiles.map(p => {
+                return new faceapi.LabeledFaceDescriptors(p.name, [new Float32Array(p.descriptor)]);
+            });
+
+            const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6);
+            const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+
+            if (bestMatch.label === 'unknown') {
+                document.getElementById('ai-status').innerText = "UNKNOWN ID";
+                return alert("MATCH NOT FOUND.");
+            }
+
+            const staffId = bestMatch.label;
+            document.getElementById('staff-name').value = staffId;
+            
+            const records = fullData.attendance ? fullData.attendance.filter(a => a.name === staffId) : [];
+            let type = "เข้างาน";
+            if (records.length > 0 && records[records.length - 1].type === "เข้างาน") { type = "ออกงาน"; }
+
+            document.getElementById('ai-status').innerText = `VERIFIED: ${staffId.toUpperCase()}`;
+            await actionCall('staffClock', { name: staffId, type: type });
+            alert(`CLOCK RECORDED: ${staffId.toUpperCase()} (${type})`);
+            toggleAttendance();
+        }
+
+        function renderAttendanceLog(att) { 
+            document.getElementById('att-log').innerHTML = (att||[]).map(a => `
+                <div style="padding:5px 0; border-bottom:1px dashed var(--border);"><b>${a.name}</b> ${a.type} @ ${a.time}</div>`).join(''); 
+        }
+
+        // --- 🕒 GENERAL MANUAL INTERFACE MODAL ---
         function openManualOrderModal() {
             manualCart = []; updateManualUI();
             document.getElementById('manual-menu-list').innerHTML = fullData.menu.map(m => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;"><span style="font-size:13px;">${m[0]} (฿${m[1]})</span><button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-size:10px; cursor:pointer;">SELECT</button></div>`).join('');
@@ -638,21 +771,13 @@
             document.getElementById('manual-order-modal').style.display = 'none'; refresh();
         }
 
-        async function clockStaff(type) {
-            const name = document.getElementById('staff-name').value; if(!name) return alert("NAME?");
-            await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action: 'staffClock', name: name, type: type})}); toggleAttendance(); refresh();
-        }
-        function renderAttendanceLog(att) { document.getElementById('att-log').innerHTML = (att||[]).map(a => `<div style="padding:5px 0; border-bottom:1px dashed #eee;"><b>${a.name}</b> ${a.type} @ ${a.time}</div>`).join(''); }
-        function toggleAttendance() { let m = document.getElementById('att-modal'); m.style.display = m.style.display === 'none' ? 'flex' : 'none'; }
-        function toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); if(salesChartInst) setTimeout(drawChart, 100); }
-        function showSec(n) { ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec'].forEach(s => document.getElementById(s).style.display = 'none'); document.getElementById(n + '-sec').style.display = (n === 'report' ? 'block' : 'grid'); document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); }
         function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }
+        function showSec(n) { ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec'].forEach(s => document.getElementById(s).style.display = 'none'); document.getElementById(n + '-sec').style.display = (n === 'report' ? 'block' : 'grid'); document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); }
+        async function actionCall(action, params) { try { await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action, ...params})}); refresh(); } catch(e) { console.error(e); } }
         function clearCallNotify() { const t = document.getElementById('call-table-no').innerText; fetch(API_URL+"?action=clearCall&table="+t, {method:'POST', mode:'no-cors'}); document.getElementById('call-notify').style.display='none'; }
 
         applyLanguagePack();
-        setInterval(updateClock, 1000); 
-        refresh(); 
-        setInterval(refresh, 5000); // วนลูปรีเฟรชข้อมูลความเร็วสูงทุกๆ 5 วินาที
+        setInterval(updateClock, 1000); refresh(); setInterval(refresh, 5000);
     </script>
 </body>
 </html>

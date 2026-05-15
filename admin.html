@@ -288,7 +288,7 @@
                 heat_title: "อันดับเมนูขายดี (Heat Menu)", ai_title: "AI วิเคราะห์ธุรกิจ", manual_title: "สร้างออเดอร์นอกระบบ",
                 perf_title: "รายงานสรุปยอดขาย", btn_peak: "รายชั่วโมง", btn_day: "รายวัน", staff_title: "ตอกบัตรพนักงาน",
                 ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI กำลังค้นหาใบหน้าอัตโนมัติ...", scan_btn: "ระบบสแกนอัตโนมัติกำลังทำงาน...", reg_btn: "ลงทะเบียนใบหน้า",
-                mistake: "ตรวจพบข้อมูลผิดปกติ", no_face: "ไม่พบข้อมูลใบหน้า กรุณาลงทะเบียนก่อน"
+                mistake: "ตรวจพบข้อมูลผิดปกติ", no_face: "ไม่พบข้อมูลใบหน้าพนักงานในระบบ (กรุณาลงทะเบียนพนักงานก่อน)"
             },
             en: {
                 btn_add: "ADD ORDER", btn_staff: "STAFF", btn_export: "EXPORT PDF",
@@ -354,7 +354,7 @@
             let diff = close - now;
             if(diff < 0) { document.getElementById('close-timer').innerText = "CLOSED"; return; }
             let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-            document.getElementById('close-timer').innerText = `${h}:${m<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
+            document.getElementById('close-timer').innerText = `${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
             document.getElementById('cleanup-reminder').style.display = (h == 0 && m <= 30) ? 'block' : 'none';
             document.getElementById('date-now').innerText = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase();
         }
@@ -599,13 +599,17 @@
 
         function renderStock(menu) {
             const l = langPack[currentLang];
-            document.getElementById('stock-list-body').innerHTML = menu.map(m => `
+            document.getElementById('stock-list-body').innerHTML = menu.map(m => {
+                const isOut = m[5] === 'หมด' || m[5] === 'OUT OF STOCK';
+                const statusText = isOut ? l.status_out : l.status_normal;
+                return `
                 <tr>
                     <td style="font-weight:600; padding:15px 12px;">${m[0]}</td>
                     <td style="color:var(--text-muted);">฿${m[6]||0}</td>
-                    <td style="font-weight:700; font-size:12px; color:${m[5]=='หมด'?'var(--danger)':'var(--success)'};">${m[5]=='หมด' ? l.status_out : l.status_normal}</td>
-                    <td><button class="btn-s" style="padding:6px 12px;" onclick="handleStockToggle('${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">${l.toggle}</button></td>
-                </tr>`).join('');
+                    <td style="font-weight:700; font-size:12px; color:${isOut ? 'var(--danger)':'var(--success)'};">${statusText}</td>
+                    <td><button class="btn-s" style="padding:6px 12px;" onclick="handleStockToggle('${m[0]}','${isOut ? 'ปกติ':'หมด'}')">${l.toggle}</button></td>
+                </tr>`;
+            }).join('');
         }
         async function handleStockToggle(name, status) { await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status})}); refresh(); }
 
@@ -637,7 +641,7 @@
             drawChart();
         }
 
-        // --- 🕒 AI AUTOMATED FACIAL RECOGNITION ENGINE (STABLE ANTI-CRASH PROTECTION) ---
+        // --- 🕒 AI AUTOMATED FACIAL RECOGNITION ENGINE (ANTI-RACE CONDITION BLOCK) ---
         async function loadFaceApiModels() {
             if (isAiModelsLoaded) return;
             const l = langPack[currentLang];
@@ -647,7 +651,12 @@
                 await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
                 isAiModelsLoaded = true;
-                document.getElementById('ai-status').innerText = l.ai_ready;
+                
+                const faceCount = (fullData && fullData.faceProfiles) ? fullData.faceProfiles.length : 0;
+                document.getElementById('ai-status').innerText = currentLang === 'th' 
+                    ? `ระบบ AI พร้อมทำงาน (ฐานข้อมูลพนักงาน: ${faceCount} คน)` 
+                    : `AI SYSTEM READY (${faceCount} staff profiles loaded)`;
+                    
                 runAutoFaceDetection(); 
             } catch (e) {
                 document.getElementById('ai-status').innerText = "AI MODEL ERROR";
@@ -671,7 +680,8 @@
 
         function startWebcam() {
             const video = document.getElementById('webcam');
-            navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } })
+            // เพิ่มความยืดหยุ่นในกรณีเปิดกล้องบนอุปกรณ์พกพาหน้าร้าน
+            navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: "user" } })
                 .then(stream => { localStream = stream; video.srcObject = stream; })
                 .catch(err => console.error("Webcam blocked:", err));
         }
@@ -681,27 +691,43 @@
             document.getElementById('webcam').srcObject = null;
         }
 
-        // 🔥 [แก้ไขจุดบกพร่องเสร็จสมบูรณ์] เพิ่ม Try-Catch ครอบลูปสแกนอัตโนมัติแบบไร้ดีเลย์ เห็นหน้าปั๊บขึ้นชื่อและปิดกล้องบันทึกงานทันที
         async function runAutoFaceDetection() {
             const modal = document.getElementById('att-modal');
             const l = langPack[currentLang];
+            const scanBtn = document.getElementById('btn-scan-face');
             
-            // ตรวจสอบความพร้อมของสิทธิ์ระบบก่อนทำงาน
             if (!isAiModelsLoaded || !localStream || isScanningLocked || modal.style.display !== 'flex') return;
 
             try {
                 const video = document.getElementById('webcam');
-                // หากเฟรมวิดีโอยังไม่ตอบสนอง ให้ข้ามสเต็ปนี้ไปรอโหลดรอบถัดไปภายใน 400ms เพื่อป้องกันอาการค้าง
                 if (!video || video.paused || video.ended || !video.srcObject) {
                     setTimeout(runAutoFaceDetection, 400);
                     return;
                 }
 
+                // 🔥 [แก้ไขจุดบกพร่อง] Sentry ป้องกันฐานข้อมูลว่างเปล่า/ข้ามปัญหาระบบ Race Condition ตอนเพิ่งเปิดหน้าเว็บ
+                if (!fullData) {
+                    scanBtn.innerText = currentLang === 'th' ? "กำลังซิงค์ระบบคลังข้อมูลพนักงาน..." : "SYNCING STAFF DIRECTORY...";
+                    setTimeout(runAutoFaceDetection, 400);
+                    return;
+                }
+
+                if (!fullData.faceProfiles || fullData.faceProfiles.length === 0) {
+                    scanBtn.innerText = l.no_face;
+                    scanBtn.style.background = '#333333';
+                    scanBtn.style.color = '#ffffff';
+                    setTimeout(runAutoFaceDetection, 1000);
+                    return;
+                }
+
                 const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
 
-                if (detection && fullData && fullData.faceProfiles && fullData.faceProfiles.length > 0) {
+                if (detection) {
+                    scanBtn.innerText = currentLang === 'th' ? "ตรวจพบใบหน้า...กำลังระบุชื่อ" : "FACE DETECTED... VERIFYING";
+                    scanBtn.style.background = '#000000';
+                    scanBtn.style.color = '#ffffff';
+
                     const labeledDescriptors = [];
-                    
                     fullData.faceProfiles.forEach(p => {
                         if (p.descriptor && p.descriptor.length > 0) {
                             try {
@@ -711,21 +737,17 @@
                     });
 
                     if (labeledDescriptors.length > 0) {
-                        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.55); // ตั้งเกณฑ์ความไวการสแกนในระดับเสถียรสูงสุด
+                        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.60); 
                         const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
 
                         if (bestMatch.label !== 'unknown') {
-                            isScanningLocked = true; // ล็อกปุ่มป้องกันซ้ำซ้อน
+                            isScanningLocked = true; 
                             
                             const staffId = bestMatch.label;
                             document.getElementById('staff-name').value = staffId;
-                            document.getElementById('ai-status').innerText = currentLang === 'th' ? `กำลังบันทึก: ${staffId.toUpperCase()}` : `VERIFYING: ${staffId.toUpperCase()}`;
+                            document.getElementById('ai-status').innerText = currentLang === 'th' ? `กำลังบันทึกข้อมูล: ${staffId.toUpperCase()}` : `SAVING RECORD: ${staffId.toUpperCase()}`;
                             
-                            // เปลี่ยนสีปุ่มเป็นสถานะยืนยันชื่อพนักงานแบบอินเตอร์แอคทีฟ
-                            const scanBtn = document.getElementById('btn-scan-face');
-                            scanBtn.innerText = staffId.toUpperCase();
-                            scanBtn.style.background = '#000000';
-                            scanBtn.style.color = '#ffffff';
+                            scanBtn.innerText = `MATCHED: ${staffId.toUpperCase()}`;
 
                             const records = fullData.attendance ? fullData.attendance.filter(a => a.name === staffId) : [];
                             let type = "เข้างาน";
@@ -734,14 +756,20 @@
                             await actionCall('staffClock', { name: staffId, type: type });
                             alert(`CLOCK RECORDED: ${staffId.toUpperCase()} (${type === 'เข้างาน' ? 'IN' : 'OUT'})`);
                             
-                            toggleAttendance(); // สแกนผ่านปิด Modal ให้เองทันที
+                            toggleAttendance(); 
                             return;
+                        } else {
+                            scanBtn.innerText = currentLang === 'th' ? "ไม่พบข้อมูลพนักงานคนนี้" : "UNKNOWN FACE (NOT REGISTERED)";
+                            scanBtn.style.background = '#ef4444'; 
                         }
                     }
+                } else {
+                    scanBtn.innerText = l.scan_btn;
+                    scanBtn.style.background = 'var(--slate)';
+                    scanBtn.style.color = 'var(--text-main)';
                 }
             } catch (err) {
-                // ดักจับข้อยกเว้นและล้างหน่วยความจำ เพื่อให้ AI เริ่มลูปสแกนใบหน้าใหม่ในรอบถัดไปโดยไม่มีอาการหน่วงค้าง
-                console.warn("AI Safe Skip Loop Context:", err);
+                console.warn("AI Loop Skip Context:", err);
             }
 
             if (!isScanningLocked && modal.style.display === 'flex') {
@@ -751,10 +779,10 @@
 
         async function registerFaceProfile() {
             const name = document.getElementById('staff-name').value.trim();
-            if (!name) return alert("ENTER STAFF NAME");
+            if (!name) return alert("PLEASE ENTER STAFF NAME BEFORE REGISTER");
             if (!isAiModelsLoaded) return alert("AI NOT READY");
 
-            document.getElementById('ai-status').innerText = "CAPTURING FACE...";
+            document.getElementById('ai-status').innerText = "CAPTURING FACE PROFILE...";
             const video = document.getElementById('webcam');
             const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
 
@@ -765,22 +793,19 @@
 
             const descriptorArray = Array.from(detection.descriptor);
             document.getElementById('ai-status').innerText = "SAVING MATRIX...";
-            await fetch(API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: 'saveFaceProfile', name: name, descriptor: descriptorArray })
-            });
+            
+            // เปลี่ยนวิธีการเซฟข้อมูลผ่านท่อคำสั่งหลักเพื่ออัปเดตอาร์เรย์ตัวแปรได้ทันที
+            await actionCall('saveFaceProfile', { name: name, descriptor: descriptorArray });
 
             document.getElementById('ai-status').innerText = "REGISTERED SUCCESSFULLY";
             alert(`FACE PROFILE LOGGED FOR: ${name.toUpperCase()}`);
-            refresh();
+            toggleAttendance();
         }
 
         function renderAttendanceLog(att) { 
             document.getElementById('att-log').innerHTML = (att||[]).map(a => {
                 let displayTime = a.time;
-                // [แก้ไขบั๊กปีคริสต์ศักราช 1899] แปลงล้างรูปแบบสายอักขระเวลาแปลกปลอมให้อ่านง่ายเป็นสากลรายวัน
-                if (displayTime && (displayTime.includes('T') || displayTime.includes('-'))) {
+                if (displayTime && displayTime.includes('T')) {
                     try { displayTime = new Date(displayTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}); } catch(e){}
                 }
                 return `<div style="padding:5px 0; border-bottom:1px solid var(--border);"><b>${a.name}</b> - ${a.type} @ ${displayTime}</div>`;

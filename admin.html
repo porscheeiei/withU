@@ -254,7 +254,7 @@
             <input type="text" id="staff-name" placeholder="Staff Name" style="text-align:center; padding:12px; font-size:15px; border-radius:6px; margin-bottom:15px;">
             
             <div style="display:grid; grid-template-columns: 1fr; gap:10px; margin-bottom:15px;">
-                <div id="btn-scan-face" class="btn-black" style="text-align:center; cursor:default; background:var(--slate); color:var(--text-main); border:1px solid var(--border);">SCANNING AUTOMATICALLY...</div>
+                <div id="btn-scan-face" class="btn-black" style="text-align:center; cursor:default; background:var(--slate); color:var(--text-main); border:1px solid var(--border); transition: 0.3s;">SCANNING AUTOMATICALLY...</div>
             </div>
             
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -268,7 +268,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwAqWTz4heWd1OWty6TWMPdW8mfkb2agvDPguvedCpTIqy3Mbuo75c00_AhAkiD-R4lzg/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec";
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
         let lastActionMap = {};
@@ -288,7 +288,7 @@
                 heat_title: "อันดับเมนูขายดี (Heat Menu)", ai_title: "AI วิเคราะห์ธุรกิจ", manual_title: "สร้างออเดอร์นอกระบบ",
                 perf_title: "รายงานสรุปยอดขาย", btn_peak: "รายชั่วโมง", btn_day: "รายวัน", staff_title: "ตอกบัตรพนักงาน",
                 ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI กำลังค้นหาใบหน้าอัตโนมัติ...", scan_btn: "ระบบสแกนอัตโนมัติกำลังทำงาน...", reg_btn: "ลงทะเบียนใบหน้า",
-                mistake: "ตรวจพบข้อมูลผิดปกติ"
+                mistake: "ตรวจพบข้อมูลผิดปกติ", no_face: "ไม่พบข้อมูลใบหน้า กรุณาลงทะเบียนก่อน"
             },
             en: {
                 btn_add: "ADD ORDER", btn_staff: "STAFF", btn_export: "EXPORT PDF",
@@ -301,7 +301,7 @@
                 heat_title: "Heat Menu (Best Sellers)", ai_title: "AI Business Advisor", manual_title: "CREATE MANUAL ORDER",
                 perf_title: "DAILY PERFORMANCE REPORT", btn_peak: "HOURLY", btn_day: "DAILY", staff_title: "STAFF CLOCK",
                 ai_loading: "AI MODELS LOADING...", ai_ready: "AI SYSTEM SCANNING AUTOMATICALLY...", scan_btn: "SCANNING AUTOMATICALLY...", reg_btn: "REGISTER FACE",
-                mistake: "MISTAKE DETECTED"
+                mistake: "MISTAKE DETECTED", no_face: "NO REGISTERED FACES IN DATABASE"
             }
         };
 
@@ -354,7 +354,7 @@
             let diff = close - now;
             if(diff < 0) { document.getElementById('close-timer').innerText = "CLOSED"; return; }
             let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-            document.getElementById('close-timer').innerText = `${h}:${m<10?'0':''}${m}:${s<10?'0':''}${m}:${s<10?'0':''}${s}`;
+            document.getElementById('close-timer').innerText = `${h}:${m<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
             document.getElementById('cleanup-reminder').style.display = (h == 0 && m <= 30) ? 'block' : 'none';
             document.getElementById('date-now').innerText = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase();
         }
@@ -637,7 +637,7 @@
             drawChart();
         }
 
-        // --- 🕒 AI AUTOMATED FACIAL RECOGNITION ENGINE ---
+        // --- 🕒 AI AUTOMATED FACIAL RECOGNITION ENGINE (STABLE ANTI-CRASH PROTECTION) ---
         async function loadFaceApiModels() {
             if (isAiModelsLoaded) return;
             const l = langPack[currentLang];
@@ -650,7 +650,7 @@
                 document.getElementById('ai-status').innerText = l.ai_ready;
                 runAutoFaceDetection(); 
             } catch (e) {
-                document.getElementById('ai-status').innerText = "AI ERROR";
+                document.getElementById('ai-status').innerText = "AI MODEL ERROR";
                 console.error(e);
             }
         }
@@ -681,38 +681,67 @@
             document.getElementById('webcam').srcObject = null;
         }
 
+        // 🔥 [แก้ไขจุดบกพร่องเสร็จสมบูรณ์] เพิ่ม Try-Catch ครอบลูปสแกนอัตโนมัติแบบไร้ดีเลย์ เห็นหน้าปั๊บขึ้นชื่อและปิดกล้องบันทึกงานทันที
         async function runAutoFaceDetection() {
             const modal = document.getElementById('att-modal');
+            const l = langPack[currentLang];
+            
+            // ตรวจสอบความพร้อมของสิทธิ์ระบบก่อนทำงาน
             if (!isAiModelsLoaded || !localStream || isScanningLocked || modal.style.display !== 'flex') return;
 
-            const video = document.getElementById('webcam');
-            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-
-            if (detection && fullData && fullData.faceProfiles && fullData.faceProfiles.length > 0) {
-                const labeledDescriptors = fullData.faceProfiles.map(p => {
-                    return new faceapi.LabeledFaceDescriptors(p.name, [new Float32Array(p.descriptor)]);
-                });
-
-                const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6);
-                const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-
-                if (bestMatch.label !== 'unknown') {
-                    isScanningLocked = true; 
-                    
-                    const staffId = bestMatch.label;
-                    document.getElementById('staff-name').value = staffId;
-                    document.getElementById('ai-status').innerText = currentLang === 'th' ? `กำลังบันทึก: ${staffId.toUpperCase()}` : `VERIFYING: ${staffId.toUpperCase()}`;
-
-                    const records = fullData.attendance ? fullData.attendance.filter(a => a.name === staffId) : [];
-                    let type = "เข้างาน";
-                    if (records.length > 0 && records[records.length - 1].type === "เข้างาน") { type = "ออกงาน"; }
-
-                    await actionCall('staffClock', { name: staffId, type: type });
-                    alert(`CLOCK RECORDED: ${staffId.toUpperCase()} (${type === 'เข้างาน' ? 'IN' : 'OUT'})`);
-                    
-                    toggleAttendance(); 
+            try {
+                const video = document.getElementById('webcam');
+                // หากเฟรมวิดีโอยังไม่ตอบสนอง ให้ข้ามสเต็ปนี้ไปรอโหลดรอบถัดไปภายใน 400ms เพื่อป้องกันอาการค้าง
+                if (!video || video.paused || video.ended || !video.srcObject) {
+                    setTimeout(runAutoFaceDetection, 400);
                     return;
                 }
+
+                const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+
+                if (detection && fullData && fullData.faceProfiles && fullData.faceProfiles.length > 0) {
+                    const labeledDescriptors = [];
+                    
+                    fullData.faceProfiles.forEach(p => {
+                        if (p.descriptor && p.descriptor.length > 0) {
+                            try {
+                                labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(p.name, [new Float32Array(p.descriptor)]));
+                            } catch(err) {}
+                        }
+                    });
+
+                    if (labeledDescriptors.length > 0) {
+                        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.55); // ตั้งเกณฑ์ความไวการสแกนในระดับเสถียรสูงสุด
+                        const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+
+                        if (bestMatch.label !== 'unknown') {
+                            isScanningLocked = true; // ล็อกปุ่มป้องกันซ้ำซ้อน
+                            
+                            const staffId = bestMatch.label;
+                            document.getElementById('staff-name').value = staffId;
+                            document.getElementById('ai-status').innerText = currentLang === 'th' ? `กำลังบันทึก: ${staffId.toUpperCase()}` : `VERIFYING: ${staffId.toUpperCase()}`;
+                            
+                            // เปลี่ยนสีปุ่มเป็นสถานะยืนยันชื่อพนักงานแบบอินเตอร์แอคทีฟ
+                            const scanBtn = document.getElementById('btn-scan-face');
+                            scanBtn.innerText = staffId.toUpperCase();
+                            scanBtn.style.background = '#000000';
+                            scanBtn.style.color = '#ffffff';
+
+                            const records = fullData.attendance ? fullData.attendance.filter(a => a.name === staffId) : [];
+                            let type = "เข้างาน";
+                            if (records.length > 0 && records[records.length - 1].type === "เข้างาน") { type = "ออกงาน"; }
+
+                            await actionCall('staffClock', { name: staffId, type: type });
+                            alert(`CLOCK RECORDED: ${staffId.toUpperCase()} (${type === 'เข้างาน' ? 'IN' : 'OUT'})`);
+                            
+                            toggleAttendance(); // สแกนผ่านปิด Modal ให้เองทันที
+                            return;
+                        }
+                    }
+                }
+            } catch (err) {
+                // ดักจับข้อยกเว้นและล้างหน่วยความจำ เพื่อให้ AI เริ่มลูปสแกนใบหน้าใหม่ในรอบถัดไปโดยไม่มีอาการหน่วงค้าง
+                console.warn("AI Safe Skip Loop Context:", err);
             }
 
             if (!isScanningLocked && modal.style.display === 'flex') {
@@ -750,7 +779,8 @@
         function renderAttendanceLog(att) { 
             document.getElementById('att-log').innerHTML = (att||[]).map(a => {
                 let displayTime = a.time;
-                if (displayTime && displayTime.includes('T')) {
+                // [แก้ไขบั๊กปีคริสต์ศักราช 1899] แปลงล้างรูปแบบสายอักขระเวลาแปลกปลอมให้อ่านง่ายเป็นสากลรายวัน
+                if (displayTime && (displayTime.includes('T') || displayTime.includes('-'))) {
                     try { displayTime = new Date(displayTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}); } catch(e){}
                 }
                 return `<div style="padding:5px 0; border-bottom:1px solid var(--border);"><b>${a.name}</b> - ${a.type} @ ${displayTime}</div>`;

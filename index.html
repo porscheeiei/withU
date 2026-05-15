@@ -17,18 +17,15 @@
         
         .app-container { width: 100%; max-width: 550px; margin: 0 auto; padding: 0 20px 160px 20px; }
 
-        /* --- 🔝 Header --- */
         .top-bar { background: var(--glass); backdrop-filter: blur(15px); padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 1000; }
         .brand { font-weight: 900; font-size: 26px; letter-spacing: -0.5px; text-transform: uppercase; }
         .table-badge { background: #000; color: #fff; padding: 8px 22px; border-radius: 50px; font-size: 18px; font-weight: 800; }
         .call-btn { background: var(--bright-red); color: #fff !important; border: none; padding: 10px 20px; border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(255,0,0,0.2); }
 
-        /* --- 🔍 Search Area --- */
         .search-area { position: sticky; top: 75px; z-index: 950; background: var(--bg); padding: 15px 0 10px 0; }
         .search-input { width: 100%; padding: 16px 25px 16px 55px; border-radius: 50px; border: none; background: #fff; font-size: 15px; outline: none; box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
         .search-icon { position: absolute; left: 22px; top: 32px; color: #94a3b8; display: flex; pointer-events: none; }
         
-        /* --- 🏷 Navigation --- */
         #category-nav { display: flex; overflow-x: auto; padding: 5px 0 15px 0; scrollbar-width: none; gap: 12px; }
         .nav-pill { background: #fff; color: var(--gray); border: 1px solid var(--border); padding: 10px 28px; border-radius: 50px; font-size: 14px; white-space: nowrap; cursor: pointer; font-weight: 600; transition: 0.3s; }
         .nav-pill.active { background: #000; color: #fff; border-color: #000; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
@@ -37,7 +34,6 @@
         .sub-pill { background: #f1f5f9; color: #64748b; padding: 8px 22px; border-radius: 50px; font-size: 12px; white-space: nowrap; cursor: pointer; font-weight: 700; transition: 0.3s; }
         .sub-pill.active { background: #000; color: #fff; }
 
-        /* --- 🍽 Menu Cards --- */
         .menu-item { background: #fff; border-radius: 45px; padding: 35px; border: 1px solid rgba(0,0,0,0.01); box-shadow: 0 12px 40px -10px rgba(0,0,0,0.05); margin-bottom: 25px; animation: fadeIn 0.5s ease; position: relative; }
         .menu-top { display: flex; align-items: center; margin-bottom: 25px; }
         .menu-img { width: 115px; height: 115px; object-fit: cover; border-radius: 30px; margin-right: 25px; background: #f8fafc; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
@@ -87,30 +83,12 @@
         .custom-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); display: none; z-index: 5000; align-items: flex-end; justify-content: center; }
         .custom-modal { background: #fff; width: 100%; max-width: 500px; padding: 45px 35px; border-radius: 45px 45px 0 0; text-align: center; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        /* --- 🎬 Keyframes แอนิเมชัน --- */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        @keyframes slideUpCart { 
-            from { transform: translateX(-50%) translateY(100px); opacity: 0; } 
-            to { transform: translateX(-50%) translateY(0); opacity: 1; } 
-        }
-
-        @keyframes ring {
-            0% { transform: rotate(0); }
-            10% { transform: rotate(15deg); }
-            20% { transform: rotate(-15deg); }
-            30% { transform: rotate(10deg); }
-            40% { transform: rotate(-10deg); }
-            50% { transform: rotate(0); }
-            100% { transform: rotate(0); }
-        }
-
-        @keyframes pulse-ring { 
-            0% { transform: scale(0.8); opacity: 1; } 
-            100% { transform: scale(1.6); opacity: 0; } 
-        }
+        @keyframes slideUpCart { from { transform: translateX(-50%) translateY(100px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+        @keyframes ring { 0% { transform: rotate(0); } 10% { transform: rotate(15deg); } 20% { transform: rotate(-15deg); } 30% { transform: rotate(10deg); } 40% { transform: rotate(-10deg); } 50% { transform: rotate(0); } 100% { transform: rotate(0); } }
+        @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
 
         .sold-out { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
     </style>
@@ -201,42 +179,18 @@
         const urlParams = new URLSearchParams(window.location.search);
         const urlTable = urlParams.get('table');
         const savedTable = localStorage.getItem('withu_table');
-
-        if (urlTable) {
-            currentTable = urlTable;
-            localStorage.setItem('withu_table', currentTable);
-            startApp();
-            if (localStorage.getItem('withu_order_active') === 'true') showStatus();
-        } else if (savedTable) {
-            currentTable = savedTable;
-            startApp();
-            if (localStorage.getItem('withu_order_active') === 'true') showStatus();
-        }
+        if (urlTable) { currentTable = urlTable; localStorage.setItem('withu_table', currentTable); startApp(); if (localStorage.getItem('withu_order_active') === 'true') showStatus(); }
+        else if (savedTable) { currentTable = savedTable; startApp(); if (localStorage.getItem('withu_order_active') === 'true') showStatus(); }
     }
 
     function lockTable() { let s = document.getElementById("table-select"); if(!s.value) return; currentTable = s.value; localStorage.setItem('withu_table', currentTable); startApp(); }
-    
-    function startApp() { 
-        document.getElementById("display-table").innerText = "โต๊ะ " + currentTable; 
-        document.getElementById("table-overlay").style.display = "none"; 
-        document.getElementById("menu-view").style.display = "block"; 
-        document.getElementById("app-header").style.display = "flex"; 
-        loadMenu(); 
-    }
+    function startApp() { document.getElementById("display-table").innerText = "โต๊ะ " + currentTable; document.getElementById("table-overlay").style.display = "none"; document.getElementById("menu-view").style.display = "block"; document.getElementById("app-header").style.display = "flex"; loadMenu(); }
 
     async function loadMenu() { 
         const cachedMenu = localStorage.getItem('withu_cached_menu');
-        if(cachedMenu) {
-            const d = JSON.parse(cachedMenu);
-            fullMenu = d.menu; toppingsData = d.toppings; 
-            renderMenu("ทั้งหมด");
-        }
+        if(cachedMenu) { const d = JSON.parse(cachedMenu); fullMenu = d.menu; toppingsData = d.toppings; renderMenu("ทั้งหมด"); }
         fetch(API_URL + "?action=getMenu").then(r=>r.json()).then(d=>{
-            if(d.menu) {
-                localStorage.setItem('withu_cached_menu', JSON.stringify(d));
-                fullMenu = d.menu; toppingsData = d.toppings;
-                updateDisplay();
-            }
+            if(d.menu) { localStorage.setItem('withu_cached_menu', JSON.stringify(d)); fullMenu = d.menu; toppingsData = d.toppings; updateDisplay(); }
         });
     }
 
@@ -329,7 +283,10 @@
     
     async function chk() {
         try {
-            const r = await fetch(API_URL + "?action=getAdminData"); const d = await r.json(); const myOrders = d.orders.filter(o => o.table == currentTable);
+            const r = await fetch(API_URL + "?action=getAdminData"); 
+            const d = await r.json(); 
+            const myOrders = d.orders.filter(o => o.table.toString() == currentTable.toString());
+
             if (myOrders.length === 0) { 
                 upS(4); document.getElementById('queue-info').innerText = "ขอบคุณที่ใช้บริการค่ะ";
                 if(!autoCloseTimer) {
@@ -341,8 +298,17 @@
                 }
                 return; 
             }
-            const myRank = [...new Set(d.orders.map(o => o.table))].indexOf(currentTable.toString());
-            document.getElementById('queue-info').innerText = myRank > 0 ? `เหลืออีก ${myRank} คิวถึงออเดอร์ของคุณ` : "ลำดับถัดไปคือออเดอร์ของคุณค่ะ";
+
+            // --- 🚀 ระบบคำนวณคิวที่สมบูรณ์ ---
+            const activeOrders = d.orders.filter(o => o.status !== "สำเร็จ");
+            const allTablesInQueue = [...new Set(activeOrders.map(o => o.table.toString()))];
+            const myRank = allTablesInQueue.indexOf(currentTable.toString());
+
+            const qEl = document.getElementById('queue-info');
+            if (myRank === 0) { qEl.innerText = "ลำดับถัดไปคือออเดอร์ของคุณค่ะ 👨‍🍳"; }
+            else if (myRank > 0) { qEl.innerText = `เหลืออีก ${myRank} คิวถึงออเดอร์ของคุณ`; }
+            else { qEl.innerText = "ออเดอร์ของคุณกำลังดำเนินการ"; }
+
             let minVal = 4, totalSum = 0; const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4};
             myOrders.forEach(o => { if (p[o.status] < minVal) minVal = p[o.status]; totalSum += parseFloat(String(o.total).replace(/,/g,'')) || 0; });
             upS(minVal); document.getElementById('stat-sum').innerText = totalSum.toLocaleString();

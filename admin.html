@@ -3,214 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WITHU | Premium Command Center</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>WITHU | COMMAND CENTER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg: #f8f9fa; --surface: #ffffff; --text-main: #1a1c1e; --text-muted: #6c757d;
-            --accent: #000000; --border: #edf0f2; --danger: #ef4444; --success: #10b981; --warning: #f59e0b;
-            --radius: 16px; --shadow: 0 4px 20px rgba(0,0,0,0.03);
+            --bg: #fcfcfc; --surface: #ffffff; --text-main: #000000; --text-muted: #737373;
+            --accent: #000000; --border: #e5e5e5; --danger: #000000; --success: #000000;
+            --radius: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         [data-theme="dark"] {
-            --bg: #0d0e10; --surface: #16181d; --text-main: #f1f3f5; --text-muted: #adb5bd;
-            --border: #2c2e33; --accent: #ffffff;
+            --bg: #0a0a0a; --surface: #121212; --text-main: #ffffff; --text-muted: #a3a3a3;
+            --border: #262626; --accent: #ffffff;
         }
 
-        * { font-family: 'Prompt', 'Inter', sans-serif; box-sizing: border-box; outline: none; }
-        body { background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 50px; transition: 0.3s; -webkit-font-smoothing: antialiased; }
+        * { font-family: 'Inter', 'Prompt', sans-serif; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { background: var(--bg); color: var(--text-main); margin: 0; transition: background 0.3s; padding-bottom: 40px; }
 
-        /* --- 🕒 Operation Header --- */
-        .op-header { background: #000; color: #fff; padding: 12px 40px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; position: sticky; top: 0; z-index: 1100; }
-        .cleanup-alert { background: var(--danger); color: white; padding: 4px 12px; border-radius: 8px; animation: blink 1s infinite; display: none; font-weight: 700; }
-        @keyframes blink { 50% { opacity: 0.5; } }
+        /* --- TOP OPERATION BAR --- */
+        .op-bar { background: #000; color: #fff; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; letter-spacing: 1px; position: sticky; top: 0; z-index: 1100; font-weight: 600; }
+        .cleanup-alert { color: #fff; border: 1px solid #fff; padding: 2px 8px; border-radius: 4px; display: none; }
 
-        /* --- 🔝 Navigation --- */
-        .top-nav { background: var(--surface); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 43px; z-index: 1000; }
-        .logo { font-weight: 800; font-size: 20px; letter-spacing: -1px; }
-        .logo span { color: var(--text-muted); font-weight: 400; margin-left: 5px; }
+        /* --- NAVIGATION --- */
+        .top-nav { background: var(--surface); padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 38px; z-index: 1000; }
+        .logo { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; }
 
-        .container { max-width: 1400px; margin: 25px auto; padding: 0 25px; }
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
 
-        /* --- 📊 Dashboard Stats --- */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: var(--surface); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
-        .stat-card small { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; }
-        .stat-card h3 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+        /* --- SUMMARY STATS --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: var(--surface); padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .stat-card small { color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+        .stat-card h3 { margin: 0; font-size: 26px; font-weight: 700; }
 
-        /* --- 🕹️ Control Tabs --- */
-        .tab-bar { display: flex; gap: 8px; margin-bottom: 25px; background: var(--border); padding: 5px; border-radius: 12px; width: fit-content; }
-        .tab-btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; background: transparent; color: var(--text-muted); font-weight: 600; font-size: 13px; transition: 0.2s; }
-        .tab-btn.active { background: var(--surface); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        /* --- TABS --- */
+        .tab-bar { display: flex; gap: 5px; margin-bottom: 25px; background: var(--border); padding: 4px; border-radius: 10px; width: fit-content; }
+        .tab-btn { padding: 8px 18px; border-radius: 7px; border: none; cursor: pointer; background: transparent; color: var(--text-muted); font-weight: 600; font-size: 13px; transition: 0.2s; }
+        .tab-btn.active { background: var(--surface); color: var(--text-main); }
 
-        /* --- 📦 Order Kanban --- */
-        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
-        .order-card { background: var(--surface); border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); position: relative; display: flex; flex-direction: column; }
-        .card-head { padding: 20px 25px; background: rgba(0,0,0,0.015); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
-        .card-body { padding: 25px; flex-grow: 1; }
+        /* --- ORDER KANBAN --- */
+        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+        .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s; }
+        .card-head { padding: 20px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
+        .card-body { padding: 20px; flex-grow: 1; }
+
+        .speed-badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 5px; display: inline-block; border: 1px solid currentColor; }
+        .speed-fast { color: var(--text-main); }
+        .speed-late { color: var(--text-main); background: #000; color: #fff; }
+
+        .item-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; align-items: center; }
+        .item-info b { font-weight: 600; }
+        .item-info small { display: block; color: var(--text-muted); font-size: 12px; margin-top: 2px; }
         
-        .speed-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; }
-        .speed-fast { background: #ecfdf5; color: #10b981; }
-        .speed-warn { background: #fffbeb; color: #f59e0b; }
-        .speed-late { background: #fef2f2; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-
-        .item-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
-        .item-info b { font-weight: 600; color: var(--text-main); }
-        .item-info small { display: block; color: var(--text-muted); font-size: 12px; }
+        /* ปุ่มลบรายการรายชิ้น */
+        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; }
+        .btn-void:hover { color: #000; }
 
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn-secondary { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
-        .btn-main { background: #000; color: #fff; border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 10px; transition: 0.2s; }
-        .btn-main:hover { opacity: 0.8; }
+        .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; }
+        .btn-black { background: #000; color: #fff; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 10px; font-size: 14px; }
 
-        /* --- 📋 Inventory List --- */
-        .stock-table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 15px; overflow: hidden; }
-        .stock-table th { text-align: left; padding: 15px 25px; background: rgba(0,0,0,0.02); color: var(--text-muted); font-size: 11px; text-transform: uppercase; }
-        .stock-table td { padding: 15px 25px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        /* --- REPORT TABLE --- */
+        .report-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .report-table th { text-align: left; padding: 12px; border-bottom: 2px solid #000; font-size: 12px; text-transform: uppercase; }
+        .report-table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
-        /* --- 🔔 Toast Alert --- */
-        .toast { position: fixed; bottom: 30px; left: 30px; background: #000; color: #fff; padding: 18px 30px; border-radius: 20px; display: none; align-items: center; gap: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); z-index: 10000; animation: slideUp 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); cursor: pointer; }
-        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        /* --- MODALS --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
+        .modal-card { background: var(--surface); width: 100%; max-width: 450px; border-radius: 20px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
 
-        /* --- 📑 Modal --- */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
-        .modal-card { background: var(--surface); width: 100%; max-width: 500px; border-radius: 30px; padding: 35px; box-shadow: 0 40px 100px rgba(0,0,0,0.1); }
+        .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .pay-tile { padding: 20px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; text-align: center; font-weight: 700; font-size: 14px; }
+        .pay-tile:hover { background: #000; color: #fff; }
+
+        input[type="number"], input[type="text"], select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; background: var(--surface); color: var(--text-main); }
+
+        @media (max-width: 600px) {
+            .op-bar, .top-nav { padding: 10px 15px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .order-grid { grid-template-columns: 1fr; }
+        }
 
         @media print {
-            .op-header, .top-nav, .tab-bar, .stats-grid, .order-grid, .action-btns { display: none !important; }
-            #report-sec { display: block !important; padding: 0; }
-            .container { margin: 0; max-width: 100%; }
+            .op-bar, .top-nav, .tab-bar, .stats-grid, .order-grid, .action-btns, .btn-black { display: none !important; }
+            #report-sec { display: block !important; }
+            .container { margin: 0; padding: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div class="op-header">
-        <div style="display: flex; gap: 30px;">
-            <span>CLOSING IN: <b id="close-timer">00:00:00</b></span>
-            <span>AVG. SERVICE: <b id="avg-speed">0.0 MINS</b></span>
-        </div>
-        <div id="cleanup-reminder" class="cleanup-alert">⚠️ TIME TO CLEAN UP & PACKING!</div>
-        <div id="date-display" style="font-weight: 700; opacity: 0.7;"></div>
+    <div class="op-bar">
+        <div>CLOSING IN: <span id="close-timer">00:00:00</span></div>
+        <div id="cleanup-reminder" class="cleanup-alert">CLEANUP TIME</div>
+        <div id="date-now"></div>
     </div>
 
     <nav class="top-nav">
-        <div class="logo">WITHU <span>SYSTEM v6.2</span></div>
+        <div class="logo">WITHU <span>SYSTEM</span></div>
         <div class="action-btns" style="display: flex; gap: 10px;">
-            <button class="tab-btn" onclick="openManualOrderModal()" style="background: var(--success); color: white;">➕ New Order</button>
-            <button class="tab-btn" onclick="window.print()">📄 PDF Report</button>
-            <button class="tab-btn" onclick="toggleAttendance()" style="background: #000; color: white;">🕒 Attendance</button>
-            <button class="tab-btn" onclick="toggleTheme()" style="background: var(--border); color: var(--text-main);">🌓</button>
+            <button class="tab-btn" onclick="openManualOrderModal()" style="border: 1px solid #000; color: #000;">ADD ORDER</button>
+            <button class="tab-btn" onclick="toggleAttendance()" style="background: #000; color: #fff;">STAFF</button>
+            <button class="tab-btn" onclick="window.print()" style="background: #000; color: #fff;">EXPORT PDF</button>
         </div>
     </nav>
 
     <div class="container">
         <div class="stats-grid">
-            <div class="stat-card">
-                <small>Gross Profit Today</small>
-                <h3 id="prof-val" style="color: var(--success);">฿0</h3>
-            </div>
-            <div class="stat-card">
-                <small>Total Revenue</small>
-                <h3 id="rev-val">฿0</h3>
-            </div>
-            <div class="stat-card">
-                <small>Total Orders</small>
-                <h3 id="daily-order-count">0</h3>
-            </div>
+            <div class="stat-card"><small>Gross Profit</small><h3 id="prof-val">0</h3></div>
+            <div class="stat-card"><small>Revenue</small><h3 id="rev-val">0</h3></div>
+            <div class="stat-card"><small>SLA Speed</small><h3 id="avg-speed">0.0 MINS</h3></div>
         </div>
 
         <div class="tab-bar">
-            <button onclick="showSec('orders')" class="tab-btn active" id="t-orders">Orders</button>
-            <button onclick="showSec('takeaway')" class="tab-btn" id="t-takeaway">Delivery / Takeaway</button>
-            <button onclick="showSec('stock')" class="tab-btn" id="t-stock">Inventory</button>
-            <button onclick="showSec('report')" class="tab-btn" id="t-report">Performance Report</button>
+            <button onclick="showSec('orders')" class="tab-btn active" id="t-orders">STORE</button>
+            <button onclick="showSec('takeaway')" class="tab-btn" id="t-takeaway">DELIVERY</button>
+            <button onclick="showSec('stock')" class="tab-btn" id="t-stock">STOCK</button>
+            <button onclick="showSec('report')" class="tab-btn" id="t-report">REPORT</button>
         </div>
 
         <div id="order-sec" class="order-grid"></div>
         <div id="takeaway-sec" class="order-grid" style="display:none;"></div>
 
         <div id="stock-sec" style="display:none;">
-            <table class="stock-table">
-                <thead><tr><th>Item Name</th><th>Cost</th><th>Status</th><th>Control</th></tr></thead>
-                <tbody id="stock-list-body"></tbody>
-            </table>
+            <div id="stock-list-body" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;"></div>
         </div>
 
         <div id="report-sec" style="display:none;">
-            <div id="printable-report" style="background:#fff; padding:50px; border-radius:24px; border:1px solid var(--border);">
-                <h1 style="text-align:center; margin:0; letter-spacing:-2px;">WITHU DAILY PERFORMANCE</h1>
-                <p style="text-align:center; color:var(--text-muted); margin-bottom:40px;" id="report-date-text"></p>
-                <canvas id="salesChart" height="100"></canvas>
-                <div id="report-content" style="margin-top:50px;"></div>
+            <div id="printable-report">
+                <h2 style="margin:0;">DAILY PERFORMANCE</h2>
+                <p id="report-date-text" style="color: var(--text-muted); font-size: 14px;"></p>
+                <div style="height: 300px; margin: 30px 0;"><canvas id="salesChart"></canvas></div>
+                <div id="report-content"></div>
             </div>
         </div>
     </div>
 
-    <div id="att-modal" class="modal-overlay">
-        <div class="modal-card" style="max-width:400px; text-align:center;">
-            <h2 style="margin-top:0;">Staff Clock</h2>
-            <p style="color:var(--text-muted); font-size:14px;">บันทึกเวลาเข้า-ออกงาน</p>
-            <input type="text" id="staff-name" placeholder="Enter Staff Name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); margin-bottom:15px; font-size:16px; text-align:center;">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button class="btn-secondary" onclick="clockStaff('เข้างาน')" style="background:var(--success); color:#fff; border:none; padding:15px;">Clock In</button>
-                <button class="btn-secondary" onclick="clockStaff('ออกงาน')" style="background:var(--danger); color:#fff; border:none; padding:15px;">Clock Out</button>
+    <div id="pay-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h2 id="p-table-title" style="margin:0; font-size:24px;">TABLE -</h2>
+            <div id="p-bill-items" style="margin: 20px 0; border-top: 1px solid var(--border); padding-top: 15px;"></div>
+            <small style="text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Total Amount</small>
+            <div id="p-total-price" style="font-size: 42px; font-weight: 800; margin-bottom: 20px;">฿0</div>
+            
+            <div id="p-methods" class="pay-grid">
+                <div class="pay-tile" onclick="selectPayMethod('qr')">PROMPTPAY</div>
+                <div class="pay-tile" onclick="selectPayMethod('cash')">CASH</div>
             </div>
-            <button onclick="toggleAttendance()" style="margin-top:20px; width:100%; border:none; background:none; cursor:pointer; color:var(--text-muted); font-weight:600;">Cancel</button>
+
+            <div id="p-qr-area" style="display:none; text-align:center;">
+                <img id="p-qr-img" style="width:200px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 15px;">
+                <button class="btn-black" onclick="finalPay('พร้อมเพย์')">CONFIRM PAYMENT</button>
+            </div>
+
+            <div id="p-cash-area" style="display:none;">
+                <input type="number" id="p-cash-input" placeholder="Received Amount" oninput="calcChange()">
+                <div id="p-change-display" style="font-size: 20px; font-weight: 700; margin: 15px 0; display:none;">CHANGE: ฿0</div>
+                <button id="p-cash-submit" class="btn-black" style="display:none;" onclick="finalPay('เงินสด')">COMPLETE CASH SALE</button>
+            </div>
+            
+            <button onclick="closePayModal()" style="margin-top:20px; width:100%; border:none; background:none; color:var(--text-muted); cursor:pointer; font-weight:600;">CANCEL</button>
         </div>
     </div>
 
     <div id="manual-order-modal" class="modal-overlay">
         <div class="modal-card">
-            <h2 style="margin-top:0;">Create Manual Order</h2>
-            <select id="manual-channel" style="width:100%; padding:12px; margin-bottom:20px; border-radius:10px; border:1px solid var(--border);">
-                <option value="LINE">LINE Official</option>
-                <option value="GRAB">GRAB Food</option>
-                <option value="LINEMAN">LINEMAN</option>
-                <option value="TAKEAWAY">Front Counter</option>
+            <h2 style="margin:0;">NEW ORDER</h2>
+            <select id="manual-channel" style="margin: 15px 0;">
+                <option value="LINE">LINE</option>
+                <option value="GRAB">GRAB</option>
+                <option value="TAKEAWAY">COUNTER</option>
             </select>
-            <div id="manual-menu-list" style="max-height:250px; overflow-y:auto; border:1px solid var(--border); padding:10px; border-radius:12px; margin-bottom:20px;"></div>
-            <div style="background:var(--bg); padding:20px; border-radius:12px; border:1px solid var(--border);">
-                <small style="font-weight:800; color:var(--text-muted);">SELECTED ITEMS</small>
-                <div id="manual-cart-items" style="margin:10px 0; font-size:14px;"></div>
-                <div style="display:flex; justify-content:space-between; font-weight:800; border-top:1px solid var(--border); padding-top:12px; font-size:18px;">
+            <div id="manual-menu-list" style="max-height: 250px; overflow-y:auto; border:1px solid var(--border); border-radius: 8px; padding: 10px;"></div>
+            <div id="manual-cart-summary" style="background:rgba(0,0,0,0.02); padding: 15px; border-radius: 10px; margin-top: 15px;">
+                <div id="manual-cart-items"></div>
+                <div style="display:flex; justify-content:space-between; font-weight:800; margin-top: 10px; font-size: 18px;">
                     <span>Total</span><span id="manual-total-price">฿0</span>
                 </div>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;">
-                <button class="btn-secondary" onclick="document.getElementById('manual-order-modal').style.display='none'">Cancel</button>
-                <button class="btn-main" onclick="submitManualOrder()" style="margin-top:0;">Confirm Order</button>
+            <div class="btn-group">
+                <button class="btn-outline" onclick="document.getElementById('manual-order-modal').style.display='none'">CANCEL</button>
+                <button class="btn-black" onclick="submitManualOrder()" style="margin-top:0;">SEND ORDER</button>
             </div>
-        </div>
-    </div>
-
-    <div id="call-toast" class="toast" onclick="clearSpecificCall()">
-        <span style="font-size:24px;">🔔</span>
-        <div>
-            <b style="display:block;">Table <span id="call-table-no">-</span> is calling!</b>
-            <small>Tap to acknowledge and clear alert</small>
         </div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxYc-5SV7ayKsLpAUUrILqSAU7wUIMf1q_dQfef5tkvDcjJo1AoYa_2zH6-gdX6mP9pnQ/exec";
         let fullData = null, manualCart = [], salesChartInst = null;
+        let pTable = "", pTotal = 0, pRows = [];
 
-        // --- 🕒 System Intelligence Logic ---
-        function updateSystemClock() {
+        function updateClock() {
             const now = new Date();
             const close = new Date(); close.setHours(23, 59, 59);
             let diff = close - now;
-            
             if(diff < 0) { document.getElementById('close-timer').innerText = "CLOSED"; return; }
-            
             let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
             document.getElementById('close-timer').innerText = `${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
-            
-            // Cleanup Alert (30 mins before closing)
             document.getElementById('cleanup-reminder').style.display = (h == 0 && m <= 30) ? 'block' : 'none';
-            document.getElementById('date-display').innerText = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
+            document.getElementById('date-now').innerText = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase();
         }
 
         async function refresh() {
@@ -220,43 +211,18 @@
                 
                 document.getElementById('rev-val').innerText = "฿" + d.summary.revenue.toLocaleString();
                 document.getElementById('prof-val').innerText = "฿" + (d.summary.grossProfit || 0).toLocaleString();
-                document.getElementById('daily-order-count').innerText = d.summary.report.reduce((s,i)=>s+i.qty,0);
-
-                if(d.calls?.length > 0) {
-                    document.getElementById('call-table-no').innerText = d.calls[d.calls.length - 1].table;
-                    document.getElementById('call-toast').style.display = 'flex';
-                } else { document.getElementById('call-toast').style.display = 'none'; }
-
-                renderOrderDashboard(d.orders);
-                renderInventory(d.menu);
-                renderPerformanceReport(d.summary.report);
+                
+                renderOrders(d.orders);
+                renderStock(d.menu);
+                renderReport(d.summary.report);
                 calculateSLA(d.orders);
-                if(!salesChartInst) drawSalesChart(d.summary);
-            } catch(e) { console.error("Refresh Logic Error:", e); }
+                if(!salesChartInst) drawChart(d.summary.peakHours);
+            } catch(e) { console.error(e); }
         }
 
-        function calculateSLA(orders) {
-            if(!orders || orders.length === 0) { document.getElementById('avg-speed').innerText = "0.0 MINS"; return; }
-            const totalMins = orders.reduce((s,o) => s + getTimeDiff(o.time), 0);
-            const avg = (totalMins / orders.length).toFixed(1);
-            const el = document.getElementById('avg-speed');
-            el.innerText = avg + " MINS";
-            el.style.color = avg > 10 ? 'var(--danger)' : (avg > 5 ? 'var(--warning)' : 'var(--success)');
-        }
-
-        function renderOrderDashboard(orders) {
-            const storeCont = document.getElementById('order-sec');
-            const deliveryCont = document.getElementById('takeaway-sec');
-            
-            let inStore = orders.filter(o => !isNaN(o.table));
-            let delivery = orders.filter(o => isNaN(o.table));
-
-            storeCont.innerHTML = buildCards(inStore);
-            deliveryCont.innerHTML = buildCards(delivery);
-        }
-
-        function buildCards(orders) {
-            if(orders.length === 0) return `<div style="grid-column:1/-1; text-align:center; padding:80px; color:var(--text-muted); font-size:14px;">☕️ No pending orders in this section.</div>`;
+        function renderOrders(orders) {
+            const store = document.getElementById('order-sec');
+            const takeaway = document.getElementById('takeaway-sec');
             let groups = {};
             orders.forEach(o => {
                 if(!groups[o.table]) groups[o.table] = {items:[], total:0, rows:[], time:o.time};
@@ -265,131 +231,182 @@
                 groups[o.table].rows.push(o.rowNum);
             });
 
-            return Object.keys(groups).map(t => {
-                const wait = getTimeDiff(groups[t].time);
-                let speedClass = wait > 10 ? "speed-late" : (wait > 5 ? "speed-warn" : "speed-fast");
-                return `
-                <div class="order-card">
-                    <div class="card-head">
-                        <div><b style="font-size:26px; letter-spacing:-1px;">${isNaN(t)?t:'TABLE '+t}</b><br>
-                        <span class="speed-badge ${speedClass}">⏱️ ${wait} MINS AGO</span></div>
-                        <small style="color:var(--text-muted); font-weight:700;">${new Date(groups[t].time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
-                    </div>
-                    <div class="card-body">
-                        ${groups[t].items.map(i => `<div class="item-row">
-                            <div class="item-info"><b>${i.qty}x ${i.menu}</b><small>${i.details || '-'}</small></div>
-                            <b style="font-size:15px;">฿${i.total}</b>
-                        </div>`).join('')}
-                        <hr style="border:none; border-top:1px dashed var(--border); margin:15px 0;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:24px; font-weight:800;">฿${groups[t].total.toLocaleString()}</span>
-                            <div class="action-btns" style="display:flex; gap:5px;">
-                                <button class="btn-secondary" onclick="upS(${JSON.stringify(groups[t].rows)},'กำลังทำ')">COOK</button>
-                                <button class="btn-secondary" onclick="upS(${JSON.stringify(groups[t].rows)},'รอเสิร์ฟ')">SERVE</button>
-                            </div>
+            const buildHtml = (filterFn) => {
+                let html = "";
+                Object.keys(groups).filter(filterFn).forEach(t => {
+                    const wait = getTimeDiff(groups[t].time);
+                    html += `
+                    <div class="order-card">
+                        <div class="card-head">
+                            <div><b style="font-size:22px;">${isNaN(t)?t:'TABLE '+t}</b><br>
+                            <span class="speed-badge ${wait > 10 ? 'speed-late' : 'speed-fast'}">${wait} MINS AGO</span></div>
+                            <small style="color:var(--text-muted); font-weight:700;">${new Date(groups[t].time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
                         </div>
-                        <button class="btn-main" onclick="openPayModal('${t}', ${groups[t].total}, ${JSON.stringify(groups[t].rows)})">COLLECT PAYMENT</button>
-                    </div>
-                </div>`;
-            }).join('');
+                        <div class="card-body">
+                            ${groups[t].items.map(i => `
+                                <div class="item-row">
+                                    <div class="item-info"><b>${i.qty}x ${i.menu}</b><small>${i.details}</small></div>
+                                    <div style="text-align:right;">
+                                        <div style="font-weight:700;">฿${i.total}</div>
+                                        <button class="btn-void" onclick="voidIt(${i.rowNum})">VOID</button>
+                                    </div>
+                                </div>`).join('')}
+                            <hr style="border:none; border-top:1px dashed var(--border); margin:15px 0;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:22px; font-weight:800;">฿${groups[t].total.toLocaleString()}</span>
+                                <div style="display:flex; gap:5px;">
+                                    <button class="btn-outline" onclick="upS(${JSON.stringify(groups[t].rows)},'กำลังทำ')">COOK</button>
+                                    <button class="btn-outline" onclick="upS(${JSON.stringify(groups[t].rows)},'รอเสิร์ฟ')">SERVE</button>
+                                </div>
+                            </div>
+                            <button class="btn-black" onclick="openPayModal('${t}', ${groups[t].total}, ${JSON.stringify(groups[t].rows)}, ${JSON.stringify(groups[t].items)})">COLLECT PAYMENT</button>
+                        </div>
+                    </div>`;
+                });
+                return html || `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted); font-size:13px;">NO PENDING ORDERS</div>`;
+            };
+
+            store.innerHTML = buildHtml(t => !isNaN(t));
+            takeaway.innerHTML = buildHtml(t => isNaN(t));
         }
 
-        // --- ➕ Manual Order Handlers ---
+        // --- 💰 PAYMENT LOGIC (RESTORATION) ---
+        function openPayModal(table, total, rows, items) {
+            pTable = table; pTotal = total; pRows = rows;
+            document.getElementById('p-table-title').innerText = isNaN(table) ? table : "TABLE " + table;
+            document.getElementById('p-total-price').innerText = "฿" + total.toLocaleString();
+            document.getElementById('p-bill-items').innerHTML = items.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;"><span>${i.qty}x ${i.menu}</span><b>฿${i.total}</b></div>`).join('');
+            
+            // ยิงสถานะไปหน้า Display
+            fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:table, status:'paying'})});
+            
+            document.getElementById('p-qr-area').style.display = 'none';
+            document.getElementById('p-cash-area').style.display = 'none';
+            document.getElementById('p-methods').style.display = 'grid';
+            document.getElementById('pay-modal').style.display = 'flex';
+        }
+
+        function selectPayMethod(m) {
+            document.getElementById('p-methods').style.display = 'none';
+            if(m === 'qr') {
+                document.getElementById('p-qr-img').src = `https://promptpay.io/0931805507/${pTotal}.png`;
+                document.getElementById('p-qr-area').style.display = 'block';
+            } else {
+                document.getElementById('p-cash-input').value = "";
+                document.getElementById('p-change-display').style.display = 'none';
+                document.getElementById('p-cash-submit').style.display = 'none';
+                document.getElementById('p-cash-area').style.display = 'block';
+                setTimeout(() => document.getElementById('p-cash-input').focus(), 100);
+            }
+        }
+
+        function calcChange() {
+            const rec = parseFloat(document.getElementById('p-cash-input').value) || 0;
+            const change = rec - pTotal;
+            if(rec >= pTotal) {
+                document.getElementById('p-change-display').innerText = "CHANGE: ฿" + change.toLocaleString();
+                document.getElementById('p-change-display').style.display = 'block';
+                document.getElementById('p-cash-submit').style.display = 'block';
+            } else {
+                document.getElementById('p-change-display').style.display = 'none';
+                document.getElementById('p-cash-submit').style.display = 'none';
+            }
+        }
+
+        async function finalPay(method) {
+            if(confirm(`Confirm ${method} payment?`)) {
+                await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:pTable, status:'idle'})});
+                await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'markMultipleDone', rowNums:pRows, paymentMethod:method})});
+                closePayModal(); refresh();
+            }
+        }
+
+        function closePayModal() {
+            fetch(API_URL, {method:'POST', body:JSON.stringify({action:'setPaymentStatus', table:pTable, status:'idle'})});
+            document.getElementById('pay-modal').style.display = 'none';
+        }
+
+        // --- 📊 REPORT LOGIC (RESTORATION) ---
+        function renderReport(report) {
+            document.getElementById('report-date-text').innerText = new Date().toLocaleDateString('en-GB', {dateStyle:'full'}).toUpperCase();
+            document.getElementById('report-content').innerHTML = `
+                <table class="report-table">
+                    <thead><tr><th>Product Name</th><th style="text-align:center;">Sold</th><th style="text-align:right;">Profit</th></tr></thead>
+                    <tbody>${report.map(i => `
+                        <tr>
+                            <td><b>${i.name}</b></td>
+                            <td style="text-align:center;">${i.qty}</td>
+                            <td style="text-align:right; font-weight:800;">฿${(i.profit || 0).toLocaleString()}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>`;
+        }
+
+        // --- 📋 STOCK & OTHERS ---
+        function renderStock(menu) {
+            document.getElementById('stock-list-body').innerHTML = menu.map(m => `
+                <div style="display:flex; justify-content:space-between; padding:15px 25px; border-bottom:1px solid var(--border); align-items:center;">
+                    <span><b>${m[0]}</b><br><small style="color:var(--text-muted);">Cost ฿${m[6]||0}</small></span>
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <span style="font-size:11px; font-weight:700;">${m[5]||'NORMAL'}</span>
+                        <button class="btn-outline" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">TOGGLE</button>
+                    </div>
+                </div>`).join('');
+        }
+
         function openManualOrderModal() {
             manualCart = []; updateManualUI();
             document.getElementById('manual-menu-list').innerHTML = fullData.menu.map(m => `
-                <div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid var(--border); align-items:center;">
-                    <span style="font-size:14px; font-weight:500;">${m[0]} (฿${m[1]})</span>
-                    <button onclick="addToManual('${m[0]}', ${m[1]})" style="background:var(--text-main); border:none; color:var(--surface); border-radius:8px; cursor:pointer; padding:6px 15px; font-size:11px; font-weight:700;">ADD</button>
+                <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; align-items:center;">
+                    <span style="font-size:13px;">${m[0]} (฿${m[1]})</span>
+                    <button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:4px; padding:4px 10px; font-size:10px; cursor:pointer;">ADD</button>
                 </div>`).join('');
             document.getElementById('manual-order-modal').style.display = 'flex';
         }
         function addToManual(n, p) { manualCart.push({name:n, price:p, qty:1, total:p}); updateManualUI(); }
         function updateManualUI() {
-            document.getElementById('manual-cart-items').innerHTML = manualCart.map((i,idx) => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.name}</span><span>฿${i.price} <small style="color:var(--danger); cursor:pointer; font-weight:800;" onclick="manualCart.splice(${idx},1); updateManualUI();">✕</small></span></div>`).join('');
+            document.getElementById('manual-cart-items').innerHTML = manualCart.map((i,idx) => `<div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;"><span>${i.name}</span><span>฿${i.price} <button onclick="manualCart.splice(${idx},1); updateManualUI()" style="border:none; background:none; color:red; cursor:pointer;">✕</button></span></div>`).join('');
             document.getElementById('manual-total-price').innerText = "฿" + manualCart.reduce((s,i)=>s+i.total,0).toLocaleString();
         }
         async function submitManualOrder() {
             if(manualCart.length === 0) return;
-            const channel = document.getElementById('manual-channel').value;
-            await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'submitOrder', table:channel, cart:manualCart})});
-            document.getElementById('manual-order-modal').style.display = 'none';
-            refresh();
+            const chan = document.getElementById('manual-channel').value;
+            await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'submitOrder', table:chan, cart:manualCart})});
+            document.getElementById('manual-order-modal').style.display = 'none'; refresh();
         }
 
-        // --- 📋 Inventory Helpers ---
-        function renderInventory(menu) {
-            document.getElementById('stock-list-body').innerHTML = menu.map(m => `
-                <tr>
-                    <td style="font-weight:600;">${m[0]}</td>
-                    <td style="color:var(--text-muted);">฿${m[6] || 0}</td>
-                    <td><span style="color: ${m[5]==='หมด'?'var(--danger)':'var(--success)'}; font-weight:800;">● ${m[5]||'ปกติ'}</span></td>
-                    <td><button class="btn-secondary" onclick="tgS('menu','${m[0]}','${m[5]=='หมด'?'ปกติ':'หมด'}')">TOGGLE</button></td>
-                </tr>`).join('');
-        }
-
-        // --- 🕒 Staff Attendance ---
-        function toggleAttendance() { 
-            const m = document.getElementById('att-modal');
-            m.style.display = m.style.display === 'none' ? 'flex' : 'none';
-        }
-        async function clockStaff(type) {
-            const name = document.getElementById('staff-name').value;
-            if(!name) return alert("Please enter staff name.");
-            await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'staffClock', name:name, type:type})});
-            alert(`${type} recorded for ${name}`);
-            toggleAttendance();
-        }
-
-        // --- 📊 Report & Charting ---
-        function drawSalesChart(summary) {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            salesChartInst = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Array.from({length: 24}, (_, i) => i + ":00"),
-                    datasets: [{ label: 'Hourly Sales', data: summary.peakHours, backgroundColor: '#000', borderRadius: 5 }]
-                },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-            });
-        }
-
-        function renderPerformanceReport(report) {
-            document.getElementById('report-date-text').innerText = "PERFORMANCE DATA FOR " + new Date().toLocaleDateString('en-GB', { dateStyle:'full' }).toUpperCase();
-            document.getElementById('report-content').innerHTML = `
-                <table style="width:100%; border-collapse:collapse;">
-                    <thead><tr style="border-bottom:2px solid #000;"><th style="text-align:left; padding:15px;">PRODUCT</th><th>QTY</th><th style="text-align:right;">NET PROFIT</th></tr></thead>
-                    <tbody>${report.map(i => `<tr style="border-bottom:1px solid #eee;"><td style="padding:15px; font-weight:600;">${i.name}</td><td style="text-align:center;">${i.qty}</td><td style="text-align:right; font-weight:800; color:var(--success);">฿${(i.profit||0).toLocaleString()}</td></tr>`).join('')}</tbody>
-                </table>`;
-        }
-
-        // --- ⚙️ Core Utilities ---
         function getTimeDiff(timeStr) {
             const now = new Date(); const dateObj = new Date(timeStr);
             if (isNaN(dateObj.getTime())) return 0;
             return Math.floor((now - dateObj) / 60000);
         }
 
+        function calculateSLA(orders) {
+            if(!orders || orders.length === 0) return;
+            const avg = (orders.reduce((s,o) => s + getTimeDiff(o.time), 0) / orders.length).toFixed(1);
+            document.getElementById('avg-speed').innerText = avg + " MINS";
+        }
+
         function showSec(sec) {
             ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec'].forEach(s => document.getElementById(s).style.display = 'none');
-            document.getElementById(sec + '-sec').style.display = (sec==='report'?'block':'grid');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id==='t-'+sec));
+            document.getElementById(sec + '-sec').style.display = (sec === 'report' ? 'block' : 'grid');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + sec));
         }
 
-        function toggleTheme() {
-            const curr = document.body.getAttribute('data-theme');
-            document.body.setAttribute('data-theme', curr === 'dark' ? 'light' : 'dark');
+        function drawChart(peakHours) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChartInst = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: Array.from({length:24},(_,i)=>i+":00"), datasets:[{data:peakHours, backgroundColor:'#000', borderRadius:4}]},
+                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+            });
         }
 
+        async function voidIt(r) { if(confirm("Void this item?")) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'voidItem',rowNum:r})}); refresh(); } }
         async function upS(r, s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNums:r,nextStatus:s})}); refresh(); }
         async function tgS(t, n, s) { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateStock',type:t,name:n,status:s})}); refresh(); }
-        async function clearSpecificCall() {
-            const t = document.getElementById('call-table-no').innerText;
-            await fetch(API_URL + "?action=clearCall&table=" + t);
-            refresh();
-        }
 
-        setInterval(updateSystemClock, 1000);
+        setInterval(updateClock, 1000);
         setInterval(refresh, 10000);
         refresh();
     </script>

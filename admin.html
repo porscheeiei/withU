@@ -36,7 +36,7 @@
         .map-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 10px; }
         .map-table { padding: 12px 5px; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 800; background: var(--surface); transition: all 0.2s ease; }
         
-        /* บังคับสีแผงผังโต๊ะที่มีออเดอร์เคลื่อนไหวค้างในระบบหน้าร้านทั้งหมดให้รันเป็นสีดำสนิทล้วน */
+        /* ล็อกสีกราฟแผนผังโต๊ะที่มีออเดอร์เคลื่อนไหวค้างในระบบทั้งหมดให้เป็นสีดำสนิทล้วนตามข้อกำหนดใหม่ */
         .map-table.map-new, 
         .map-table.map-cooking, 
         .map-table.map-serving, 
@@ -64,14 +64,14 @@
         .card-head { padding: 18px; background: rgba(0,0,0,0.01); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
         .card-body { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; }
 
-        /* แถบความคืบหน้าสถานะการปรุงอาหารและการรอยกเสิร์ฟภายในห้องเครื่อง */
+        /* แถบความคืบหน้าสไตล์โมโนโครมเปลี่ยนหัวข้อที่สองเป็น กำลังทำ คลีนสะอาดปลอดอีโมจิ */
         .track-bar { display: flex; gap: 6px; width: 100%; margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--border); }
         .track-step { flex: 1; text-align: center; padding: 4px 6px; border-radius: 20px; font-size: 10px; font-weight: 800; background: #e5e7eb; color: #6b7280; transition: all 0.2s ease; }
         .track-step.active.step-new { background: #000000; color: #ffffff; }
         .track-step.active.step-cooking { background: #000000; color: #ffffff; }
         .track-step.active.step-serving { background: #000000; color: #ffffff; }
 
-        /* ชุดคอมโพเนนต์ป้ายกำกับสถานะการ์ดแบบเคลียร์สัญลักษณ์อีโมจิออกทั้งหมด */
+        /* ป้ายสถานะโต๊ะอาหารเวอร์ชันคลีนมินิมอลแบบถอดอีโมจิออกทั้งหมด */
         .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; }
         .pill-new { background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
         .pill-cooking { background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
@@ -110,7 +110,7 @@
 
         input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; background: var(--surface); color: var(--text-main); }
         
-        /* แถบแบนเนอร์แจ้งเตือนเรียกพนักงานด่วน คาดล็อกขอบบนสุดหน้าจอภาพความคมชัดสูง */
+        /* แถบแบนเนอร์แจ้งเตือนพนักงานเรียกตัวตนด่วนคาดหน้าจอสูงสุดแบบปลอดอีโมจิ */
         .toast-notify { 
             position: fixed; 
             top: 0; 
@@ -131,7 +131,7 @@
         }
         @keyframes urgentAlertBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
 
-        /* แถบแจ้งเตือนปิดร้านเมื่อนาฬิกาเข้าสู่ช่วง 30 นาทีสุดท้าย วางใน Flow หน้าเว็บหลักเพื่อแก้อาการซ้อนทับบังข้อความกัน */
+        /* แถบแจ้งเตือนเวลาปิดร้านรันเข้า Flow ระบบหน้าเว็บหลักเพื่อเคลียร์ปัญหาเลเยอร์ทับซ้อนบังข้อความ */
         .closing-banner {
             width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: urgentAlertBlink 0.5s infinite alternate;
         }
@@ -251,7 +251,7 @@
                 <div class="pay-tile" onclick="selectPayMethod('cash')" id="btn-method-cash">CASH</div>
             </div>
             <div id="p-qr-area" style="display:none; text-align:center;">
-                <img id="p-qr-img" style="width:180px; height:180px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px;">
+                <img id="p-qr-img" style="width:180px; height:180px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px;" alt="PromptPay QR">
                 <button class="btn-black" onclick="finalPay('พร้อมเพย์')" id="btn-confirm-pay">CONFIRM</button>
             </div>
             <div id="p-cash-area" style="display:none;">
@@ -378,7 +378,7 @@
             let diff = close - now;
             if(diff < 0) { document.getElementById('close-timer').innerText = "CLOSED"; return; }
             let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-            document.getElementById('close-timer').innerText = `${h}:${m<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
+            document.getElementById('close-timer').innerText = `${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
             document.getElementById('cleanup-reminder').style.display = (h == 0 && m <= 30) ? 'block' : 'none';
             document.getElementById('date-now').innerText = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase();
         }
@@ -598,7 +598,6 @@
             document.getElementById('pay-modal').style.display = 'none';
             refresh();
         }
-        
         function closePayModal() { 
             localStorage.removeItem('cds_paying_table');
             actionCall('setPaymentStatus', {table: pTable, status: 'idle'}); 

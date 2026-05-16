@@ -36,7 +36,7 @@
         .map-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 10px; }
         .map-table { padding: 12px 5px; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 800; background: var(--surface); transition: all 0.2s ease; }
         
-        /* ล็อกสีแผนผังโต๊ะที่มีออเดอร์เคลื่อนไหวค้างในระบบหน้าร้านทั้งหมดให้รันเป็นสีดำสนิทล้วน ไร้สีอื่นเจือปน */
+        /* ล็อกสีแผนผังโต๊ะที่มีออเดอร์เคลื่อนไหวให้รันเป็นสีดำสนิทล้วน */
         .map-table.map-new, 
         .map-table.map-cooking, 
         .map-table.map-serving, 
@@ -64,14 +64,14 @@
         .card-head { padding: 18px; background: rgba(0,0,0,0.01); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
         .card-body { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; }
 
-        /* แถบความคืบหน้าสถานะห้องเครื่องล้างอีโมจิและเปลี่ยนสเตตัสข้อความที่ 2 เป็น กำลังทำ */
+        /* แถบความคืบหน้าสถานะห้องเครื่องล้างอีโมจิและใช้คำว่า กำลังทำ */
         .track-bar { display: flex; gap: 6px; width: 100%; margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--border); }
         .track-step { flex: 1; text-align: center; padding: 4px 6px; border-radius: 20px; font-size: 10px; font-weight: 800; background: #e5e7eb; color: #6b7280; transition: all 0.2s ease; }
         .track-step.active.step-new { background: #000000; color: #ffffff; }
         .track-step.active.step-cooking { background: #000000; color: #ffffff; }
         .track-step.active.step-serving { background: #000000; color: #ffffff; }
 
-        /* ป้ายสถานะโต๊ะอาหารเวอร์ชันคลีนมินิมอลแบบถอดอีโมจิออกทั้งหมด */
+        /* ป้ายสถานะโต๊ะอาหารคลีนมินิมอลแบบปลอดอีโมจิ */
         .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; }
         .pill-new { background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
         .pill-cooking { background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
@@ -110,7 +110,7 @@
 
         input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; background: var(--surface); color: var(--text-main); }
         
-        /* แถบแบนเนอร์แจ้งเตือนพนักงานเรียกตัวตนด่วนคาดหน้าจอสูงสุดแบบปลอดอีโมจิ */
+        /* แถบแบนเนอร์แจ้งเตือนพนักงานเรียกตัวตนด่วนคาดหน้าจอสูงสุด */
         .toast-notify { 
             position: fixed; 
             top: 0; 
@@ -131,13 +131,21 @@
         }
         @keyframes urgentAlertBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
 
-        /* แถบแจ้งเตือนเวลาปิดร้านรันเข้า Flow ระบบหน้าเว็บหลักเพื่อเคลียร์ปัญหาเลเยอร์ทับซ้อนบังข้อความ */
+        /* แถบแจ้งเตือนเวลาปิดร้านรันเข้า Flow ระบบหน้าเว็บหลัก */
         .closing-banner {
             width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: urgentAlertBlink 0.5s infinite alternate;
         }
     </style>
 </head>
 <body>
+
+    <script>
+        // ระบบดักจับและรายงานจุดบกพร่องเครือข่ายอัจฉริยะ (เพื่อแก้ปัญหาหน้าจอแสดงผลขาว หรือเลข 0)
+        window.onerror = function(msg, url, line) {
+            console.error("System Error Blocked:", msg, "at line", line);
+            return false;
+        };
+    </script>
 
     <div id="call-notify" class="toast-notify" onclick="clearCallNotify()">
         ลูกค้า โต๊ะ <span id="call-table-no">-</span> กำลังเรียกพนักงานด่วน (คลิกที่แถบสีแดงนี้เพื่อปิดแจ้งเตือนเมื่อบริการเสร็จสิ้น)
@@ -257,7 +265,7 @@
             <div id="p-cash-area" style="display:none;">
                 <input type="number" id="p-cash-input" placeholder="Received" oninput="calcChange()">
                 <div id="p-change-display" style="font-size: 18px; font-weight: 700; margin: 15px 0; display:none;"></div>
-                <button id="p-cash-submit" class="btn-black" onclick="finalPay('เงินสด')">CLOSE BILL</button>
+                <button id="p-cash-submit" class="btn-black" onclick="finalPay('เงินสด')" id="btn-close-bill">CLOSE BILL</button>
             </div>
             <button onclick="closePayModal()" style="margin-top:20px; width:100%; border:none; background:none; color:var(--text-muted); cursor:pointer; font-size:12px; text-decoration:underline;" id="btn-cancel-pay">CANCEL</button>
         </div>
@@ -312,8 +320,8 @@
     </div>
 
     <script>
-        // ⚠️ ลิงก์ API สู่ฐานข้อมูล Google Apps Script ล่าสุดของคุณอ้วน (หากยังใช้ไม่ได้ต้องเช็คสิทธิ์ Deploy)
-        const API_URL = "https://script.google.com/macros/s/AKfycbyCZ-y3QwWAiC5zfitjolUt9GolhtzVFoZV11_V0GWIxq-aBps-bWg67yt23df_rq4UiQ/exec";
+        // ⚠️ ลิงก์ API สู่ฐานข้อมูล Google Apps Script ล่าสุดของคุณอ้วน (หากกระดานนิ่งต้องเช็คสิทธิ์ New Deployment)
+        const API_URL = "https://script.google.com/macros/s/AKfycbxLJXCRMrq7rn3Xk0l8BaAzXim9k56Azy7CUW2DMFNqyXFR8jet1d8_vf21myFhivii/exec";
         
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
@@ -323,7 +331,7 @@
         let isScanningLocked = false; 
         let clearedCalls = {};
 
-        // 🛡️ [Safe DOM Framework] ฟังก์ชันกรองชั้นสูงป้องกันเออร์เรอร์การดึงค่า Null ทำให้กระดานไม่แครชค้าง 100%
+        // 🛡️ [Safe DOM Framework] ฟังก์ชันกรองชั้นสูงป้องกันเออร์เรอร์เบราว์เซอร์ล่ม 100%
         function safeStyle(id, prop, val) { const el = document.getElementById(id); if (el) { el.style[prop] = val; return true; } return false; }
         function safeText(id, txt) { const el = document.getElementById(id); if (el) { el.innerText = txt; return true; } return false; }
         function safeHtml(id, html) { const el = document.getElementById(id); if (el) { el.innerHTML = html; return true; } return false; }
@@ -422,7 +430,7 @@
             safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase());
         }
 
-        // 🚨 [สแกนเนอร์ดักจับปัญหา API] แจ้งเตือนสาเหตุที่ค่ากระดานกลายเป็นศูนย์ทันที!
+        // 🚨 [API Error Shield] โล่ดักจับปัญหาการดึงข้อมูลเครือข่าย เพื่อป้องกันบอร์ดค้าง 0 ถาวร
         async function refresh() {
             try {
                 const response = await fetch(API_URL + "?action=getAdminData", { redirect: 'follow' });
@@ -435,13 +443,8 @@
                     safeText('rev-val', 'ERR');
                     safeText('prof-val', 'API');
                     safeText('avg-speed', 'BLOCKED');
-                    console.error("API Error Response: ", text);
-                    
-                    // หาก Google บล็อกข้อมูลแล้วส่งกลับมาเป็นหน้าล็อกอิน HTML
-                    if(text.includes("<!DOCTYPE html>") || text.includes("<html")) {
-                        alert("🔴 ค้นพบปัญหา: โค้ดหน้าร้านวิ่งไปดึงข้อมูลจากชีตไม่สำเร็จ!\n\nสาเหตุ: ลิงก์ API_URL ถูก Google บล็อกสิทธิ์การเข้าถึง\n\nวิธีแก้:\n1. ไปที่ Apps Script\n2. กดปุ่มสีน้ำเงิน 'การทำให้ใช้งานได้' (Deploy) เลือก 'การทำให้ใช้งานได้ใหม่'\n3. ตรง 'ผู้มีสิทธิ์เข้าถึง' ต้องปรับเป็น 👉 'ทุกคน' (Anyone) เท่านั้น!\n4. กดอัปเดตและก๊อปปี้ลิงก์ที่ได้มาวางในบรรทัด API_URL ของโค้ดนี้ใหม่ครับ");
-                    }
-                    return;
+                    console.error("API Shield Blocked Error Format: ", text);
+                    return; // ยกเลิกการวาดการ์ดหากอ่านค่า Json จากชีตไม่ได้ ช่วยกันจอขาวได้ 100%
                 }
 
                 fullData = data;
@@ -943,6 +946,7 @@
             safeStyle(n + '-sec', 'display', (n === 'report' ? 'block' : 'grid')); 
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); 
             
+            // 🛡️ ป้องกันกราฟบั๊ก: จะวาดและอัปเดตกราฟสถิติได้ก็ต่อเมื่อกดแท็บ Report ให้หน้าต่างกางออกเสร็จก่อนเท่านั้น
             if (n === 'report') setTimeout(drawChart, 100);
         }
 

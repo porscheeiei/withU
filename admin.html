@@ -36,7 +36,7 @@
         .map-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 10px; }
         .map-table { padding: 12px 5px; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 800; background: var(--surface); transition: all 0.2s ease; }
         
-        /* ล็อกรหัสสีแผนผังโต๊ะที่มีออเดอร์ค้างในระบบทั้งหมดให้เป็นสีดำสนิทล้วน ไร้สีอื่นเจือปน */
+        /* บังคับสีแผงผังโต๊ะที่มีออเดอร์เคลื่อนไหวค้างในระบบหน้าร้านทั้งหมดให้รันเป็นสีดำสนิทล้วน */
         .map-table.map-new, 
         .map-table.map-cooking, 
         .map-table.map-serving, 
@@ -64,14 +64,14 @@
         .card-head { padding: 18px; background: rgba(0,0,0,0.01); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
         .card-body { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; }
 
-        /* แถบความคืบหน้าสไตล์โมโนโครมเปลี่ยนหัวข้อที่สองเป็น กำลังทำ */
+        /* แถบความคืบหน้าสถานะการปรุงอาหารและการรอยกเสิร์ฟภายในห้องเครื่อง */
         .track-bar { display: flex; gap: 6px; width: 100%; margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--border); }
         .track-step { flex: 1; text-align: center; padding: 4px 6px; border-radius: 20px; font-size: 10px; font-weight: 800; background: #e5e7eb; color: #6b7280; transition: all 0.2s ease; }
         .track-step.active.step-new { background: #000000; color: #ffffff; }
         .track-step.active.step-cooking { background: #000000; color: #ffffff; }
         .track-step.active.step-serving { background: #000000; color: #ffffff; }
 
-        /* ป้ายสถานะโต๊ะอาหารเวอร์ชันปลอดอีโมจิเรียบหรู */
+        /* ชุดคอมโพเนนต์ป้ายกำกับสถานะการ์ดแบบเคลียร์สัญลักษณ์อีโมจิออกทั้งหมด */
         .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; }
         .pill-new { background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
         .pill-cooking { background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
@@ -110,7 +110,7 @@
 
         input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; background: var(--surface); color: var(--text-main); }
         
-        /* แถบแบนเนอร์แจ้งเตือนพนักงานเรียกตัวตนด่วนคาดหน้าจอสูงสุดแบบปลอดอีโมจิ */
+        /* แถบแบนเนอร์แจ้งเตือนเรียกพนักงานด่วน คาดล็อกขอบบนสุดหน้าจอภาพความคมชัดสูง */
         .toast-notify { 
             position: fixed; 
             top: 0; 
@@ -131,7 +131,7 @@
         }
         @keyframes urgentAlertBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
 
-        /* 🛠️ [แก้ไขสไตล์ย้ายตำแหน่งใหม่] ย้ายแถบแบนเนอร์แจ้งเตือนเวลาปิดร้านเข้ามาอยู่ใน Flow หน้าเว็บหลักเพื่อแก้อาการทับซ้อนบังกัน */
+        /* แถบแจ้งเตือนปิดร้านเมื่อนาฬิกาเข้าสู่ช่วง 30 นาทีสุดท้าย วางใน Flow หน้าเว็บหลักเพื่อแก้อาการซ้อนทับบังข้อความกัน */
         .closing-banner {
             width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: urgentAlertBlink 0.5s infinite alternate;
         }
@@ -252,7 +252,6 @@
             </div>
             <div id="p-qr-area" style="display:none; text-align:center;">
                 <img id="p-qr-img" style="width:180px; height:180px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px;">
-                <img id="p-qr-img" style="width:180px; height:180px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px;">
                 <button class="btn-black" onclick="finalPay('พร้อมเพย์')" id="btn-confirm-pay">CONFIRM</button>
             </div>
             <div id="p-cash-area" style="display:none;">
@@ -320,35 +319,7 @@
         let currentLang = localStorage.getItem('withu_lang') || 'th';
         let isAiModelsLoaded = false, localStream = null, currentChartMode = 'peak';
         let isScanningLocked = false; 
-
-        const langPack = {
-            th: {
-                btn_add: "เพิ่มออเดอร์", btn_staff: "พนักงาน", btn_export: "ส่งออก PDF",
-                profit: "กำไรสุทธิวันนี้", revenue: "ยอดขายวันนี้", speed: "ความเร็วบริการเฉลี่ย", orders: "ออเดอร์วันนี้",
-                tab_orders: "ออเดอร์หน้าร้าน", tab_takeaway: "เดลิเวอรี", tab_stock: "คลังสินค้า", tab_report: "ผลประกอบการ",
-                no_orders: "ไม่มีออเดอร์ค้างในระบบ", mins_ago: "นาทีที่แล้ว", cook: "เตรียม", serve: "เสิร์ฟ",
-                collect: "เรียกเก็บเงิน", total_due: "ยอดรวมที่ต้องชำระ", cancel: "ยกเลิก", confirm: "ยืนยัน",
-                th_name: "ชื่อเมนู", th_cost: "ต้นทุน", th_status: "สถานะ", th_ctrl: "จัดการ", void: "ลบรายการ",
-                status_normal: "ปกติ", status_out: "หมด", toggle: "สลับสถานะ", live_map: "แผนผังร้านแบบ Real-time",
-                heat_title: "อันดับเมนูขายดี (Heat Menu)", ai_title: "AI วิเคราะห์ธุรกิจ", manual_title: "สร้างออเดอร์นอกระบบ",
-                perf_title: "รายงานสรุปยอดขาย", btn_peak: "รายชั่วโมง", btn_day: "รายวัน", staff_title: "ตอกบัตรพนักงาน",
-                ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI พร้อมใช้งาน", scan_btn: "สแกนใบหน้าตอกบัตร", reg_btn: "ลงทะเบียนใบหน้า",
-                mistake: "ตรวจพบข้อมูลผิดปกติ", no_face: "ไม่พบข้อมูลใบหน้าพนักงานในระบบ (กรุณาลงทะเบียนพนักงานก่อน)"
-            },
-            en: {
-                btn_add: "ADD ORDER", btn_staff: "STAFF", btn_export: "EXPORT PDF",
-                profit: "Gross Profit", revenue: "Revenue", speed: "Avg Service", orders: "Orders Today",
-                tab_orders: "Store", tab_takeaway: "Delivery", tab_stock: "Stock", tab_report: "Performance",
-                no_orders: "NO PENDING ORDERS", mins_ago: "MINS AGO", cook: "COOK", serve: "SERVE",
-                collect: "COLLECT PAYMENT", total_due: "Total Due", cancel: "CANCEL", confirm: "CONFIRM",
-                th_name: "Item Name", th_cost: "Cost", th_status: "Status", th_ctrl: "Control", void: "VOID",
-                status_normal: "NORMAL", status_out: "OUT OF STOCK", toggle: "TOGGLE", live_map: "Live Restaurant Map",
-                heat_title: "Heat Menu (Best Sellers)", ai_title: "AI Business Advisor", manual_title: "CREATE MANUAL ORDER",
-                perf_title: "DAILY PERFORMANCE REPORT", btn_peak: "HOURLY", btn_day: "DAILY", staff_title: "STAFF CLOCK",
-                ai_loading: "AI MODELS LOADING...", ai_ready: "AI SYSTEM READY", scan_btn: "SCAN FACE TO CLOCK", reg_btn: "REGISTER FACE",
-                mistake: "MISTAKE DETECTED", no_face: "NO REGISTERED FACES IN DATABASE"
-            }
-        };
+        let clearedCalls = {};
 
         function toggleTheme() {
             const currentTheme = document.body.getAttribute('data-theme');
@@ -407,9 +378,7 @@
             let diff = close - now;
             if(diff < 0) { document.getElementById('close-timer').innerText = "CLOSED"; return; }
             let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-            document.getElementById('close-timer').innerText = `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
-            
-            // ตรวจเช็คเวลาช่วง 30 นาทีสุดท้ายก่อนปิดร้านเพื่อสั่งแสดงผลแถบเตือนสีแดงด้านบน
+            document.getElementById('close-timer').innerText = `${h}:${m<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
             document.getElementById('cleanup-reminder').style.display = (h == 0 && m <= 30) ? 'block' : 'none';
             document.getElementById('date-now').innerText = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase();
         }
@@ -423,8 +392,15 @@
                 document.getElementById('prof-val').innerText = "฿" + (data.summary.grossProfit || 0).toLocaleString();
                 document.getElementById('order-count').innerText = data.summary.report.reduce((s,i)=>s+i.qty,0);
 
-                if (data.calls && data.calls.length > 0) {
-                    document.getElementById('call-table-no').innerText = data.calls[data.calls.length - 1].table;
+                let activeCalls = (data.calls || []).filter(c => !clearedCalls[c.table]);
+                Object.keys(clearedCalls).forEach(t => {
+                    if (!data.calls || !data.calls.some(c => c.table.toString() === t.toString())) {
+                        delete clearedCalls[t];
+                    }
+                });
+
+                if (activeCalls.length > 0) {
+                    document.getElementById('call-table-no').innerText = activeCalls[activeCalls.length - 1].table;
                     document.getElementById('call-notify').style.display = 'block';
                 } else { document.getElementById('call-notify').style.display = 'none'; }
 
@@ -433,8 +409,8 @@
                     if(tile) tile.className = "map-table";
                 }
 
-                if(data.calls && data.calls.length > 0) {
-                    data.calls.forEach(c => {
+                if(activeCalls.length > 0) {
+                    activeCalls.forEach(c => {
                         let tile = document.getElementById(`map-t-${c.table}`);
                         if(tile) tile.classList.add("alert-trigger");
                     });
@@ -507,7 +483,6 @@
                         mapColorClass = "map-cooking";
                     }
 
-                    // ล้างลูปคลาสสีเก่าออก บังคับเทสีดำออโตเมติกให้แผนผังแผงโต๊ะที่มีออเดอร์เคลื่อนไหวทันที
                     if(!isNaN(tableId)) {
                         let tile = document.getElementById(`map-t-${tableId}`);
                         if(tile && !tile.classList.contains("alert-trigger")) {
@@ -579,7 +554,6 @@
             if(hasActiveOrder) openPayModal(tableId);
         }
 
-        // --- 💰 PAYMENT & DISPLAY (CDS) SYNC ---
         function openPayModal(tableId) {
             const orders = fullData.orders.filter(o => o.table.toString() === tableId.toString());
             if(!orders.length) return;
@@ -624,6 +598,7 @@
             document.getElementById('pay-modal').style.display = 'none';
             refresh();
         }
+        
         function closePayModal() { 
             localStorage.removeItem('cds_paying_table');
             actionCall('setPaymentStatus', {table: pTable, status: 'idle'}); 
@@ -632,7 +607,6 @@
             refresh();
         }
 
-        // --- 📋 ACTIONS & UPDATES ENGINE ---
         function handleStatusUpdate(tableId, status) {
             lastActionMap[tableId] = status;
             if(fullData && fullData.orders) {
@@ -650,7 +624,6 @@
             refresh();
         }
 
-        // --- 📊 INSIGHTS & REPORTING ---
         function renderAIInsights(summary, activeOrders) {
             const topProducts = summary.report.slice(0, 3);
             document.getElementById('heat-menu-list').innerHTML = topProducts.map((p, index) => `
@@ -701,7 +674,6 @@
         }
         async function handleStockToggle(name, status) { await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status})}); refresh(); }
 
-        // --- ⚙️ GRAPH ENGINE ---
         function drawChart() {
             if(!fullData || !fullData.summary) return;
             const ctx = document.getElementById('salesChart').getContext('2d');
@@ -729,7 +701,6 @@
             drawChart();
         }
 
-        // --- 🕒 AI FACIAL RECOGNITION ENGINE (STABLE ONE-CLICK MANUAL SENSING) ---
         async function loadFaceApiModels() {
             if (isAiModelsLoaded) return;
             const l = langPack[currentLang];
@@ -880,7 +851,13 @@
             }).join(''); 
         }
 
-        // --- 🕒 GENERAL MANUAL INTERFACE MODAL ---
+        function clearCallNotify() { 
+            const t = document.getElementById('call-table-no').innerText; 
+            clearedCalls[t] = true; 
+            fetch(API_URL + "?action=clearCall&table=" + t, { method: 'GET', mode: 'no-cors' }); 
+            document.getElementById('call-notify').style.display = 'none'; 
+        }
+
         function openManualOrderModal() {
             manualCart = []; updateManualUI();
             document.getElementById('manual-menu-list').innerHTML = fullData.menu.map(m => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;"><span style="font-size:13px;">${m[0]} (฿${m[1]})</span><button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-size:10px; cursor:pointer;">SELECT</button></div>`).join('');
@@ -900,7 +877,6 @@
         function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }
         function showSec(n) { ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec'].forEach(s => document.getElementById(s).style.display = 'none'); document.getElementById(n + '-sec').style.display = (n === 'report' ? 'block' : 'grid'); document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); }
         async function actionCall(action, params) { try { await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action, ...params})}); refresh(); } catch(e) { console.error(e); } }
-        function clearCallNotify() { const t = document.getElementById('call-table-no').innerText; fetch(API_URL+"?action=clearCall&table="+t, {method:'POST', mode:'no-cors'}); document.getElementById('call-notify').style.display='none'; }
 
         applyLanguagePack();
         setInterval(updateClock, 1000); refresh(); setInterval(refresh, 5000);

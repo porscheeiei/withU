@@ -268,7 +268,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyJoXJUGIgMX4iRL8yUnfI8iRX4kcZXc540F78HWoxb3XZ1jTpXApR7m9Fguv1mqJuOMg/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec";
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
         let lastActionMap = {};
@@ -304,6 +304,15 @@
                 mistake: "MISTAKE DETECTED", no_face: "NO REGISTERED FACES IN DATABASE"
             }
         };
+
+        // 🔥 [กู้คืนคำสั่งที่หลุด] ฟังก์ชันสลับโหมดมืด-สว่าง พร้อมคำสั่งอัปเดตสีกราฟรายงานแท่งอัตโนมัติ 
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('withu_theme', newTheme);
+            if (salesChartInst) drawChart(); // สั่งให้วาดกราฟใหม่เพื่อปรับเปลี่ยนสีแท่งตามโหมดทันที
+        }
 
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'th' : 'en';
@@ -675,6 +684,10 @@
                 stopWebcam();
             }
         }
+
+        // โหมดดึงประวัติธีมสลับโหมดล่าสุดมาทำงานเปิดหน้าจอครั้งแรกสุด
+        const savedTheme = localStorage.getItem('withu_theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
 
         function startWebcam() {
             const video = document.getElementById('webcam');

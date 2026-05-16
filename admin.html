@@ -18,26 +18,32 @@
             --border: #262626; --slate: #1c1c1e;
         }
 
-        * { font-family: 'Inter', 'Prompt', sans-serif; box-sizing: border-box; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
+        * { font-family: 'Inter', 'Prompt', sans-serif; box-sizing: border-box; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; line-height: 1.6; }
         body { background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 60px; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
 
         /* --- OPERATIONS BAR --- */
         .op-bar { background: #000000; color: #ffffff; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: 1px; position: sticky; top: 0; z-index: 1100; font-weight: 600; text-transform: uppercase; }
-        .cleanup-alert { color: #ffffff; border: 1px solid #ffffff; padding: 2px 8px; border-radius: 4px; display: none; }
-
+        
         /* --- NAVIGATION --- */
         .top-nav { background: var(--surface); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 35px; z-index: 1000; }
         .logo { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; text-transform: uppercase; }
 
         .container { max-width: 1450px; margin: 25px auto; padding: 0 20px; }
 
-        /* --- LIVE MAP GRID --- */
+        /* --- LIVE MAP GRID & MONOCHROME LURKERS --- */
         .map-section { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-bottom: 25px; box-shadow: var(--shadow); }
         .map-title { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.05em; color: var(--text-muted); }
         .map-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 10px; }
-        .map-table { padding: 12px 5px; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 700; background: var(--surface); transition: 0.2s; }
-        .map-table.active { background: #000000; color: #ffffff; border-color: #000000; }
-        .map-table.alert-trigger { background: #ef4444; color: #ffffff; border-color: #ef4444; animation: mapPulse 0.8s infinite alternate; }
+        .map-table { padding: 12px 5px; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 800; background: var(--surface); transition: all 0.2s ease; }
+        
+        /* ล็อกรหัสสีแผนผังโต๊ะที่มีออเดอร์ค้างในระบบทั้งหมดให้เป็นสีดำสนิทล้วน ไร้สีอื่นเจือปน */
+        .map-table.map-new, 
+        .map-table.map-cooking, 
+        .map-table.map-serving, 
+        .map-table.map-ordered-more, 
+        .map-table.map-waiting-bill { background: #000000 !important; color: #ffffff !important; border-color: #000000 !important; }
+        .map-table.alert-trigger { background: #ef4444 !important; color: #ffffff !important; border-color: #ef4444 !important; animation: mapPulse 0.4s infinite alternate; }
+        
         @keyframes mapPulse { from { opacity: 1; } to { opacity: 0.3; } }
 
         /* --- DASHBOARD STATS --- */
@@ -53,14 +59,25 @@
 
         /* --- ORDER KANBAN --- */
         .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
-        .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); }
+        .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); position: relative; }
         .order-card.sla-trigger { border: 2px solid #000000; background: var(--slate); }
         .card-head { padding: 18px; background: rgba(0,0,0,0.01); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
         .card-body { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; }
 
-        .track-bar { display: flex; justify-content: space-between; width: 100%; font-size: 9px; margin-top: 10px; padding-top: 5px; font-weight: 700; text-transform: uppercase; border-top: 1px dashed var(--border); }
-        .track-step { color: var(--text-muted); opacity: 0.25; }
-        .track-step.active { color: var(--text-main); opacity: 1; font-weight: 800; }
+        /* แถบความคืบหน้าสไตล์โมโนโครมเปลี่ยนหัวข้อที่สองเป็น กำลังทำ */
+        .track-bar { display: flex; gap: 6px; width: 100%; margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--border); }
+        .track-step { flex: 1; text-align: center; padding: 4px 6px; border-radius: 20px; font-size: 10px; font-weight: 800; background: #e5e7eb; color: #6b7280; transition: all 0.2s ease; }
+        .track-step.active.step-new { background: #000000; color: #ffffff; }
+        .track-step.active.step-cooking { background: #000000; color: #ffffff; }
+        .track-step.active.step-serving { background: #000000; color: #ffffff; }
+
+        /* ป้ายสถานะโต๊ะอาหารเวอร์ชันปลอดอีโมจิเรียบหรู */
+        .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; }
+        .pill-new { background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
+        .pill-cooking { background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
+        .pill-serving { background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
+        .pill-ordered-more { background: #000000; color: #ffffff; border: 1px solid #000000; }
+        .pill-waiting-bill { background: #000000; color: #ffffff; border: 1px solid #000000; }
 
         .item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; align-items: center; }
         .item-row:last-child { border-bottom: none; }
@@ -92,16 +109,39 @@
         .pay-tile:hover { background: #000000; color: #ffffff; }
 
         input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; background: var(--surface); color: var(--text-main); }
-        .toast-notify { position: fixed; bottom: 20px; left: 20px; background: #000; color: #fff; padding: 15px 25px; border-radius: 4px; display: none; font-size: 12px; font-weight: 600; z-index: 10000; text-transform: uppercase; cursor: pointer; }
+        
+        /* แถบแบนเนอร์แจ้งเตือนพนักงานเรียกตัวตนด่วนคาดหน้าจอสูงสุดแบบปลอดอีโมจิ */
+        .toast-notify { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            background: #ef4444; 
+            color: #ffffff; 
+            padding: 18px 30px; 
+            display: none; 
+            font-size: 16px; 
+            font-weight: 800; 
+            text-align: center; 
+            z-index: 99999; 
+            cursor: pointer; 
+            box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5);
+            animation: urgentAlertBlink 0.5s infinite alternate;
+            letter-spacing: 0.5px;
+        }
+        @keyframes urgentAlertBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
 
-        @media (max-width: 900px) { .report-grid { grid-template-columns: 1fr; } .map-grid { grid-template-columns: repeat(5, 1fr); } }
-        @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr 1fr; } .order-grid { grid-template-columns: 1fr; } }
-        @media print { .op-bar, .top-nav, .tab-bar, .stats-grid, .order-grid, .action-btns, .map-section, .btn-black, .btn-void { display: none !important; } #report-sec { display: block !important; } }
+        /* 🛠️ [แก้ไขสไตล์ย้ายตำแหน่งใหม่] ย้ายแถบแบนเนอร์แจ้งเตือนเวลาปิดร้านเข้ามาอยู่ใน Flow หน้าเว็บหลักเพื่อแก้อาการทับซ้อนบังกัน */
+        .closing-banner {
+            width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: urgentAlertBlink 0.5s infinite alternate;
+        }
     </style>
 </head>
 <body>
 
-    <div id="call-notify" class="toast-notify" onclick="clearCallNotify()">TABLE <span id="call-table-no">-</span> IS CALLING STAFF</div>
+    <div id="call-notify" class="toast-notify" onclick="clearCallNotify()">
+        ลูกค้า โต๊ะ <span id="call-table-no">-</span> กำลังเรียกพนักงานด่วน (คลิกที่แถบสีแดงนี้เพื่อปิดแจ้งเตือนเมื่อบริการเสร็จสิ้น)
+    </div>
 
     <div class="op-bar">
         <div>CLOSING IN: <span id="close-timer">00:00:00</span></div>
@@ -122,6 +162,10 @@
 
     <div class="container">
         
+        <div id="cleanup-reminder" class="closing-banner">
+            แจ้งเตือน: ใกล้ถึงเวลาปิดร้านแล้ว กรุณาตรวจสอบการเคลียร์ออเดอร์ค้างและทำความสะอาดเคาน์เตอร์ระบบ
+        </div>
+
         <div class="map-section" id="restaurant-map-block">
             <div class="map-title" id="lbl-live-map">Live Restaurant Map</div>
             <div class="map-grid" id="live-map-grid">
@@ -208,6 +252,7 @@
             </div>
             <div id="p-qr-area" style="display:none; text-align:center;">
                 <img id="p-qr-img" style="width:180px; height:180px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px;">
+                <img id="p-qr-img" style="width:180px; height:180px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px;">
                 <button class="btn-black" onclick="finalPay('พร้อมเพย์')" id="btn-confirm-pay">CONFIRM</button>
             </div>
             <div id="p-cash-area" style="display:none;">
@@ -268,7 +313,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyCZ-y3QwWAiC5zfitjolUt9GolhtzVFoZV11_V0GWIxq-aBps-bWg67yt23df_rq4UiQ/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxl4GeYKx0_j-TIPAe_G4na34VwBD3dobTftL1F5Vgv6pnfXG2C6g70FG9VQbuzsIORnQ/exec";
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
         let lastActionMap = {};
@@ -305,13 +350,12 @@
             }
         };
 
-        // 🔥 [กู้คืนคำสั่งที่หลุด] ฟังก์ชันสลับโหมดมืด-สว่าง พร้อมคำสั่งอัปเดตสีกราฟรายงานแท่งอัตโนมัติ 
         function toggleTheme() {
             const currentTheme = document.body.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.body.setAttribute('data-theme', newTheme);
             localStorage.setItem('withu_theme', newTheme);
-            if (salesChartInst) drawChart(); // สั่งให้วาดกราฟใหม่เพื่อปรับเปลี่ยนสีแท่งตามโหมดทันที
+            if (salesChartInst) drawChart(); 
         }
 
         function toggleLanguage() {
@@ -363,7 +407,9 @@
             let diff = close - now;
             if(diff < 0) { document.getElementById('close-timer').innerText = "CLOSED"; return; }
             let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-            document.getElementById('close-timer').innerText = `${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
+            document.getElementById('close-timer').innerText = `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
+            
+            // ตรวจเช็คเวลาช่วง 30 นาทีสุดท้ายก่อนปิดร้านเพื่อสั่งแสดงผลแถบเตือนสีแดงด้านบน
             document.getElementById('cleanup-reminder').style.display = (h == 0 && m <= 30) ? 'block' : 'none';
             document.getElementById('date-now').innerText = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase();
         }
@@ -377,7 +423,7 @@
                 document.getElementById('prof-val').innerText = "฿" + (data.summary.grossProfit || 0).toLocaleString();
                 document.getElementById('order-count').innerText = data.summary.report.reduce((s,i)=>s+i.qty,0);
 
-                if (data.calls?.length > 0) {
+                if (data.calls && data.calls.length > 0) {
                     document.getElementById('call-table-no').innerText = data.calls[data.calls.length - 1].table;
                     document.getElementById('call-notify').style.display = 'block';
                 } else { document.getElementById('call-notify').style.display = 'none'; }
@@ -419,11 +465,6 @@
                 groups[o.table].items.push(o);
                 groups[o.table].total += parseFloat(String(o.total).replace(/,/g,'')) || 0;
                 groups[o.table].rows.push(o.rowNum);
-
-                if(!isNaN(o.table)) {
-                    let tile = document.getElementById(`map-t-${o.table}`);
-                    if(tile && !tile.classList.contains("alert-trigger")) tile.classList.add("active");
-                }
             });
 
             for(let i=1; i<=15; i++) {
@@ -435,13 +476,48 @@
 
             const genCards = (isStore) => {
                 let html = "";
-                Object.keys(groups).filter(t => isStore ? !isNaN(t) : isNaN(t)).forEach(t => {
-                    const wait = getTimeDiff(groups[t].time);
-                    const status = lastActionMap[t] || groups[t].items[0].status || "รับออเดอร์";
+                Object.keys(groups).filter(t => isStore ? !isNaN(t) : isNaN(t)).forEach(tableId => {
+                    const wait = getTimeDiff(groups[tableId].time);
+                    const status = lastActionMap[tableId] || groups[tableId].items[0].status || "รับออเดอร์";
                     
-                    const s1 = (status === "รับออเดอร์" || status === "PENDING") ? "active" : "";
-                    const s2 = (status === "กำลังทำ") ? "active" : "";
-                    const s3 = (status === "รอเสิร์ฟ") ? "active" : "";
+                    let hasNewItem = groups[tableId].items.some(i => i.status === "รับออเดอร์" || i.status === "PENDING" || i.status === "NEW");
+                    let hasCookingItem = groups[tableId].items.some(i => i.status === "กำลังทำ" || i.status === "COOKING");
+                    let hasServingItem = groups[tableId].items.some(i => i.status === "รอเสิร์ฟ" || i.status === "SERVING");
+                    let isPayingMode = (localStorage.getItem('cds_paying_table') == tableId || status === "paying");
+
+                    let thaiStatusText = "ออเดอร์ใหม่";
+                    let pillClass = "pill-new";
+                    let mapColorClass = "map-new";
+
+                    if (isPayingMode) {
+                        thaiStatusText = "ลูกค้ารอเช็คบิล";
+                        pillClass = "pill-waiting-bill";
+                        mapColorClass = "map-waiting-bill";
+                    } else if (hasNewItem && (hasCookingItem || hasServingItem)) {
+                        thaiStatusText = "ลูกค้าสั่งมาเพิ่ม";
+                        pillClass = "pill-ordered-more";
+                        mapColorClass = "map-ordered-more";
+                    } else if (hasServingItem) {
+                        thaiStatusText = "รอจัดเสิร์ฟ";
+                        pillClass = "pill-serving";
+                        mapColorClass = "map-serving";
+                    } else if (hasCookingItem) {
+                        thaiStatusText = "กำลังทำอาหาร";
+                        pillClass = "pill-cooking";
+                        mapColorClass = "map-cooking";
+                    }
+
+                    // ล้างลูปคลาสสีเก่าออก บังคับเทสีดำออโตเมติกให้แผนผังแผงโต๊ะที่มีออเดอร์เคลื่อนไหวทันที
+                    if(!isNaN(tableId)) {
+                        let tile = document.getElementById(`map-t-${tableId}`);
+                        if(tile && !tile.classList.contains("alert-trigger")) {
+                            tile.className = `map-table ${mapColorClass}`;
+                        }
+                    }
+
+                    const s1 = (status === "รับออเดอร์" || status === "PENDING" || thaiStatusText.includes("ใหม่") || thaiStatusText.includes("เพิ่ม")) ? "active" : "";
+                    const s2 = (status === "กำลังทำ" || thaiStatusText.includes("ทำอาหาร")) ? "active" : "";
+                    const s3 = (status === "รอเสิร์ฟ" || thaiStatusText.includes("เสิร์ฟ")) ? "active" : "";
 
                     let isSlaLate = wait > 15;
 
@@ -449,26 +525,29 @@
                         <div class="card-head">
                             <div style="width: 100%;">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <b style="font-size:20px; letter-spacing:-0.5px;">${isNaN(t) ? t : 'TABLE '+t}</b>
+                                    <b style="font-size:20px; letter-spacing:-0.5px;">${isNaN(tableId) ? tableId : 'TABLE '+tableId}</b>
+                                    <span class="table-status-pill ${pillClass}">${thaiStatusText}</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
                                     <small style="font-weight:700; color:var(--text-muted);">${wait} ${l.mins_ago}</small>
                                 </div>
                                 <div class="track-bar">
-                                    <span class="track-step ${s1}">1. NEW</span>
-                                    <span class="track-step ${s2}">2. COOKING</span>
-                                    <span class="track-step ${s3}">3. SERVING</span>
+                                    <span class="track-step step-new ${s1}">1. ออเดอร์</span>
+                                    <span class="track-step step-cooking ${s2}">2. กำลังทำ</span>
+                                    <span class="track-step step-serving ${s3}">3. จัดเสิร์ฟ</span>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body">
                             <div style="flex-grow:1;">
-                                ${groups[t].items.map(i => {
+                                ${groups[tableId].items.map(i => {
                                     if(i.qty > 10) globalMistakeDetected = true;
                                     const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
                                     return `
                                     <div class="item-row">
                                         <div class="item-info">
                                             <b>${i.qty}x ${i.menu}</b>
-                                            ${(!isStore && !hasDetails) ? '' : `<small>${i.details || '-'}</small>`}
+                                            ${(!isStore) ? '' : (hasDetails ? `<small>${i.details}</small>` : '')}
                                             <button class="btn-void" onclick="handleVoidItem(${i.rowNum})">${l.void}</button>
                                         </div>
                                         <b style="font-size:14px;">฿${i.total}</b>
@@ -477,13 +556,13 @@
                             </div>
                             <hr style="border:none; border-top:1px dashed var(--border); margin:12px 0;">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-size:20px; font-weight:800;">฿${groups[t].total.toLocaleString()}</span>
+                                <span style="font-size:20px; font-weight:800;">฿${groups[tableId].total.toLocaleString()}</span>
                                 <div style="display:flex; gap:5px;">
-                                    <button class="btn-outline" onclick="handleStatusUpdate('${t}', 'กำลังทำ')">${l.cook}</button>
-                                    <button class="btn-outline" onclick="handleStatusUpdate('${t}', 'รอเสิร์ฟ')">${l.serve}</button>
+                                    <button class="btn-outline" style="border:1px solid var(--border); font-weight:800;" onclick="handleStatusUpdate('${tableId}', 'กำลังทำ')">${l.cook}</button>
+                                    <button class="btn-outline" style="border:1px solid var(--border); font-weight:800;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}</button>
                                 </div>
                             </div>
-                            <button class="btn-black" onclick="openPayModal('${t}')">${l.collect}</button>
+                            <button class="btn-black" onclick="openPayModal('${tableId}')">${l.collect}</button>
                         </div></div>`;
                 });
                 return html || `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted); font-size:12px;">${l.no_orders}</div>`;
@@ -576,7 +655,7 @@
             const topProducts = summary.report.slice(0, 3);
             document.getElementById('heat-menu-list').innerHTML = topProducts.map((p, index) => `
                 <div style="font-size:13px; font-weight:600; padding:4px 0; border-bottom:1px dashed var(--border);">
-                    ${index+1}. ${p.name} (${p.qty} ชิ้น)
+                    ${index+1}. ${p.name}
                 </div>`).join('') || "ไม่มีข้อมูล";
 
             const totalMins = activeOrders.reduce((s,o) => s + getTimeDiff(o.time), 0);
@@ -684,10 +763,6 @@
                 stopWebcam();
             }
         }
-
-        // โหมดดึงประวัติธีมสลับโหมดล่าสุดมาทำงานเปิดหน้าจอครั้งแรกสุด
-        const savedTheme = localStorage.getItem('withu_theme') || 'light';
-        document.body.setAttribute('data-theme', savedTheme);
 
         function startWebcam() {
             const video = document.getElementById('webcam');

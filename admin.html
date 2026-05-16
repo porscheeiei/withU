@@ -30,13 +30,13 @@
 
         .container { max-width: 1450px; margin: 25px auto; padding: 0 20px; }
 
-        /* --- LIVE MAP GRID & MONOCHROME DESIGN --- */
+        /* --- LIVE MAP GRID & MONOCHROME LURKERS --- */
         .map-section { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-bottom: 25px; box-shadow: var(--shadow); }
         .map-title { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.05em; color: var(--text-muted); }
         .map-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 10px; }
         .map-table { padding: 12px 5px; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 800; background: var(--surface); transition: all 0.2s ease; }
         
-        /* ล็อกสีแผนผังโต๊ะที่มีออเดอร์ค้างในระบบหน้าร้านทั้งหมดให้รันเป็นสีดำสนิทล้วน ไร้สีอื่นเจือปน */
+        /* ล็อกสีแผนผังโต๊ะที่มีออเดอร์เคลื่อนไหวค้างในระบบหน้าร้านทั้งหมดให้รันเป็นสีดำสนิทล้วน ไร้สีอื่นเจือปน */
         .map-table.map-new, 
         .map-table.map-cooking, 
         .map-table.map-serving, 
@@ -138,6 +138,14 @@
     </style>
 </head>
 <body>
+
+    <script>
+        // ระบบดักจับและรายงานจุดบกพร่องเครือข่ายอัจฉริยะ
+        window.onerror = function(msg, url, line) {
+            console.error("ระบบตรวจพบจุดบกพร่อง: " + msg + "\nกรุณาตรวจสอบว่า API_URL ได้รับสิทธิ์ New Deployment เป็น Everyone หรือยัง");
+            return false;
+        };
+    </script>
 
     <div id="call-notify" class="toast-notify" onclick="clearCallNotify()">
         ลูกค้า โต๊ะ <span id="call-table-no">-</span> กำลังเรียกพนักงานด่วน (คลิกที่แถบสีแดงนี้เพื่อปิดแจ้งเตือนเมื่อบริการเสร็จสิ้น)
@@ -312,7 +320,6 @@
     </div>
 
     <script>
-        // ยึดท่อส่งสัญญานระบุตำแหน่ง Web App ดั้งเดิมของอ้วนเอาไว้ใช้งานอย่างสมบูรณ์แบบ
         const API_URL = "https://script.google.com/macros/s/AKfycbyCZ-y3QwWAiC5zfitjolUt9GolhtzVFoZV11_V0GWIxq-aBps-bWg67yt23df_rq4UiQ/exec";
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
@@ -415,9 +422,11 @@
             let diff = close - now;
             if(diff < 0) { safeText('close-timer', "CLOSED"); return; }
             let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+            
+            // 🔥 [FIX] เติมวงเล็บปิด ) กลับเข้ามาที่บรรทัดด้านล่างเรียบร้อยแล้ว
             safeText('close-timer', `${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`);
             safeStyle('cleanup-reminder', 'display', (h == 0 && m <= 30) ? 'block' : 'none');
-            safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase();
+            safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase()); 
         }
 
         async function refresh() {
@@ -769,9 +778,9 @@
                 isAiModelsLoaded = true;
                 
                 const faceCount = (fullData && fullData.faceProfiles) ? fullData.faceProfiles.length : 0;
-                setText('ai-status', currentLang === 'th' ? `ระบบ AI พร้อมทำงาน (คลังใบหน้าพนักงาน: ${faceCount} คน)` : `AI SYSTEM READY (${faceCount} face profiles loaded)`);
+                safeText('ai-status', currentLang === 'th' ? `ระบบ AI พร้อมทำงาน (คลังใบหน้าพนักงาน: ${faceCount} คน)` : `AI SYSTEM READY (${faceCount} face profiles loaded)`);
             } catch (e) {
-                setText('ai-status', "AI MODEL ERROR");
+                safeText('ai-status', "AI MODEL ERROR");
                 console.error(e);
             }
         }
@@ -868,15 +877,15 @@
             if (!name) return alert("PLEASE ENTER STAFF NAME BEFORE REGISTER");
             if (!isAiModelsLoaded) return alert("AI NOT READY");
 
-            setText('ai-status', "CAPTURING FACE PROFILE...");
+            safeText('ai-status', "CAPTURING FACE PROFILE...");
             const video = document.getElementById('webcam');
             if(!video) return;
             const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
 
-            if (!detection) { setText('ai-status', "RE-TRY FACE POSITION"); return alert("FACE NOT DETECTED. POSITION IN CENTER."); }
+            if (!detection) { safeText('ai-status', "RE-TRY FACE POSITION"); return alert("FACE NOT DETECTED. POSITION IN CENTER."); }
 
             const descriptorArray = Array.from(detection.descriptor);
-            setText('ai-status', "SAVING MATRIX...");
+            safeText('ai-status', "SAVING MATRIX...");
             
             await actionCall('saveFaceProfile', { name: name, descriptor: descriptorArray });
 
@@ -885,13 +894,13 @@
             fullData.faceProfiles = fullData.faceProfiles.filter(p => p.name.toLowerCase() !== name.toLowerCase());
             fullData.faceProfiles.push({ name: name, descriptor: descriptorArray });
 
-            setText('ai-status', "REGISTERED SUCCESSFULLY");
+            safeText('ai-status', "REGISTERED SUCCESSFULLY");
             alert(`FACE PROFILE LOGGED FOR: ${name.toUpperCase()}`);
             toggleAttendance();
         }
 
         function renderAttendanceLog(att) { 
-            setHtml('att-log', (att||[]).map(a => {
+            safeHtml('att-log', (att||[]).map(a => {
                 let displayTime = a.time;
                 if (displayTime && displayTime.includes('T')) {
                     try { displayTime = new Date(displayTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}); } catch(e){}
@@ -917,14 +926,14 @@
         function openManualOrderModal() {
             manualCart = []; updateManualUI();
             if(fullData && fullData.menu) {
-                setHtml('manual-menu-list', fullData.menu.map(m => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;"><span style="font-size:13px;">${m[0]} (฿${m[1]})</span><button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-size:10px; cursor:pointer;">SELECT</button></div>`).join(''));
+                safeHtml('manual-menu-list', fullData.menu.map(m => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;"><span style="font-size:13px;">${m[0]} (฿${m[1]})</span><button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-size:10px; cursor:pointer;">SELECT</button></div>`).join(''));
             }
             safeStyle('manual-order-modal', 'display', 'flex');
         }
         function addToManual(n, p) { manualCart.push({name:n, price:p, qty:1, total:p}); updateManualUI(); }
         function updateManualUI() {
-            setHtml('manual-cart-items', manualCart.map((i,idx) => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.name}</span><span>฿${i.price} <button onclick="manualCart.splice(${idx},1); updateManualUI()" style="border:none; background:none; color:red; cursor:pointer;">✕</button></span></div>`).join(''));
-            setText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.total,0).toLocaleString());
+            safeHtml('manual-cart-items', manualCart.map((i,idx) => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.name}</span><span>฿${i.price} <button onclick="manualCart.splice(${idx},1); updateManualUI()" style="border:none; background:none; color:red; cursor:pointer;">✕</button></span></div>`).join(''));
+            safeText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.total,0).toLocaleString());
         }
         async function submitManualOrder() {
             if(!manualCart.length) return;

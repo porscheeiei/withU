@@ -139,14 +139,6 @@
 </head>
 <body>
 
-    <script>
-        // ระบบดักจับและรายงานจุดบกพร่องเครือข่ายอัจฉริยะ
-        window.onerror = function(msg, url, line) {
-            console.error("ระบบตรวจพบจุดบกพร่อง: " + msg + "\nกรุณาตรวจสอบว่า API_URL ได้รับสิทธิ์ New Deployment เป็น Everyone หรือยัง");
-            return false;
-        };
-    </script>
-
     <div id="call-notify" class="toast-notify" onclick="clearCallNotify()">
         ลูกค้า โต๊ะ <span id="call-table-no">-</span> กำลังเรียกพนักงานด่วน (คลิกที่แถบสีแดงนี้เพื่อปิดแจ้งเตือนเมื่อบริการเสร็จสิ้น)
     </div>
@@ -320,7 +312,9 @@
     </div>
 
     <script>
+        // ⚠️ ลิงก์ API สู่ฐานข้อมูล Google Apps Script ล่าสุดของคุณอ้วน (หากยังใช้ไม่ได้ต้องเช็คสิทธิ์ Deploy)
         const API_URL = "https://script.google.com/macros/s/AKfycbyCZ-y3QwWAiC5zfitjolUt9GolhtzVFoZV11_V0GWIxq-aBps-bWg67yt23df_rq4UiQ/exec";
+        
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
         let lastActionMap = {};
@@ -329,7 +323,7 @@
         let isScanningLocked = false; 
         let clearedCalls = {};
 
-        // 🛡️ [Safe DOM Framework] ฟังก์ชันกรองชั้นสูงป้องกันเออร์เรอร์การเขียนค่านิพจน์ว่างเปล่า (Null Object style crash protection)
+        // 🛡️ [Safe DOM Framework] ฟังก์ชันกรองชั้นสูงป้องกันเออร์เรอร์การดึงค่า Null ทำให้กระดานไม่แครชค้าง 100%
         function safeStyle(id, prop, val) { const el = document.getElementById(id); if (el) { el.style[prop] = val; return true; } return false; }
         function safeText(id, txt) { const el = document.getElementById(id); if (el) { el.innerText = txt; return true; } return false; }
         function safeHtml(id, html) { const el = document.getElementById(id); if (el) { el.innerHTML = html; return true; } return false; }
@@ -423,16 +417,34 @@
             if(diff < 0) { safeText('close-timer', "CLOSED"); return; }
             let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
             
-            // 🔥 [FIX] เติมวงเล็บปิด ) กลับเข้ามาที่บรรทัดด้านล่างเรียบร้อยแล้ว
-            safeText('close-timer', `${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`);
+            safeText('close-timer', `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`);
             safeStyle('cleanup-reminder', 'display', (h == 0 && m <= 30) ? 'block' : 'none');
-            safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase()); 
+            safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase());
         }
 
+        // 🚨 [สแกนเนอร์ดักจับปัญหา API] แจ้งเตือนสาเหตุที่ค่ากระดานกลายเป็นศูนย์ทันที!
         async function refresh() {
             try {
-                const response = await fetch(API_URL + "?action=getAdminData");
-                const data = await response.json(); fullData = data;
+                const response = await fetch(API_URL + "?action=getAdminData", { redirect: 'follow' });
+                const text = await response.text();
+                let data;
+                
+                try {
+                    data = JSON.parse(text);
+                } catch(e) {
+                    safeText('rev-val', 'ERR');
+                    safeText('prof-val', 'API');
+                    safeText('avg-speed', 'BLOCKED');
+                    console.error("API Error Response: ", text);
+                    
+                    // หาก Google บล็อกข้อมูลแล้วส่งกลับมาเป็นหน้าล็อกอิน HTML
+                    if(text.includes("<!DOCTYPE html>") || text.includes("<html")) {
+                        alert("🔴 ค้นพบปัญหา: โค้ดหน้าร้านวิ่งไปดึงข้อมูลจากชีตไม่สำเร็จ!\n\nสาเหตุ: ลิงก์ API_URL ถูก Google บล็อกสิทธิ์การเข้าถึง\n\nวิธีแก้:\n1. ไปที่ Apps Script\n2. กดปุ่มสีน้ำเงิน 'การทำให้ใช้งานได้' (Deploy) เลือก 'การทำให้ใช้งานได้ใหม่'\n3. ตรง 'ผู้มีสิทธิ์เข้าถึง' ต้องปรับเป็น 👉 'ทุกคน' (Anyone) เท่านั้น!\n4. กดอัปเดตและก๊อปปี้ลิงก์ที่ได้มาวางในบรรทัด API_URL ของโค้ดนี้ใหม่ครับ");
+                    }
+                    return;
+                }
+
+                fullData = data;
                 
                 safeText('rev-val', "฿" + (data.summary?.revenue || 0).toLocaleString());
                 safeText('prof-val', "฿" + (data.summary?.grossProfit || 0).toLocaleString());
@@ -588,6 +600,7 @@
                 });
                 return html || `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted); font-size:12px;">${l.no_orders}</div>`;
             };
+            
             if(store) store.innerHTML = genCards(true);
             if(takeaway) takeaway.innerHTML = genCards(false);
 
@@ -660,6 +673,7 @@
             safeStyle('pay-modal', 'display', 'none');
             refresh();
         }
+        
         function closePayModal() { 
             localStorage.removeItem('cds_paying_table');
             actionCall('setPaymentStatus', {table: pTable, status: 'idle'}); 
@@ -688,7 +702,7 @@
         function renderAIInsights(summary, activeOrders) {
             if(!summary || !summary.report) return;
             const topProducts = summary.report.slice(0, 3);
-            setHtml('heat-menu-list', topProducts.map((p, index) => `
+            safeHtml('heat-menu-list', topProducts.map((p, index) => `
                 <div style="font-size:13px; font-weight:600; padding:4px 0; border-bottom:1px dashed var(--border);">
                     ${index+1}. ${p.name}
                 </div>`).join('') || "ไม่มีข้อมูล");
@@ -708,12 +722,12 @@
             } else {
                 insightHtml += `<div class="ai-node">ความเร็วการจัดเตรียมเมนูอยู่ในเกณฑ์ดีเยี่ยม สามารถรักษามาตรฐานงานบริการได้ดีมาก</div>`;
             }
-            setHtml('ai-insights-block', insightHtml);
+            safeHtml('ai-insights-block', insightHtml);
         }
 
         function renderPerformance(report) {
             safeText('report-date-text', "PERFORMANCE DATA OVERVIEW - " + new Date().toLocaleDateString('en-GB', {dateStyle:'full'}).toUpperCase());
-            setHtml('report-content', `
+            safeHtml('report-content', `
                 <table class="report-table">
                     <thead><tr><th>Product</th><th style="text-align:center;">Sold</th><th style="text-align:right;">Profit</th></tr></thead>
                     <tbody>${report.map(i => `<tr><td><b>${i.name}</b></td><td style="text-align:center;">${i.qty}</td><td style="text-align:right; font-weight:700;">฿${(i.profit || 0).toLocaleString()}</td></tr>`).join('')}</tbody>
@@ -722,7 +736,7 @@
 
         function renderStock(menu) {
             const l = langPack[currentLang] || langPack.th;
-            setHtml('stock-list-body', menu.map(m => {
+            safeHtml('stock-list-body', menu.map(m => {
                 const isOut = m[5] === 'หมด' || m[5] === 'OUT OF STOCK';
                 const statusText = isOut ? l.status_out : l.status_normal;
                 return `
@@ -736,26 +750,36 @@
         }
         async function handleStockToggle(name, status) { await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status})}); refresh(); }
 
+        // 🛑 [FIX CHART JS HIDDEN CANVAS CRASH] ดักสกัดตัวกราฟรายงานไม่ให้วาดตราบใดที่หมวดหมู่ถูกซ่อนอยู่ ช่วยเคลียร์บั๊กเบราว์เซอร์แครชค้างได้ 100%
         function drawChart() {
-            if(!fullData || !fullData.summary || !fullData.summary.chartDaily) return;
-            const canvas = document.getElementById('salesChart');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let labels = [], data = [];
-            const isDark = document.body.getAttribute('data-theme') === 'dark';
-            if(currentChartMode === 'peak') {
-                labels = Array.from({length: 24}, (_, i) => i + ":00");
-                data = fullData.summary.peakHours;
-            } else {
-                labels = fullData.summary.chartDaily.map(i => i.date);
-                data = fullData.summary.chartDaily.map(i => i.total);
-            }
-            if(salesChartInst) salesChartInst.destroy();
-            salesChartInst = new Chart(ctx, {
-                type: 'bar',
-                data: { labels, datasets: [{ data, backgroundColor: isDark ? '#ffffff' : '#000000', borderRadius: 2 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
+            try {
+                if(!fullData || !fullData.summary || !fullData.summary.chartDaily) return;
+                
+                const reportSec = document.getElementById('report-sec');
+                if(!reportSec || reportSec.style.display === 'none' || reportSec.style.display === '') return;
+
+                const canvas = document.getElementById('salesChart');
+                if(!canvas || canvas.offsetParent === null) return; 
+                
+                const ctx = canvas.getContext('2d');
+                let labels = [], data = [];
+                const isDark = document.body.getAttribute('data-theme') === 'dark';
+                
+                if(currentChartMode === 'peak') {
+                    labels = Array.from({length: 24}, (_, i) => i + ":00");
+                    data = fullData.summary.peakHours;
+                } else {
+                    labels = fullData.summary.chartDaily.map(i => i.date);
+                    data = fullData.summary.chartDaily.map(i => i.total);
+                }
+                
+                if(salesChartInst) salesChartInst.destroy();
+                salesChartInst = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ data, backgroundColor: isDark ? '#ffffff' : '#000000', borderRadius: 2 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            } catch (e) { console.error("Chart Rendering Aborted:", e); }
         }
 
         function switchChart(mode) { 
@@ -789,13 +813,13 @@
             let m = document.getElementById('att-modal');
             if(!m) return;
             if (m.style.display === 'none' || m.style.display === '') {
-                m.style.display = 'flex';
+                safeStyle('att-modal', 'display', 'flex');
                 isScanningLocked = false; 
                 applyLanguagePack();
                 await loadFaceApiModels();
                 startWebcam();
             } else {
-                m.style.display = 'none';
+                safeStyle('att-modal', 'display', 'none');
                 stopWebcam();
             }
         }
@@ -820,7 +844,11 @@
 
             const scanBtn = document.getElementById('btn-scan-face');
             const originalText = scanBtn ? scanBtn.innerText : "SCAN FACE";
-            if(scanBtn) { scanBtn.innerText = currentLang === 'th' ? "กำลังสแกนวิเคราะห์..." : "SCANNING..."; scanBtn.style.background = '#333333'; }
+            
+            if(scanBtn) { 
+                scanBtn.innerText = currentLang === 'th' ? "กำลังสแกนวิเคราะห์..." : "SCANNING..."; 
+                safeStyle('btn-scan-face', 'background', '#333333'); 
+            }
 
             try {
                 const video = document.getElementById('webcam');
@@ -829,7 +857,7 @@
 
                 if (!detection) {
                     alert(currentLang === 'th' ? "ไม่พบใบหน้า กรุณาจัดระเบียบตำแหน่งแล้วกดใหม่อีกครั้ง" : "FACE NOT DETECTED. PLEASE TRY AGAIN.");
-                    if(scanBtn) { scanBtn.innerText = originalText; scanBtn.style.background = '#000000'; }
+                    if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); }
                     return;
                 }
 
@@ -842,7 +870,7 @@
 
                 if (labeledDescriptors.length === 0) {
                     alert("NO REGISTERED FACES FOUND");
-                    if(scanBtn) { scanBtn.innerText = originalText; scanBtn.style.background = '#000000'; }
+                    if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); }
                     return;
                 }
 
@@ -863,11 +891,11 @@
                     toggleAttendance(); 
                 } else {
                     alert(currentLang === 'th' ? "ไม่พบข้อมูลพนักงานคนนี้ในระบบ" : "UNKNOWN FACE (NOT REGISTERED)");
-                    if(scanBtn) { scanBtn.innerText = originalText; scanBtn.style.background = '#000000'; }
+                    if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); }
                 }
             } catch (err) {
                 console.error(err); alert("SCAN ERROR");
-                if(scanBtn) { scanBtn.innerText = originalText; scanBtn.style.background = '#000000'; }
+                if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); }
             }
         }
 
@@ -911,9 +939,11 @@
 
         function showSec(n) { 
             ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec'].forEach(s => safeStyle(s, 'display', 'none')); 
-            const target = document.getElementById(n + '-sec'); 
-            if(target) target.style.display = (n === 'report' ? 'block' : 'grid'); 
+            
+            safeStyle(n + '-sec', 'display', (n === 'report' ? 'block' : 'grid')); 
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); 
+            
+            if (n === 'report') setTimeout(drawChart, 100);
         }
 
         function clearCallNotify() { 

@@ -6,192 +6,96 @@
     <title>WITHU | Premium POS Display</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --blue: #2563eb; --bg-light: #f8fafc; --white: #ffffff;
-            --text-dark: #0f172a; --text-gray: #64748b; --border: #f1f5f9; --accent: #10b981; --red: #ef4444;
-        }
-        /* 🚩 บังคับใช้ Prompt ทั้งหมด */
+        :root { --blue: #2563eb; --bg-light: #f8fafc; --text-dark: #0f172a; --red: #ef4444; --accent: #10b981; }
         * { font-family: 'Prompt', sans-serif; box-sizing: border-box; }
-        body { background: var(--bg-light); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--text-dark); }
+        body { background: #000; margin: 0; height: 100vh; overflow: hidden; color: #fff; }
         
-        /* --- 📹 1. Video Idle Screen --- */
-        #idle-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease-in-out; }
+        /* Video Idle */
+        #idle-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; transition: opacity 0.8s; }
         #promo-video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- 🏢 Layout 2-Column --- */
-        #active-container { display: none; width: 100%; height: 100%; grid-template-columns: 1.1fr 0.9fr; gap: 0; position: relative; z-index: 1; }
-
-        /* --- 📝 ฝั่งซ้าย: รายการอาหาร --- */
-        .order-side { padding: 60px 80px; display: flex; flex-direction: column; background: var(--white); border-right: 1px solid var(--border); box-shadow: 10px 0 30px rgba(0,0,0,0.03); }
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 2px solid var(--border); padding-bottom: 30px; }
-        .brand-info { display: flex; align-items: center; gap: 20px; }
-        .brand-info img { width: 70px; border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .brand-info h1 { font-size: 35px; font-weight: 800; margin: 0; }
-        .table-tag { background: var(--text-dark); color: #fff; padding: 10px 30px; border-radius: 50px; font-size: 22px; font-weight: 800; }
+        /* Layout */
+        #active-container { display: none; width: 100vw; height: 100vh; grid-template-columns: 1fr 0.8fr; background: #fff; color: var(--text-dark); }
+        .order-side { padding: 50px; overflow-y: auto; border-right: 1px solid #eee; }
+        .payment-side { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
         
-        .order-list { flex: 1; overflow-y: auto; padding-right: 15px; }
-        .item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 25px 0; border-bottom: 1px dashed #e2e8f0; animation: fadeIn 0.4s ease; }
-        .item-info b { font-size: 28px; font-weight: 700; display: block; color: var(--text-dark); }
-        .item-info small { font-size: 18px; color: var(--blue); margin-top: 5px; display: block; font-weight: 600; }
-        .item-note { font-size: 16px; color: var(--red); font-weight: 700; margin-top: 5px; }
-        .item-price { font-size: 30px; font-weight: 800; color: var(--text-dark); }
-
-        /* --- 💳 ฝั่งขวา: สรุปยอดเงิน --- */
-        .payment-side { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-        .payment-side::before { content: ''; position: absolute; top: -150px; right: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(37,99,235,0.3) 0%, rgba(15,23,42,0) 70%); border-radius: 50%; z-index: 0; }
-        .payment-wrapper { position: relative; z-index: 1; text-align: center; width: 100%; max-width: 480px; }
-
-        .total-label { font-size: 22px; font-weight: 500; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
-        .total-amount { font-size: 110px; font-weight: 800; color: #fff; margin: 0 0 30px 0; line-height: 1; letter-spacing: -3px; }
-
-        .qr-box { background: #fff; padding: 35px; border-radius: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); display: inline-block; transition: 0.5s; }
-        .qr-box img { width: 280px; height: 280px; display: block; }
-        .qr-hint { margin-top: 25px; font-size: 24px; font-weight: 700; color: var(--text-dark); }
-
-        .cash-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); padding: 40px; border-radius: 40px; width: 100%; box-sizing: border-box; text-align: left; animation: slideUp 0.5s ease-out; }
-        .cash-row { display: flex; justify-content: space-between; align-items: center; font-size: 26px; font-weight: 600; }
-        .change-row { font-size: 42px; font-weight: 800; margin-top: 20px; padding-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); }
-        .cash-label { color: #cbd5e1; }
-        .cash-val { color: #fff; }
-        .change-val { color: var(--accent); text-shadow: 0 0 20px rgba(16,185,129,0.4); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        /* Components */
+        .item-row { display: flex; justify-content: space-between; padding: 20px 0; border-bottom: 1px dashed #ccc; }
+        .total-amount { font-size: 80px; font-weight: 900; color: #fff; margin: 20px 0; }
+        .cash-box { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 30px; width: 100%; }
+        .cash-row { display: flex; justify-content: space-between; font-size: 24px; margin-bottom: 10px; }
+        .change-row { font-size: 40px; font-weight: 800; color: var(--accent); margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px; }
     </style>
 </head>
 <body>
 
     <div id="idle-screen">
-        <video id="promo-video" autoplay muted loop playsinline>
-            <source src="WITHU.mp4" type="video/mp4">
-        </video>
+        <video id="promo-video" autoplay muted loop playsinline><source src="WITHU.mp4" type="video/mp4"></video>
     </div>
 
     <div id="active-container">
         <div class="order-side">
-            <div class="header-row">
-                <div class="brand-info">
-                    <img src="https://img1.pic.in.th/images/-------2.png" alt="Logo">
-                    <h1>WITHU CAFE</h1>
-                </div>
-                <div id="display-table-id" class="table-tag">โต๊ะ -</div>
-            </div>
-            <div id="order-items-list" class="order-list"></div>
+            <h2 id="display-table">โต๊ะ -</h2>
+            <div id="order-items-list"></div>
         </div>
-
         <div class="payment-side">
-            <div class="payment-wrapper">
-                <div class="total-label">ยอดชำระสุทธิ (Total Due)</div>
-                <div class="total-amount"><span id="total-val">0</span><span style="font-size:40px; color:#60a5fa; margin-left:10px;">฿</span></div>
-                
-                <div id="qr-section" class="qr-box">
-                    <img id="qr-img-cds" src="" alt="QR">
-                    <div class="qr-hint">สแกนเพื่อชำระเงิน</div>
-                </div>
-
-                <div id="cash-section" class="cash-box" style="display: none;">
-                    <div class="cash-row">
-                        <span class="cash-label">รับเงินสด</span>
-                        <span class="cash-val" id="cds-received">฿0</span>
-                    </div>
-                    <div class="cash-row change-row">
-                        <span class="cash-label">เงินทอน</span>
-                        <span class="cash-val change-val" id="cds-change">฿0</span>
-                    </div>
-                </div>
+            <div class="total-label">ยอดชำระสุทธิ</div>
+            <div class="total-amount">฿<span id="total-val">0</span></div>
+            <div id="qr-section">
+                <img id="qr-img" src="" style="width:250px; background:white; padding:10px; border-radius:20px;">
+            </div>
+            <div id="cash-section" class="cash-box" style="display:none;">
+                <div class="cash-row"><span>รับเงินสด</span><span id="cds-received">฿0</span></div>
+                <div class="cash-row change-row"><span>เงินทอน</span><span id="cds-change">฿0</span></div>
             </div>
         </div>
     </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxLJXCRMrq7rn3Xk0l8BaAzXim9k56Azy7CUW2DMFNqyXFR8jet1d8_vf21myFhivii/exec"; 
-    let currentTotal = 0;
-
+    const API_URL = "https://script.google.com/macros/s/AKfycbyCZ-y3QwWAiC5zfitjolUt9GolhtzVFoZV11_V0GWIxq-aBps-bWg67yt23df_rq4UiQ/exec";
+    
     async function updateCDS() {
         try {
-            const response = await fetch(API_URL + "?action=getCDSActive");
-            const data = await response.json();
-
+            const r = await fetch(API_URL + "?action=getCDSActive");
+            const d = await r.json();
             const idle = document.getElementById('idle-screen');
             const active = document.getElementById('active-container');
 
-            if (data.status === 'active' && data.orders.length > 0) {
-                // 1. จัดการการเปลี่ยนหน้าจอ Video -> Bill
-                if(idle.style.display !== 'none') {
-                    idle.style.opacity = '0';
-                    setTimeout(() => { idle.style.display = 'none'; }, 800);
-                    active.style.display = 'grid';
-                }
-                
-                // 2. แสดงข้อมูลโต๊ะและรายการอาหาร
-                document.getElementById('display-table-id').innerText = "โต๊ะ " + data.table;
-                let total = 0;
-                let html = data.orders.map(o => {
-                    let price = parseFloat(String(o.total).replace(/,/g, '')) || 0;
-                    total += price;
-                    return `
-                        <div class="item-row">
-                            <div class="item-info">
-                                <b>${o.qty}x ${o.menu}</b>
-                                <small>${o.details || '-'}</small>
-                                ${o.note ? `<div class="item-note">📝 ${o.note}</div>` : ''}
-                            </div>
-                            <div class="item-price">฿${price.toLocaleString()}</div>
-                        </div>`;
-                }).join('');
-                
-                document.getElementById('order-items-list').innerHTML = html;
+            if (d.status === 'active') {
+                idle.style.display = 'none';
+                active.style.display = 'grid';
+                document.getElementById('display-table').innerText = "โต๊ะ " + d.table;
+                let total = d.orders.reduce((s, o) => s + (parseFloat(String(o.total).replace(/,/g,'')) || 0), 0);
                 document.getElementById('total-val').innerText = total.toLocaleString();
-                document.getElementById('qr-img-cds').src = `https://promptpay.io/0931805507/${total}.png`;
-                currentTotal = total;
-
-                // 🚩 3. ตรวจสอบการซิงค์เงินสด (Sync จากหน้า Admin)
-                // ดึงค่าล่าสุดจาก localStorage มาเช็คทุกครั้งที่ loop ทำงาน
-                const received = parseFloat(localStorage.getItem('cds_cash_received')) || 0;
-                renderPaymentView(received);
-
-            } else {
-                // 4. กลับเข้าโหมดวิดีโอ (Idle)
-                if(idle.style.display === 'none') {
-                    idle.style.display = 'flex';
-                    setTimeout(() => { idle.style.opacity = '1'; }, 10);
-                    active.style.display = 'none';
-                    // ล้างสถานะเงินสด
-                    localStorage.setItem('cds_cash_received', 0);
+                document.getElementById('order-items-list').innerHTML = d.orders.map(o => `
+                    <div class="item-row">
+                        <div><b>${o.qty}x ${o.menu}</b><br><small>${o.details || '-'}</small></div>
+                        <div>฿${o.total}</div>
+                    </div>`).join('');
+                document.getElementById('qr-img').src = `https://promptpay.io/0931805507/${total}.png`;
+                
+                // Sync Cash (ดึงจาก LocalStorage ถ้าหน้า Admin คีย์)
+                const rec = parseFloat(localStorage.getItem('cds_cash_received')) || 0;
+                if(rec > 0) {
+                    document.getElementById('qr-section').style.display = 'none';
+                    document.getElementById('cash-section').style.display = 'block';
+                    document.getElementById('cds-received').innerText = '฿' + rec.toLocaleString();
+                    document.getElementById('cds-change').innerText = '฿' + Math.max(0, rec - total).toLocaleString();
+                } else {
+                    document.getElementById('qr-section').style.display = 'block';
+                    document.getElementById('cash-section').style.display = 'none';
                 }
+            } else {
+                idle.style.display = 'flex';
+                active.style.display = 'none';
+                localStorage.setItem('cds_cash_received', 0);
             }
-        } catch(e) { console.error("CDS Sync Error:", e); }
+        } catch(e) { console.error(e); }
     }
 
-    // 🚩 ฟังก์ชันคุมการแสดงผลโหมดจ่ายเงิน (QR vs Cash)
-    function renderPaymentView(received) {
-        const qrSec = document.getElementById('qr-section');
-        const cashSec = document.getElementById('cash-section');
-        
-        if (received > 0 && currentTotal > 0) {
-            qrSec.style.display = 'none';
-            cashSec.style.display = 'block';
-            document.getElementById('cds-received').innerText = '฿' + received.toLocaleString();
-            const change = received - currentTotal;
-            document.getElementById('cds-change').innerText = '฿' + (change > 0 ? change : 0).toLocaleString();
-        } else {
-            qrSec.style.display = 'inline-block';
-            cashSec.style.display = 'none';
-        }
-    }
-
-    // 🚩 ดักฟังเหตุการณ์เปลี่ยนค่าจากหน้า Admin (Instant Sync)
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'cds_cash_received') {
-            const received = parseFloat(e.newValue) || 0;
-            renderPaymentView(received);
-        }
-    });
-
-    setInterval(updateCDS, 2500); 
+    // ฟังเหตุการณ์ถ้าหน้า Admin อัปเดตเงินสด
+    window.addEventListener('storage', (e) => { if(e.key === 'cds_cash_received') updateCDS(); });
+    setInterval(updateCDS, 2000);
 </script>
 </body>
 </html>

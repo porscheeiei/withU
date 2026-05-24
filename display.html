@@ -6,25 +6,37 @@
     <title>WITHU | Premium POS Display</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #2563eb; --bg-light: #f8fafc; --text-dark: #0f172a; --red: #ef4444; --accent: #10b981; }
+        :root { --blue: #2563eb; --bg-light: #f8fafc; --white: #ffffff; --text-dark: #0f172a; --text-gray: #64748b; --border: #f1f5f9; --accent: #10b981; --red: #ef4444; }
         * { font-family: 'Prompt', sans-serif; box-sizing: border-box; }
-        body { background: #000; margin: 0; height: 100vh; overflow: hidden; color: #fff; }
+        body { background: #000; margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--text-dark); }
         
-        /* Video Idle */
-        #idle-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; transition: opacity 0.8s; }
+        /* 1. Video Idle Screen */
+        #idle-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease-in-out; }
         #promo-video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Layout */
-        #active-container { display: none; width: 100vw; height: 100vh; grid-template-columns: 1fr 0.8fr; background: #fff; color: var(--text-dark); }
-        .order-side { padding: 50px; overflow-y: auto; border-right: 1px solid #eee; }
-        .payment-side { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
-        
-        /* Components */
-        .item-row { display: flex; justify-content: space-between; padding: 20px 0; border-bottom: 1px dashed #ccc; }
-        .total-amount { font-size: 80px; font-weight: 900; color: #fff; margin: 20px 0; }
-        .cash-box { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 30px; width: 100%; }
-        .cash-row { display: flex; justify-content: space-between; font-size: 24px; margin-bottom: 10px; }
-        .change-row { font-size: 40px; font-weight: 800; color: var(--accent); margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px; }
+        /* 2. Layout 2-Column */
+        #active-container { display: none; width: 100%; height: 100%; grid-template-columns: 1.1fr 0.9fr; gap: 0; position: relative; z-index: 1; }
+
+        /* ฝั่งซ้าย: รายการอาหาร */
+        .order-side { padding: 60px 80px; display: flex; flex-direction: column; background: var(--white); border-right: 1px solid var(--border); box-shadow: 10px 0 30px rgba(0,0,0,0.03); }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 2px solid var(--border); padding-bottom: 30px; }
+        .brand-info { display: flex; align-items: center; gap: 20px; }
+        .brand-info img { width: 70px; border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .brand-info h1 { font-size: 35px; font-weight: 800; margin: 0; }
+        .table-tag { background: #000; color: #fff; padding: 10px 30px; border-radius: 50px; font-size: 22px; font-weight: 800; }
+        .order-list { flex: 1; overflow-y: auto; padding-right: 15px; }
+        .item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 25px 0; border-bottom: 1px dashed #e2e8f0; }
+        .item-info b { font-size: 28px; font-weight: 700; display: block; }
+        .item-info small { font-size: 18px; color: var(--blue); margin-top: 5px; display: block; }
+        .item-price { font-size: 30px; font-weight: 800; }
+
+        /* ฝั่งขวา: สรุปยอดเงิน */
+        .payment-side { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .total-amount { font-size: 110px; font-weight: 800; color: #fff; margin: 0 0 30px 0; line-height: 1; letter-spacing: -3px; }
+        .qr-box { background: #fff; padding: 35px; border-radius: 40px; }
+        .cash-box { background: rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 40px; width: 100%; max-width: 450px; }
+        .cash-row { display: flex; justify-content: space-between; font-size: 26px; margin-bottom: 15px; }
+        .change-row { font-size: 42px; font-weight: 800; color: var(--accent); margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.2); pt: 20px; }
     </style>
 </head>
 <body>
@@ -35,15 +47,17 @@
 
     <div id="active-container">
         <div class="order-side">
-            <h2 id="display-table">โต๊ะ -</h2>
-            <div id="order-items-list"></div>
-        </div>
-        <div class="payment-side">
-            <div class="total-label">ยอดชำระสุทธิ</div>
-            <div class="total-amount">฿<span id="total-val">0</span></div>
-            <div id="qr-section">
-                <img id="qr-img" src="" style="width:250px; background:white; padding:10px; border-radius:20px;">
+            <div class="header-row">
+                <div class="brand-info"><img src="https://img1.pic.in.th/images/-------2.png"><h1>WITHU CAFE</h1></div>
+                <div id="display-table-id" class="table-tag">โต๊ะ -</div>
             </div>
+            <div id="order-items-list" class="order-list"></div>
+        </div>
+
+        <div class="payment-side">
+            <div style="font-size: 22px; color: #94a3b8; text-transform: uppercase;">ยอดชำระสุทธิ</div>
+            <div class="total-amount">฿<span id="total-val">0</span></div>
+            <div id="qr-section" class="qr-box"><img id="qr-img-cds" src="" style="width:280px; height:280px;"></div>
             <div id="cash-section" class="cash-box" style="display:none;">
                 <div class="cash-row"><span>รับเงินสด</span><span id="cds-received">฿0</span></div>
                 <div class="cash-row change-row"><span>เงินทอน</span><span id="cds-change">฿0</span></div>
@@ -53,7 +67,8 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyCZ-y3QwWAiC5zfitjolUt9GolhtzVFoZV11_V0GWIxq-aBps-bWg67yt23df_rq4UiQ/exec";
-    
+    let currentTotal = 0;
+
     async function updateCDS() {
         try {
             const r = await fetch(API_URL + "?action=getCDSActive");
@@ -64,17 +79,20 @@
             if (d.status === 'active') {
                 idle.style.display = 'none';
                 active.style.display = 'grid';
-                document.getElementById('display-table').innerText = "โต๊ะ " + d.table;
-                let total = d.orders.reduce((s, o) => s + (parseFloat(String(o.total).replace(/,/g,'')) || 0), 0);
-                document.getElementById('total-val').innerText = total.toLocaleString();
-                document.getElementById('order-items-list').innerHTML = d.orders.map(o => `
-                    <div class="item-row">
-                        <div><b>${o.qty}x ${o.menu}</b><br><small>${o.details || '-'}</small></div>
-                        <div>฿${o.total}</div>
-                    </div>`).join('');
-                document.getElementById('qr-img').src = `https://promptpay.io/0931805507/${total}.png`;
+                document.getElementById('display-table-id').innerText = "โต๊ะ " + d.table;
                 
-                // Sync Cash (ดึงจาก LocalStorage ถ้าหน้า Admin คีย์)
+                let total = 0;
+                document.getElementById('order-items-list').innerHTML = d.orders.map(o => {
+                    let price = parseFloat(String(o.total).replace(/,/g, '')) || 0;
+                    total += price;
+                    return `<div class="item-row"><div class="item-info"><b>${o.qty}x ${o.menu}</b><small>${o.details}</small></div><div class="item-price">฿${price.toLocaleString()}</div></div>`;
+                }).join('');
+                
+                document.getElementById('total-val').innerText = total.toLocaleString();
+                document.getElementById('qr-img-cds').src = `https://promptpay.io/0931805507/${total}.png`;
+                currentTotal = total;
+
+                // Sync Cash
                 const rec = parseFloat(localStorage.getItem('cds_cash_received')) || 0;
                 if(rec > 0) {
                     document.getElementById('qr-section').style.display = 'none';
@@ -90,10 +108,10 @@
                 active.style.display = 'none';
                 localStorage.setItem('cds_cash_received', 0);
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("CDS Sync Error:", e); }
     }
 
-    // ฟังเหตุการณ์ถ้าหน้า Admin อัปเดตเงินสด
+    // Sync ฟังค่าเงินสดจากหน้า Admin
     window.addEventListener('storage', (e) => { if(e.key === 'cds_cash_received') updateCDS(); });
     setInterval(updateCDS, 2000);
 </script>

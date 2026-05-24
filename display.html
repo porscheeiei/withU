@@ -5,36 +5,33 @@
     <title>WITHU | Premium POS Display</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-dark: #0f172a; --bg-glass: rgba(255, 255, 255, 0.95); --accent: #3b82f6; --text-dark: #1e293b; }
+        :root { --bg-dark: #0f172a; --text-dark: #0f172a; }
         * { font-family: 'Prompt', sans-serif; box-sizing: border-box; }
         body { background: #000; margin: 0; height: 100vh; overflow: hidden; }
 
-        /* 1. Video Idle Screen (Smooth Transition) */
-        #idle-screen { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease-in-out; }
+        /* Idle Video */
+        #idle-screen { position: fixed; inset: 0; z-index: 1000; display: flex; }
         #promo-video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 2. Layout 2-Column (Luxury Split) */
-        #active-container { display: none; width: 100vw; height: 100vh; grid-template-columns: 1fr 480px; gap: 0; background: #fff; }
+        /* Active Display */
+        #active-container { display: none; width: 100vw; height: 100vh; grid-template-columns: 1fr 480px; background: #fff; }
 
-        /* ฝั่งซ้าย: รายการอาหาร (Glassmorphism Look) */
-        .order-side { background: var(--bg-glass); padding: 50px 70px; display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid #eee; }
-        .brand-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 50px; }
-        .brand-name { display: flex; align-items: center; gap: 20px; font-size: 32px; font-weight: 800; color: #000; }
-        .table-badge { background: #000; color: #fff; padding: 12px 35px; border-radius: 50px; font-size: 24px; font-weight: 800; }
-        
-        .item-row { display: flex; justify-content: space-between; padding: 25px 0; border-bottom: 1px solid #e2e8f0; animation: fadeIn 0.5s ease; }
-        .item-name { font-size: 28px; font-weight: 600; }
-        .item-details { font-size: 18px; color: #64748b; margin-top: 5px; }
+        /* Left: Order */
+        .order-side { padding: 50px 70px; display: flex; flex-direction: column; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .brand-info { display: flex; align-items: center; gap: 15px; font-size: 28px; font-weight: 800; }
+        .table-badge { background: #0f172a; color: #fff; padding: 10px 30px; border-radius: 20px; font-size: 24px; font-weight: 800; }
+        .item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 25px 0; border-bottom: 1px solid #f1f5f9; }
+        .item-info b { font-size: 28px; font-weight: 700; display: block; }
+        .item-info small { font-size: 18px; color: #2563eb; font-weight: 600; display: block; margin-top: 5px; }
         .item-price { font-size: 28px; font-weight: 800; }
 
-        /* ฝั่งขวา: Payment (Dark Luxury Mode) */
+        /* Right: Payment */
         .payment-side { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
-        .due-label { font-size: 18px; color: #94a3b8; text-transform: uppercase; letter-spacing: 3px; }
+        .due-label { font-size: 18px; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; }
         .total-amount { font-size: 100px; font-weight: 900; margin: 10px 0 40px 0; letter-spacing: -3px; display: flex; align-items: flex-start; }
-        .qr-card { background: #fff; padding: 25px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; }
-        .hint-text { margin-top: 20px; font-size: 22px; font-weight: 600; color: #000; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .qr-card { background: #fff; padding: 30px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; color: #000; }
+        .qr-hint { margin-top: 15px; font-size: 22px; font-weight: 700; }
     </style>
 </head>
 <body>
@@ -43,19 +40,19 @@
 
     <div id="active-container">
         <div class="order-side">
-            <div class="brand-header">
-                <div class="brand-name"><img src="https://img1.pic.in.th/images/-------2.png" style="width:60px;"> WITHU CAFE</div>
+            <div class="header-row">
+                <div class="brand-info"><img src="https://img1.pic.in.th/images/-------2.png" style="width:50px;"> WITHU CAFE</div>
                 <div id="table-display" class="table-badge">โต๊ะ -</div>
             </div>
-            <div id="order-items-list" class="order-list"></div>
+            <div id="order-items-list"></div>
         </div>
 
         <div class="payment-side">
             <div class="due-label">ยอดชำระสุทธิ (TOTAL DUE)</div>
-            <div class="total-amount"><span id="total-val">0</span><span style="font-size:30px; margin-top:15px; margin-left:10px; color:#60a5fa;">฿</span></div>
+            <div class="total-amount"><span id="total-val">0</span><span style="font-size:30px; margin-top:15px; color:#60a5fa;">฿</span></div>
             <div class="qr-card">
                 <img id="qr-img" src="" style="width:250px; height:250px; display:block;">
-                <div class="hint-text">สแกนเพื่อชำระเงิน</div>
+                <div class="qr-hint">สแกนเพื่อชำระเงิน</div>
             </div>
         </div>
     </div>
@@ -75,12 +72,22 @@
                 setTimeout(() => { idle.style.display = 'none'; active.style.display = 'grid'; }, 800);
                 
                 document.getElementById('table-display').innerText = "โต๊ะ " + d.table;
+                
                 let total = 0;
                 document.getElementById('order-items-list').innerHTML = d.orders.map(o => {
                     let p = parseFloat(String(o.total).replace(/,/g, '')) || 0;
                     total += p;
-                    return `<div class="item-row"><div class="item-info"><b class="item-name">${o.qty}x ${o.menu}</b><small class="item-details">${o.details || '-'}</small></div><div class="item-price">฿${p.toLocaleString()}</div></div>`;
+                    // แสดง detail ถ้ามี (เช่น หวาน 0%)
+                    return `
+                        <div class="item-row">
+                            <div class="item-info">
+                                <b>${o.qty}x ${o.menu}</b>
+                                ${o.details && o.details !== '-' ? `<small>${o.details}</small>` : ''}
+                            </div>
+                            <div class="item-price">฿${p.toLocaleString()}</div>
+                        </div>`;
                 }).join('');
+                
                 document.getElementById('total-val').innerText = total.toLocaleString();
                 document.getElementById('qr-img').src = `https://promptpay.io/0931805507/${total}.png`;
             } else {
@@ -88,7 +95,7 @@
                 idle.style.opacity = '1';
                 active.style.display = 'none';
             }
-        } catch(e) {}
+        } catch(e) { console.error("Sync Error:", e); }
     }
     
     setInterval(updateCDS, 2000);

@@ -5,65 +5,58 @@
     <title>WITHU | Premium POS Display</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-dark: #0f172a; --bg-glass: rgba(255, 255, 255, 0.95); --accent: #3b82f6; --text-dark: #1e293b; }
         * { font-family: 'Prompt', sans-serif; box-sizing: border-box; }
-        body { background: #000; margin: 0; height: 100vh; overflow: hidden; }
-
-        /* Idle Screen */
-        #idle-screen { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        #promo-video { width: 100%; height: 100%; object-fit: cover; }
-
-        /* Active Layout */
-        #active-container { display: none; width: 100vw; height: 100vh; grid-template-columns: 1fr 480px; gap: 0; }
-
-        /* Left Side: Order List (Minimalist Receipt Look) */
-        .order-side { background: var(--bg-glass); padding: 50px 70px; display: flex; flex-direction: column; }
-        .brand-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 50px; }
-        .brand-name { display: flex; align-items: center; gap: 20px; font-size: 32px; font-weight: 800; color: #000; }
-        .table-badge { background: #000; color: #fff; padding: 12px 35px; border-radius: 50px; font-size: 24px; }
+        body { background: #f8fafc; margin: 0; height: 100vh; overflow: hidden; }
         
-        .order-list { flex: 1; overflow-y: auto; }
-        .item-row { display: flex; justify-content: space-between; padding: 25px 0; border-bottom: 1px solid #e2e8f0; }
-        .item-name { font-size: 28px; font-weight: 600; }
-        .item-details { font-size: 18px; color: #64748b; }
-        .item-price { font-size: 28px; font-weight: 800; }
+        /* Layout Grid */
+        #active-container { display: none; width: 100vw; height: 100vh; grid-template-columns: 1fr 450px; }
 
-        /* Right Side: Luxury Payment Box */
-        .payment-side { background: var(--bg-dark); padding: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
-        .due-label { font-size: 18px; color: #94a3b8; text-transform: uppercase; letter-spacing: 3px; }
-        .total-amount { font-size: 100px; font-weight: 900; margin: 10px 0 40px 0; letter-spacing: -3px; }
-        .qr-card { background: #fff; padding: 25px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .hint-text { margin-top: 20px; font-size: 22px; font-weight: 600; color: #fff; }
-        
-        /* Cash State */
-        .cash-box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 40px; width: 100%; border: 1px solid rgba(255,255,255,0.1); }
-        .cash-row { display: flex; justify-content: space-between; font-size: 24px; margin-bottom: 10px; }
-        .change-val { font-size: 48px; color: #10b981; font-weight: 800; }
+        /* Left Side: Order List */
+        .order-side { background: #fff; padding: 40px; overflow-y: auto; border-right: 1px solid #eee; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .brand-info { display: flex; align-items: center; gap: 15px; }
+        .brand-info img { width: 50px; border-radius: 50%; }
+        .table-tag { background: #0f172a; color: #fff; padding: 8px 25px; border-radius: 50px; font-weight: 800; }
+        .item-row { display: flex; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid #f1f5f9; }
+        .item-info b { font-size: 20px; display: block; }
+        .item-info small { font-size: 14px; color: #3b82f6; font-weight: 600; }
+        .item-price { font-size: 22px; font-weight: 800; }
+
+        /* Right Side: Payment */
+        .payment-side { background: #0f172a; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
+        .total-label { font-size: 18px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .total-amount { font-size: 90px; font-weight: 900; margin: 10px 0; display: flex; align-items: flex-start; }
+        .currency { font-size: 35px; color: #60a5fa; margin-top: 15px; margin-left: 5px; }
+        .qr-box { background: #fff; padding: 20px; border-radius: 20px; text-align: center; }
+        .qr-hint { margin-top: 15px; font-size: 20px; font-weight: 700; color: #000; }
     </style>
 </head>
 <body>
 
-    <div id="idle-screen"><video id="promo-video" autoplay muted loop playsinline><source src="WITHU.mp4" type="video/mp4"></video></div>
+    <div id="idle-screen" style="position:fixed; inset:0; background:#000; display:flex; align-items:center; justify-content:center;">
+        <video id="promo-video" autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+            <source src="WITHU.mp4" type="video/mp4">
+        </video>
+    </div>
 
     <div id="active-container">
         <div class="order-side">
-            <div class="brand-header">
-                <div class="brand-name"><img src="https://img1.pic.in.th/images/-------2.png" style="width:60px;"> WITHU CAFE</div>
-                <div id="table-display" class="table-badge">โต๊ะ -</div>
+            <div class="header-row">
+                <div class="brand-info">
+                    <img src="https://img1.pic.in.th/images/-------2.png">
+                    <h1 style="font-size:24px; margin:0;">WITHU CAFE</h1>
+                </div>
+                <div id="display-table-id" class="table-tag">โต๊ะ -</div>
             </div>
-            <div id="order-items-list" class="order-list"></div>
+            <div id="order-items-list"></div>
         </div>
 
         <div class="payment-side">
-            <div class="due-label">ยอดชำระสุทธิ (TOTAL)</div>
-            <div class="total-amount" id="total-val">0</div>
-            <div id="qr-section" class="qr-card">
-                <img id="qr-img" src="" style="width:250px; height:250px;">
-                <div style="color:#000; font-weight:700; margin-top:10px;">สแกนเพื่อชำระเงิน</div>
-            </div>
-            <div id="cash-section" class="cash-box" style="display:none;">
-                <div class="cash-row"><span>รับเงินสด</span><span id="cds-received">฿0</span></div>
-                <div class="cash-row" style="margin-top:20px; border-top:1px solid #444; padding-top:20px;"><span>เงินทอน</span><span id="cds-change" class="change-val">฿0</span></div>
+            <div class="total-label">ยอดชำระสุทธิ (TOTAL DUE)</div>
+            <div class="total-amount"><span id="total-val">0</span><span class="currency">฿</span></div>
+            <div class="qr-box">
+                <img id="qr-img-cds" src="" style="width:220px; height:220px; display:block;">
+                <div class="qr-hint">สแกนเพื่อชำระเงิน</div>
             </div>
         </div>
     </div>
@@ -81,38 +74,24 @@
             if (d.status === 'active') {
                 idle.style.display = 'none';
                 active.style.display = 'grid';
-                document.getElementById('table-display').innerText = "โต๊ะ " + d.table;
+                document.getElementById('display-table-id').innerText = "โต๊ะ " + d.table;
                 
                 let total = 0;
                 document.getElementById('order-items-list').innerHTML = d.orders.map(o => {
-                    let p = parseFloat(String(o.total).replace(/,/g, '')) || 0;
-                    total += p;
-                    return `<div class="item-row"><div class="item-info"><b>${o.qty}x ${o.menu}</b><small>${o.details}</small></div><div class="item-price">฿${p.toLocaleString()}</div></div>`;
+                    let price = parseFloat(String(o.total).replace(/,/g, '')) || 0;
+                    total += price;
+                    return `<div class="item-row"><div class="item-info"><b>${o.qty}x ${o.menu}</b><small>${o.details || '-'}</small></div><div class="item-price">฿${price.toLocaleString()}</div></div>`;
                 }).join('');
                 
                 document.getElementById('total-val').innerText = total.toLocaleString();
-                document.getElementById('qr-img').src = `https://promptpay.io/0931805507/${total}.png`;
-                
-                // Sync Cash Logic
-                const rec = parseFloat(localStorage.getItem('cds_cash_received')) || 0;
-                if(rec > 0) {
-                    document.getElementById('qr-section').style.display = 'none';
-                    document.getElementById('cash-section').style.display = 'block';
-                    document.getElementById('cds-received').innerText = '฿' + rec.toLocaleString();
-                    document.getElementById('cds-change').innerText = '฿' + Math.max(0, rec - total).toLocaleString();
-                } else {
-                    document.getElementById('qr-section').style.display = 'block';
-                    document.getElementById('cash-section').style.display = 'none';
-                }
+                document.getElementById('qr-img-cds').src = `https://promptpay.io/0931805507/${total}.png`;
             } else {
                 idle.style.display = 'flex';
                 active.style.display = 'none';
-                localStorage.setItem('cds_cash_received', 0);
             }
-        } catch(e) {}
+        } catch(e) { console.error("Sync Error:", e); }
     }
-    
-    window.addEventListener('storage', (e) => { if(e.key === 'cds_cash_received') updateCDS(); });
+
     setInterval(updateCDS, 2000);
 </script>
 </body>

@@ -381,40 +381,72 @@
     async function chk() {
         try {
             const r = await fetch(API_URL + "?action=getAdminData"); 
-            const d = await r.json(); fullData = d;
-            const myOrders = d.orders.filter(o => o.table.toString() == currentTable.toString());
+            const d = await r.json(); 
+            // รองรับโครงสร้างข้อมูลที่ส่งกลับมาเป็น object หรือ array จาก Google Sheets
+            const myOrders = d.orders.filter(o => {
+                const tbl = o.table || o[1]; // Index 1 คือคอลัมน์ "โต๊ะ" ใน Sheets
+                return tbl && tbl.toString() == currentTable.toString();
+            });
 
             if (myOrders.length === 0) { 
-                upS(4); document.getElementById('queue-info').innerText = "ขอบคุณที่ใช้บริการค่ะ";
+                upS(4); 
+                document.getElementById('queue-info').innerText = "ขอบคุณที่ใช้บริการค่ะ";
                 if(!autoCloseTimer) {
-                    let sec = 300; autoCloseTimer = setInterval(() => {
-                        sec--; let m=Math.floor(sec/60), s=sec%60;
+                    let sec = 300; 
+                    autoCloseTimer = setInterval(() => {
+                        sec--; 
+                        let m = Math.floor(sec/60), s = sec%60;
                         document.getElementById('auto-close-msg').innerText = `ระบบจะปิดอัตโนมัติใน ${m}:${s<10?'0':''}${s}`;
                         if(sec <= 0) executeClearSession();
-                    }, 1000);
+                    }, 1000); 
                 }
-                return; 
+            } else {
+                if(autoCloseTimer) { clearInterval(autoCloseTimer); autoCloseTimer = null; document.getElementById('auto-close-msg').innerText = ""; }
+                
+                let sum = 0;
+                let htmlList = "";
+                let minStatus = 4; // 1: รับออเดอร์, 2: กำลังทำ, 3: รอเสิร์ฟ, 4: สำเร็จ
+
+                myOrders.forEach(o => {
+                    const menu = o.menu || o.name || o[2]; // Index 2 คือคอลัมน์ "เมนู"
+                    const detail = o.details || o.sweetness || o[3] || ''; // Index 3 คือ "รายละเอียด"
+                    const qty = o.qty || o[5] || 1; // Index 5 คือ "จำนวน"
+                    const total = parseFloat(o.total || o[6] || 0); // Index 6 คือ "รวม"
+                    const status = o.status || o[7]; // Index 7 คือ "สถานะ"
+
+                    sum += total;
+                    htmlList += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                    <span>${qty}x ${menu} <br><small style="color:var(--gray);">${detail}</small></span>
+                                    <span>฿${total.toLocaleString()}</span>
+                                 </div>`;
+                    
+                    if (status === "รับออเดอร์") minStatus = Math.min(minStatus, 1);
+                    else if (status === "กำลังทำ") minStatus = Math.min(minStatus, 2);
+                    else if (status === "รอเสิร์ฟ") minStatus = Math.min(minStatus, 3);
+                });
+
+                document.getElementById('stat-list').innerHTML = htmlList;
+                document.getElementById('stat-sum').innerText = sum.toLocaleString();
+                
+                const statusText = minStatus === 1 ? "กำลังรอรับออเดอร์" : minStatus === 2 ? "กำลังเตรียมอาหาร" : minStatus === 3 ? "กำลังไปเสิร์ฟ" : "สำเร็จ";
+                document.getElementById('queue-info').innerText = `สถานะ: ${statusText}`;
+                
+                upS(minStatus);
             }
-
-            const activeOrders = d.orders.filter(o => o.status !== "สำเร็จ");
-            const allTablesInQueue = [...new Set(activeOrders.map(o => o.table.toString()))];
-            const myRank = allTablesInQueue.indexOf(currentTable.toString());
-
-            const qEl = document.getElementById('queue-info');
-            if (myRank === 0) { qEl.innerText = "ลำดับถัดไปคือออเดอร์ของคุณค่ะ 👨‍🍳"; }
-            else if (myRank > 0) { qEl.innerText = `เหลืออีก ${myRank} คิวถึงออเดอร์ของคุณ`; }
-            else { qEl.innerText = "ออเดอร์ของคุณกำลังดำเนินการ"; }
-
-            let minVal = 4, totalSum = 0; const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4};
-            myOrders.forEach(o => { if (p[o.status] < minVal) minVal = p[o.status]; totalSum += parseFloat(String(o.total).replace(/,/g,'')) || 0; });
-            upS(minVal); document.getElementById('stat-sum').innerText = totalSum.toLocaleString();
-            document.getElementById('stat-list').innerHTML = myOrders.map(o => `<div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid #f1f5f9; text-align:left;"><span><b style="font-size:15px;">${o.qty}x ${o.menu}</b></span><b style="color:var(--blue); font-size:13px;">${o.status}</b></div>`).join('');
-        } catch(e) {}
+        } catch (e) {
+            console.error("Status Update Error:", e);
+        }
     }
-    function upS(s) { for(let i=1;i<=4;i++) { const el = document.getElementById('st-'+i); if(el) el.classList.toggle('active', i<=s); } }
 
-    const savedTheme = localStorage.getItem('withu_theme') || 'light';
-    document.body.setAttribute('data-theme', savedTheme);
+    function upS(step) {
+        for(let i = 1; i <= 4; i++) {
+            let el = document.getElementById(`st-${i}`);
+            if(el) {
+                if(i <= step) el.classList.add('active');
+                else el.classList.remove('active');
+            }
+        }
+    }
 </script>
 </body>
 </html>

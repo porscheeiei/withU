@@ -4,109 +4,126 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WITHU ADMIN | CONTROL CENTER</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <style>
         :root {
-            --bg: #fcfcfd;        
-            --surface: #ffffff;   
-            --text-main: #1a1a1e; 
-            --text-muted: #8e8e93;
-            --border: #f1f5f9;    
-            --slate: #f8fafc;
-            --blue: #007aff;      
-            --rose: #ff3b30;      
-            --emerald: #34c759;   
-            --shadow-lux: 0 10px 30px rgba(0, 0, 0, 0.04);
-            --radius-lg: 24px;
-            --radius-md: 16px;
+            --bg: #fcfcfd; --surface: #ffffff; --text-main: #000000; --text-muted: #737373;
+            --accent: #000000; --border: #e5e5e5; --slate: #f5f5f5;
+            --radius: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         [data-theme="dark"] {
-            --bg: #09090b; --surface: #18181b; --text-main: #f4f4f5; --text-muted: #a1a1aa;
-            --border: #27272a; --slate: #202023; --blue: #3b82f6;
+            --bg: #0a0a0a; --surface: #121212; --text-main: #ffffff; --text-muted: #a3a3a3;
+            --border: #262626; --slate: #1c1c1e;
         }
 
-        * { font-family: 'Prompt', sans-serif; box-sizing: border-box; -webkit-tap-highlight-color: transparent; letter-spacing: 0.01em; line-height: 1.6; }
-        body { background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 8px; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
+        * { font-family: 'Inter', 'Prompt', sans-serif; box-sizing: border-box; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; line-height: 1.6; }
+        body { background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 60px; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
 
-        .op-bar { background: var(--text-main); color: var(--surface); padding: 14px 30px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; position: sticky; top: 0; z-index: 1100; box-shadow: var(--shadow-lux); }
+        .op-bar { background: #000000; color: #ffffff; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: 1px; position: sticky; top: 0; z-index: 1100; font-weight: 600; text-transform: uppercase; }
         
-        .top-nav { background: var(--surface); padding: 18px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 48px; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.01); }
-        .logo { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
+        .top-nav { background: var(--surface); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 35px; z-index: 1000; }
+        .logo { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; text-transform: uppercase; }
 
-        .container { max-width: 1450px; margin: 30px auto; padding: 0 24px; }
+        .container { max-width: 1450px; margin: 25px auto; padding: 0 20px; }
 
-        .map-section { background: var(--surface); border: none; padding: 25px; border-radius: var(--radius-lg); margin-bottom: 30px; box-shadow: var(--shadow-lux); }
-        .map-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 18px; letter-spacing: 0.05em; color: var(--text-muted); }
-        .map-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 12px; }
-        .map-table { padding: 16px 5px; border: 1px solid var(--border); border-radius: 12px; text-align: center; font-size: 12px; font-weight: 700; background: var(--slate); transition: all 0.25s ease; cursor: pointer; color: var(--text-main); }
-        .map-table:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: var(--blue); }
+        .map-section { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-bottom: 25px; box-shadow: var(--shadow); }
+        .map-title { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.05em; color: var(--text-muted); }
+        .map-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 10px; }
+        .map-table { padding: 12px 5px; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 800; background: var(--surface); transition: all 0.2s ease; cursor: pointer; }
         
-        .map-table.map-new, .map-table.map-cooking, .map-table.map-serving, .map-table.map-ordered-more, .map-table.map-waiting-bill { background: var(--text-main) !important; color: var(--surface) !important; border-color: var(--text-main) !important; }
-        .map-table.alert-trigger { background: var(--rose) !important; color: #ffffff !important; border-color: var(--rose) !important; animation: mapPulse 0.5s infinite alternate; }
-        @keyframes mapPulse { from { opacity: 1; transform: scale(1); } to { opacity: 0.6; transform: scale(0.97); } }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: var(--surface); padding: 24px; border-radius: var(--radius-lg); border: none; box-shadow: var(--shadow-lux); transition: 0.3s; }
-        .stat-card:hover { transform: translateY(-3px); }
-        .stat-card small { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
-        .stat-card h3 { margin: 0; font-size: 28px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
-
-        .tab-bar { display: flex; gap: 6px; margin-bottom: 30px; background: var(--slate); padding: 6px; border-radius: 16px; width: fit-content; }
-        .tab-btn { padding: 10px 24px; border-radius: 12px; border: none; cursor: pointer; background: transparent; color: var(--text-muted); font-weight: 700; font-size: 13px; transition: 0.2s; }
-        .tab-btn.active { background: var(--surface); color: var(--text-main); box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
-
-        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 24px; }
-        .order-card { background: var(--surface); border: none; border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow-lux); transition: 0.3s; }
-        .order-card.sla-trigger { border: 2px solid var(--rose); background: rgba(255,59,48,0.02); }
-        .card-head { padding: 22px; background: rgba(0,0,0,0.01); border-bottom: 1px solid var(--border); }
-        .card-body { padding: 22px; flex-grow: 1; display: flex; flex-direction: column; }
-
-        .track-bar { display: flex; gap: 8px; width: 100%; margin-top: 15px; padding-top: 12px; border-top: 1px dashed var(--border); }
-        .track-step { flex: 1; text-align: center; padding: 6px; border-radius: 50px; font-size: 11px; font-weight: 700; background: var(--slate); color: var(--text-muted); }
-        .track-step.active.step-new, .track-step.active.step-cooking, .track-step.active.step-serving { background: var(--blue); color: #ffffff; box-shadow: 0 4px 10px rgba(0,122,255,0.2); }
-
-        .table-status-pill { padding: 6px 14px; border-radius: 50px; font-size: 11px; font-weight: 800; text-transform: uppercase; background: var(--slate); color: var(--text-main); border: 1px solid var(--border); }
-        .pill-ordered-more, .pill-waiting-bill { background: var(--text-main); color: var(--surface); border: 1px solid var(--text-main); }
-
-        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: center; }
-        .item-info b { font-weight: 700; color: var(--text-main); }
-        .item-info small { display: block; color: var(--text-muted); font-size: 12px; margin-top: 3px; }
-
-        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 12px; text-decoration: underline; padding: 0; margin-top: 4px; display: inline-block; }
-        .btn-void:hover { color: var(--rose); }
-
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-main); transition: 0.2s; }
-        .btn-outline:hover { background: var(--slate); border-color: var(--text-main); }
-        .btn-black { background: var(--text-main); color: var(--surface); border: none; padding: 16px; border-radius: 50px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-
-        .report-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 24px; }
-        .report-table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-lux); }
-        .report-table th { text-align: left; padding: 16px; font-size: 12px; text-transform: uppercase; background: var(--slate); color: var(--text-muted); border-bottom: 1px solid var(--border); }
-        .report-table td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .map-table.map-new, 
+        .map-table.map-cooking, 
+        .map-table.map-serving, 
+        .map-table.map-ordered-more, 
+        .map-table.map-waiting-bill { background: #000000 !important; color: #ffffff !important; border-color: #000000 !important; }
+        .map-table.alert-trigger { background: #ef4444 !important; color: #ffffff !important; border-color: #ef4444 !important; animation: mapPulse 0.4s infinite alternate; }
         
-        .ai-card { background: var(--surface); border: none; padding: 25px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lux); height: fit-content; }
-        .ai-node { font-size: 14px; line-height: 1.6; border-left: 3px solid var(--blue); padding-left: 15px; margin-bottom: 18px; color: var(--text-main); font-weight: 500; }
+        @keyframes mapPulse { from { opacity: 1; } to { opacity: 0.3; } }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: flex-end; justify-content: center; z-index: 5000; }
-        .modal-card { background: var(--surface); width: 100%; max-width: 480px; border-radius: 32px 32px 0 0; padding: 25px 30px 45px 30px; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); max-height: 85vh; overflow-y: auto; animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .drag-handle { width: 45px; height: 5px; background: #e5e5ea; border-radius: 10px; margin: 0 auto 20px auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--surface); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .stat-card small { color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+        .stat-card h3 { margin: 0; font-size: 24px; font-weight: 700; }
 
-        .pay-tile { padding: 16px; border: 1px solid var(--border); border-radius: 14px; cursor: pointer; text-align: center; font-weight: 700; font-size: 13px; background: var(--slate); transition: 0.2s; }
-        .pay-tile:hover { background: var(--text-main); color: var(--surface); }
+        .tab-bar { display: flex; gap: 4px; margin-bottom: 25px; background: var(--border); padding: 4px; border-radius: 8px; width: fit-content; }
+        .tab-btn { padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: var(--text-muted); font-weight: 600; font-size: 12px; transition: 0.2s; text-transform: uppercase; white-space: nowrap; }
+        .tab-btn.active { background: var(--surface); color: var(--text-main); }
 
-        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); font-size: 15px; background: var(--slate); color: var(--text-main); outline: none; }
-        input:focus, select:focus { background: #fff; border-color: var(--blue); }
+        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+        .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); position: relative; }
+        .order-card.sla-trigger { border: 2px solid #000000; background: var(--slate); }
+        .card-head { padding: 18px; background: rgba(0,0,0,0.01); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
+        .card-body { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; }
+
+        .track-bar { display: flex; gap: 6px; width: 100%; margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--border); }
+        .track-step { flex: 1; text-align: center; padding: 4px 6px; border-radius: 20px; font-size: 10px; font-weight: 800; background: #e5e7eb; color: #6b7280; transition: all 0.2s ease; }
+        .track-step.active.step-new, .track-step.active.step-cooking, .track-step.active.step-serving { background: #000000; color: #ffffff; }
+
+        .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
+        .pill-ordered-more, .pill-waiting-bill { background: #000000; color: #ffffff; border: 1px solid #000000; }
+
+        .item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; align-items: center; }
+        .item-row:last-child { border-bottom: none; }
+        .item-info b { font-weight: 600; }
+        .item-info small { display: block; color: var(--text-muted); font-size: 11px; margin-top: 1px; }
+
+        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; }
+        .btn-void:hover { color: #000000; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: var(--text-main); }
+        .btn-outline:hover { background: #000000; color: #ffffff; border-color: #000000; }
+        .btn-black { background: #000000; color: #ffffff; border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 12px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .report-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
+        .report-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .report-table th { text-align: left; padding: 12px; border-bottom: 2px solid var(--text-main); font-size: 11px; text-transform: uppercase; background: var(--slate); color: var(--text-muted); }
+        .report-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
         
-        .tab-btn:active, .btn-outline:active, .btn-black:active, .pay-tile:active, .map-table:active { transform: scale(0.96); }
+        .ai-card { background: var(--surface); border: 1px solid var(--border); padding: 25px; border-radius: 12px; box-shadow: var(--shadow); height: fit-content; }
+        .ai-node { font-size: 13px; line-height: 1.6; border-left: 2px solid var(--text-main); padding-left: 15px; margin-bottom: 15px; color: var(--text-muted); }
 
-        .toast-notify { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: var(--rose); color: #ffffff; padding: 16px 24px; display: none; font-size: 15px; font-weight: 700; text-align: center; border-radius: 50px; z-index: 99999; cursor: pointer; box-shadow: 0 10px 30px rgba(255,59,48,0.3); animation: slideDownModal 0.4s ease; }
-        @keyframes slideDownModal { from { top: -100px; opacity: 0; } to { top: 20px; opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
+        .modal-card { background: var(--surface); width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
 
-        .closing-banner { width: 100%; background: var(--rose); color: #ffffff; text-align: center; padding: 14px; font-weight: 700; font-size: 13px; display: none; text-transform: uppercase; border-radius: 14px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(255,59,48,0.15); }
+        .pay-tile { padding: 15px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; text-align: center; font-weight: 700; font-size: 12px; text-transform: uppercase; }
+        .pay-tile:hover { background: #000000; color: #ffffff; }
+
+        input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; background: var(--surface); color: var(--text-main); }
+        
+        .toast-notify { 
+            position: fixed; top: 0; left: 0; width: 100%; background: #ef4444; color: #ffffff; 
+            padding: 18px 30px; display: none; font-size: 16px; font-weight: 800; text-align: center; 
+            z-index: 99999; cursor: pointer; box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5);
+            animation: urgentAlertBlink 0.5s infinite alternate; letter-spacing: 0.5px;
+        }
+        @keyframes urgentAlertBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
+
+        .closing-banner {
+            width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: urgentAlertBlink 0.5s infinite alternate;
+        }
+
+        /* 📱 Mobile & Tablet Responsive CSS */
+        @media (max-width: 1024px) {
+            .map-grid { grid-template-columns: repeat(10, 1fr); }
+            .report-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .map-grid { grid-template-columns: repeat(5, 1fr); }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .order-grid { grid-template-columns: 1fr; }
+            .top-nav { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .action-btns { width: 100%; overflow-x: auto; padding-bottom: 5px; display: flex; }
+            .tab-bar { width: 100%; overflow-x: auto; display: flex; }
+        }
+        @media (max-width: 480px) {
+            .map-grid { grid-template-columns: repeat(3, 1fr); }
+            .stats-grid { grid-template-columns: 1fr; }
+            .action-btns button { flex: 1; font-size: 10px; padding: 8px 10px; }
+            .op-bar { flex-direction: column; gap: 5px; padding: 10px; text-align: center; }
+        }
     </style>
 </head>
 <body>
@@ -119,29 +136,30 @@
     </script>
 
     <div id="call-notify" class="toast-notify" onclick="clearCallNotify()">
-        🔔 โต๊ะ <span id="call-table-no">-</span> เรียกพนักงาน (คลิกเพื่อเคลียร์คิว)
+        ลูกค้า โต๊ะ <span id="call-table-no">-</span> กำลังเรียกพนักงานด่วน (คลิกที่แถบสีแดงนี้เพื่อปิดแจ้งเตือนเมื่อบริการเสร็จสิ้น)
     </div>
 
     <div class="op-bar">
         <div>CLOSING IN: <span id="close-timer">00:00:00</span></div>
-        <div id="mistake-log" style="font-weight: 700; color: var(--rose); display:none; letter-spacing: 1px;">MISTAKE DETECTED</div>
+        <div id="mistake-log" style="font-weight: 700; color: #ef4444; display:none; text-transform: uppercase; letter-spacing: 1px;">MISTAKE DETECTED</div>
         <div id="date-now"></div>
     </div>
 
     <nav class="top-nav">
-        <div class="logo">WITHU Center</div>
+        <div class="logo">WITHU ADMIN</div>
         <div class="action-btns" style="display: flex; gap: 8px;">
-            <button class="tab-btn" onclick="toggleLanguage()" style="border: 1px solid var(--border);" id="btn-lang">TH / EN</button>
+            <button class="tab-btn" onclick="toggleLanguage()" style="border: 1px solid #000;" id="btn-lang">EN / TH</button>
             <button class="tab-btn" onclick="openManualOrderModal()" id="btn-add-nav">ADD ORDER</button>
-            <button class="tab-btn" onclick="toggleAttendance()" id="btn-staff-nav" style="background: var(--text-main); color: var(--surface);">STAFF</button>
-            <button class="tab-btn" onclick="window.print()" id="btn-export-nav" style="background: var(--text-main); color: var(--surface);">EXPORT</button>
+            <button class="tab-btn" onclick="toggleAttendance()" id="btn-staff-nav" style="background: #000; color: #fff;">STAFF</button>
+            <button class="tab-btn" onclick="window.print()" id="btn-export-nav" style="background: #000; color: #fff;">EXPORT</button>
             <button class="tab-btn" onclick="toggleTheme()" style="background: var(--border);">MODE</button>
         </div>
     </nav>
 
     <div class="container">
+        
         <div id="cleanup-reminder" class="closing-banner">
-            แจ้งเตือน: ใกล้เวลาปิดร้านแล้ว กรุณาเคลียร์ออเดอร์ตกค้างและทำความสะอาดเคาน์เตอร์ค่ะอ้วน
+            แจ้งเตือน: ใกล้ถึงเวลาปิดร้านแล้ว กรุณาตรวจสอบการเคลียร์ออเดอร์ค้างและทำความสะอาดเคาน์เตอร์ระบบ
         </div>
 
         <div class="map-section" id="restaurant-map-block">
@@ -156,8 +174,8 @@
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card"><small id="lbl-stat-profit">Profit</small><h3 id="prof-val">฿0</h3></div>
-            <div class="stat-card"><small id="lbl-stat-revenue">Revenue</small><h3 id="rev-val">฿0</h3></div>
+            <div class="stat-card"><small id="lbl-stat-profit">Profit</small><h3 id="prof-val">0</h3></div>
+            <div class="stat-card"><small id="lbl-stat-revenue">Revenue</small><h3 id="rev-val">0</h3></div>
             <div class="stat-card"><small id="lbl-stat-speed">Avg Service</small><h3 id="avg-speed">0.0 MINS</h3></div>
             <div class="stat-card"><small id="lbl-stat-orders">Orders Today</small><h3 id="order-count">0</h3></div>
         </div>
@@ -173,7 +191,7 @@
         <div id="takeaway-sec" class="order-grid" style="display:none;"></div>
 
         <div id="stock-sec" style="display:none; overflow-x: auto;">
-            <table class="report-table" style="min-width: 600px;">
+            <table class="report-table" style="background: var(--surface); min-width: 600px;">
                 <thead>
                     <tr>
                         <th id="th-stock-name">Item Name</th>
@@ -188,18 +206,18 @@
 
         <div id="report-sec" style="display:none;">
             <div id="printable-report">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-                    <h2 style="margin:0; font-weight:800; letter-spacing:-1px;" id="lbl-perf-title">DAILY PERFORMANCE REPORT</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                    <h2 style="margin:0; letter-spacing:-1px;" id="lbl-perf-title">DAILY PERFORMANCE REPORT</h2>
                     <div style="display:flex; gap:8px;">
                         <button class="tab-btn active" id="btn-peak" onclick="switchChart('peak')" style="border:1px solid var(--border);">HOURLY</button>
                         <button class="tab-btn" id="btn-day" onclick="switchChart('day')" style="border:1px solid var(--border);">DAILY</button>
                     </div>
                 </div>
-                <p id="report-date-text" style="color: var(--text-muted); font-size: 14px; font-weight:500; margin-bottom: 25px;"></p>
+                <p id="report-date-text" style="color: var(--text-muted); font-size: 13px; text-transform: uppercase; margin-bottom: 25px;"></p>
                 
                 <div class="report-grid">
                     <div style="overflow-x: auto;">
-                        <div style="height: 280px; position: relative; margin-bottom:30px; min-width: 400px;"><canvas id="salesChart"></canvas></div>
+                        <div style="height: 250px; position: relative; margin-bottom:30px; min-width: 400px;"><canvas id="salesChart"></canvas></div>
                         <div id="report-content"></div>
                     </div>
                     
@@ -218,36 +236,34 @@
         </div>
     </div>
 
-    <div id="pay-modal" class="modal-overlay" onclick="if(event.target==this)closePayModal()">
+    <div id="pay-modal" class="modal-overlay">
         <div class="modal-card">
-            <div class="drag-handle"></div>
-            <h2 id="p-table-title" style="margin:0; font-weight:800; font-size:22px; letter-spacing:-0.5px;">TABLE -</h2>
-            <div id="p-bill-items" style="margin: 20px 0; border-top: 1px solid var(--border); padding-top: 15px; max-height: 180px; overflow-y: auto;"></div>
-            <small style="text-transform: uppercase; font-weight: 700; color: var(--text-muted); font-size: 11px;" id="lbl-total-due">Total Amount</small>
-            <div id="p-total-price" style="font-size: 36px; font-weight: 800; margin: 5px 0 25px 0; color: var(--blue);">฿0</div>
-            <div id="p-methods" style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <h2 id="p-table-title" style="margin:0; font-size:20px; text-transform:uppercase;">TABLE -</h2>
+            <div id="p-bill-items" style="margin: 15px 0; border-top: 1px solid var(--border); padding-top: 12px; max-height: 150px; overflow-y: auto;"></div>
+            <small style="text-transform: uppercase; font-weight: 700; color: var(--text-muted); font-size: 10px;" id="lbl-total-due">Total Amount</small>
+            <div id="p-total-price" style="font-size: 32px; font-weight: 800; margin: 5px 0 20px 0;">฿0</div>
+            <div id="p-methods" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <div class="pay-tile" onclick="selectPayMethod('qr')" id="btn-method-qr">PROMPTPAY</div>
                 <div class="pay-tile" onclick="selectPayMethod('cash')" id="btn-method-cash">CASH</div>
             </div>
             <div id="p-qr-area" style="display:none; text-align:center;">
-                <img id="p-qr-img" style="width:190px; height:190px; border: 1px solid var(--border); border-radius: 16px; margin: 15px 0;" alt="PromptPay QR">
+                <img id="p-qr-img" style="width:180px; height:180px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px;" alt="PromptPay QR">
                 <button class="btn-black" onclick="finalPay('พร้อมเพย์')" id="btn-confirm-pay">CONFIRM</button>
             </div>
             <div id="p-cash-area" style="display:none;">
-                <input type="number" id="p-cash-input" placeholder="จำนวนเงินที่รับมา" oninput="calcChange()">
-                <div id="p-change-display" style="font-size: 18px; font-weight: 800; margin: 20px 0; color: var(--emerald); display:none;"></div>
+                <input type="number" id="p-cash-input" placeholder="Received" oninput="calcChange()">
+                <div id="p-change-display" style="font-size: 18px; font-weight: 700; margin: 15px 0; display:none;"></div>
                 <button id="p-cash-submit" class="btn-black" onclick="finalPay('เงินสด')">CLOSE BILL</button>
             </div>
-            <button onclick="closePayModal()" style="margin-top:20px; width:100%; border:none; background:none; color:var(--text-muted); cursor:pointer; font-size:13px; text-decoration:underline; font-weight:500;" id="btn-cancel-pay">CANCEL</button>
+            <button onclick="closePayModal()" style="margin-top:20px; width:100%; border:none; background:none; color:var(--text-muted); cursor:pointer; font-size:12px; text-decoration:underline;" id="btn-cancel-pay">CANCEL</button>
         </div>
     </div>
 
-    <div id="manual-order-modal" class="modal-overlay" onclick="if(event.target==this)this.style.display='none'">
+    <div id="manual-order-modal" class="modal-overlay">
         <div class="modal-card">
-            <div class="drag-handle"></div>
-            <h2 style="margin:0; font-weight:800; font-size:20px;" id="lbl-manual-title">CREATE MANUAL ORDER</h2>
+            <h2 style="margin:0; font-size:18px; margin-bottom:15px;" id="lbl-manual-title">CREATE MANUAL ORDER</h2>
             
-            <div style="margin: 20px 0 15px 0;">
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <select id="manual-channel" style="font-weight:700;">
                     <option value="LINE">LINE OFFICIAL</option>
                     <option value="GRAB">GRAB FOOD</option>
@@ -256,56 +272,55 @@
                 </select>
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
-                <select id="manual-sweetness">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <select id="manual-sweetness" style="font-size:12px; padding:8px;">
                     <option value="">หวานปกติ (100%)</option>
                     <option value="หวานน้อย 50%">หวานน้อย (50%)</option>
                     <option value="ไม่หวาน 0%">ไม่หวาน (0%)</option>
                 </select>
-                <select id="manual-topping">
+                <select id="manual-topping" style="font-size:12px; padding:8px;">
                     <option value="" data-price="0">ไม่มีท็อปปิ้ง</option>
                 </select>
             </div>
 
-            <div id="manual-menu-list" style="max-height: 180px; overflow-y:auto; border:1px solid var(--border); border-radius: 14px; padding: 8px; background: var(--slate);"></div>
+            <div id="manual-menu-list" style="max-height: 200px; overflow-y:auto; border:1px solid var(--border); border-radius: 8px; padding: 5px;"></div>
             
-            <div style="background:var(--slate); padding: 16px; border-radius: 14px; margin-top: 15px;">
+            <div style="background:var(--slate); padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 13px;">
                 <div id="manual-cart-items" style="max-height: 100px; overflow-y:auto;"></div>
-                <div style="display:flex; justify-content:space-between; font-weight:800; border-top:1px solid var(--border); padding-top: 12px; margin-top: 12px; font-size:16px;">
-                    <span id="lbl-manual-total">TOTAL</span><span id="manual-total-price" style="color:var(--blue);">฿0</span>
+                <div style="display:flex; justify-content:space-between; font-weight:800; border-top:1px solid var(--border); padding-top: 8px; margin-top: 8px;">
+                    <span id="lbl-manual-total">TOTAL</span><span id="manual-total-price">฿0</span>
                 </div>
             </div>
             
-            <div class="btn-group">
+            <div class="btn-group" style="grid-template-columns: 1fr 1fr; margin-top:15px;">
                 <button class="btn-outline" onclick="document.getElementById('manual-order-modal').style.display='none'" id="btn-manual-cancel">CANCEL</button>
                 <button class="btn-black" onclick="submitManualOrder()" style="margin:0;" id="btn-manual-confirm">CONFIRM</button>
             </div>
         </div>
     </div>
 
-    <div id="att-modal" class="modal-overlay" onclick="if(event.target==this)toggleAttendance()">
-        <div class="modal-card" style="text-align:center;">
-            <div class="drag-handle"></div>
-            <h2 style="margin:0; font-weight:800; font-size:20px;" id="lbl-staff-title">STAFF CLOCK</h2>
-            <p style="color:var(--blue); font-size:12px; font-weight:700; margin: 5px 0 0 0;" id="ai-status">AI MODELS LOADING...</p>
+    <div id="att-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width:420px; text-align:center;">
+            <h2 style="margin:0; font-size:18px;" id="lbl-staff-title">STAFF CLOCK</h2>
+            <p style="color:var(--text-muted); font-size:11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 5px 0 0 0;" id="ai-status">AI MODELS LOADING...</p>
             
-            <div style="position:relative; width:100%; max-width:320px; height:240px; margin:20px auto; background:#000000; border-radius:16px; overflow:hidden; box-shadow: var(--shadow-lux);">
+            <div style="position:relative; width:100%; max-width:320px; height:240px; margin:15px auto; background:#000000; border-radius:8px; overflow:hidden; border:1px solid var(--border);">
                 <video id="webcam" autoplay muted playsinline width="320" height="240" style="object-fit: cover; width:100%; height:100%;"></video>
             </div>
 
-            <input type="text" id="staff-name" placeholder="ชื่อพนักงาน" style="text-align:center; font-weight:600; margin-bottom:15px;">
+            <input type="text" id="staff-name" placeholder="Staff Name" style="text-align:center; padding:12px; font-size:15px; border-radius:6px; margin-bottom:15px;">
             
-            <div style="margin-bottom:15px;">
+            <div style="display:grid; grid-template-columns: 1fr; gap:10px; margin-bottom:15px;">
                 <button id="btn-scan-face" class="btn-black" onclick="startFaceRecognition()" style="margin-top:0;">SCAN FACE TO CLOCK</button>
             </div>
             
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <button class="btn-outline" onclick="registerFaceProfile()" id="btn-reg-face">REGISTER FACE</button>
                 <button class="btn-outline" onclick="toggleAttendance()" id="btn-staff-close">CLOSE</button>
             </div>
             
             <hr style="border:none; border-top:1px solid var(--border); margin:20px 0;">
-            <div id="att-log" style="text-align:left; font-size:13px; max-height:120px; overflow-y:auto; font-weight:500;"></div>
+            <div id="att-log" style="text-align:left; font-size:12px; max-height:120px; overflow-y:auto;"></div>
         </div>
     </div>
 
@@ -742,7 +757,7 @@
             safeHtml('report-content', `
                 <table class="report-table">
                     <thead><tr><th>Product</th><th style="text-align:center;">Sold</th><th style="text-align:right;">Profit</th></tr></thead>
-                    <tbody>${report.map(i => `<tr><td><b>${i.name}</b></td><td style="text-align:center; font-weight:600;">${i.qty}</td><td style="text-align:right; color:var(--blue); font-weight:700;">฿${(i.profit || 0).toLocaleString()}</td></tr>`).join('')}</tbody>
+                    <tbody>${report.map(i => `<tr><td><b>${i.name}</b></td><td style="text-align:center; font-weight:600;">${i.qty}</td><td style="text-align:right; font-weight:700;">฿${(i.profit || 0).toLocaleString()}</td></tr>`).join('')}</tbody>
                 </table>`);
         }
 
@@ -752,23 +767,25 @@
                 const isOut = m[5] === 'หมด' || m[5] === 'OUT OF STOCK';
                 return `
                 <tr>
-                    <td style="font-weight:600; padding:16px 12px;">${m[0]}</td>
-                    <td style="color:var(--text-muted); font-weight:500;">฿${m[6]||0}</td>
-                    <td style="font-weight:700; font-size:13px; color:${isOut ? 'var(--rose)':'var(--emerald)'};">${isOut ? l.status_out : l.status_normal}</td>
-                    <td><button class="btn-outline" style="padding:6px 14px; border-radius:8px;" onclick="handleStockToggle('${m[0]}','${isOut ? 'ปกติ':'หมด'}')">${l.toggle}</button></td>
+                    <td style="font-weight:600; padding:14px 12px;">${m[0]}</td>
+                    <td style="color:var(--text-muted);">฿${m[6]||0}</td>
+                    <td style="font-weight:700; font-size:12px; color:${isOut ? '#ef4444':'#10b981'};">${isOut ? l.status_out : l.status_normal}</td>
+                    <td><button class="btn-outline" style="padding:6px 12px;" onclick="handleStockToggle('${m[0]}','${isOut ? 'ปกติ':'หมด'}')">${l.toggle}</button></td>
                 </tr>`;
             }).join(''));
         }
         
         async function handleStockToggle(name, status) { 
-            await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status})}); refresh(); 
+            await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status})}); 
+            lastFingerprint = ""; 
+            refresh(); 
         }
 
         function drawChart() {
             try {
                 if(!fullData || !fullData.summary || !fullData.summary.chartDaily) return;
                 const reportSec = document.getElementById('report-sec');
-                if(!reportSec || reportSec.style.display === 'none') return;
+                if(!reportSec || reportSec.style.display === 'none' || reportSec.style.display === '') return;
                 const canvas = document.getElementById('salesChart'); if(!canvas || canvas.offsetParent === null) return; 
                 const ctx = canvas.getContext('2d');
                 let labels = [], data = [];
@@ -805,7 +822,7 @@
                 await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
                 isAiModelsLoaded = true;
                 const faceCount = (fullData && fullData.faceProfiles) ? fullData.faceProfiles.length : 0;
-                safeText('ai-status', currentLang === 'th' ? `ระบบ AI พร้อมทำงาน (คลังพนักงาน: ${faceCount} คน)` : `AI READY (${faceCount} profiles)`);
+                safeText('ai-status', currentLang === 'th' ? `ระบบ AI พร้อมทำงาน (คลังใบหน้า: ${faceCount} คน)` : `AI READY (${faceCount} profiles)`);
             } catch (e) { safeText('ai-status', "AI MODEL ERROR"); }
         }
 
@@ -833,7 +850,7 @@
             if (!isAiModelsLoaded) return alert("AI SYSTEM NOT READY");
             if (!fullData || !fullData.faceProfiles || fullData.faceProfiles.length === 0) return alert("NO PROFILES FOUND");
             const scanBtn = document.getElementById('btn-scan-face'); const originalText = scanBtn ? scanBtn.innerText : "SCAN";
-            if(scanBtn) { scanBtn.innerText = currentLang === 'th' ? "กำลังตรวจใบหน้า..." : "SCANNING..."; safeStyle('btn-scan-face', 'background', '#4b5563'); }
+            if(scanBtn) { scanBtn.innerText = currentLang === 'th' ? "กำลังตรวจใบหน้า..." : "SCANNING..."; safeStyle('btn-scan-face', 'background', '#333333'); }
 
             try {
                 const video = document.getElementById('webcam'); if(!video) return;
@@ -857,4 +874,107 @@
                 const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.60); const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
                 if (bestMatch.label !== 'unknown') {
                     const staffId = bestMatch.label; const records = fullData.attendance ? fullData.attendance.filter(a => a.name === staffId) : [];
-                    let type = "เข้างาน
+                    let type = "เข้างาน"; if (records.length > 0 && records[records.length - 1].type === "เข้างาน") type = "ออกงาน";
+                    await actionCall('staffClock', { name: staffId, type: type });
+                    alert(`บันทึกเวลาสำเร็จ: ${staffId.toUpperCase()} (${type})`); toggleAttendance(); 
+                } else {
+                    alert("ไม่พบข้อมูลพนักงานคนนี้"); if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); }
+                }
+            } catch (err) { if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); } }
+        }
+
+        async function registerFaceProfile() {
+            const el = document.getElementById('staff-name'); const name = el ? el.value.trim() : "";
+            if (!name) return alert("กรุณาใส่ชื่อพนักงานก่อนบันทึกใบหน้า");
+            safeText('ai-status', "CAPTURING PROFILE MATRIX...");
+            const video = document.getElementById('webcam'); if(!video) return;
+            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+            if (!detection) return alert("ตรวจจับใบหน้าล้มเหลว กรุณาเล็งหน้าตรงๆ อีกครั้ง");
+
+            const descriptorArray = Array.from(detection.descriptor);
+            safeText('ai-status', "SYNCHRONIZING MEMORY...");
+            await actionCall('saveFaceProfile', { name: name, descriptor: descriptorArray });
+
+            if (!fullData) fullData = { faceProfiles: [] };
+            if (!fullData.faceProfiles) fullData.faceProfiles = [];
+            fullData.faceProfiles = fullData.faceProfiles.filter(p => p.name.toLowerCase() !== name.toLowerCase());
+            fullData.faceProfiles.push({ name: name, descriptor: descriptorArray });
+
+            safeText('ai-status', "REGISTERED SUCCESSFULLY"); alert(`ลงทะเบียนใบหน้าสำเร็จ: ${name.toUpperCase()}`); toggleAttendance();
+        }
+
+        function renderAttendanceLog(att) { 
+            safeHtml('att-log', (att||[]).map(a => {
+                let displayTime = a.time;
+                if (displayTime && displayTime.includes('T')) {
+                    try { displayTime = new Date(displayTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}); } catch(e){}
+                }
+                return `<div style="padding:6px 0; border-bottom:1px solid var(--border);"><b>${a.name}</b> - ${a.type} @ ${displayTime}</div>`;
+            }).join('')); 
+        }
+
+        function showSec(n) { 
+            ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec'].forEach(s => safeStyle(s, 'display', 'none')); 
+            safeStyle(n + '-sec', 'display', (n === 'report' ? 'block' : 'grid')); 
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); 
+            if (n === 'report') setTimeout(drawChart, 150);
+        }
+
+        function clearCallNotify() { 
+            const t = document.getElementById('call-table-no').innerText; clearedCalls[t] = true; 
+            fetch(API_URL + "?action=clearCall&table=" + t, { method: 'GET', mode: 'no-cors' }); safeStyle('call-notify', 'display', 'none');
+        }
+
+        function openManualOrderModal() {
+            manualCart = []; updateManualUI();
+            if(fullData && fullData.menu) {
+                safeHtml('manual-menu-list', fullData.menu.map(m => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;"><span style="font-size:13px; font-weight:600;">${m[0]} (฿${m[1]})</span><button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;">SELECT</button></div>`).join(''));
+            }
+            if(fullData && fullData.toppings) {
+                const topSelect = document.getElementById('manual-topping');
+                if (topSelect) topSelect.innerHTML = `<option value="" data-price="0">ไม่มีท็อปปิ้ง</option>` + fullData.toppings.map(t => `<option value="${t[0]}" data-price="${t[1]}">+ ${t[0]} (฿${t[1]})</option>`).join('');
+            }
+            safeStyle('manual-order-modal', 'display', 'flex');
+        }
+
+        function addToManual(name, basePrice) { 
+            let sweet = document.getElementById('manual-sweetness').value;
+            let topEl = document.getElementById('manual-topping');
+            let topName = ""; let topPrice = 0;
+            if (topEl && topEl.selectedIndex > 0) {
+                topName = topEl.options[topEl.selectedIndex].value;
+                topPrice = parseFloat(topEl.options[topEl.selectedIndex].getAttribute('data-price')) || 0;
+            }
+            let finalPrice = basePrice + topPrice;
+            manualCart.push({ name: name, price: finalPrice, qty: 1, total: finalPrice, sweetness: sweet, note: topName }); 
+            updateManualUI(); 
+        }
+
+        function updateManualUI() {
+            safeHtml('manual-cart-items', manualCart.map((i,idx) => {
+                let desc = i.name; if(i.sweetness || i.note) desc += ` <small style="color:var(--text-muted);">(${i.sweetness || ''} ${i.note ? '+'+i.note : ''})</small>`;
+                return `<div style="display:flex; justify-content:space-between; margin-bottom:6px; align-items:center;">
+                    <span style="font-size:13px; font-weight:500;">${desc}</span>
+                    <span style="font-size:13px; font-weight:600;">฿${i.price} <button onclick="manualCart.splice(${idx},1); updateManualUI()" style="border:none; background:none; color:#ef4444; cursor:pointer; font-weight:700;">✕</button></span>
+                </div>`;
+            }).join(''));
+            safeText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.total,0).toLocaleString());
+        }
+
+        async function submitManualOrder() {
+            if(!manualCart.length) return;
+            const ch = document.getElementById('manual-channel'); const channelVal = ch ? ch.value : 'LINE';
+            await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action: 'submitOrder', table: channelVal, cart: manualCart})});
+            safeStyle('manual-order-modal', 'display', 'none'); 
+            lastFingerprint = ""; 
+            refresh();
+        }
+
+        function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }
+        async function actionCall(action, params) { try { await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action, ...params})}); refresh(); } catch(e) { console.error(e); } }
+
+        const savedTheme = safeStorageGet('withu_theme', 'light'); document.body.setAttribute('data-theme', savedTheme);
+        applyLanguagePack(); setInterval(updateClock, 1000); refresh(); setInterval(refresh, 5000);
+    </script>
+</body>
+</html>

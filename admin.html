@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WITHU ADMIN | CONTROL CENTER</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <style>
@@ -129,7 +129,6 @@
 <body>
 
     <script>
-        // ระบบดักจับการพังทลายสคริปต์
         window.onerror = function(msg, url, line) {
             console.error("System Error Blocked:", msg, "at line", line);
             return false;
@@ -281,7 +280,7 @@
                 </select>
                 <select id="manual-topping" style="font-size:12px; padding:8px;">
                     <option value="" data-price="0">ไม่มีท็อปปิ้ง</option>
-                    </select>
+                </select>
             </div>
 
             <div id="manual-menu-list" style="max-height: 200px; overflow-y:auto; border:1px solid var(--border); border-radius: 8px; padding: 5px;"></div>
@@ -326,7 +325,7 @@
     </div>
 
     <script>
-        // ⚠️ ลิงก์ API สู่ฐานข้อมูล Google Apps Script ล่าสุด (ห้ามแก้ไข)
+        // ⚠️ ลิงก์ API สู่ฐานข้อมูล Google Apps Script ล่าสุด (ตรวจสอบสิทธิ์ให้เป็น Anyone ทุกครั้งที่มีการ Deploy)
         const API_URL = "https://script.google.com/macros/s/AKfycbyCZ-y3QwWAiC5zfitjolUt9GolhtzVFoZV11_V0GWIxq-aBps-bWg67yt23df_rq4UiQ/exec";
         
         let fullData = null, manualCart = [], salesChartInst = null;
@@ -335,13 +334,14 @@
         let isAiModelsLoaded = false, localStream = null, currentChartMode = 'peak';
         let isScanningLocked = false; 
         let clearedCalls = {};
+        let lastFingerprint = ""; // สำหรับตรวจจับ Bypass ลูปการวาด DOM ซ้ำโดยไม่จำเป็น
 
         // 🛡️ Safe DOM Framework
         function safeStyle(id, prop, val) { const el = document.getElementById(id); if (el) { el.style[prop] = val; return true; } return false; }
         function safeText(id, txt) { const el = document.getElementById(id); if (el) { el.innerText = txt; return true; } return false; }
         function safeHtml(id, html) { const el = document.getElementById(id); if (el) { el.innerHTML = html; return true; } return false; }
         
-        // 🛡️ Safe LocalStorage Framework (ป้องกันบราวเซอร์มือถือบล็อกแคช)
+        // 🛡️ Safe LocalStorage Framework
         function safeStorageGet(key, defVal) { try { return localStorage.getItem(key) || defVal; } catch(e) { return defVal; } }
         function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
         function safeStorageRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
@@ -454,12 +454,16 @@
                 try {
                     data = JSON.parse(text);
                 } catch(e) {
-                    safeText('rev-val', 'ERR');
-                    safeText('prof-val', 'API');
-                    safeText('avg-speed', 'BLOCKED');
+                    // หากโครงสร้างพัง ให้ Bypass ข้อความแจ้งเตือนแปลกปลอมออกไปทันที
+                    console.error("JSON Parse Error Bypass", e);
                     return; 
                 }
 
+                // ตรวจสอบลายนิ้วมือการซิงค์ (Fingerprint Check) เพื่อลดการหน่วงของหน้าแอปพลิเคชัน
+                if (data.fingerprint && data.fingerprint === lastFingerprint) {
+                    return; 
+                }
+                lastFingerprint = data.fingerprint || "";
                 fullData = data;
                 
                 const rev = (data.summary && data.summary.revenue) ? data.summary.revenue : 0;
@@ -511,10 +515,6 @@
                 drawChart();
             } catch(e) { 
                 console.error("Sync Failure:", e); 
-                if (!fullData) {
-                    safeText('rev-val', 'ERR');
-                    safeText('prof-val', 'NET');
-                }
             }
         }
 
@@ -703,6 +703,7 @@
             await actionCall('markMultipleDone', {rowNums: pRows, paymentMethod: method});
             safeStorageSet('cds_cash_received', '0');
             safeStyle('pay-modal', 'display', 'none');
+            lastFingerprint = ""; // ล้างค่าลายนิ้วมือเพื่อบังคับให้หน้าจอวาด UI ใหม่ทันที
             refresh();
         }
         
@@ -711,6 +712,7 @@
             actionCall('setPaymentStatus', {table: pTable, status: 'idle'}); 
             safeStorageSet('cds_cash_received', '0'); 
             safeStyle('pay-modal', 'display', 'none');
+            lastFingerprint = "";
             refresh();
         }
 
@@ -728,6 +730,7 @@
         async function handleVoidItem(rowNum) {
             if(!confirm("Confirm VOID this item?")) return;
             await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'voidItem', rowNum: rowNum})});
+            lastFingerprint = "";
             refresh();
         }
 
@@ -762,299 +765,4 @@
             safeHtml('report-content', `
                 <table class="report-table">
                     <thead><tr><th>Product</th><th style="text-align:center;">Sold</th><th style="text-align:right;">Profit</th></tr></thead>
-                    <tbody>${report.map(i => `<tr><td><b>${i.name}</b></td><td style="text-align:center;">${i.qty}</td><td style="text-align:right; font-weight:700;">฿${(i.profit || 0).toLocaleString()}</td></tr>`).join('')}</tbody>
-                </table>`);
-        }
-
-        function renderStock(menu) {
-            const l = langPack[currentLang] || langPack.th;
-            safeHtml('stock-list-body', menu.map(m => {
-                const isOut = m[5] === 'หมด' || m[5] === 'OUT OF STOCK';
-                const statusText = isOut ? l.status_out : l.status_normal;
-                return `
-                <tr>
-                    <td style="font-weight:600; padding:15px 12px;">${m[0]}</td>
-                    <td style="color:var(--text-muted);">฿${m[6]||0}</td>
-                    <td style="font-weight:700; font-size:12px; color:${isOut ? 'var(--danger)':'var(--success)'};">${statusText}</td>
-                    <td><button class="btn-s" style="padding:6px 12px;" onclick="handleStockToggle('${m[0]}','${isOut ? 'ปกติ':'หมด'}')">${l.toggle}</button></td>
-                </tr>`;
-            }).join(''));
-        }
-        
-        async function handleStockToggle(name, status) { 
-            await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status})}); 
-            refresh(); 
-        }
-
-        function drawChart() {
-            try {
-                if(!fullData || !fullData.summary || !fullData.summary.chartDaily) return;
-                
-                const reportSec = document.getElementById('report-sec');
-                if(!reportSec || reportSec.style.display === 'none' || reportSec.style.display === '') return;
-
-                const canvas = document.getElementById('salesChart');
-                if(!canvas || canvas.offsetParent === null) return; 
-                
-                const ctx = canvas.getContext('2d');
-                let labels = [], data = [];
-                const isDark = document.body.getAttribute('data-theme') === 'dark';
-                
-                if(currentChartMode === 'peak') {
-                    labels = Array.from({length: 24}, function(_, i) { return i + ":00" });
-                    data = fullData.summary.peakHours;
-                } else {
-                    labels = fullData.summary.chartDaily.map(i => i.date);
-                    data = fullData.summary.chartDaily.map(i => i.total);
-                }
-                
-                if(salesChartInst) salesChartInst.destroy();
-                salesChartInst = new Chart(ctx, {
-                    type: 'bar',
-                    data: { labels: labels, datasets: [{ data: data, backgroundColor: isDark ? '#ffffff' : '#000000', borderRadius: 2 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                });
-            } catch (e) { console.error("Chart Rendering Aborted:", e); }
-        }
-
-        function switchChart(mode) { 
-            currentChartMode = mode; 
-            const pBtn = document.getElementById('btn-peak');
-            const dBtn = document.getElementById('btn-day');
-            if(pBtn) pBtn.classList.toggle('active', mode==='peak');
-            if(dBtn) dBtn.classList.toggle('active', mode==='day');
-            drawChart();
-        }
-
-        async function loadFaceApiModels() {
-            if (isAiModelsLoaded) return;
-            const l = langPack[currentLang] || langPack.th;
-            const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights/';
-            try {
-                await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
-                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-                isAiModelsLoaded = true;
-                
-                const faceCount = (fullData && fullData.faceProfiles) ? fullData.faceProfiles.length : 0;
-                safeText('ai-status', currentLang === 'th' ? `ระบบ AI พร้อมทำงาน (คลังใบหน้าพนักงาน: ${faceCount} คน)` : `AI SYSTEM READY (${faceCount} face profiles loaded)`);
-            } catch (e) {
-                safeText('ai-status', "AI MODEL ERROR");
-                console.error(e);
-            }
-        }
-
-        async function toggleAttendance() {
-            let m = document.getElementById('att-modal');
-            if(!m) return;
-            if (m.style.display === 'none' || m.style.display === '') {
-                safeStyle('att-modal', 'display', 'flex');
-                isScanningLocked = false; 
-                applyLanguagePack();
-                await loadFaceApiModels();
-                startWebcam();
-            } else {
-                safeStyle('att-modal', 'display', 'none');
-                stopWebcam();
-            }
-        }
-
-        function startWebcam() {
-            const video = document.getElementById('webcam');
-            if(!video) return;
-            navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: "user" } })
-                .then(stream => { localStream = stream; video.srcObject = stream; })
-                .catch(err => console.error("Webcam blocked:", err));
-        }
-
-        function stopWebcam() {
-            if (localStream) { localStream.getTracks().forEach(track => track.stop()); localStream = null; }
-            const video = document.getElementById('webcam');
-            if(video) video.srcObject = null;
-        }
-
-        async function startFaceRecognition() {
-            if (!isAiModelsLoaded) return alert("AI SYSTEM NOT READY");
-            if (!fullData || !fullData.faceProfiles || fullData.faceProfiles.length === 0) return alert("NO BASE FACE PROFILES IN SHEET DATABASE");
-
-            const scanBtn = document.getElementById('btn-scan-face');
-            const originalText = scanBtn ? scanBtn.innerText : "SCAN FACE";
-            
-            if(scanBtn) { 
-                scanBtn.innerText = currentLang === 'th' ? "กำลังสแกนวิเคราะห์..." : "SCANNING..."; 
-                safeStyle('btn-scan-face', 'background', '#333333'); 
-            }
-
-            try {
-                const video = document.getElementById('webcam');
-                if(!video) return;
-                const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-
-                if (!detection) {
-                    alert(currentLang === 'th' ? "ไม่พบใบหน้า กรุณาจัดระเบียบตำแหน่งแล้วกดใหม่อีกครั้ง" : "FACE NOT DETECTED. PLEASE TRY AGAIN.");
-                    if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); }
-                    return;
-                }
-
-                const labeledDescriptors = [];
-                fullData.faceProfiles.forEach(p => {
-                    if (p.descriptor && p.descriptor.length > 0) {
-                        try { labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(p.name, [new Float32Array(p.descriptor)])); } catch(err) {}
-                    }
-                });
-
-                if (labeledDescriptors.length === 0) {
-                    alert("NO REGISTERED FACES FOUND");
-                    if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); }
-                    return;
-                }
-
-                const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.60); 
-                const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-
-                if (bestMatch.label !== 'unknown') {
-                    const staffId = bestMatch.label;
-                    const input = document.getElementById('staff-name');
-                    if(input) input.value = staffId;
-                    
-                    const records = fullData.attendance ? fullData.attendance.filter(a => a.name === staffId) : [];
-                    let type = "เข้างาน";
-                    if (records.length > 0 && records[records.length - 1].type === "เข้างาน") { type = "ออกงาน"; }
-
-                    await actionCall('staffClock', { name: staffId, type: type });
-                    alert(`CLOCK RECORDED: ${staffId.toUpperCase()} (${type === 'เข้างาน' ? 'IN' : 'OUT'})`);
-                    toggleAttendance(); 
-                } else {
-                    alert(currentLang === 'th' ? "ไม่พบข้อมูลพนักงานคนนี้ในระบบ" : "UNKNOWN FACE (NOT REGISTERED)");
-                    if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); }
-                }
-            } catch (err) {
-                console.error(err); alert("SCAN ERROR");
-                if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); }
-            }
-        }
-
-        async function registerFaceProfile() {
-            const el = document.getElementById('staff-name');
-            const name = el ? el.value.trim() : "";
-            if (!name) return alert("PLEASE ENTER STAFF NAME BEFORE REGISTER");
-            if (!isAiModelsLoaded) return alert("AI NOT READY");
-
-            safeText('ai-status', "CAPTURING FACE PROFILE...");
-            const video = document.getElementById('webcam');
-            if(!video) return;
-            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-
-            if (!detection) { safeText('ai-status', "RE-TRY FACE POSITION"); return alert("FACE NOT DETECTED. POSITION IN CENTER."); }
-
-            const descriptorArray = Array.from(detection.descriptor);
-            safeText('ai-status', "SAVING MATRIX...");
-            
-            await actionCall('saveFaceProfile', { name: name, descriptor: descriptorArray });
-
-            if (!fullData) fullData = { faceProfiles: [] };
-            if (!fullData.faceProfiles) fullData.faceProfiles = [];
-            fullData.faceProfiles = fullData.faceProfiles.filter(p => p.name.toLowerCase() !== name.toLowerCase());
-            fullData.faceProfiles.push({ name: name, descriptor: descriptorArray });
-
-            safeText('ai-status', "REGISTERED SUCCESSFULLY");
-            alert(`FACE PROFILE LOGGED FOR: ${name.toUpperCase()}`);
-            toggleAttendance();
-        }
-
-        function renderAttendanceLog(att) { 
-            safeHtml('att-log', (att||[]).map(a => {
-                let displayTime = a.time;
-                if (displayTime && displayTime.includes('T')) {
-                    try { displayTime = new Date(displayTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}); } catch(e){}
-                }
-                return `<div style="padding:5px 0; border-bottom:1px solid var(--border);"><b>${a.name}</b> - ${a.type} @ ${displayTime}</div>`;
-            }).join('')); 
-        }
-
-        function showSec(n) { 
-            ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec'].forEach(s => safeStyle(s, 'display', 'none')); 
-            
-            safeStyle(n + '-sec', 'display', (n === 'report' ? 'block' : 'grid')); 
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); 
-            
-            if (n === 'report') setTimeout(drawChart, 100);
-        }
-
-        function clearCallNotify() { 
-            const t = document.getElementById('call-table-no').innerText; 
-            clearedCalls[t] = true; 
-            fetch(API_URL + "?action=clearCall&table=" + t, { method: 'GET', mode: 'no-cors' }); 
-            safeStyle('call-notify', 'display', 'none');
-        }
-
-        // 🔥 [อัปเกรดระบบ] เพิ่มท็อปปิ้งใน Manual Order
-        function openManualOrderModal() {
-            manualCart = []; updateManualUI();
-            
-            if(fullData && fullData.menu) {
-                safeHtml('manual-menu-list', fullData.menu.map(m => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;"><span style="font-size:13px;">${m[0]} (฿${m[1]})</span><button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-size:10px; cursor:pointer;">SELECT</button></div>`).join(''));
-            }
-
-            if(fullData && fullData.toppings) {
-                const topSelect = document.getElementById('manual-topping');
-                if (topSelect) {
-                    topSelect.innerHTML = `<option value="" data-price="0">ไม่มีท็อปปิ้ง</option>` + 
-                        fullData.toppings.map(t => `<option value="${t[0]}" data-price="${t[1]}">+ ${t[0]} (฿${t[1]})</option>`).join('');
-                }
-            }
-
-            safeStyle('manual-order-modal', 'display', 'flex');
-        }
-
-        function addToManual(name, basePrice) { 
-            let sweet = document.getElementById('manual-sweetness').value;
-            let topEl = document.getElementById('manual-topping');
-            let topName = "";
-            let topPrice = 0;
-            
-            if (topEl && topEl.selectedIndex > 0) {
-                topName = topEl.options[topEl.selectedIndex].value;
-                topPrice = parseFloat(topEl.options[topEl.selectedIndex].getAttribute('data-price')) || 0;
-            }
-            
-            let finalPrice = basePrice + topPrice;
-            
-            // ตรงกับโครงสร้างฐานข้อมูลหลังบ้าน
-            manualCart.push({ name: name, price: finalPrice, qty: 1, total: finalPrice, sweetness: sweet, note: topName }); 
-            updateManualUI(); 
-        }
-
-        function updateManualUI() {
-            safeHtml('manual-cart-items', manualCart.map((i,idx) => {
-                let desc = i.name;
-                if(i.sweetness || i.note) {
-                    desc += ` <small style="color:var(--text-muted);">(${i.sweetness || ''} ${i.note ? '+'+i.note : ''})</small>`;
-                }
-                return `<div style="display:flex; justify-content:space-between; margin-bottom:5px; align-items:center;">
-                    <span style="font-size:12px; line-height:1.2;">${desc}</span>
-                    <span style="font-size:12px;">฿${i.price} <button onclick="manualCart.splice(${idx},1); updateManualUI()" style="border:none; background:none; color:red; cursor:pointer; padding:0 5px;">✕</button></span>
-                </div>`;
-            }).join(''));
-            safeText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.total,0).toLocaleString());
-        }
-
-        async function submitManualOrder() {
-            if(!manualCart.length) return;
-            const ch = document.getElementById('manual-channel');
-            const channelVal = ch ? ch.value : 'LINE';
-            await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action: 'submitOrder', table: channelVal, cart: manualCart})});
-            safeStyle('manual-order-modal', 'display', 'none'); refresh();
-        }
-
-        function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }
-        async function actionCall(action, params) { try { await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action, ...params})}); refresh(); } catch(e) { console.error(e); } }
-
-        const savedTheme = safeStorageGet('withu_theme', 'light');
-        document.body.setAttribute('data-theme', savedTheme);
-
-        applyLanguagePack();
-        setInterval(updateClock, 1000); refresh(); setInterval(refresh, 5000);
-    </script>
-</body>
-</html>
+                    <tbody>${report.map(i => `<tr><td><b>${i.name}</b></td><td style="text-align:

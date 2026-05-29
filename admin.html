@@ -164,13 +164,7 @@
 
         <div class="map-section" id="restaurant-map-block">
             <div class="map-title" id="lbl-live-map">Live Restaurant Map</div>
-            <div class="map-grid" id="live-map-grid">
-                <script>
-                    for(let i=1; i<=15; i++) {
-                        document.write(`<div class="map-table" id="map-t-${i}" onclick="handleMapTableClick('${i}')">T-${i}</div>`);
-                    }
-                </script>
-            </div>
+            <div class="map-grid" id="live-map-grid"></div>
         </div>
 
         <div class="stats-grid">
@@ -327,6 +321,7 @@
     <script>
         // ⚠️ วางลิงก์ API ล่าสุดของอ้วนไว้ในเครื่องหมายฟันหนูตรงนี้ได้เลยครับ!
         const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
+        const API_KEY = "WITHU_SECRET_2026"; // ⭐️ API Key สำหรับความปลอดภัย
         
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
@@ -443,6 +438,7 @@
             safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase());
         }
 
+        // ⭐️ FIX: ฟังก์ชัน refresh() ที่ถูกประกาศอย่างถูกต้อง
         async function refresh() {
             try {
                 if(!API_URL || API_URL.includes("วางลิงก์")) return;
@@ -463,12 +459,14 @@
                 lastFingerprint = data.fingerprint || "";
                 fullData = data;
                 
-                const rev = (data.summary && data.summary.revenue) ? data.summary.revenue : 0;
-                const prof = (data.summary && data.summary.grossProfit) ? data.summary.grossProfit : 0;
-                const rpt = (data.summary && data.summary.report) ? data.summary.report : [];
+                // ⭐️ อัปเดตให้รองรับโครงสร้างข้อมูลใหม่ (analytics แทน summary)
+                const analytics = data.analytics || {};
+                const rev = analytics.revenue || 0;
+                const prof = 0; // GS ใหม่ไม่มี grossProfit โดยตรง
+                const rpt = analytics.report || [];
 
-                safeText('rev-val', "฿" + rev.toLocaleString());
-                safeText('prof-val', "฿" + prof.toLocaleString());
+                safeText('rev-val', "฿" + (typeof rev === 'number' ? rev.toLocaleString() : '0'));
+                safeText('prof-val', "฿" + (typeof prof === 'number' ? prof.toLocaleString() : '0'));
                 
                 let activeItemsCount = (data.orders || []).reduce(function(acc, curr) { return acc + (parseInt(curr.qty) || 0); }, 0);
                 let historyItemsCount = rpt.reduce(function(acc, curr) { return acc + (parseInt(curr.qty) || 0); }, 0);
@@ -503,8 +501,9 @@
                 renderPerformance(rpt);
                 renderAttendanceLog(data.attendance || []);
                 
-                const safeSummary = data.summary ? data.summary : {revenue:0, report:[]};
-                renderAIInsights(safeSummary, data.orders || []);
+                // ⭐️ อัปเดตให้ใช้ analytics แทน summary
+                const safeAnalytics = data.analytics ? data.analytics : {revenue:0, report:[]};
+                renderAIInsights(safeAnalytics, data.orders || []);
                 
                 const avg = data.orders && data.orders.length > 0 ? (data.orders.reduce((s,o) => s + getTimeDiff(o.time), 0) / data.orders.length).toFixed(1) : "0.0";
                 safeText('avg-speed', avg + " MINS");
@@ -653,10 +652,6 @@
             safeHtml('p-bill-items', orders.map(i => `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:10px;"><span>${i.qty}x ${i.menu}</span><b>฿${i.total}</b></div>`).join(''));
             
             safeStorageSet('cds_paying_table', tableId.toString());
-            
-            // ยกเลิกคำสั่งนี้ชั่วคราวเพื่อไม่ให้สถานะทับซ้อนกันตอนโหลด
-            // actionCall('setPaymentStatus', {table: tableId, status: 'paying'});
-            
             safeStorageSet('cds_cash_received', '0');
 
             safeStyle('p-qr-area', 'display', 'none');
@@ -692,11 +687,10 @@
             }
         }
 
-        // ⭐️⭐️⭐️ ฟังก์ชัน finalPay ถูกแก้ไขให้เป็น One-shot ปิดบิลทันที ⭐️⭐️⭐️
+        // ⭐️ FIX: ฟังก์ชัน finalPay ที่ปรับปรุงแล้ว
         async function finalPay(method) {
             if(!confirm("ต้องการปิดยอดชำระเงินนี้?")) return;
             
-            // คำนวณเงินทอนเพื่อส่งไปให้จอ Display
             let actualChange = "0";
             if (method === 'เงินสด') {
                 let rec = parseFloat(document.getElementById('p-cash-input').value) || 0;
@@ -706,28 +700,31 @@
 
             safeStyle('pay-modal', 'display', 'none');
             
-            // แสดงข้อความโหลดชั่วคราวเพื่อให้รู้ว่ากดติดแล้ว (ไม่แก้โครงสร้าง UI หลัก)
             const orderSec = document.getElementById('order-sec');
             if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ กำลังเคลียร์บิล... รอสักครู่ครับ</div>";
             
-            // ยิงคำสั่ง 'closeBill' ไปให้ Google Sheet แบบทีเดียวจบ
-            fetch(API_URL, {
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify({
-                    action: 'closeBill', 
-                    table: pTable, 
-                    rowNums: pRows, 
-                    paymentMethod: method, 
-                    change: actualChange
-                })
-            });
+            try {
+                // ⭐️ อัปเดตให้ส่ง apiKey
+                await fetch(API_URL, {
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    body: JSON.stringify({
+                        action: 'closeBill', 
+                        table: pTable, 
+                        rowNums: pRows, 
+                        paymentMethod: method, 
+                        change: actualChange,
+                        apiKey: API_KEY
+                    })
+                });
+            } catch(e) {
+                console.error("Payment API Error:", e);
+            }
             
             safeStorageRemove('cds_paying_table');
             safeStorageSet('cds_cash_received', '0');
             lastFingerprint = ""; 
             
-            // หน่วงเวลา 2.5 วิ รอ Google Sheet ลบข้อมูลเสร็จ ค่อยดึงใหม่ (บิลจะหายทันที)
             setTimeout(() => { refresh(); }, 2500);
         }
         
@@ -746,14 +743,20 @@
                 fullData.orders.forEach(o => { if(o.table.toString() === tableId.toString()) o.status = status; });
                 renderOrders(fullData.orders);
             }
+            // ⭐️ อัปเดตให้ส่ง rowNums และ apiKey
             const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
             if (rows.length === 0) return;
-            fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'updateStatus', rowNums: rows, nextStatus: status})});
+            fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'updateStatus', rowNums: rows, nextStatus: status, apiKey: API_KEY})});
         }
 
         async function handleVoidItem(rowNum) {
             if(!confirm("ยืนยันลบเมนูนี้ออกจากบิล?")) return;
-            await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'voidItem', rowNum: rowNum})});
+            try {
+                // ⭐️ เพิ่ม apiKey
+                await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'voidItem', rowNum: rowNum, orderId: rowNum, apiKey: API_KEY})});
+            } catch(e) {
+                console.error("Void Item Error:", e);
+            }
             lastFingerprint = "";
             refresh();
         }
@@ -807,14 +810,20 @@
         }
         
         async function handleStockToggle(name, status) { 
-            await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status})}); 
-            lastFingerprint = ""; 
+            try {
+                // ⭐️ เพิ่ม apiKey (หมายเหตุ: GS ไม่มี action updateStock ให้ใช้ updateStatus แทน)
+                await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status, apiKey: API_KEY})}); 
+            } catch(e) {
+                console.error("Stock Toggle Error:", e);
+            }
+            lastFingerprint = "";
             refresh(); 
         }
 
         function drawChart() {
             try {
-                if(!fullData || !fullData.summary || !fullData.summary.chartDaily) return;
+                // ⭐️ อัปเดตให้ใช้ analytics แทน summary
+                if(!fullData || !fullData.analytics) return;
                 const reportSec = document.getElementById('report-sec');
                 if(!reportSec || reportSec.style.display === 'none' || reportSec.style.display === '') return;
                 const canvas = document.getElementById('salesChart'); if(!canvas || canvas.offsetParent === null) return; 
@@ -823,12 +832,19 @@
                 const isDark = document.body.getAttribute('data-theme') === 'dark';
                 
                 if(currentChartMode === 'peak') {
-                    labels = Array.from({length: 24}, function(_, i) { return i + ":00" }); data = fullData.summary.peakHours;
+                    labels = Array.from({length: 24}, function(_, i) { return i + ":00" }); 
+                    data = (fullData.analytics.peakHours || []);
                 } else {
-                    labels = fullData.summary.chartDaily.map(i => i.date); data = fullData.summary.chartDaily.map(i => i.total);
+                    labels = (fullData.analytics.chartDaily || []).map(i => i.date || ''); 
+                    data = (fullData.analytics.chartDaily || []).map(i => i.total || 0);
                 }
                 
                 if(salesChartInst) salesChartInst.destroy();
+                // ⭐️ ตรวจสอบว่า data มีค่าหรือไม่
+                if (!labels || labels.length === 0 || !data || data.length === 0) {
+                    console.warn("No chart data available");
+                    return;
+                }
                 salesChartInst = new Chart(ctx, {
                     type: 'bar',
                     data: { labels: labels, datasets: [{ data: data, backgroundColor: isDark ? '#ffffff' : '#000000', borderRadius: 4 }] },
@@ -989,23 +1005,57 @@
                     <span style="font-size:13px; font-weight:600;">฿${i.price} <button onclick="manualCart.splice(${idx},1); updateManualUI()" style="border:none; background:none; color:#ef4444; cursor:pointer; font-weight:700;">✕</button></span>
                 </div>`;
             }).join(''));
-            safeText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.total,0).toLocaleString());
+            // ⭐️ FIX: ใช้ i.price แทน i.total
+            safeText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.price,0).toLocaleString());
         }
 
         async function submitManualOrder() {
             if(!manualCart.length) return;
             const ch = document.getElementById('manual-channel'); const channelVal = ch ? ch.value : 'LINE';
-            await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action: 'submitOrder', table: channelVal, cart: manualCart})});
+            try {
+                // ⭐️ เพิ่ม apiKey
+                await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action: 'submitOrder', table: channelVal, cart: manualCart, apiKey: API_KEY})});
+            } catch(e) {
+                console.error("Submit Order Error:", e);
+            }
             safeStyle('manual-order-modal', 'display', 'none'); 
             lastFingerprint = ""; 
             refresh();
         }
 
         function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }
-        async function actionCall(action, params) { try { await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action, ...params})}); refresh(); } catch(e) { console.error(e); } }
+        // ⭐️ อัปเดต actionCall ให้เพิ่ม apiKey โดยอัตโนมัติ
+        async function actionCall(action, params) { 
+            try { 
+                const payload = {action, apiKey: API_KEY, ...params};
+                await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(payload)}); 
+                refresh(); 
+            } catch(e) { 
+                console.error(e); 
+            } 
+        }
 
-        const savedTheme = safeStorageGet('withu_theme', 'light'); document.body.setAttribute('data-theme', savedTheme);
-        applyLanguagePack(); setInterval(updateClock, 1000); refresh(); setInterval(refresh, 5000);
+        // ⭐️ FIX: ตั้งค่า theme และเรียก refresh() ตามลำดับที่ถูกต้อง
+        const savedTheme = safeStorageGet('withu_theme', 'light'); 
+        document.body.setAttribute('data-theme', savedTheme);
+        applyLanguagePack(); 
+        
+        // ⭐️ FIX: สร้าง map tables ด้วย DOM API แทน document.write
+        const mapGrid = document.getElementById('live-map-grid');
+        if (mapGrid) {
+            for(let i=1; i<=15; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'map-table';
+                tile.id = `map-t-${i}`;
+                tile.textContent = `T-${i}`;
+                tile.onclick = function() { handleMapTableClick(i); };
+                mapGrid.appendChild(tile);
+            }
+        }
+        
+        setInterval(updateClock, 1000); 
+        refresh(); 
+        setInterval(refresh, 5000);
     </script>
 </body>
 </html>

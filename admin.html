@@ -458,10 +458,9 @@
                 lastFingerprint = data.fingerprint || "";
                 fullData = data;
                 
-                // ⭐️ อัปเดตให้รองรับโครงสร้างข้อมูลใหม่ (analytics แทน summary)
                 const analytics = data.analytics || {};
                 const rev = analytics.revenue || 0;
-                const prof = analytics.profit || 0; // ⭐️ FIX: ดึงค่ากำไรจากฐานข้อมูลมาแสดงผลแล้วครับ!
+                const prof = analytics.profit || 0; 
                 const rpt = analytics.report || [];
 
                 safeText('rev-val', "฿" + (typeof rev === 'number' ? rev.toLocaleString() : '0'));
@@ -741,7 +740,18 @@
             }
             const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
             if (rows.length === 0) return;
-            fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'updateStatus', rowNums: rows, nextStatus: status, apiKey: API_KEY})});
+            
+            // ⭐️ FIX: เปลี่ยนจาก nextStatus เป็น status เพื่อให้ตรงกับฝั่ง Google Apps Script
+            fetch(API_URL, {
+                method:'POST', 
+                mode:'no-cors', 
+                body: JSON.stringify({
+                    action:'updateStatus', 
+                    rowNums: rows, 
+                    status: status, 
+                    apiKey: API_KEY
+                })
+            });
         }
 
         async function handleVoidItem(rowNum) {

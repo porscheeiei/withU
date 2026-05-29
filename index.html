@@ -170,7 +170,6 @@
             <div style="display:flex; justify-content:space-between; font-weight:900; font-size:26px; margin-bottom:35px; color:#000;">
                 <span>ยอดรวม</span><span>฿<span id="stat-sum">0</span></span>
             </div>
-            <button class="btn-add" style="background:#f1f5f9; color:#000; border: 2.5px solid #000; margin-bottom:15px;" onclick="orderMore()">สั่งเมนูเพิ่ม</button>
             <button class="btn-finish-red" onclick="clearSession()">จบการสั่งซื้อ / เช็คบิล</button>
             <div id="auto-close-msg" style="margin-top:25px; font-size:12px; color:var(--gray); font-weight:700;"></div>
         </div>
@@ -190,7 +189,10 @@
 </div>
 
 <script>
+    // --- CONFIGURATION ---
     const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec"; 
+    const API_KEY = "WITHU_SECRET_2026"; // ต้องตรงกับใน Google Apps Script
+    
     let currentTable = "", cart = [], fullMenu = [], toppingsData = [], currentS = {}, itemOpt = {}, itemExpanded = {}, itemQty = {}, currentF = "ทั้งหมด", currentSubF = "ทั้งหมด", currentSearch = "", sInterval, autoCloseTimer;
     let currentBannerIndex = 0, bannerSliderInterval = null, touchStartX = 0, touchEndX = 0;
 
@@ -288,7 +290,6 @@
         currentF = f; currentSubF = "ทั้งหมด";
         const n = document.getElementById('category-nav'); const sn = document.getElementById('sub-category-nav');
         
-        // บังคับเงื่อนไขตรวจจับ: แสดงแบนเนอร์เฉพาะหมวดหมู่หน้า "ทั้งหมด" เท่านั้น หน้าอื่นสั่งซ่อนทันที
         const bannerBlock = document.getElementById('banner-carousel-block');
         if (bannerBlock) {
             bannerBlock.style.display = (f === "ทั้งหมด") ? "block" : "none";
@@ -352,27 +353,70 @@
     async function sub() { 
         const note = document.getElementById('global-note').value.trim();
         if(cart.length > 0 && note) cart.forEach(item => { item.note = note; }); 
-        const payload = {action:'submitOrder', table:currentTable, cart:cart};
+        
+        const payload = {
+            action: 'submitOrder', 
+            apiKey: API_KEY,
+            table: currentTable, 
+            cart: cart
+        };
+
         localStorage.setItem('withu_order_active', 'true');
-        document.getElementById('modal-body').innerHTML = `<div class="sending-container"><div style="font-size:80px; margin-bottom:20px;">✅</div><h2 style="font-weight:900;">สั่งสำเร็จแล้วค่ะ!</h2><p style="color:var(--gray); font-size:14px;">เรากำลังเตรียมเมนูให้คุณค่ะ</p></div>`;
-        cart = []; updateUI();
-        setTimeout(() => { showStatus(); }, 1200);
-        fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }).catch(e => console.error(e));
+        document.getElementById('modal-body').innerHTML = `<div class="sending-container"><div class="pulse-loader">⏳</div><h2 style="font-weight:900;">กำลังส่งออเดอร์...</h2></div>`;
+        
+        try {
+            const response = await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors',
+                body: JSON.stringify(payload) 
+            });
+            
+            document.getElementById('modal-body').innerHTML = `<div class="sending-container"><div style="font-size:80px; margin-bottom:20px;">✅</div><h2 style="font-weight:900;">สั่งสำเร็จแล้วค่ะ!</h2><p style="color:var(--gray); font-size:14px;">เรากำลังเตรียมเมนูให้คุณค่ะ</p></div>`;
+            cart = []; 
+            updateUI();
+            setTimeout(() => { showStatus(); }, 1200);
+        } catch (e) {
+            console.error(e);
+            alert("เกิดข้อผิดพลาดในการส่งออเดอร์ กรุณาลองใหม่อีกครั้ง");
+            openReceipt();
+        }
     }
 
     function openCall() { document.getElementById('call-modal').style.display = 'flex'; }
+    
     async function confirmCall() {
         const body = document.getElementById('modal-body');
         body.innerHTML = `<div class="sending-container"><div class="pulse-loader">⏳</div><h2 style="font-weight:900;">กำลังเรียกพนักงาน...</h2></div>`;
         document.getElementById('modal').style.display = 'flex';
-        fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'callStaff', table:currentTable, reason:'ทั่วไป'}) })
-            .then(() => {
-                body.innerHTML = `<div class="sending-container"><div style="font-size:80px; margin-bottom:20px;">✅</div><h2 style="font-weight:900;">รับทราบค่ะ!</h2></div>`;
-                setTimeout(() => { document.getElementById('modal').style.display='none'; }, 1500);
+        document.getElementById('call-modal').style.display = 'none';
+
+        const payload = {
+            action: 'callStaff', 
+            apiKey: API_KEY,
+            table: currentTable, 
+            reason: 'ทั่วไป'
+        };
+
+        try {
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors',
+                body: JSON.stringify(payload) 
             });
+            body.innerHTML = `<div class="sending-container"><div style="font-size:80px; margin-bottom:20px;">✅</div><h2 style="font-weight:900;">รับทราบค่ะ!</h2><p style="color:var(--gray); font-size:14px;">พนักงานกำลังไปหาที่โต๊ะนะคะ</p></div>`;
+            setTimeout(() => { document.getElementById('modal').style.display='none'; }, 2000);
+        } catch (e) {
+            console.error(e);
+            document.getElementById('modal').style.display='none';
+        }
     }
-    
-    function orderMore() { document.getElementById('status-view').style.display = 'none'; document.getElementById('menu-view').style.display = 'block'; if(autoCloseTimer) clearInterval(autoCloseTimer); document.getElementById('auto-close-msg').innerText = ""; }
+
+    function orderMore() { 
+        document.getElementById('status-view').style.display = 'none'; 
+        document.getElementById('menu-view').style.display = 'block'; 
+        if(sInterval) { clearInterval(sInterval); sInterval = null; }
+    }
+
     function clearSession() { document.getElementById('modal-body').innerHTML = `<div style="padding:20px;"><div style="font-size:60px; margin-bottom:20px;">🚩</div><h2 style="font-weight:900; letter-spacing:-1px;">จบการสั่งซื้อ?</h2><p style="color:var(--gray); margin-bottom:35px; font-size:15px; line-height:1.6;">ประวัติจะถูกล้างออกจากเครื่องนะคะอ้วน</p><button class="btn-finish-red" onclick="executeClearSession()">ยืนยันจบการสั่งซื้อ</button><button onclick="document.getElementById('modal').style.display='none'" style="margin-top:20px; background:none; border:none; color:var(--gray); font-weight:700; cursor:pointer; width:100%;">กลับไปหน้าเดิม</button></div>`; document.getElementById('modal').style.display = 'flex'; }
     function executeClearSession() { localStorage.removeItem('withu_table'); localStorage.removeItem('withu_order_active'); location.href = location.pathname; }
     
@@ -381,7 +425,7 @@
     async function chk() {
         try {
             const r = await fetch(API_URL + "?action=getAdminData"); 
-            const d = await r.json(); fullData = d;
+            const d = await r.json(); 
             const myOrders = d.orders.filter(o => o.table.toString() == currentTable.toString());
 
             if (myOrders.length === 0) { 
@@ -396,7 +440,7 @@
                 return; 
             }
 
-            const activeOrders = d.orders.filter(o => o.status !== "สำเร็จ");
+            const activeOrders = d.orders.filter(o => o.status !== "สำเร็จ" && o.status !== "completed");
             const allTablesInQueue = [...new Set(activeOrders.map(o => o.table.toString()))];
             const myRank = allTablesInQueue.indexOf(currentTable.toString());
 
@@ -405,12 +449,30 @@
             else if (myRank > 0) { qEl.innerText = `เหลืออีก ${myRank} คิวถึงออเดอร์ของคุณ`; }
             else { qEl.innerText = "ออเดอร์ของคุณกำลังดำเนินการ"; }
 
-            let minVal = 4, totalSum = 0; const p = {"รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "สำเร็จ":4};
-            myOrders.forEach(o => { if (p[o.status] < minVal) minVal = p[o.status]; totalSum += parseFloat(String(o.total).replace(/,/g,'')) || 0; });
-            upS(minVal); document.getElementById('stat-sum').innerText = totalSum.toLocaleString();
-            document.getElementById('stat-list').innerHTML = myOrders.map(o => `<div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid #f1f5f9; text-align:left;"><span><b style="font-size:15px;">${o.qty}x ${o.menu}</b></span><b style="color:var(--blue); font-size:13px;">${o.status}</b></div>`).join('');
-        } catch(e) {}
+            let minVal = 4, totalSum = 0; 
+            
+            // ⭐️ จุดที่แก้ไขบั๊กคิวเด้งไปเลข 4 ⭐️
+            const p = {"active":1, "รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "completed":4, "สำเร็จ":4};
+            
+            myOrders.forEach(o => { 
+                let statusVal = p[o.status] || 1;
+                if (statusVal < minVal) minVal = statusVal; 
+                totalSum += parseFloat(String(o.total).replace(/,/g,'')) || 0; 
+            });
+            
+            upS(minVal); 
+            document.getElementById('stat-sum').innerText = totalSum.toLocaleString();
+            document.getElementById('stat-list').innerHTML = myOrders.map(o => {
+                let displayStatus = o.status;
+                if(o.status === 'active') displayStatus = 'รับออเดอร์';
+                if(o.status === 'completed') displayStatus = 'สำเร็จ';
+                return `<div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid #f1f5f9; text-align:left;"><span><b style="font-size:15px;">${o.qty}x ${o.menu}</b></span><b style="color:var(--blue); font-size:13px;">${displayStatus}</b></div>`;
+            }).join('');
+        } catch(e) {
+            console.error("Status check failed", e);
+        }
     }
+    
     function upS(s) { for(let i=1;i<=4;i++) { const el = document.getElementById('st-'+i); if(el) el.classList.toggle('active', i<=s); } }
 
     const savedTheme = localStorage.getItem('withu_theme') || 'light';

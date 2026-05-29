@@ -653,7 +653,10 @@
             safeHtml('p-bill-items', orders.map(i => `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:10px;"><span>${i.qty}x ${i.menu}</span><b>฿${i.total}</b></div>`).join(''));
             
             safeStorageSet('cds_paying_table', tableId.toString());
-            actionCall('setPaymentStatus', {table: tableId, status: 'paying'});
+            
+            // ยกเลิกคำสั่งนี้ชั่วคราวเพื่อไม่ให้สถานะทับซ้อนกันตอนโหลด
+            // actionCall('setPaymentStatus', {table: tableId, status: 'paying'});
+            
             safeStorageSet('cds_cash_received', '0');
 
             safeStyle('p-qr-area', 'display', 'none');
@@ -689,15 +692,43 @@
             }
         }
 
+        // ⭐️⭐️⭐️ ฟังก์ชัน finalPay ถูกแก้ไขให้เป็น One-shot ปิดบิลทันที ⭐️⭐️⭐️
         async function finalPay(method) {
             if(!confirm("ต้องการปิดยอดชำระเงินนี้?")) return;
-            safeStorageRemove('cds_paying_table');
-            await actionCall('setPaymentStatus', {table: pTable, status: 'idle'});
-            await actionCall('markMultipleDone', {rowNums: pRows, paymentMethod: method});
-            safeStorageSet('cds_cash_received', '0');
+            
+            // คำนวณเงินทอนเพื่อส่งไปให้จอ Display
+            let actualChange = "0";
+            if (method === 'เงินสด') {
+                let rec = parseFloat(document.getElementById('p-cash-input').value) || 0;
+                let diff = rec - pTotal;
+                actualChange = diff > 0 ? diff.toString() : "0";
+            }
+
             safeStyle('pay-modal', 'display', 'none');
+            
+            // แสดงข้อความโหลดชั่วคราวเพื่อให้รู้ว่ากดติดแล้ว (ไม่แก้โครงสร้าง UI หลัก)
+            const orderSec = document.getElementById('order-sec');
+            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ กำลังเคลียร์บิล... รอสักครู่ครับ</div>";
+            
+            // ยิงคำสั่ง 'closeBill' ไปให้ Google Sheet แบบทีเดียวจบ
+            fetch(API_URL, {
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({
+                    action: 'closeBill', 
+                    table: pTable, 
+                    rowNums: pRows, 
+                    paymentMethod: method, 
+                    change: actualChange
+                })
+            });
+            
+            safeStorageRemove('cds_paying_table');
+            safeStorageSet('cds_cash_received', '0');
             lastFingerprint = ""; 
-            refresh();
+            
+            // หน่วงเวลา 2.5 วิ รอ Google Sheet ลบข้อมูลเสร็จ ค่อยดึงใหม่ (บิลจะหายทันที)
+            setTimeout(() => { refresh(); }, 2500);
         }
         
         function closePayModal() { 

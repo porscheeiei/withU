@@ -438,7 +438,6 @@
             safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase());
         }
 
-        // ⭐️ FIX: ฟังก์ชัน refresh() ที่ถูกประกาศอย่างถูกต้อง
         async function refresh() {
             try {
                 if(!API_URL || API_URL.includes("วางลิงก์")) return;
@@ -462,7 +461,7 @@
                 // ⭐️ อัปเดตให้รองรับโครงสร้างข้อมูลใหม่ (analytics แทน summary)
                 const analytics = data.analytics || {};
                 const rev = analytics.revenue || 0;
-                const prof = 0; // GS ใหม่ไม่มี grossProfit โดยตรง
+                const prof = analytics.profit || 0; // ⭐️ FIX: ดึงค่ากำไรจากฐานข้อมูลมาแสดงผลแล้วครับ!
                 const rpt = analytics.report || [];
 
                 safeText('rev-val', "฿" + (typeof rev === 'number' ? rev.toLocaleString() : '0'));
@@ -501,7 +500,6 @@
                 renderPerformance(rpt);
                 renderAttendanceLog(data.attendance || []);
                 
-                // ⭐️ อัปเดตให้ใช้ analytics แทน summary
                 const safeAnalytics = data.analytics ? data.analytics : {revenue:0, report:[]};
                 renderAIInsights(safeAnalytics, data.orders || []);
                 
@@ -542,9 +540,9 @@
                     const wait = getTimeDiff(groups[tableId].time);
                     const status = lastActionMap[tableId] || groups[tableId].items[0].status || "รับออเดอร์";
                     
-                    let hasNewItem = groups[tableId].items.some(i => i.status === "รับออเดอร์" || i.status === "PENDING" || i.status === "NEW");
-                    let hasCookingItem = groups[tableId].items.some(i => i.status === "กำลังทำ" || i.status === "COOKING");
-                    let hasServingItem = groups[tableId].items.some(i => i.status === "รอเสิร์ฟ" || i.status === "SERVING");
+                    let hasNewItem = groups[tableId].items.some(i => i.status === "รับออเดอร์" || i.status === "PENDING" || i.status === "NEW" || i.status === "active");
+                    let hasCookingItem = groups[tableId].items.some(i => i.status === "กำลังทำ" || i.status === "COOKING" || i.status === "COOK");
+                    let hasServingItem = groups[tableId].items.some(i => i.status === "รอเสิร์ฟ" || i.status === "SERVING" || i.status === "SERVE");
                     let isPayingMode = (safeStorageGet('cds_paying_table', '') == tableId || status === "paying");
 
                     let thaiStatusText = "ออเดอร์ใหม่";
@@ -576,9 +574,9 @@
                         }
                     }
 
-                    const s1 = (status === "รับออเดอร์" || status === "PENDING" || thaiStatusText.indexOf("ใหม่") !== -1 || thaiStatusText.indexOf("เพิ่ม") !== -1) ? "active" : "";
-                    const s2 = (status === "กำลังทำ" || thaiStatusText.indexOf("ทำอาหาร") !== -1) ? "active" : "";
-                    const s3 = (status === "รอเสิร์ฟ" || thaiStatusText.indexOf("เสิร์ฟ") !== -1) ? "active" : "";
+                    const s1 = (status === "รับออเดอร์" || status === "active" || status === "PENDING" || thaiStatusText.indexOf("ใหม่") !== -1 || thaiStatusText.indexOf("เพิ่ม") !== -1) ? "active" : "";
+                    const s2 = (status === "กำลังทำ" || status === "COOK" || thaiStatusText.indexOf("ทำอาหาร") !== -1) ? "active" : "";
+                    const s3 = (status === "รอเสิร์ฟ" || status === "SERVE" || thaiStatusText.indexOf("เสิร์ฟ") !== -1) ? "active" : "";
 
                     let isSlaLate = wait > 15;
 
@@ -687,7 +685,6 @@
             }
         }
 
-        // ⭐️ FIX: ฟังก์ชัน finalPay ที่ปรับปรุงแล้ว
         async function finalPay(method) {
             if(!confirm("ต้องการปิดยอดชำระเงินนี้?")) return;
             
@@ -704,7 +701,6 @@
             if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ กำลังเคลียร์บิล... รอสักครู่ครับ</div>";
             
             try {
-                // ⭐️ อัปเดตให้ส่ง apiKey
                 await fetch(API_URL, {
                     method: 'POST', 
                     mode: 'no-cors', 
@@ -743,7 +739,6 @@
                 fullData.orders.forEach(o => { if(o.table.toString() === tableId.toString()) o.status = status; });
                 renderOrders(fullData.orders);
             }
-            // ⭐️ อัปเดตให้ส่ง rowNums และ apiKey
             const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
             if (rows.length === 0) return;
             fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'updateStatus', rowNums: rows, nextStatus: status, apiKey: API_KEY})});
@@ -752,7 +747,6 @@
         async function handleVoidItem(rowNum) {
             if(!confirm("ยืนยันลบเมนูนี้ออกจากบิล?")) return;
             try {
-                // ⭐️ เพิ่ม apiKey
                 await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'voidItem', rowNum: rowNum, orderId: rowNum, apiKey: API_KEY})});
             } catch(e) {
                 console.error("Void Item Error:", e);
@@ -811,7 +805,6 @@
         
         async function handleStockToggle(name, status) { 
             try {
-                // ⭐️ เพิ่ม apiKey (หมายเหตุ: GS ไม่มี action updateStock ให้ใช้ updateStatus แทน)
                 await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status, apiKey: API_KEY})}); 
             } catch(e) {
                 console.error("Stock Toggle Error:", e);
@@ -822,7 +815,6 @@
 
         function drawChart() {
             try {
-                // ⭐️ อัปเดตให้ใช้ analytics แทน summary
                 if(!fullData || !fullData.analytics) return;
                 const reportSec = document.getElementById('report-sec');
                 if(!reportSec || reportSec.style.display === 'none' || reportSec.style.display === '') return;
@@ -840,7 +832,6 @@
                 }
                 
                 if(salesChartInst) salesChartInst.destroy();
-                // ⭐️ ตรวจสอบว่า data มีค่าหรือไม่
                 if (!labels || labels.length === 0 || !data || data.length === 0) {
                     console.warn("No chart data available");
                     return;
@@ -1005,7 +996,6 @@
                     <span style="font-size:13px; font-weight:600;">฿${i.price} <button onclick="manualCart.splice(${idx},1); updateManualUI()" style="border:none; background:none; color:#ef4444; cursor:pointer; font-weight:700;">✕</button></span>
                 </div>`;
             }).join(''));
-            // ⭐️ FIX: ใช้ i.price แทน i.total
             safeText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.price,0).toLocaleString());
         }
 
@@ -1013,7 +1003,6 @@
             if(!manualCart.length) return;
             const ch = document.getElementById('manual-channel'); const channelVal = ch ? ch.value : 'LINE';
             try {
-                // ⭐️ เพิ่ม apiKey
                 await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action: 'submitOrder', table: channelVal, cart: manualCart, apiKey: API_KEY})});
             } catch(e) {
                 console.error("Submit Order Error:", e);
@@ -1024,7 +1013,6 @@
         }
 
         function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }
-        // ⭐️ อัปเดต actionCall ให้เพิ่ม apiKey โดยอัตโนมัติ
         async function actionCall(action, params) { 
             try { 
                 const payload = {action, apiKey: API_KEY, ...params};
@@ -1035,12 +1023,10 @@
             } 
         }
 
-        // ⭐️ FIX: ตั้งค่า theme และเรียก refresh() ตามลำดับที่ถูกต้อง
         const savedTheme = safeStorageGet('withu_theme', 'light'); 
         document.body.setAttribute('data-theme', savedTheme);
         applyLanguagePack(); 
         
-        // ⭐️ FIX: สร้าง map tables ด้วย DOM API แทน document.write
         const mapGrid = document.getElementById('live-map-grid');
         if (mapGrid) {
             for(let i=1; i<=15; i++) {

@@ -34,11 +34,11 @@
         .qr-card { background: #fff; padding: 20px; border-radius: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
         .hint-text { margin-top: 20px; font-size: 20px; font-weight: 600; color: #fff; }
 
-        /* 3. Change Screen (หน้าจอแสดงเงินทอน) */
+        /* 3. Change Screen (หน้าจอแสดงเงินทอน/จ่ายสำเร็จ) */
         #change-screen { position: fixed; inset: 0; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1e293b, #0f172a); color: #fff; text-align: center; animation: fadeIn 0.5s ease-out; }
-        .change-title { font-size: 40px; font-weight: 700; color: #94a3b8; margin-bottom: 20px; letter-spacing: 2px; }
+        .change-title { font-size: 50px; font-weight: 700; color: #94a3b8; margin-bottom: 20px; letter-spacing: 2px; }
         .change-amount { font-size: 180px; font-weight: 900; color: var(--accent); line-height: 1; margin-bottom: 30px; text-shadow: 0 10px 30px rgba(56, 189, 248, 0.3); }
-        .thank-you-text { font-size: 30px; font-weight: 600; }
+        .thank-you-text { font-size: 35px; font-weight: 600; margin-top: 20px;}
 
         @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
@@ -68,64 +68,71 @@
     </div>
 
     <div id="change-screen">
-        <div class="change-title">เงินทอนของคุณ</div>
-        <div class="change-amount"><span id="change-val">0</span><span style="font-size: 60px;">฿</span></div>
+        <div class="change-title" id="display-title">เงินทอนของคุณ</div>
+        <div class="change-amount" id="display-amount-box"><span id="change-val">0</span><span style="font-size: 60px;">฿</span></div>
         <div class="thank-you-text">ขอบคุณที่ใช้บริการค่ะ 🙏</div>
     </div>
 
 <script>
-    // ⭐️ สำคัญ: ต้องใส่ URL ของ API ของฝั่งระบบที่มี getDisplayData() ครับ
+    // ⭐️ อัปเดต API_URL ให้ตรงกับของระบบปัจจุบันที่แก้บั๊กแล้ว
     const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
     
-    // ดึงเลขโต๊ะจาก URL (ถ้าอ้วนใช้ระบบที่หน้าจอล็อกกับโต๊ะไว้)
+    // ดึงเลขโต๊ะจาก URL (เช่น ?table=1)
     const urlParams = new URLSearchParams(window.location.search);
-    const tableId = urlParams.get('table') || ""; // ต้องแนบ ?table=1 ต่อท้ายลิงก์เวลาเปิดใช้
+    const tableId = (urlParams.get('table') || "").trim();
 
     let changeTimer = null;
 
     async function updateCDS() {
         try {
-            // ดึงข้อมูลสำหรับโต๊ะนั้นๆ (API ต้องรองรับ getDisplayData)
             const r = await fetch(API_URL + "?action=getDisplayData&table=" + tableId);
             const d = await r.json();
             
             const idle = document.getElementById('idle-screen');
             const active = document.getElementById('active-container');
             const changeScreen = document.getElementById('change-screen');
+            const titleBox = document.getElementById('display-title');
+            const amountBox = document.getElementById('display-amount-box');
 
-            // ⭐️ 1. ถ้าแอดมินกดรับเงิน/ปิดบิลแล้ว
+            // ⭐️ 1. ถ้าแอดมินกดรับเงิน/ปิดบิลแล้ว (รองรับทั้ง PromptPay และ เงินสด)
             if (d.paymentStatus === 'completed') {
                 let changeAmount = parseFloat(d.change) || 0;
                 
+                active.style.display = 'none';
+                idle.style.display = 'none';
+                changeScreen.style.display = 'flex';
+
                 if (changeAmount > 0) {
-                    // โชว์ป๊อปอัปเงินทอน
+                    // กรณีจ่ายเงินสดและมีเงินทอน
+                    titleBox.innerText = "เงินทอนของคุณ";
                     document.getElementById('change-val').innerText = changeAmount.toLocaleString();
-                    active.style.display = 'none';
-                    idle.style.display = 'none';
-                    changeScreen.style.display = 'flex';
-                    
-                    // หน่วงเวลาให้โชว์เงินทอน 10 วินาที แล้วกลับไปหน้าวิดีโอ (idle)
-                    if (!changeTimer) {
-                        changeTimer = setTimeout(() => {
-                            changeScreen.style.display = 'none';
-                            idle.style.display = 'flex';
-                            idle.style.opacity = '1';
-                            changeTimer = null;
-                        }, 10000);
-                    }
+                    amountBox.style.display = 'block';
                 } else {
-                    // ถ้าไม่มีเงินทอน กลับไปหน้าวิดีโอเลย
-                    changeScreen.style.display = 'none';
-                    active.style.display = 'none';
-                    idle.style.display = 'flex';
-                    idle.style.opacity = '1';
+                    // กรณีจ่ายพร้อมเพย์ หรือ เงินสดพอดี (ไม่มีเงินทอน)
+                    titleBox.innerText = "ชำระเงินสำเร็จ 🎉";
+                    amountBox.style.display = 'none'; // ซ่อนกล่องตัวเลขเงินทอน
+                }
+                
+                // หน่วงเวลาให้โชว์หน้าชำระเงินสำเร็จ 7 วินาที แล้วกลับไปหน้าวิดีโอ (idle)
+                if (!changeTimer) {
+                    changeTimer = setTimeout(() => {
+                        changeScreen.style.display = 'none';
+                        idle.style.display = 'flex';
+                        idle.style.opacity = '1';
+                        
+                        // รีเซ็ตค่ากลับไว้รอออเดอร์หน้า
+                        amountBox.style.display = 'block'; 
+                        titleBox.innerText = "เงินทอนของคุณ";
+                        
+                        changeTimer = null;
+                    }, 7000);
                 }
                 return;
             }
 
             // ถ้ากำลังเช็คบิล หรือ มีออเดอร์ให้โชว์หน้า Active
             if (d.orders && d.orders.length > 0) {
-                // ยกเลิก timer เงินทอนถ้ามีการสั่งใหม่
+                // ยกเลิก timer ถ้ามีการสั่งใหม่
                 if(changeTimer) { clearTimeout(changeTimer); changeTimer = null; }
                 changeScreen.style.display = 'none';
 

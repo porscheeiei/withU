@@ -16,7 +16,7 @@
         /* 2. Active Screen (Modern Grid) */
         #active-container { display: none; width: 100vw; height: 100vh; grid-template-columns: 1fr 480px; background: #0f172a; }
 
-        /* Left: Order List (Modern Receipt) */
+        /* Left: Order List */
         .order-side { background: #fff; padding: 50px; overflow-y: auto; display: flex; flex-direction: column; }
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .brand-info { display: flex; align-items: center; gap: 15px; font-size: 28px; font-weight: 800; color: #000; }
@@ -27,7 +27,7 @@
         .item-info small { color: #64748b; font-size: 16px; }
         .item-price { font-size: 26px; font-weight: 800; }
 
-        /* Right: Luxury Payment */
+        /* Right: Payment */
         .payment-side { padding: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at top right, #1e293b, #0f172a); color: #fff; }
         .due-label { font-size: 16px; color: #94a3b8; text-transform: uppercase; letter-spacing: 4px; }
         .total-amount { font-size: 120px; font-weight: 900; margin: 0 0 40px 0; letter-spacing: -5px; }
@@ -51,7 +51,7 @@
     <div id="active-container">
         <div class="order-side">
             <div class="header-row">
-                <div class="brand-info"><img src="https://img1.pic.in.th/images/-------2.png" style="width:50px;"> WITHU CAFE</div>
+                <div class="brand-info"><img src="https://img1.pic.in.th/images/-------2.png" style="width:50px; border-radius: 10px;"> WITHU CAFE</div>
                 <div id="table-display" class="table-badge">โต๊ะ -</div>
             </div>
             <div id="order-items-list"></div>
@@ -74,16 +74,28 @@
     </div>
 
 <script>
-    // ⭐️ อัปเดต API_URL ให้ตรงกับของระบบปัจจุบันที่แก้บั๊กแล้ว
+    // ⭐️ ใส่ API_URL ตัวล่าสุด
     const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
     
-    // ดึงเลขโต๊ะจาก URL (เช่น ?table=1)
+    // ⭐️ ระบบถามเลขโต๊ะอัจฉริยะ (กันพลาดลืมใส่ในลิงก์)
     const urlParams = new URLSearchParams(window.location.search);
-    const tableId = (urlParams.get('table') || "").trim();
+    let tableId = (urlParams.get('table') || "").trim();
+    
+    // ถ้าไม่มีเลขโต๊ะ ให้เด้งหน้าต่างถามเลย
+    if (!tableId) {
+        tableId = prompt("จอ Display นี้ตั้งอยู่ที่โต๊ะเบอร์อะไรครับ? (เช่น 1)", "1");
+        if(tableId) {
+            window.history.replaceState(null, null, "?table=" + tableId);
+        }
+    }
 
     let changeTimer = null;
+    let lastOrderHash = ""; 
+    let lastPaymentStatus = ""; // ⭐️ เพิ่มตัวนี้เพื่อกันจอเด้งรัวๆ
 
     async function updateCDS() {
+        if (!tableId) return; // ถ้าไม่ใส่เลขโต๊ะ ให้หยุดทำงาน
+
         try {
             const r = await fetch(API_URL + "?action=getDisplayData&table=" + tableId);
             const d = await r.json();
@@ -94,71 +106,88 @@
             const titleBox = document.getElementById('display-title');
             const amountBox = document.getElementById('display-amount-box');
 
-            // ⭐️ 1. ถ้าแอดมินกดรับเงิน/ปิดบิลแล้ว (รองรับทั้ง PromptPay และ เงินสด)
+            // ⭐️ ตรวจสอบสถานะการจ่ายเงิน
             if (d.paymentStatus === 'completed') {
-                let changeAmount = parseFloat(d.change) || 0;
-                
-                active.style.display = 'none';
-                idle.style.display = 'none';
-                changeScreen.style.display = 'flex';
+                if (lastPaymentStatus !== 'completed') {
+                    // เพิ่งจ่ายเสร็จสดๆ ร้อนๆ
+                    lastPaymentStatus = 'completed';
+                    let changeAmount = parseFloat(d.change) || 0;
+                    
+                    active.style.display = 'none';
+                    idle.style.display = 'none';
+                    changeScreen.style.display = 'flex';
 
-                if (changeAmount > 0) {
-                    // กรณีจ่ายเงินสดและมีเงินทอน
-                    titleBox.innerText = "เงินทอนของคุณ";
-                    document.getElementById('change-val').innerText = changeAmount.toLocaleString();
-                    amountBox.style.display = 'block';
-                } else {
-                    // กรณีจ่ายพร้อมเพย์ หรือ เงินสดพอดี (ไม่มีเงินทอน)
-                    titleBox.innerText = "ชำระเงินสำเร็จ 🎉";
-                    amountBox.style.display = 'none'; // ซ่อนกล่องตัวเลขเงินทอน
-                }
-                
-                // หน่วงเวลาให้โชว์หน้าชำระเงินสำเร็จ 7 วินาที แล้วกลับไปหน้าวิดีโอ (idle)
-                if (!changeTimer) {
+                    if (changeAmount > 0) {
+                        titleBox.innerText = "เงินทอนของคุณ";
+                        document.getElementById('change-val').innerText = changeAmount.toLocaleString();
+                        amountBox.style.display = 'block';
+                    } else {
+                        titleBox.innerText = "ชำระเงินสำเร็จ 🎉";
+                        amountBox.style.display = 'none';
+                    }
+                    
+                    if (changeTimer) clearTimeout(changeTimer);
                     changeTimer = setTimeout(() => {
                         changeScreen.style.display = 'none';
                         idle.style.display = 'flex';
                         idle.style.opacity = '1';
                         
-                        // รีเซ็ตค่ากลับไว้รอออเดอร์หน้า
                         amountBox.style.display = 'block'; 
                         titleBox.innerText = "เงินทอนของคุณ";
-                        
                         changeTimer = null;
-                    }, 7000);
+                        lastOrderHash = "";
+                    }, 7000); // โชว์ 7 วินาทีแล้วกลับไปหน้าวิดีโอ
                 }
-                return;
+                return; 
             }
 
-            // ถ้ากำลังเช็คบิล หรือ มีออเดอร์ให้โชว์หน้า Active
-            if (d.orders && d.orders.length > 0) {
-                // ยกเลิก timer ถ้ามีการสั่งใหม่
-                if(changeTimer) { clearTimeout(changeTimer); changeTimer = null; }
-                changeScreen.style.display = 'none';
+            // ถ้ายังไม่จ่าย ให้อัปเดตสถานะล่าสุดเก็บไว้
+            lastPaymentStatus = d.paymentStatus;
 
-                idle.style.opacity = '0';
-                setTimeout(() => { idle.style.display = 'none'; active.style.display = 'grid'; }, 800);
+            // ⭐️ โชว์รายการออเดอร์
+            if (d.orders && d.orders.length > 0) {
+                if (changeTimer) { clearTimeout(changeTimer); changeTimer = null; }
+                changeScreen.style.display = 'none';
                 
-                document.getElementById('table-display').innerText = "โต๊ะ " + (tableId || d.orders[0].table);
-                
-                let total = 0;
-                document.getElementById('order-items-list').innerHTML = d.orders.map(o => {
-                    let p = parseFloat(String(o.total).replace(/,/g, '')) || 0;
-                    total += p;
-                    return `<div class="item-row"><div class="item-info"><b>${o.qty}x ${o.menu}</b><small>${o.details || '-'}</small></div><div class="item-price">฿${p.toLocaleString()}</div></div>`;
-                }).join('');
-                
-                document.getElementById('total-val').innerText = total.toLocaleString();
-                document.getElementById('qr-img').src = `https://promptpay.io/0931805507/${total}.png`;
+                if (idle.style.display !== 'none') {
+                    idle.style.opacity = '0';
+                    setTimeout(() => { idle.style.display = 'none'; active.style.display = 'grid'; }, 800);
+                }
+
+                document.getElementById('table-display').innerText = 'โต๊ะ ' + (tableId || d.orders[0].table);
+
+                const currentOrderHash = JSON.stringify(d.orders);
+                if (currentOrderHash !== lastOrderHash) {
+                    let total = 0;
+                    document.getElementById('order-items-list').innerHTML = d.orders.map((o, index) => {
+                        let p = parseFloat(String(o.total).replace(/,/g, '')) || 0;
+                        total += p;
+                        let delay = index * 0.05;
+                        return `
+                        <div class="item-row" style="animation-delay: ${delay}s">
+                            <div class="item-info">
+                                <b>${o.qty}x ${o.menu}</b>
+                                <small>${o.details || '-'}</small>
+                            </div>
+                            <div class="item-price">฿${p.toLocaleString()}</div>
+                        </div>`;
+                    }).join('');
+
+                    document.getElementById('total-val').innerText = total.toLocaleString();
+                    document.getElementById('qr-img').src = `https://promptpay.io/0931805507/${total}.png`;
+                    
+                    lastOrderHash = currentOrderHash;
+                }
             } else {
-                // ถ้าไม่มีออเดอร์ ให้โชว์วิดีโอ Idle
-                if(changeTimer) { clearTimeout(changeTimer); changeTimer = null; }
+                // ⭐️ ไม่มีออเดอร์ (โต๊ะว่าง)
+                if (changeTimer) { clearTimeout(changeTimer); changeTimer = null; }
                 changeScreen.style.display = 'none';
                 active.style.display = 'none';
                 idle.style.display = 'flex';
                 idle.style.opacity = '1';
+                lastOrderHash = ""; 
             }
-        } catch(e) {
+        } catch (e) {
             console.error("Display Update Error", e);
         }
     }

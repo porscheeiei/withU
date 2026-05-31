@@ -445,7 +445,7 @@
             const myRank = allTablesInQueue.indexOf(currentTable.toString());
 
             const qEl = document.getElementById('queue-info');
-            if (myRank === 0) { qEl.innerText = "ลำดับถัดไปคือออเดอร์ของคุณค่ะ 👨‍🍳"; }
+            if (myRank === 0) { qEl.innerText = "ลำดับถัดไปคือออเดอร์ของคุณค่ะ "; }
             else if (myRank > 0) { qEl.innerText = `เหลืออีก ${myRank} คิวถึงออเดอร์ของคุณ`; }
             else { qEl.innerText = "ออเดอร์ของคุณกำลังดำเนินการ"; }
 

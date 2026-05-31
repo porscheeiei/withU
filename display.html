@@ -16,7 +16,7 @@
         /* 2. Active Screen (Modern Grid) */
         #active-container { display: none; width: 100vw; height: 100vh; grid-template-columns: 1fr 480px; background: #0f172a; }
 
-        /* Left: Order List */
+        /* Left: Order List (Modern Receipt) */
         .order-side { background: #fff; padding: 50px; overflow-y: auto; display: flex; flex-direction: column; }
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .brand-info { display: flex; align-items: center; gap: 15px; font-size: 28px; font-weight: 800; color: #000; }
@@ -27,21 +27,22 @@
         .item-info small { color: #64748b; font-size: 16px; }
         .item-price { font-size: 26px; font-weight: 800; }
 
-        /* Right: Payment */
+        /* Right: Luxury Payment */
         .payment-side { padding: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at top right, #1e293b, #0f172a); color: #fff; }
         .due-label { font-size: 16px; color: #94a3b8; text-transform: uppercase; letter-spacing: 4px; }
         .total-amount { font-size: 120px; font-weight: 900; margin: 0 0 40px 0; letter-spacing: -5px; }
+        
+        #qr-block { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .qr-card { background: #fff; padding: 20px; border-radius: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
         .hint-text { margin-top: 20px; font-size: 20px; font-weight: 600; color: #fff; }
 
-        /* 3. Change Screen (หน้าจอแสดงเงินทอน/จ่ายสำเร็จ) */
-        #change-screen { position: fixed; inset: 0; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1e293b, #0f172a); color: #fff; text-align: center; animation: fadeIn 0.5s ease-out; }
-        .change-title { font-size: 50px; font-weight: 700; color: #94a3b8; margin-bottom: 20px; letter-spacing: 2px; }
-        .change-amount { font-size: 180px; font-weight: 900; color: var(--accent); line-height: 1; margin-bottom: 30px; text-shadow: 0 10px 30px rgba(56, 189, 248, 0.3); }
-        .thank-you-text { font-size: 35px; font-weight: 600; margin-top: 20px;}
+        #success-stamp { display: none; font-size: 26px; font-weight: 800; color: #10b981; margin-top: 20px; text-align: center; background: #fff; padding: 15px 40px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: bounceIn 0.5s ease; }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        /* ป๊อปอัปเงินทอน (แสดงแทน QR) */
+        #cash-receipt { display: none; width: 100%; text-align: center; background: #fff; color: #000; padding: 40px 30px; border-radius: 30px; margin-top: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: slideIn 0.5s ease-out; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounceIn { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -60,41 +61,45 @@
         <div class="payment-side">
             <div class="due-label">ยอดชำระสุทธิ (TOTAL)</div>
             <div class="total-amount"><span id="total-val">0</span><span style="font-size:30px; margin-left:10px; color:var(--accent);">฿</span></div>
-            <div class="qr-card">
-                <img id="qr-img" src="" style="width:250px; height:250px; display:block;">
+            
+            <div id="qr-block">
+                <div class="qr-card">
+                    <img id="qr-img" src="" style="width:250px; height:250px; display:block;">
+                </div>
+                <div class="hint-text" id="hint-text">สแกน QR เพื่อชำระเงิน</div>
+                <div id="success-stamp">ชำระเงินสำเร็จ ✅</div>
             </div>
-            <div class="hint-text">สแกน QR เพื่อชำระเงิน</div>
+
+            <div id="cash-receipt">
+                <div style="font-size: 18px; color: #64748b; font-weight: 700; text-transform: uppercase;">รับเงินมา</div>
+                <div style="font-size: 45px; font-weight: 900; color: #000; margin-bottom: 20px;" id="received-val">0 ฿</div>
+                
+                <div style="font-size: 18px; color: #64748b; font-weight: 700; text-transform: uppercase;">เงินทอน</div>
+                <div style="font-size: 65px; font-weight: 900; color: var(--accent); margin-bottom: 20px; line-height: 1;" id="change-display-val">0 ฿</div>
+                
+                <div style="font-size: 22px; font-weight: 800; color: #10b981; background: #ecfdf5; padding: 10px; border-radius: 20px; display: inline-block;">ชำระเงินสำเร็จ ✅</div>
+            </div>
         </div>
     </div>
 
-    <div id="change-screen">
-        <div class="change-title" id="display-title">เงินทอนของคุณ</div>
-        <div class="change-amount" id="display-amount-box"><span id="change-val">0</span><span style="font-size: 60px;">฿</span></div>
-        <div class="thank-you-text">ขอบคุณที่ใช้บริการค่ะ 🙏</div>
-    </div>
-
 <script>
-    // ⭐️ ใส่ API_URL ตัวล่าสุด
+    // ⭐️ ใส่ API_URL ตัวล่าสุดตรงนี้
     const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
     
-    // ⭐️ ระบบถามเลขโต๊ะอัจฉริยะ (กันพลาดลืมใส่ในลิงก์)
+    // ดึงเลขโต๊ะจาก URL หรือเด้งถามถ้าลืมใส่
     const urlParams = new URLSearchParams(window.location.search);
     let tableId = (urlParams.get('table') || "").trim();
-    
-    // ถ้าไม่มีเลขโต๊ะ ให้เด้งหน้าต่างถามเลย
     if (!tableId) {
         tableId = prompt("จอ Display นี้ตั้งอยู่ที่โต๊ะเบอร์อะไรครับ? (เช่น 1)", "1");
-        if(tableId) {
-            window.history.replaceState(null, null, "?table=" + tableId);
-        }
+        if(tableId) window.history.replaceState(null, null, "?table=" + tableId);
     }
 
     let changeTimer = null;
     let lastOrderHash = ""; 
-    let lastPaymentStatus = ""; // ⭐️ เพิ่มตัวนี้เพื่อกันจอเด้งรัวๆ
+    let lastPaymentStatus = ""; 
 
     async function updateCDS() {
-        if (!tableId) return; // ถ้าไม่ใส่เลขโต๊ะ ให้หยุดทำงาน
+        if (!tableId) return;
 
         try {
             const r = await fetch(API_URL + "?action=getDisplayData&table=" + tableId);
@@ -102,52 +107,61 @@
             
             const idle = document.getElementById('idle-screen');
             const active = document.getElementById('active-container');
-            const changeScreen = document.getElementById('change-screen');
-            const titleBox = document.getElementById('display-title');
-            const amountBox = document.getElementById('display-amount-box');
 
-            // ⭐️ ตรวจสอบสถานะการจ่ายเงิน
+            // ⭐️ 1. ถ้าแอดมินกดปิดบิลแล้ว
             if (d.paymentStatus === 'completed') {
                 if (lastPaymentStatus !== 'completed') {
-                    // เพิ่งจ่ายเสร็จสดๆ ร้อนๆ
                     lastPaymentStatus = 'completed';
-                    let changeAmount = parseFloat(d.change) || 0;
                     
-                    active.style.display = 'none';
+                    let changeAmount = parseFloat(d.change) || 0;
+                    // ดึงค่ายอดรวมปัจจุบันจากหน้าจอมาคำนวณ
+                    let currentTotal = parseFloat(document.getElementById('total-val').innerText.replace(/,/g, '')) || 0;
+                    
+                    // บังคับให้หน้าจอ Active (เมนูอาหาร) ยังคงแสดงอยู่ ไม่ให้หายไป!
+                    active.style.display = 'grid';
                     idle.style.display = 'none';
-                    changeScreen.style.display = 'flex';
 
                     if (changeAmount > 0) {
-                        titleBox.innerText = "เงินทอนของคุณ";
-                        document.getElementById('change-val').innerText = changeAmount.toLocaleString();
-                        amountBox.style.display = 'block';
+                        // 🟢 กรณีจ่ายเงินสด (มีเงินทอน)
+                        let receivedAmount = currentTotal + changeAmount;
+                        
+                        document.getElementById('qr-block').style.display = 'none'; // ซ่อน QR
+                        document.getElementById('cash-receipt').style.display = 'block'; // โชว์ใบเสร็จเงินสด
+                        
+                        document.getElementById('received-val').innerText = receivedAmount.toLocaleString() + " ฿";
+                        document.getElementById('change-display-val').innerText = changeAmount.toLocaleString() + " ฿";
                     } else {
-                        titleBox.innerText = "ชำระเงินสำเร็จ 🎉";
-                        amountBox.style.display = 'none';
+                        // 🔵 กรณีจ่ายพร้อมเพย์ หรือ เงินสดแบบพอดี
+                        document.getElementById('hint-text').style.display = 'none'; // ซ่อนคำว่าให้สแกน
+                        document.getElementById('success-stamp').style.display = 'block'; // โชว์ป้ายสำเร็จทับ
                     }
                     
+                    // หน่วงเวลา 7 วินาที แล้วรีเซ็ตกลับหน้าวิดีโอ
                     if (changeTimer) clearTimeout(changeTimer);
                     changeTimer = setTimeout(() => {
-                        changeScreen.style.display = 'none';
+                        active.style.display = 'none';
                         idle.style.display = 'flex';
                         idle.style.opacity = '1';
                         
-                        amountBox.style.display = 'block'; 
-                        titleBox.innerText = "เงินทอนของคุณ";
+                        // รีเซ็ต UI ให้กลับเป็นสภาพเดิมเพื่อรอรับลูกค้าคนต่อไป
+                        document.getElementById('qr-block').style.display = 'flex';
+                        document.getElementById('cash-receipt').style.display = 'none';
+                        document.getElementById('hint-text').style.display = 'block';
+                        document.getElementById('success-stamp').style.display = 'none';
+                        
                         changeTimer = null;
-                        lastOrderHash = "";
-                    }, 7000); // โชว์ 7 วินาทีแล้วกลับไปหน้าวิดีโอ
+                        lastOrderHash = ""; // ล้างแคชเมนู
+                    }, 7000);
                 }
-                return; 
+                return; // หยุดการดึงเมนูอาหาร เพราะจ่ายเงินจบแล้ว
             }
 
-            // ถ้ายังไม่จ่าย ให้อัปเดตสถานะล่าสุดเก็บไว้
+            // ถ้าสถานะยังไม่ใช่ completed ให้อัปเดตตัวแปรไว้
             lastPaymentStatus = d.paymentStatus;
 
-            // ⭐️ โชว์รายการออเดอร์
+            // ⭐️ 2. โชว์รายการออเดอร์ (เมื่อกำลังสั่งอาหาร)
             if (d.orders && d.orders.length > 0) {
                 if (changeTimer) { clearTimeout(changeTimer); changeTimer = null; }
-                changeScreen.style.display = 'none';
                 
                 if (idle.style.display !== 'none') {
                     idle.style.opacity = '0';
@@ -179,9 +193,8 @@
                     lastOrderHash = currentOrderHash;
                 }
             } else {
-                // ⭐️ ไม่มีออเดอร์ (โต๊ะว่าง)
+                // ⭐️ 3. โต๊ะว่าง (ไม่มีออเดอร์) ตัดเข้าวิดีโอทันที
                 if (changeTimer) { clearTimeout(changeTimer); changeTimer = null; }
-                changeScreen.style.display = 'none';
                 active.style.display = 'none';
                 idle.style.display = 'flex';
                 idle.style.opacity = '1';

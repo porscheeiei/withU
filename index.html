@@ -292,7 +292,8 @@
         
         const bannerBlock = document.getElementById('banner-carousel-block');
         if (bannerBlock) {
-            bannerBlock.style.display = (f === "ทั้งหมด") ? "block" : "none";
+            // ⭐️ ซ่อนแบนเนอร์ทันทีที่มีการพิมพ์ค้นหา ⭐️
+            bannerBlock.style.display = (f === "ทั้งหมด" && currentSearch === "") ? "block" : "none";
         }
 
         let cats = [...new Set(fullMenu.map(r => r[2] || "อื่นๆ"))];
@@ -431,7 +432,8 @@
             if (myOrders.length === 0) { 
                 upS(4); document.getElementById('queue-info').innerText = "ขอบคุณที่ใช้บริการค่ะ";
                 if(!autoCloseTimer) {
-                    let sec = 300; autoCloseTimer = setInterval(() => {
+                    // ⭐️ เปลี่ยนเวลาปิดอัตโนมัติเป็น 30 วินาที ⭐️
+                    let sec = 30; autoCloseTimer = setInterval(() => {
                         sec--; let m=Math.floor(sec/60), s=sec%60;
                         document.getElementById('auto-close-msg').innerText = `ระบบจะปิดอัตโนมัติใน ${m}:${s<10?'0':''}${s}`;
                         if(sec <= 0) executeClearSession();
@@ -451,7 +453,6 @@
 
             let minVal = 4, totalSum = 0; 
             
-            // ⭐️ จุดที่แก้ไขบั๊กคิวเด้งไปเลข 4 ⭐️
             const p = {"active":1, "รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "completed":4, "สำเร็จ":4};
             
             myOrders.forEach(o => { 

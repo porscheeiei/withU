@@ -67,7 +67,7 @@
         .item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; align-items: center; }
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 600; }
-        .item-info small { display: block; color: var(--text-muted); font-size: 12px; margin-top: 2px; font-weight: 500; }
+        .item-info small { display: block; color: var(--text-muted); font-size: 11px; margin-top: 1px; }
 
         .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; }
         .btn-void:hover { color: #000000; }
@@ -261,6 +261,8 @@
                 <select id="manual-channel" style="font-weight:700;"></select>
             </div>
 
+            <input type="text" id="manual-search" placeholder="🔍 ค้นหาเมนู..." oninput="renderManualMenu()" style="margin-bottom: 10px; font-size: 13px; padding: 8px;">
+
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                 <select id="manual-sweetness" style="font-size:12px; padding:8px;">
                     <option value="">ความหวาน/เผ็ด ปกติ</option>
@@ -279,7 +281,7 @@
             <div id="manual-menu-list" style="max-height: 200px; overflow-y:auto; border:1px solid var(--border); border-radius: 8px; padding: 5px;"></div>
             
             <div style="background:var(--slate); padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 13px;">
-                <div id="manual-cart-items" style="max-height: 100px; overflow-y:auto;"></div>
+                <div id="manual-cart-items" style="max-height: 150px; overflow-y:auto;"></div>
                 <div style="display:flex; justify-content:space-between; font-weight:800; border-top:1px solid var(--border); padding-top: 8px; margin-top: 8px;">
                     <span id="lbl-manual-total">TOTAL</span><span id="manual-total-price">฿0</span>
                 </div>
@@ -599,7 +601,6 @@
                             <div style="flex-grow:1;">
                                 ${groups[tableId].items.map(i => {
                                     if(i.qty > 10) globalMistakeDetected = true;
-                                    // ⭐️ แก้ไขให้แสดงรายละเอียดทั้งแบบกินร้านและกลับบ้าน
                                     const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
                                     return `
                                     <div class="item-row">
@@ -1006,7 +1007,9 @@
         }
 
         function openManualOrderModal(targetTable = null) {
-            manualCart = []; updateManualUI();
+            manualCart = []; 
+            document.getElementById('manual-search').value = ""; // ⭐️ รีเซ็ตช่องค้นหา
+            updateManualUI();
             const ch = document.getElementById('manual-channel');
             const l = langPack[currentLang] || langPack.th;
             
@@ -1025,9 +1028,8 @@
                 safeText('lbl-manual-title', l.manual_title);
             }
 
-            if(fullData && fullData.menu) {
-                safeHtml('manual-menu-list', fullData.menu.map(m => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;"><span style="font-size:13px; font-weight:600;">${m[0]} (฿${m[1]})</span><button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;">SELECT</button></div>`).join(''));
-            }
+            // ⭐️ เรนเดอร์เมนูครั้งแรก
+            renderManualMenu();
             
             let allToppings = [];
             if(fullData && fullData.toppings) allToppings = allToppings.concat(fullData.toppings);
@@ -1043,7 +1045,21 @@
             safeStyle('manual-order-modal', 'display', 'flex');
         }
 
-        // ⭐️ เปลี่ยนให้เก็บข้อมูลตัวเลือกลงใน `note` แทน `sweetness` เพื่อให้เซิร์ฟเวอร์รับไปลงคอลัมน์รายละเอียด (col 5)
+        // ⭐️ ฟังก์ชันใหม่สำหรับคัดกรองเมนูตามช่องค้นหา
+        function renderManualMenu() {
+            if(!fullData || !fullData.menu) return;
+            const term = document.getElementById('manual-search').value.toLowerCase();
+            const filteredMenu = fullData.menu.filter(m => m[0].toLowerCase().includes(term));
+            
+            safeHtml('manual-menu-list', filteredMenu.map(m => `
+                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;">
+                    <span style="font-size:13px; font-weight:600;">${m[0]} (฿${m[1]})</span>
+                    <button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;">SELECT</button>
+                </div>
+            `).join('') || `<div style="padding:10px; text-align:center; font-size:12px; color:var(--text-muted);">ไม่พบเมนูที่ค้นหา</div>`);
+        }
+
+        // ⭐️ แก้ไขฟังก์ชันเพิ่มเข้าตะกร้าให้รวบรวมรายการที่ซ้ำกัน
         function addToManual(name, basePrice) { 
             let sweet = document.getElementById('manual-sweetness').value;
             let topEl = document.getElementById('manual-topping');
@@ -1058,20 +1074,46 @@
             if (sweet !== "") finalDetail += sweet;
             if (topName !== "") finalDetail += (finalDetail !== "" ? ", " : "") + topName;
             
-            manualCart.push({ name: name, price: finalPrice, qty: 1, total: finalPrice, note: finalDetail }); 
+            // เช็คว่ามีเมนูที่ชื่อและรายละเอียดเหมือนกันเป๊ะๆ หรือไม่
+            let existingIdx = manualCart.findIndex(item => item.name === name && item.note === finalDetail);
+            if (existingIdx >= 0) {
+                manualCart[existingIdx].qty += 1;
+                manualCart[existingIdx].total = manualCart[existingIdx].qty * manualCart[existingIdx].price;
+            } else {
+                manualCart.push({ name: name, price: finalPrice, qty: 1, total: finalPrice, note: finalDetail }); 
+            }
             updateManualUI(); 
         }
 
-        // ⭐️ ดึงจาก i.note มาแสดงใน UI ของแอดมินตอนเลือก
+        // ⭐️ ฟังก์ชันใหม่ปรับเพิ่ม-ลด จำนวนในตะกร้า
+        function adjustManualQty(idx, delta) {
+            manualCart[idx].qty += delta;
+            if(manualCart[idx].qty <= 0) {
+                manualCart.splice(idx, 1);
+            } else {
+                manualCart[idx].total = manualCart[idx].price * manualCart[idx].qty;
+            }
+            updateManualUI();
+        }
+
+        // ⭐️ ปรับ UI ให้มีปุ่ม - 1 + แทนปุ่มลบ (กากบาท) อันเดิม
         function updateManualUI() {
             safeHtml('manual-cart-items', manualCart.map((i,idx) => {
                 let desc = i.name; if(i.note) desc += ` <small style="color:var(--text-muted);">(${i.note})</small>`;
-                return `<div style="display:flex; justify-content:space-between; margin-bottom:6px; align-items:center;">
-                    <span style="font-size:13px; font-weight:500;">${desc}</span>
-                    <span style="font-size:13px; font-weight:600;">฿${i.price} <button onclick="manualCart.splice(${idx},1); updateManualUI()" style="border:none; background:none; color:#ef4444; cursor:pointer; font-weight:700;">✕</button></span>
+                return `
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px;">
+                    <div style="flex:1; padding-right:10px;">
+                        <div style="font-size:13px; font-weight:600;">${desc}</div>
+                        <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-top:2px;">฿${i.price}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <button onclick="adjustManualQty(${idx}, -1)" style="width:28px; height:28px; border:1px solid var(--border); border-radius:6px; background:var(--surface); cursor:pointer; font-weight:bold;">-</button>
+                        <span style="font-size:13px; font-weight:700; width:16px; text-align:center;">${i.qty}</span>
+                        <button onclick="adjustManualQty(${idx}, 1)" style="width:28px; height:28px; border:1px solid var(--border); border-radius:6px; background:#000; color:#fff; cursor:pointer; font-weight:bold;">+</button>
+                    </div>
                 </div>`;
             }).join(''));
-            safeText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.price,0).toLocaleString());
+            safeText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.total,0).toLocaleString());
         }
 
         async function submitManualOrder() {
@@ -1092,7 +1134,7 @@
             btnConfirm.innerText = originalText;
             safeStyle('manual-order-modal', 'display', 'none'); 
             lastFingerprint = ""; 
-            setTimeout(() => refresh(), 1000);
+            setTimeout(() => refresh(), 1000); // รีเฟรชทันทีเพื่อโชว์ข้อมูลใหม่
         }
 
         function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }
@@ -1127,4 +1169,4 @@
         setInterval(refresh, 5000);
     </script>
 </body>
-</html>
+</html>ในหน้าระบบลูกค้า index.html อยากให้ช่องหมายเหตุเพิ่มไปแบบไม่ต้องพิมพ์หมายเหตุเอง มีช่องให้เลือกว่า  ไม่ผัก / ไม่กระเทียมเจียว / แยกน้ำแข็ง ประมาณนี้อะครับ

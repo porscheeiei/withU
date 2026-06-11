@@ -67,7 +67,7 @@
         .item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; align-items: center; }
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 600; }
-        .item-info small { display: block; color: var(--text-muted); font-size: 11px; margin-top: 1px; }
+        .item-info small { display: block; color: var(--text-muted); font-size: 12px; margin-top: 2px; font-weight: 500; }
 
         .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; }
         .btn-void:hover { color: #000000; }
@@ -149,7 +149,7 @@
         <div class="logo">WITHU ADMIN</div>
         <div class="action-btns" style="display: flex; gap: 8px;">
             <button class="tab-btn" onclick="toggleLanguage()" style="border: 1px solid #000;" id="btn-lang">EN / TH</button>
-            <button class="tab-btn" onclick="openManualOrderModal()" id="btn-add-nav">ADD ORDER</button>
+            <button class="tab-btn" onclick="openManualOrderModal(null)" id="btn-add-nav">ADD ORDER</button>
             <button class="tab-btn" onclick="toggleAttendance()" id="btn-staff-nav" style="background: #000; color: #fff;">STAFF</button>
             <button class="tab-btn" onclick="window.print()" id="btn-export-nav" style="background: #000; color: #fff;">EXPORT</button>
             <button class="tab-btn" onclick="toggleTheme()" style="background: var(--border);">MODE</button>
@@ -258,19 +258,18 @@
             <h2 style="margin:0; font-size:18px; margin-bottom:15px;" id="lbl-manual-title">CREATE MANUAL ORDER</h2>
             
             <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <select id="manual-channel" style="font-weight:700;">
-                    <option value="LINE">LINE OFFICIAL</option>
-                    <option value="GRAB">GRAB FOOD</option>
-                    <option value="LINEMAN">LINEMAN</option>
-                    <option value="TAKEAWAY">COUNTER</option>
-                </select>
+                <select id="manual-channel" style="font-weight:700;"></select>
             </div>
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                 <select id="manual-sweetness" style="font-size:12px; padding:8px;">
-                    <option value="">หวานปกติ (100%)</option>
+                    <option value="">ความหวาน/เผ็ด ปกติ</option>
                     <option value="หวานน้อย 50%">หวานน้อย (50%)</option>
                     <option value="ไม่หวาน 0%">ไม่หวาน (0%)</option>
+                    <option value="ไม่เผ็ด">ไม่เผ็ด</option>
+                    <option value="เผ็ดน้อย">เผ็ดน้อย</option>
+                    <option value="เผ็ดมาก">เผ็ดมาก</option>
+                    <option value="พิเศษ">ไซส์พิเศษ (+10)</option>
                 </select>
                 <select id="manual-topping" style="font-size:12px; padding:8px;">
                     <option value="" data-price="0">ไม่มีท็อปปิ้ง</option>
@@ -321,7 +320,7 @@
     <script>
         // ⚠️ วางลิงก์ API ล่าสุดของอ้วนไว้ในเครื่องหมายฟันหนูตรงนี้ได้เลยครับ!
         const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
-        const API_KEY = "WITHU_SECRET_2026"; // ⭐️ API Key สำหรับความปลอดภัย
+        const API_KEY = "WITHU_SECRET_2026"; 
         
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
@@ -353,7 +352,7 @@
                 heat_title: "อันดับเมนูขายดี (Heat Menu)", ai_title: "AI วิเคราะห์ธุรกิจ", manual_title: "สร้างออเดอร์นอกระบบ",
                 perf_title: "รายงานสรุปยอดขาย", btn_peak: "รายชั่วโมง", btn_day: "รายวัน", staff_title: "ตอกบัตรพนักงาน",
                 ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI พร้อมใช้งาน", scan_btn: "สแกนใบหน้าตอกบัตร", reg_btn: "ลงทะเบียนใบหน้า",
-                mistake: "ตรวจพบข้อมูลผิดปกติ"
+                mistake: "ตรวจพบข้อมูลผิดปกติ", btn_move_table: "ย้ายโต๊ะ", btn_add_item: "เพิ่มเมนู"
             },
             en: {
                 btn_add: "ADD ORDER", btn_staff: "STAFF", btn_export: "EXPORT PDF",
@@ -366,7 +365,7 @@
                 heat_title: "Heat Menu (Best Sellers)", ai_title: "AI Business Advisor", manual_title: "CREATE MANUAL ORDER",
                 perf_title: "DAILY PERFORMANCE REPORT", btn_peak: "HOURLY", btn_day: "DAILY", staff_title: "STAFF CLOCK",
                 ai_loading: "AI MODELS LOADING...", ai_ready: "AI SYSTEM READY", scan_btn: "SCAN FACE TO CLOCK", reg_btn: "REGISTER FACE",
-                mistake: "MISTAKE DETECTED"
+                mistake: "MISTAKE DETECTED", btn_move_table: "MOVE TABLE", btn_add_item: "ADD ITEM"
             }
         };
 
@@ -600,12 +599,13 @@
                             <div style="flex-grow:1;">
                                 ${groups[tableId].items.map(i => {
                                     if(i.qty > 10) globalMistakeDetected = true;
+                                    // ⭐️ แก้ไขให้แสดงรายละเอียดทั้งแบบกินร้านและกลับบ้าน
                                     const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
                                     return `
                                     <div class="item-row">
                                         <div class="item-info">
                                             <b>${i.qty}x ${i.menu}</b>
-                                            ${(!isStore) ? '' : (hasDetails ? `<small>${i.details}</small>` : '')}
+                                            ${hasDetails ? `<small>${i.details}</small>` : ''}
                                             <br><button class="btn-void" onclick="handleVoidItem(${i.rowNum})">${l.void}</button>
                                         </div>
                                         <b style="font-size:15px; color:var(--blue);">฿${i.total}</b>
@@ -613,6 +613,7 @@
                                 }).join('')}
                             </div>
                             <hr style="border:none; border-top:1px dashed var(--border); margin:15px 0;">
+                            
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-size:22px; font-weight:800;">฿${groups[tableId].total.toLocaleString()}</span>
                                 <div style="display:flex; gap:6px;">
@@ -620,7 +621,13 @@
                                     <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}</button>
                                 </div>
                             </div>
-                            <button class="btn-black" onclick="openPayModal('${tableId}')">${l.collect}</button>
+                            
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
+                                <button class="btn-outline" onclick="promptMoveTable('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_move_table || 'ย้ายโต๊ะ'}</button>
+                                <button class="btn-outline" onclick="openManualOrderModal('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_add_item || 'เพิ่มเมนู'}</button>
+                            </div>
+
+                            <button class="btn-black" onclick="openPayModal('${tableId}')" style="margin-top:8px;">${l.collect}</button>
                         </div></div>`;
                 });
                 return html || `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted); font-size:14px; font-weight:500;">${l.no_orders}</div>`;
@@ -629,6 +636,32 @@
             if(store) store.innerHTML = genCards(true);
             if(takeaway) takeaway.innerHTML = genCards(false);
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
+        }
+
+        async function promptMoveTable(oldTable) {
+            const msg = currentLang === 'th' ? `ต้องการย้ายข้อมูลโต๊ะ ${oldTable} ไปที่โต๊ะเบอร์อะไร?` : `Move table ${oldTable} to which table number?`;
+            const newTable = prompt(msg);
+            if (!newTable || newTable.trim() === "") return;
+
+            const orderSec = document.getElementById('order-sec');
+            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ Moving table data...</div>";
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ 
+                        action: 'moveTable', 
+                        apiKey: API_KEY, 
+                        oldTable: oldTable, 
+                        newTable: newTable.trim() 
+                    })
+                });
+            } catch (e) {
+                console.error("Move table error:", e);
+            }
+            lastFingerprint = ""; 
+            setTimeout(() => refresh(), 1000);
         }
 
         function handleMapTableClick(tableId) {
@@ -741,7 +774,6 @@
             const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
             if (rows.length === 0) return;
             
-            // ⭐️ FIX: เปลี่ยนจาก nextStatus เป็น status เพื่อให้ตรงกับฝั่ง Google Apps Script
             fetch(API_URL, {
                 method:'POST', 
                 mode:'no-cors', 
@@ -973,18 +1005,45 @@
             fetch(API_URL + "?action=clearCall&table=" + t, { method: 'GET', mode: 'no-cors' }); safeStyle('call-notify', 'display', 'none');
         }
 
-        function openManualOrderModal() {
+        function openManualOrderModal(targetTable = null) {
             manualCart = []; updateManualUI();
+            const ch = document.getElementById('manual-channel');
+            const l = langPack[currentLang] || langPack.th;
+            
+            if (targetTable) {
+                ch.innerHTML = `<option value="${targetTable}" selected>TABLE ${targetTable}</option>`;
+                ch.disabled = true;
+                safeText('lbl-manual-title', currentLang === 'th' ? `เพิ่มเมนูให้โต๊ะ ${targetTable}` : `ADD TO TABLE ${targetTable}`);
+            } else {
+                ch.innerHTML = `
+                    <option value="LINE">LINE OFFICIAL</option>
+                    <option value="GRAB">GRAB FOOD</option>
+                    <option value="LINEMAN">LINEMAN</option>
+                    <option value="TAKEAWAY">COUNTER</option>
+                `;
+                ch.disabled = false;
+                safeText('lbl-manual-title', l.manual_title);
+            }
+
             if(fullData && fullData.menu) {
                 safeHtml('manual-menu-list', fullData.menu.map(m => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;"><span style="font-size:13px; font-weight:600;">${m[0]} (฿${m[1]})</span><button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;">SELECT</button></div>`).join(''));
             }
-            if(fullData && fullData.toppings) {
-                const topSelect = document.getElementById('manual-topping');
-                if (topSelect) topSelect.innerHTML = `<option value="" data-price="0">ไม่มีท็อปปิ้ง</option>` + fullData.toppings.map(t => `<option value="${t[0]}" data-price="${t[1]}">+ ${t[0]} (฿${t[1]})</option>`).join('');
-            }
+            
+            let allToppings = [];
+            if(fullData && fullData.toppings) allToppings = allToppings.concat(fullData.toppings);
+            if(fullData && fullData.toppings2) allToppings = allToppings.concat(fullData.toppings2);
+            
+            let uniqueToppingsMap = new Map();
+            allToppings.forEach(t => uniqueToppingsMap.set(t[0], t));
+            let uniqueToppings = Array.from(uniqueToppingsMap.values());
+
+            const topSelect = document.getElementById('manual-topping');
+            if (topSelect) topSelect.innerHTML = `<option value="" data-price="0">ไม่มีท็อปปิ้ง</option>` + uniqueToppings.map(t => `<option value="${t[0]}" data-price="${t[1]}">+ ${t[0]} (฿${t[1]})</option>`).join('');
+            
             safeStyle('manual-order-modal', 'display', 'flex');
         }
 
+        // ⭐️ เปลี่ยนให้เก็บข้อมูลตัวเลือกลงใน `note` แทน `sweetness` เพื่อให้เซิร์ฟเวอร์รับไปลงคอลัมน์รายละเอียด (col 5)
         function addToManual(name, basePrice) { 
             let sweet = document.getElementById('manual-sweetness').value;
             let topEl = document.getElementById('manual-topping');
@@ -994,13 +1053,19 @@
                 topPrice = parseFloat(topEl.options[topEl.selectedIndex].getAttribute('data-price')) || 0;
             }
             let finalPrice = basePrice + topPrice;
-            manualCart.push({ name: name, price: finalPrice, qty: 1, total: finalPrice, sweetness: sweet, note: topName }); 
+            
+            let finalDetail = "";
+            if (sweet !== "") finalDetail += sweet;
+            if (topName !== "") finalDetail += (finalDetail !== "" ? ", " : "") + topName;
+            
+            manualCart.push({ name: name, price: finalPrice, qty: 1, total: finalPrice, note: finalDetail }); 
             updateManualUI(); 
         }
 
+        // ⭐️ ดึงจาก i.note มาแสดงใน UI ของแอดมินตอนเลือก
         function updateManualUI() {
             safeHtml('manual-cart-items', manualCart.map((i,idx) => {
-                let desc = i.name; if(i.sweetness || i.note) desc += ` <small style="color:var(--text-muted);">(${i.sweetness || ''} ${i.note ? '+'+i.note : ''})</small>`;
+                let desc = i.name; if(i.note) desc += ` <small style="color:var(--text-muted);">(${i.note})</small>`;
                 return `<div style="display:flex; justify-content:space-between; margin-bottom:6px; align-items:center;">
                     <span style="font-size:13px; font-weight:500;">${desc}</span>
                     <span style="font-size:13px; font-weight:600;">฿${i.price} <button onclick="manualCart.splice(${idx},1); updateManualUI()" style="border:none; background:none; color:#ef4444; cursor:pointer; font-weight:700;">✕</button></span>
@@ -1011,15 +1076,23 @@
 
         async function submitManualOrder() {
             if(!manualCart.length) return;
-            const ch = document.getElementById('manual-channel'); const channelVal = ch ? ch.value : 'LINE';
+            const ch = document.getElementById('manual-channel'); 
+            const channelVal = ch ? ch.value : 'LINE';
+            
+            const btnConfirm = document.getElementById('btn-manual-confirm');
+            const originalText = btnConfirm.innerText;
+            btnConfirm.innerText = "SENDING...";
+
             try {
                 await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action: 'submitOrder', table: channelVal, cart: manualCart, apiKey: API_KEY})});
             } catch(e) {
                 console.error("Submit Order Error:", e);
             }
+            
+            btnConfirm.innerText = originalText;
             safeStyle('manual-order-modal', 'display', 'none'); 
             lastFingerprint = ""; 
-            refresh();
+            setTimeout(() => refresh(), 1000);
         }
 
         function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }

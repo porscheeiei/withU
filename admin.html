@@ -54,7 +54,7 @@
         .track-step.active.step-new, .track-step.active.step-cooking, .track-step.active.step-serving { background: #000000; color: #ffffff; }
         .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
         .pill-ordered-more, .pill-waiting-bill { background: #000000; color: #ffffff; border: 1px solid #000000; }
-        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; }
+        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; flex-direction: column; gap: 8px; }
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 700; font-size: 16px; }
 
@@ -80,8 +80,8 @@
             animation: urgentAlertBlink 1s infinite alternate;
         }
         
-        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 8px; }
-        .btn-void:hover { color: #ef4444; }
+        .btn-void { background: #fef2f2; border: 1px solid #fca5a5; color: #ef4444; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; }
+        .btn-void:hover { background: #ef4444; color: #ffffff; border-color: #ef4444; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
         .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: var(--text-main); }
         .btn-outline:hover { background: #000000; color: #ffffff; border-color: #000000; }
@@ -460,7 +460,6 @@
         }
 
         async function refresh() {
-            // ⭐️ เปิดสถานะ UI กำลังรีเฟรช ⭐️
             safeStyle('sync-status', 'display', 'inline-block');
             
             try {
@@ -530,7 +529,6 @@
             } catch(e) { 
                 console.error("Sync Failure:", e); 
             } finally {
-                // ⭐️ ปิดสถานะ UI รีเฟรช เมื่อดึงข้อมูลเสร็จ ⭐️
                 safeStyle('sync-status', 'display', 'none');
             }
         }
@@ -652,29 +650,40 @@
                                         cleanDetails = [...new Set(detailsArray)].join(', ');
                                     }
 
+                                    // ⭐️ สถานะป้ายกำกับรายเมนู ⭐️
+                                    let sBadgeColor = "#e5e7eb"; let sTextColor = "#6b7280";
+                                    if (i.status === "กำลังทำ") { sBadgeColor = "#fef3c7"; sTextColor = "#d97706"; }
+                                    else if (i.status === "รอเสิร์ฟ" || i.status === "เสิร์ฟแล้ว") { sBadgeColor = "#d1fae5"; sTextColor = "#059669"; }
+                                    else { sBadgeColor = "#f3f4f6"; sTextColor = "#4b5563"; }
+
+                                    let statusBadge = `<span style="background:${sBadgeColor}; color:${sTextColor}; padding:3px 6px; border-radius:4px; font-size:11px; font-weight:700; margin-left:8px; vertical-align:middle;">${i.status}</span>`;
+
                                     return `
-                                    <div class="item-row" style="align-items:flex-start;">
-                                        <div class="item-info">
-                                            <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge}
-                                            ${hasDetails ? `<br><div class="item-details-highlight">${cleanDetails}</div>` : ''}
-                                            <br><button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:8px;">${l.void}</button>
+                                    <div class="item-row" style="flex-direction:column; gap:8px;">
+                                        <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%;">
+                                            <div class="item-info">
+                                                <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge} ${statusBadge}
+                                                ${hasDetails ? `<br><div class="item-details-highlight">${cleanDetails}</div>` : ''}
+                                            </div>
+                                            <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
                                         </div>
-                                        <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
+                                        <div style="display:flex; gap:6px; align-items:center; width:100%; border-top:1px dashed var(--border); padding-top:8px;">
+                                            <button class="btn-outline" style="padding:4px 10px; font-size:11px; border-radius:4px;" onclick="handleSingleItemStatus(${i.rowNum}, 'กำลังทำ')">เตรียมทำ</button>
+                                            <button class="btn-outline" style="padding:4px 10px; font-size:11px; border-radius:4px;" onclick="handleSingleItemStatus(${i.rowNum}, 'เสิร์ฟแล้ว')">เสิร์ฟ</button>
+                                            <button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin:0; margin-left:auto; text-decoration:none;">ลบรายการ</button>
+                                        </div>
                                     </div>`;
                                 }).join('')}
                             </div>
                             <hr style="border:none; border-top:1px dashed var(--border); margin:15px 0;">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-size:22px; font-weight:800;">฿${groups[tableId].total.toLocaleString()}</span>
-                                <div style="display:flex; gap:6px;">
-                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'กำลังทำ')">${l.cook}</button>
-                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}</button>
-                                </div>
                             </div>
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
                                 <button class="btn-outline" onclick="promptMoveTable('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_move_table || 'ย้ายโต๊ะ'}</button>
                                 <button class="btn-outline" onclick="openManualOrderModal('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_add_item || 'เพิ่มเมนู'}</button>
                             </div>
+                            <button class="btn-outline" onclick="handleVoidTable('${tableId}')" style="margin-top:8px; width:100%; border:1px solid #fca5a5; color:#ef4444; background:#fef2f2; padding:10px; font-weight:700;">ลบทั้งโต๊ะ (ยกเลิกบิล)</button>
                             <button class="btn-black" onclick="openPayModal('${tableId}')" style="margin-top:8px;">${l.collect}</button>
                         </div></div>`;
                 });
@@ -688,6 +697,41 @@
 
             // เล่นเสียงเวลามีออเดอร์ใหม่โผล่มา
             if(isNewOrderAdded && isSoundEnabled && isAudioUnlocked) audioCues.newOrder.play().catch(e=>{});
+        }
+
+        // ⭐️ ฟังก์ชันย่อยสำหรับปุ่มอัปเดตสถานะเมนูรายตัว ⭐️
+        function handleSingleItemStatus(rowNum, status) {
+            // Optimistic update
+            if(fullData && fullData.orders) {
+                let item = fullData.orders.find(o => o.rowNum === rowNum);
+                if(item) item.status = status;
+                renderOrders(fullData.orders);
+            }
+            fetch(API_URL, {
+                method:'POST', mode:'no-cors',
+                body: JSON.stringify({ action:'updateStatus', rowNums: [rowNum], status: status, apiKey: API_KEY })
+            });
+        }
+
+        // ⭐️ ฟังก์ชันสำหรับลบทั้งโต๊ะ (ล้างบิลทิ้ง) ⭐️
+        async function handleVoidTable(tableId) {
+            if(!confirm(`ยืนยันลบออเดอร์ทั้งหมดของโต๊ะ ${tableId} ใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)`)) return;
+            
+            const orderSec = document.getElementById('order-sec');
+            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ กำลังลบออเดอร์ทั้งโต๊ะ...</div>";
+
+            const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
+            if(rows.length === 0) return;
+
+            try {
+                await fetch(API_URL, {
+                    method:'POST', mode:'no-cors',
+                    body: JSON.stringify({ action:'updateStatus', rowNums: rows, status: 'void', apiKey: API_KEY })
+                });
+            } catch(e) { console.error("Void Table Error:", e); }
+            
+            lastFingerprint = "";
+            setTimeout(() => refresh(), 1000);
         }
 
         async function promptMoveTable(oldTable) {
@@ -887,7 +931,6 @@
             safeHtml('ai-insights-block', insightHtml);
         }
 
-        // ⭐️ แก้ไขตารางผลประกอบการให้แสดง ราคาขาย, ยอดรวมขาย, และกำไร/ชิ้น ⭐️
         function renderPerformance(report) {
             safeText('report-date-text', "PERFORMANCE DATA OVERVIEW - " + new Date().toLocaleDateString('en-GB', {dateStyle:'full'}).toUpperCase());
             

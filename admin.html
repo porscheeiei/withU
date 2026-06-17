@@ -54,12 +54,34 @@
         .track-step.active.step-new, .track-step.active.step-cooking, .track-step.active.step-serving { background: #000000; color: #ffffff; }
         .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
         .pill-ordered-more, .pill-waiting-bill { background: #000000; color: #ffffff; border: 1px solid #000000; }
-        .item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; align-items: center; }
+        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; }
         .item-row:last-child { border-bottom: none; }
-        .item-info b { font-weight: 600; }
-        .item-info small { display: block; color: var(--text-muted); font-size: 11px; margin-top: 1px; }
-        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; }
-        .btn-void:hover { color: #000000; }
+        .item-info b { font-weight: 700; font-size: 16px; }
+
+        /* ⭐️ ไฮไลต์หมายเหตุตัวใหญ่ กระแทกตา ⭐️ */
+        .item-details-highlight {
+            display: inline-block;
+            color: #ef4444;
+            font-size: 16px;
+            font-weight: 800;
+            background: #fef2f2;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px solid #fca5a5;
+            line-height: 1.4;
+        }
+        [data-theme="dark"] .item-details-highlight { background: #450a0a; color: #fca5a5; border-color: #991b1b; }
+
+        /* ⭐️ ป้ายกำกับ สั่งมาใหม่ ⭐️ */
+        .badge-new-item {
+            background: #ef4444; color: #ffffff; padding: 4px 8px; border-radius: 6px;
+            font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle;
+            animation: urgentAlertBlink 1s infinite alternate;
+        }
+        
+        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 8px; }
+        .btn-void:hover { color: #ef4444; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
         .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: var(--text-main); }
         .btn-outline:hover { background: #000000; color: #ffffff; border-color: #000000; }
@@ -114,15 +136,52 @@
             console.error("System Error Blocked:", msg, "at line", line);
             return false;
         };
+        
+        // ⭐️ ระบบเสียงของ Google + ปลดล็อก Browser อัตโนมัติ
+        const audioCues = {
+            newOrder: new Audio('https://actions.google.com/sounds/v1/alarms/ding.ogg'),
+            call: new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg')
+        };
+        
+        let isSoundEnabled = true;
+        let isAudioUnlocked = false;
+
+        function unlockAudioContext() {
+            if (isAudioUnlocked) return;
+            Object.values(audioCues).forEach(a => {
+                a.volume = 0;
+                let p = a.play();
+                if(p !== undefined) { p.then(() => { a.pause(); a.currentTime = 0; a.volume = 1; }).catch(()=>{}); }
+            });
+            isAudioUnlocked = true;
+            document.body.removeEventListener('click', unlockAudioContext);
+        }
+        document.body.addEventListener('click', unlockAudioContext);
+
+        function toggleSound() { 
+            isSoundEnabled = !isSoundEnabled; 
+            document.getElementById('btn-sound').innerText = isSoundEnabled ? '🔊 SOUND ON' : '🔇 SOUND OFF'; 
+            if(isSoundEnabled) {
+                audioCues.newOrder.currentTime = 0;
+                audioCues.newOrder.play().catch(e=>{});
+            }
+        }
     </script>
+
     <div id="call-notify" class="toast-notify" onclick="clearCallNotify()">
         ลูกค้า โต๊ะ <span id="call-table-no">-</span> กำลังเรียกพนักงานด่วน (คลิกที่แถบสีแดงนี้เพื่อปิดแจ้งเตือนเมื่อบริการเสร็จสิ้น)
     </div>
+    
     <div class="op-bar">
-        <div>CLOSING IN: <span id="close-timer">00:00:00</span></div>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <button id="btn-sound" onclick="toggleSound()" style="background:transparent; border:1px solid #fff; color:#fff; border-radius:4px; font-size:10px; cursor:pointer;">🔊 SOUND ON</button>
+            <span id="sync-status" style="display:none; color:#10b981; font-weight:800; font-size:11px; margin-left:10px; animation: urgentAlertBlink 1s infinite alternate;">🔄 SYNCING...</span>
+            <div style="margin-left:10px;">CLOSING IN: <span id="close-timer">00:00:00</span></div>
+        </div>
         <div id="mistake-log" style="font-weight: 700; color: #ef4444; display:none; text-transform: uppercase; letter-spacing: 1px;">MISTAKE DETECTED</div>
         <div id="date-now"></div>
     </div>
+
     <nav class="top-nav">
         <div class="logo">WITHU ADMIN</div>
         <div class="action-btns" style="display: flex; gap: 8px;">
@@ -283,7 +342,6 @@
         </div>
     </div>
     <script>
-        // ⚠️ วางลิงก์ API ล่าสุดของอ้วนไว้ในเครื่องหมายฟันหนูตรงนี้ได้เลยครับ!
         const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
         const API_KEY = "WITHU_SECRET_2026"; 
         
@@ -294,6 +352,7 @@
         let isScanningLocked = false; 
         let clearedCalls = {};
         let lastFingerprint = ""; 
+
         function safeStyle(id, prop, val) { const el = document.getElementById(id); if (el) { el.style[prop] = val; return true; } return false; }
         function safeText(id, txt) { const el = document.getElementById(id); if (el) { el.innerText = txt; return true; } return false; }
         function safeHtml(id, html) { const el = document.getElementById(id); if (el) { el.innerHTML = html; return true; } return false; }
@@ -301,6 +360,7 @@
         function safeStorageGet(key, defVal) { try { return localStorage.getItem(key) || defVal; } catch(e) { return defVal; } }
         function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
         function safeStorageRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
+
         let currentLang = safeStorageGet('withu_lang', 'th');
         const langPack = {
             th: {
@@ -330,6 +390,7 @@
                 mistake: "MISTAKE DETECTED", btn_move_table: "MOVE TABLE", btn_add_item: "ADD ITEM"
             }
         };
+
         function toggleTheme() {
             const currentTheme = document.body.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -337,6 +398,7 @@
             safeStorageSet('withu_theme', newTheme);
             if (salesChartInst) drawChart(); 
         }
+
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'th' : 'en';
             safeStorageSet('withu_lang', currentLang);
@@ -344,9 +406,10 @@
             if(fullData) { 
                 renderOrders(fullData.orders || []); 
                 renderStock(fullData.menu || []); 
-                renderPerformance((fullData.summary && fullData.summary.report) ? fullData.summary.report : []); 
+                renderPerformance((fullData.analytics && fullData.analytics.report) ? fullData.analytics.report : []); 
             }
         }
+
         function applyLanguagePack() {
             if (!langPack[currentLang]) currentLang = 'th';
             const l = langPack[currentLang];
@@ -383,6 +446,7 @@
             safeText('mistake-log', l.mistake);
             if(!isAiModelsLoaded) safeText('ai-status', l.ai_loading);
         }
+
         function updateClock() {
             const now = new Date();
             const close = new Date(); close.setHours(23, 59, 59);
@@ -394,7 +458,11 @@
             safeStyle('cleanup-reminder', 'display', (h == 0 && m <= 30) ? 'block' : 'none');
             safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase());
         }
+
         async function refresh() {
+            // ⭐️ เปิดสถานะ UI กำลังรีเฟรช ⭐️
+            safeStyle('sync-status', 'display', 'inline-block');
+            
             try {
                 if(!API_URL || API_URL.includes("วางลิงก์")) return;
                 const response = await fetch(API_URL + "?action=getAdminData", { redirect: 'follow' });
@@ -423,6 +491,7 @@
                 let activeItemsCount = (data.orders || []).reduce(function(acc, curr) { return acc + (parseInt(curr.qty) || 0); }, 0);
                 let historyItemsCount = rpt.reduce(function(acc, curr) { return acc + (parseInt(curr.qty) || 0); }, 0);
                 safeText('order-count', activeItemsCount + historyItemsCount);
+                
                 let activeCalls = (data.calls || []).filter(c => !clearedCalls[c.table]);
                 Object.keys(clearedCalls).forEach(t => {
                     if (!data.calls || !data.calls.some(c => c.table.toString() === t.toString())) {
@@ -432,7 +501,9 @@
                 if (activeCalls.length > 0) {
                     safeText('call-table-no', activeCalls[activeCalls.length - 1].table);
                     safeStyle('call-notify', 'display', 'block');
+                    if(isSoundEnabled) audioCues.call.play().catch(e=>{});
                 } else { safeStyle('call-notify', 'display', 'none'); }
+
                 for(let i=1; i<=15; i++) {
                     let tile = document.getElementById(`map-t-${i}`);
                     if(tile) tile.className = "map-table";
@@ -443,6 +514,7 @@
                         if(tile) tile.classList.add("alert-trigger");
                     });
                 }
+
                 renderOrders(data.orders || []);
                 renderStock(data.menu || []);
                 renderPerformance(rpt);
@@ -457,20 +529,27 @@
                 drawChart();
             } catch(e) { 
                 console.error("Sync Failure:", e); 
+            } finally {
+                // ⭐️ ปิดสถานะ UI รีเฟรช เมื่อดึงข้อมูลเสร็จ ⭐️
+                safeStyle('sync-status', 'display', 'none');
             }
         }
+
         function renderOrders(orders) {
             const store = document.getElementById('order-sec');
             const takeaway = document.getElementById('takeaway-sec');
             const l = langPack[currentLang] || langPack.th;
             let groups = {};
             let globalMistakeDetected = false;
+            let isNewOrderAdded = false;
+
             orders.forEach(o => {
                 if(!groups[o.table]) groups[o.table] = {items:[], total:0, rows:[], time:o.time};
                 groups[o.table].items.push(o);
                 groups[o.table].total += parseFloat(String(o.total).replace(/,/g,'')) || 0;
                 groups[o.table].rows.push(o.rowNum);
             });
+
             for(let i=1; i<=15; i++) {
                 let payingTable = safeStorageGet('cds_paying_table', null);
                 if(payingTable == i) {
@@ -478,6 +557,7 @@
                     if(tile) { tile.className = "map-table alert-trigger"; }
                 }
             }
+
             const genCards = (isStore) => {
                 let html = "";
                 Object.keys(groups).filter(t => isStore ? !isNaN(t) : isNaN(t)).forEach(tableId => {
@@ -488,14 +568,21 @@
                     let hasCookingItem = groups[tableId].items.some(i => i.status === "กำลังทำ" || i.status === "COOKING" || i.status === "COOK");
                     let hasServingItem = groups[tableId].items.some(i => i.status === "รอเสิร์ฟ" || i.status === "SERVING" || i.status === "SERVE");
                     let isPayingMode = (safeStorageGet('cds_paying_table', '') == tableId || status === "paying");
+                    
+                    let firstBatchTime = groups[tableId].items[0].time;
+                    let hasSubsequentOrders = groups[tableId].items.some(i => i.time !== firstBatchTime && (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW"));
+
                     let thaiStatusText = "ออเดอร์ใหม่";
                     let pillClass = "pill-new";
                     let mapColorClass = "map-new";
+
+                    if(hasNewItem) isNewOrderAdded = true;
+
                     if (isPayingMode) {
                         thaiStatusText = "ลูกค้ารอเช็คบิล";
                         pillClass = "pill-waiting-bill";
                         mapColorClass = "map-waiting-bill";
-                    } else if (hasNewItem && (hasCookingItem || hasServingItem)) {
+                    } else if (hasNewItem && (hasCookingItem || hasServingItem || hasSubsequentOrders)) { 
                         thaiStatusText = "ลูกค้าสั่งมาเพิ่ม";
                         pillClass = "pill-ordered-more";
                         mapColorClass = "map-ordered-more";
@@ -508,16 +595,21 @@
                         pillClass = "pill-cooking";
                         mapColorClass = "map-cooking";
                     }
+
                     if(!isNaN(tableId)) {
                         let tile = document.getElementById(`map-t-${tableId}`);
                         if(tile && !tile.classList.contains("alert-trigger")) {
                             tile.className = `map-table ${mapColorClass}`;
                         }
                     }
+
                     const s1 = (status === "รับออเดอร์" || status === "active" || status === "PENDING" || thaiStatusText.indexOf("ใหม่") !== -1 || thaiStatusText.indexOf("เพิ่ม") !== -1) ? "active" : "";
                     const s2 = (status === "กำลังทำ" || status === "COOK" || thaiStatusText.indexOf("ทำอาหาร") !== -1) ? "active" : "";
                     const s3 = (status === "รอเสิร์ฟ" || status === "SERVE" || thaiStatusText.indexOf("เสิร์ฟ") !== -1) ? "active" : "";
                     let isSlaLate = wait > 15;
+
+                    let hasExistingItems = groups[tableId].items.some(i => i.status !== "รับออเดอร์" && i.status !== "active" && i.status !== "PENDING" && i.status !== "NEW");
+
                     html += `<div class="order-card ${isSlaLate ? 'sla-trigger' : ''}">
                         <div class="card-head">
                             <div style="width: 100%;">
@@ -540,19 +632,38 @@
                                 ${groups[tableId].items.map(i => {
                                     if(i.qty > 10) globalMistakeDetected = true;
                                     const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
+                                    
+                                    let isItemNew = (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
+                                    let isSubsequentItem = (i.time !== firstBatchTime); 
+                                    let newItemBadge = "";
+                                    
+                                    if (isItemNew) {
+                                        if (hasExistingItems || isSubsequentItem) {
+                                            newItemBadge = `<span class="badge-new-item">สั่งมาเพิ่ม 🔔</span>`;
+                                        } else {
+                                            newItemBadge = `<span class="badge-new-item" style="background:#3b82f6;">ออเดอร์ใหม่ ✨</span>`;
+                                        }
+                                    }
+                                    
+                                    // ⭐️ ตัวกรองคำซ้ำสำหรับหมายเหตุ ⭐️
+                                    let cleanDetails = "";
+                                    if (hasDetails) {
+                                        let detailsArray = i.details.split(',').map(s => s.trim()).filter(s => s !== '');
+                                        cleanDetails = [...new Set(detailsArray)].join(', ');
+                                    }
+
                                     return `
-                                    <div class="item-row">
+                                    <div class="item-row" style="align-items:flex-start;">
                                         <div class="item-info">
-                                            <b>${i.qty}x ${i.menu}</b>
-                                            ${hasDetails ? `<small>${i.details}</small>` : ''}
-                                            <br><button class="btn-void" onclick="handleVoidItem(${i.rowNum})">${l.void}</button>
+                                            <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge}
+                                            ${hasDetails ? `<br><div class="item-details-highlight">${cleanDetails}</div>` : ''}
+                                            <br><button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:8px;">${l.void}</button>
                                         </div>
-                                        <b style="font-size:15px; color:var(--blue);">฿${i.total}</b>
+                                        <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
                                     </div>`;
                                 }).join('')}
                             </div>
                             <hr style="border:none; border-top:1px dashed var(--border); margin:15px 0;">
-                            
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-size:22px; font-weight:800;">฿${groups[tableId].total.toLocaleString()}</span>
                                 <div style="display:flex; gap:6px;">
@@ -560,7 +671,6 @@
                                     <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}</button>
                                 </div>
                             </div>
-                            
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
                                 <button class="btn-outline" onclick="promptMoveTable('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_move_table || 'ย้ายโต๊ะ'}</button>
                                 <button class="btn-outline" onclick="openManualOrderModal('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_add_item || 'เพิ่มเมนู'}</button>
@@ -573,14 +683,21 @@
             
             if(store) store.innerHTML = genCards(true);
             if(takeaway) takeaway.innerHTML = genCards(false);
+            
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
+
+            // เล่นเสียงเวลามีออเดอร์ใหม่โผล่มา
+            if(isNewOrderAdded && isSoundEnabled && isAudioUnlocked) audioCues.newOrder.play().catch(e=>{});
         }
+
         async function promptMoveTable(oldTable) {
             const msg = currentLang === 'th' ? `ต้องการย้ายข้อมูลโต๊ะ ${oldTable} ไปที่โต๊ะเบอร์อะไร?` : `Move table ${oldTable} to which table number?`;
             const newTable = prompt(msg);
             if (!newTable || newTable.trim() === "") return;
+
             const orderSec = document.getElementById('order-sec');
             if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ Moving table data...</div>";
+
             try {
                 await fetch(API_URL, {
                     method: 'POST',
@@ -598,11 +715,13 @@
             lastFingerprint = ""; 
             setTimeout(() => refresh(), 1000);
         }
+
         function handleMapTableClick(tableId) {
             if(!fullData || !fullData.orders) return;
             const hasActiveOrder = fullData.orders.filter(o => o.table.toString() === tableId.toString()).length > 0;
             if(hasActiveOrder) openPayModal(tableId);
         }
+
         function openPayModal(tableId) {
             if(!fullData || !fullData.orders) return;
             const orders = fullData.orders.filter(o => o.table.toString() === tableId.toString());
@@ -612,7 +731,23 @@
             
             safeText('p-table-title', isNaN(tableId) ? tableId : "TABLE " + tableId);
             safeText('p-total-price', "฿" + pTotal.toLocaleString());
-            safeHtml('p-bill-items', orders.map(i => `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:10px;"><span>${i.qty}x ${i.menu}</span><b>฿${i.total}</b></div>`).join(''));
+
+            // ⭐️ ทำให้หมายเหตุหน้าจ่ายเงินใหญ่ด้วย และกรองคำซ้ำ ⭐️
+            safeHtml('p-bill-items', orders.map(i => {
+                const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
+                let cleanDetails = "";
+                if (hasDetails) {
+                    let detailsArray = i.details.split(',').map(s => s.trim()).filter(s => s !== '');
+                    cleanDetails = [...new Set(detailsArray)].join(', ');
+                }
+                return `<div style="display:flex; justify-content:space-between; font-size:15px; margin-bottom:10px; border-bottom:1px dashed var(--border); padding-bottom:10px;">
+                    <div>
+                        <span style="font-weight:600; font-size:16px;">${i.qty}x ${i.menu}</span>
+                        ${hasDetails ? `<br><b style="color:#ef4444; font-size:15px;">(${cleanDetails})</b>` : ''}
+                    </div>
+                    <b style="font-size:16px;">฿${i.total}</b>
+                </div>`;
+            }).join(''));
             
             safeStorageSet('cds_paying_table', tableId.toString());
             safeStorageSet('cds_cash_received', '0');
@@ -621,6 +756,7 @@
             safeStyle('p-methods', 'display', 'grid');
             safeStyle('pay-modal', 'display', 'flex');
         }
+
         function selectPayMethod(m) {
             safeStyle('p-methods', 'display', 'none');
             if(m === 'qr') { 
@@ -633,6 +769,7 @@
                 setTimeout(function(){ if(input) input.focus(); }, 150); 
             }
         }
+
         function calcChange() {
             const input = document.getElementById('p-cash-input');
             const rec = input ? (parseFloat(input.value) || 0) : 0;
@@ -646,6 +783,7 @@
                 safeStyle('p-change-display', 'display', 'none'); safeStyle('p-cash-submit', 'display', 'none'); 
             }
         }
+
         async function finalPay(method) {
             if(!confirm("ต้องการปิดยอดชำระเงินนี้?")) return;
             
@@ -692,6 +830,7 @@
             lastFingerprint = "";
             refresh();
         }
+
         function handleStatusUpdate(tableId, status) {
             lastActionMap[tableId] = status;
             if(fullData && fullData.orders) {
@@ -712,6 +851,7 @@
                 })
             });
         }
+
         async function handleVoidItem(rowNum) {
             if(!confirm("ยืนยันลบเมนูนี้ออกจากบิล?")) return;
             try {
@@ -722,6 +862,7 @@
             lastFingerprint = "";
             refresh();
         }
+
         function renderAIInsights(summary, activeOrders) {
             if(!summary || !summary.report) return;
             const topProducts = summary.report.slice(0, 3);
@@ -745,14 +886,48 @@
             }
             safeHtml('ai-insights-block', insightHtml);
         }
+
+        // ⭐️ แก้ไขตารางผลประกอบการให้แสดง ราคาขาย, ยอดรวมขาย, และกำไร/ชิ้น ⭐️
         function renderPerformance(report) {
             safeText('report-date-text', "PERFORMANCE DATA OVERVIEW - " + new Date().toLocaleDateString('en-GB', {dateStyle:'full'}).toUpperCase());
-            safeHtml('report-content', `
+            
+            let tableHtml = `
                 <table class="report-table">
-                    <thead><tr><th>Product</th><th style="text-align:center;">Sold</th><th style="text-align:right;">Profit</th></tr></thead>
-                    <tbody>${report.map(i => `<tr><td><b>${i.name}</b></td><td style="text-align:center; font-weight:600;">${i.qty}</td><td style="text-align:right; font-weight:700;">฿${(i.profit || 0).toLocaleString()}</td></tr>`).join('')}</tbody>
-                </table>`);
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th style="text-align:center;">Sold</th>
+                            <th style="text-align:center;">Price/Unit</th>
+                            <th style="text-align:center;">Total Sales</th>
+                            <th style="text-align:center;">Profit/Unit</th>
+                            <th style="text-align:right;">Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            report.forEach(i => {
+                let qty = i.qty || 1;
+                let revenue = i.revenue || 0;
+                let totalProfit = i.profit || 0;
+                
+                let pricePerUnit = Math.round(revenue / qty);
+                let profitPerUnit = Math.round(totalProfit / qty);
+
+                tableHtml += `
+                    <tr>
+                        <td><b>${i.name}</b></td>
+                        <td style="text-align:center; font-weight:600;">${qty}</td>
+                        <td style="text-align:center;">฿${pricePerUnit.toLocaleString()}</td>
+                        <td style="text-align:center; font-weight:600;">฿${revenue.toLocaleString()}</td>
+                        <td style="text-align:center; color:#10b981;">฿${profitPerUnit.toLocaleString()}</td>
+                        <td style="text-align:right; font-weight:700;">฿${totalProfit.toLocaleString()}</td>
+                    </tr>`;
+            });
+
+            tableHtml += `</tbody></table>`;
+            safeHtml('report-content', tableHtml);
         }
+
         function renderStock(menu) {
             const l = langPack[currentLang] || langPack.th;
             safeHtml('stock-list-body', menu.map(m => {
@@ -776,6 +951,7 @@
             lastFingerprint = "";
             refresh(); 
         }
+
         function drawChart() {
             try {
                 if(!fullData || !fullData.analytics) return;
@@ -806,12 +982,14 @@
                 });
             } catch (e) { console.error("Chart Rendering Aborted:", e); }
         }
+
         function switchChart(mode) { 
             currentChartMode = mode; 
             const pBtn = document.getElementById('btn-peak'); const dBtn = document.getElementById('btn-day');
             if(pBtn) pBtn.classList.toggle('active', mode==='peak'); if(dBtn) dBtn.classList.toggle('active', mode==='day');
             drawChart();
         }
+
         async function loadFaceApiModels() {
             if (isAiModelsLoaded) return;
             const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights/';
@@ -824,6 +1002,7 @@
                 safeText('ai-status', currentLang === 'th' ? `ระบบ AI พร้อมทำงาน (คลังใบหน้า: ${faceCount} คน)` : `AI READY (${faceCount} profiles)`);
             } catch (e) { safeText('ai-status', "AI MODEL ERROR"); }
         }
+
         async function toggleAttendance() {
             let m = document.getElementById('att-modal'); if(!m) return;
             if (m.style.display === 'none' || m.style.display === '') {
@@ -831,16 +1010,19 @@
                 await loadFaceApiModels(); startWebcam();
             } else { safeStyle('att-modal', 'display', 'none'); stopWebcam(); }
         }
+
         function startWebcam() {
             const video = document.getElementById('webcam'); if(!video) return;
             navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: "user" } })
                 .then(stream => { localStream = stream; video.srcObject = stream; })
                 .catch(err => console.error("Webcam blocked", err));
         }
+
         function stopWebcam() {
             if (localStream) { localStream.getTracks().forEach(track => track.stop()); localStream = null; }
             const video = document.getElementById('webcam'); if(video) video.srcObject = null;
         }
+
         async function startFaceRecognition() {
             if (!isAiModelsLoaded) return alert("AI SYSTEM NOT READY");
             if (!fullData || !fullData.faceProfiles || fullData.faceProfiles.length === 0) return alert("NO PROFILES FOUND");
@@ -873,6 +1055,7 @@
                 }
             } catch (err) { if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); } }
         }
+
         async function registerFaceProfile() {
             const el = document.getElementById('staff-name'); const name = el ? el.value.trim() : "";
             if (!name) return alert("กรุณาใส่ชื่อพนักงานก่อนบันทึกใบหน้า");
@@ -889,6 +1072,7 @@
             fullData.faceProfiles.push({ name: name, descriptor: descriptorArray });
             safeText('ai-status', "REGISTERED SUCCESSFULLY"); alert(`ลงทะเบียนใบหน้าสำเร็จ: ${name.toUpperCase()}`); toggleAttendance();
         }
+
         function renderAttendanceLog(att) { 
             safeHtml('att-log', (att||[]).map(a => {
                 let displayTime = a.time;
@@ -898,19 +1082,22 @@
                 return `<div style="padding:6px 0; border-bottom:1px solid var(--border);"><b>${a.name}</b> - ${a.type} @ ${displayTime}</div>`;
             }).join('')); 
         }
+
         function showSec(n) { 
             ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec'].forEach(s => safeStyle(s, 'display', 'none')); 
             safeStyle(n + '-sec', 'display', (n === 'report' ? 'block' : 'grid')); 
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); 
             if (n === 'report') setTimeout(drawChart, 150);
         }
+
         function clearCallNotify() { 
             const t = document.getElementById('call-table-no').innerText; clearedCalls[t] = true; 
             fetch(API_URL + "?action=clearCall&table=" + t, { method: 'GET', mode: 'no-cors' }); safeStyle('call-notify', 'display', 'none');
         }
+
         function openManualOrderModal(targetTable = null) {
             manualCart = []; 
-            document.getElementById('manual-search').value = ""; // ⭐️ รีเซ็ตช่องค้นหา
+            document.getElementById('manual-search').value = ""; 
             updateManualUI();
             const ch = document.getElementById('manual-channel');
             const l = langPack[currentLang] || langPack.th;
@@ -929,7 +1116,6 @@
                 ch.disabled = false;
                 safeText('lbl-manual-title', l.manual_title);
             }
-            // ⭐️ เรนเดอร์เมนูครั้งแรก
             renderManualMenu();
             
             let allToppings = [];
@@ -944,7 +1130,7 @@
             
             safeStyle('manual-order-modal', 'display', 'flex');
         }
-        // ⭐️ ฟังก์ชันใหม่สำหรับคัดกรองเมนูตามช่องค้นหา
+
         function renderManualMenu() {
             if(!fullData || !fullData.menu) return;
             const term = document.getElementById('manual-search').value.toLowerCase();
@@ -957,7 +1143,7 @@
                 </div>
             `).join('') || `<div style="padding:10px; text-align:center; font-size:12px; color:var(--text-muted);">ไม่พบเมนูที่ค้นหา</div>`);
         }
-        // ⭐️ แก้ไขฟังก์ชันเพิ่มเข้าตะกร้าให้รวบรวมรายการที่ซ้ำกัน
+
         function addToManual(name, basePrice) { 
             let sweet = document.getElementById('manual-sweetness').value;
             let topEl = document.getElementById('manual-topping');
@@ -972,7 +1158,6 @@
             if (sweet !== "") finalDetail += sweet;
             if (topName !== "") finalDetail += (finalDetail !== "" ? ", " : "") + topName;
             
-            // เช็คว่ามีเมนูที่ชื่อและรายละเอียดเหมือนกันเป๊ะๆ หรือไม่
             let existingIdx = manualCart.findIndex(item => item.name === name && item.note === finalDetail);
             if (existingIdx >= 0) {
                 manualCart[existingIdx].qty += 1;
@@ -982,7 +1167,7 @@
             }
             updateManualUI(); 
         }
-        // ⭐️ ฟังก์ชันใหม่ปรับเพิ่ม-ลด จำนวนในตะกร้า
+
         function adjustManualQty(idx, delta) {
             manualCart[idx].qty += delta;
             if(manualCart[idx].qty <= 0) {
@@ -992,7 +1177,7 @@
             }
             updateManualUI();
         }
-        // ⭐️ ปรับ UI ให้มีปุ่ม - 1 + แทนปุ่มลบ (กากบาท) อันเดิม
+
         function updateManualUI() {
             safeHtml('manual-cart-items', manualCart.map((i,idx) => {
                 let desc = i.name; if(i.note) desc += ` <small style="color:var(--text-muted);">(${i.note})</small>`;
@@ -1011,11 +1196,11 @@
             }).join(''));
             safeText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.total,0).toLocaleString());
         }
+
         async function submitManualOrder() {
             if(!manualCart.length) return;
             const ch = document.getElementById('manual-channel'); 
             const channelVal = ch ? ch.value : 'LINE';
-            
             const btnConfirm = document.getElementById('btn-manual-confirm');
             const originalText = btnConfirm.innerText;
             btnConfirm.innerText = "SENDING...";
@@ -1024,13 +1209,14 @@
             } catch(e) {
                 console.error("Submit Order Error:", e);
             }
-            
             btnConfirm.innerText = originalText;
             safeStyle('manual-order-modal', 'display', 'none'); 
             lastFingerprint = ""; 
-            setTimeout(() => refresh(), 1000); // รีเฟรชทันทีเพื่อโชว์ข้อมูลใหม่
+            setTimeout(() => refresh(), 1000); 
         }
+
         function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }
+        
         async function actionCall(action, params) { 
             try { 
                 const payload = {action, apiKey: API_KEY, ...params};
@@ -1040,6 +1226,7 @@
                 console.error(e); 
             } 
         }
+
         const savedTheme = safeStorageGet('withu_theme', 'light'); 
         document.body.setAttribute('data-theme', savedTheme);
         applyLanguagePack(); 
@@ -1058,7 +1245,12 @@
         
         setInterval(updateClock, 1000); 
         refresh(); 
-        setInterval(refresh, 5000);
+        setInterval(refresh, 5000); 
+
+        setInterval(function() {
+            window.location.reload();
+        }, 900000);
+
     </script>
 </body>
-</html> 
+</html>

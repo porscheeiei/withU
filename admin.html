@@ -77,7 +77,7 @@
         .badge-new-item {
             background: #ef4444; color: #ffffff; padding: 4px 8px; border-radius: 6px;
             font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle;
-            animation: urgentAlertBlink 1s infinite alternate;
+            animation: alertCallBlink 1s infinite alternate;
         }
         
         .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 8px; }
@@ -109,6 +109,7 @@
         .toast-notify-call { background: #ef4444; box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5); animation: alertCallBlink 0.5s infinite alternate; }
         .toast-notify-new { background: #10b981; box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); animation: alertNewBlink 0.5s infinite alternate; }
         .toast-notify-add { background: #f59e0b; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.5); animation: alertAddBlink 0.5s infinite alternate; }
+        /* ⭐️ สีใหม่ สำหรับแจ้งเตือนขอเช็คบิล ⭐️ */
         .toast-notify-pay { background: #8b5cf6; box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5); animation: alertPayBlink 0.5s infinite alternate; }
 
         @keyframes alertCallBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
@@ -294,8 +295,8 @@
             safeStyle('dynamic-notify', 'display', 'none');
             stopLoopingSound(); // 🔴 หยุดเสียงแจ้งเตือนที่ดังวนอยู่
 
-            // ถ้าเป็นการปิดแจ้งเตือนเรียกพนักงาน ให้ซิงค์ไปหลังบ้านด้วย
-            if(currentNotifyType === 'call' && currentNotifyTable) {
+            // ถ้าเป็นการปิดแจ้งเตือนเรียกพนักงานหรือเช็คบิล ให้ซิงค์ไปหลังบ้านด้วย
+            if((currentNotifyType === 'call' || currentNotifyType === 'pay') && currentNotifyTable) {
                clearedCalls[currentNotifyTable] = true; 
                fetch(API_URL + "?action=clearCall&table=" + currentNotifyTable, { method: 'GET', mode: 'no-cors' });
             }
@@ -633,15 +634,19 @@
                     }
                 });
                 
-                // ⭐️ ตรวจสอบการเรียกพนักงาน ⭐️
+                // ⭐️ ตรวจสอบการเรียกพนักงาน / เช็คบิล ⭐️
                 if (activeCalls.length > 0) {
-                    let lastCallTable = activeCalls[activeCalls.length - 1].table;
+                    let lastCall = activeCalls[activeCalls.length - 1];
                     let notifyEl = document.getElementById('dynamic-notify');
                     if (notifyEl && notifyEl.style.display !== 'block') {
-                        triggerNotify('call', lastCallTable);
+                        if (lastCall.reason === 'pay' || lastCall.reason === 'เช็คบิล') {
+                            triggerNotify('pay', lastCall.table);
+                        } else {
+                            triggerNotify('call', lastCall.table);
+                        }
                     }
                 } else { 
-                    if (currentNotifyType === 'call') {
+                    if (currentNotifyType === 'call' || currentNotifyType === 'pay') {
                         safeStyle('dynamic-notify', 'display', 'none'); 
                     }
                 }
@@ -687,7 +692,6 @@
             // ตัวแปรสำหรับเช็คแจ้งเตือน
             let hasFreshNewOrder = false;
             let hasFreshAddedOrder = false;
-            let hasFreshPayRequest = false; // ⭐️ ตัวแปรใหม่ตรวจจับการขอเช็คบิล
             let notifyTableStr = "";
 
             orders.forEach(o => {
@@ -723,19 +727,6 @@
                     let thaiStatusText = "ออเดอร์ใหม่";
                     let pillClass = "pill-new";
                     let mapColorClass = "map-new";
-
-                    // ⭐️ ตรรกะตรวจจับการแจ้งเตือน (ซ่อนไม่ให้เด้งรัวๆ) ⭐️
-                    if (isPayingMode) {
-                        let payKey = `table_${tableId}_paying`;
-                        if (!notifiedOrders.has(payKey)) {
-                            notifiedOrders.add(payKey);
-                            notifyTableStr = tableId;
-                            hasFreshPayRequest = true;
-                        }
-                    } else {
-                        // ถ้าไม่ได้อยู่สถานะจ่ายเงินแล้ว ให้เคลียร์ memory ทิ้ง
-                        notifiedOrders.delete(`table_${tableId}_paying`);
-                    }
 
                     groups[tableId].items.forEach(i => {
                         let isItemNew = (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
@@ -818,6 +809,7 @@
                                         }
                                     }
                                     
+                                    // ⭐️ ตัวกรองคำซ้ำสำหรับหมายเหตุ ⭐️
                                     let cleanDetails = "";
                                     if (hasDetails) {
                                         let detailsArray = i.details.split(',').map(s => s.trim()).filter(s => s !== '');
@@ -888,9 +880,7 @@
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
 
             // ⭐️ เรียกการแจ้งเตือนเสียง+แถบ ถ้ามีของใหม่ ⭐️
-            if (hasFreshPayRequest) {
-                triggerNotify('pay', notifyTableStr);
-            } else if (hasFreshAddedOrder) {
+            if (hasFreshAddedOrder) {
                 triggerNotify('add', notifyTableStr);
             } else if (hasFreshNewOrder) {
                 triggerNotify('new', notifyTableStr);
@@ -1126,7 +1116,6 @@
             safeHtml('ai-insights-block', insightHtml);
         }
 
-        // ⭐️ แก้ไขตารางผลประกอบการให้แสดง ราคาขาย, ยอดรวมขาย, และกำไร/ชิ้น ⭐️
         function renderPerformance(report) {
             safeText('report-date-text', "PERFORMANCE DATA OVERVIEW - " + new Date().toLocaleDateString('en-GB', {dateStyle:'full'}).toUpperCase());
             

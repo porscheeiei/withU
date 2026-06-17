@@ -54,10 +54,11 @@
         .track-step.active.step-new, .track-step.active.step-cooking, .track-step.active.step-serving { background: #000000; color: #ffffff; }
         .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
         .pill-ordered-more, .pill-waiting-bill { background: #000000; color: #ffffff; border: 1px solid #000000; }
-        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; flex-direction: column; gap: 8px; }
+        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; }
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 700; font-size: 16px; }
 
+        /* ⭐️ ไฮไลต์หมายเหตุตัวใหญ่ กระแทกตา ⭐️ */
         .item-details-highlight {
             display: inline-block;
             color: #ef4444;
@@ -72,14 +73,15 @@
         }
         [data-theme="dark"] .item-details-highlight { background: #450a0a; color: #fca5a5; border-color: #991b1b; }
 
+        /* ⭐️ ป้ายกำกับ สั่งมาใหม่ ⭐️ */
         .badge-new-item {
             background: #ef4444; color: #ffffff; padding: 4px 8px; border-radius: 6px;
             font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle;
             animation: urgentAlertBlink 1s infinite alternate;
         }
         
-        .btn-void { background: #fef2f2; border: 1px solid #fca5a5; color: #ef4444; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; }
-        .btn-void:hover { background: #ef4444; color: #ffffff; border-color: #ef4444; }
+        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 8px; }
+        .btn-void:hover { color: #ef4444; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
         .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: var(--text-main); }
         .btn-outline:hover { background: #000000; color: #ffffff; border-color: #000000; }
@@ -97,16 +99,25 @@
         .pay-tile:hover { background: #000000; color: #ffffff; }
         input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; background: var(--surface); color: var(--text-main); }
         
+        /* ⭐️ Styles สำหรับ Toast Notification หลากสี ⭐️ */
         .toast-notify { 
-            position: fixed; top: 0; left: 0; width: 100%; background: #ef4444; color: #ffffff; 
-            padding: 18px 30px; display: none; font-size: 16px; font-weight: 800; text-align: center; 
-            z-index: 99999; cursor: pointer; box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5);
-            animation: urgentAlertBlink 0.5s infinite alternate; letter-spacing: 0.5px;
+            position: fixed; top: 0; left: 0; width: 100%; color: #ffffff; 
+            padding: 18px 30px; display: none; font-size: 18px; font-weight: 800; text-align: center; 
+            z-index: 99999; cursor: pointer;
+            letter-spacing: 0.5px;
         }
-        @keyframes urgentAlertBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
+        .toast-notify-call { background: #ef4444; box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5); animation: alertCallBlink 0.5s infinite alternate; }
+        .toast-notify-new { background: #3b82f6; box-shadow: 0 6px 25px rgba(59, 130, 246, 0.5); animation: alertNewBlink 0.5s infinite alternate; }
+        .toast-notify-add { background: #f59e0b; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.5); animation: alertAddBlink 0.5s infinite alternate; }
+
+        @keyframes alertCallBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
+        @keyframes alertNewBlink { from { background: #3b82f6; } to { background: #1e3a8a; } }
+        @keyframes alertAddBlink { from { background: #f59e0b; } to { background: #78350f; } }
+
         .closing-banner {
-            width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: urgentAlertBlink 0.5s infinite alternate;
+            width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: alertCallBlink 0.5s infinite alternate;
         }
+        /* 📱 Mobile & Tablet Responsive CSS */
         @media (max-width: 1024px) {
             .map-grid { grid-template-columns: repeat(10, 1fr); }
             .report-grid { grid-template-columns: 1fr; }
@@ -134,44 +145,87 @@
             return false;
         };
         
-        const audioCues = {
-            newOrder: new Audio('https://actions.google.com/sounds/v1/alarms/ding.ogg'),
-            call: new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg')
-        };
-        
+        // ⭐️ ระบบเสียงสังเคราะห์ (Web Audio API) ทะลวงบล็อก Browser ดัง 100% ⭐️
+        let audioCtx = null;
         let isSoundEnabled = true;
-        let isAudioUnlocked = false;
+        let notifiedOrders = new Set(); // ตัวแปรจำว่าเคยแจ้งเตือนออเดอร์ไหนไปแล้วบ้าง
 
-        function unlockAudioContext() {
-            if (isAudioUnlocked) return;
-            Object.values(audioCues).forEach(a => {
-                a.volume = 0;
-                let p = a.play();
-                if(p !== undefined) { p.then(() => { a.pause(); a.currentTime = 0; a.volume = 1; }).catch(()=>{}); }
-            });
-            isAudioUnlocked = true;
-            document.body.removeEventListener('click', unlockAudioContext);
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
         }
-        document.body.addEventListener('click', unlockAudioContext);
+
+        // ปลดล็อกระบบเสียงทันทีเมื่อผู้ใช้คลิกหน้าจอครั้งแรก
+        document.body.addEventListener('click', initAudio, { once: true });
+
+        // เสียง 1: ออเดอร์ใหม่ (กังวานและยาวขึ้น)
+        function playNewOrderSound() {
+            if (!isSoundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime); // C6 Note
+            osc.frequency.exponentialRampToValueAtTime(523.25, audioCtx.currentTime + 1.0); // ยาว 1 วินาที
+            
+            gainNode.gain.setValueAtTime(1, audioCtx.currentTime); // ดังสุด
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1.0);
+        }
+
+        // เสียง 2: เรียกพนักงาน (จังหวะฉุกเฉิน)
+        function playCallStaffSound() {
+            if (!isSoundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime + 0.4);
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.5);
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
 
         function toggleSound() { 
             isSoundEnabled = !isSoundEnabled; 
-            document.getElementById('btn-sound').innerText = isSoundEnabled ? 'SOUND ON' : 'SOUND OFF'; 
+            document.getElementById('btn-sound').innerText = isSoundEnabled ? '🔊 SOUND ON' : '🔇 SOUND OFF'; 
             if(isSoundEnabled) {
-                audioCues.newOrder.currentTime = 0;
-                audioCues.newOrder.play().catch(e=>{});
+                playNewOrderSound(); // เทสเสียงเมื่อเปิด
             }
         }
     </script>
-
-    <div id="call-notify" class="toast-notify" onclick="clearCallNotify()">
-        ลูกค้า โต๊ะ <span id="call-table-no">-</span> กำลังเรียกพนักงานด่วน (คลิกที่แถบสีแดงนี้เพื่อปิดแจ้งเตือนเมื่อบริการเสร็จสิ้น)
-    </div>
     
+    <div id="dynamic-notify" class="toast-notify" onclick="clearDynamicNotify()"></div>
+
     <div class="op-bar">
         <div style="display:flex; gap:8px; align-items:center;">
-            <button id="btn-sound" onclick="toggleSound()" style="background:transparent; border:1px solid #fff; color:#fff; border-radius:4px; font-size:10px; cursor:pointer;">SOUND ON</button>
-            <span id="sync-status" style="display:none; color:#10b981; font-weight:800; font-size:11px; margin-left:10px; animation: urgentAlertBlink 1s infinite alternate;">SYNCING...</span>
+            <button id="btn-sound" onclick="toggleSound()" style="background:transparent; border:1px solid #fff; color:#fff; border-radius:4px; font-size:10px; cursor:pointer;">🔊 SOUND ON</button>
+            <span id="sync-status" style="display:none; color:#10b981; font-weight:800; font-size:11px; margin-left:10px; animation: mapPulse 0.5s infinite alternate;">🔄 SYNCING...</span>
             <div style="margin-left:10px;">CLOSING IN: <span id="close-timer">00:00:00</span></div>
         </div>
         <div id="mistake-log" style="font-weight: 700; color: #ef4444; display:none; text-transform: uppercase; letter-spacing: 1px;">MISTAKE DETECTED</div>
@@ -209,39 +263,21 @@
             <button onclick="showSec('stock')" class="tab-btn" id="t-stock">Stock</button>
             <button onclick="showSec('report')" class="tab-btn" id="t-report">Performance</button>
         </div>
-        
         <div id="order-sec" class="order-grid"></div>
         <div id="takeaway-sec" class="order-grid" style="display:none;"></div>
-        
-        <div id="stock-sec" style="display:none; flex-direction:column; gap:15px;">
-            <div style="display:flex; gap:10px; flex-wrap:wrap; background:var(--surface); padding:15px; border-radius:12px; border:1px solid var(--border);">
-                <input type="text" id="stock-search-input" placeholder="ค้นหาเมนู..." style="flex:1; min-width:200px; padding:10px; border-radius:6px; border:1px solid var(--border);" oninput="filterStock()">
-                <select id="stock-category-filter" style="width:auto; min-width:150px; padding:10px; border-radius:6px; border:1px solid var(--border);" onchange="filterStock()">
-                    <option value="all">ทุกหมวดหมู่</option>
-                    <option value="เครื่องดื่ม">เครื่องดื่ม</option>
-                    <option value="เมนูเส้น">เมนูเส้น</option>
-                    <option value="เมนูยำ">เมนูยำ</option>
-                    <option value="ของทานเล่น">ของทานเล่น</option>
-                    <option value="เมนูข้าว">เมนูข้าว</option>
-                </select>
-                <button class="btn-outline" style="border-color:#ef4444; color:#ef4444;" onclick="bulkToggleCategoryStock('หมด')">ปิดหมวดหมู่นี้</button>
-                <button class="btn-outline" style="border-color:#10b981; color:#10b981;" onclick="bulkToggleCategoryStock('ปกติ')">เปิดหมวดหมู่นี้</button>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="report-table" style="background: var(--surface); min-width: 600px;">
-                    <thead>
-                        <tr>
-                            <th id="th-stock-name">Item Name</th>
-                            <th id="th-stock-cost">Cost</th>
-                            <th id="th-stock-status">Status</th>
-                            <th id="th-stock-ctrl">Control</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stock-list-body"></tbody>
-                </table>
-            </div>
+        <div id="stock-sec" style="display:none; overflow-x: auto;">
+            <table class="report-table" style="background: var(--surface); min-width: 600px;">
+                <thead>
+                    <tr>
+                        <th id="th-stock-name">Item Name</th>
+                        <th id="th-stock-cost">Cost</th>
+                        <th id="th-stock-status">Status</th>
+                        <th id="th-stock-ctrl">Control</th>
+                    </tr>
+                </thead>
+                <tbody id="stock-list-body"></tbody>
+            </table>
         </div>
-
         <div id="report-sec" style="display:none;">
             <div id="printable-report">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
@@ -419,7 +455,7 @@
             applyLanguagePack();
             if(fullData) { 
                 renderOrders(fullData.orders || []); 
-                filterStock(); // Update to use filter function
+                renderStock(fullData.menu || []); 
                 renderPerformance((fullData.analytics && fullData.analytics.report) ? fullData.analytics.report : []); 
             }
         }
@@ -473,6 +509,38 @@
             safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase());
         }
 
+        // ⭐️ ฟังก์ชันล้างและปิดแถบแจ้งเตือน ⭐️
+        function clearDynamicNotify() {
+            safeStyle('dynamic-notify', 'display', 'none');
+        }
+
+        // ⭐️ ฟังก์ชันเปิดแถบแจ้งเตือน (แยกสีและข้อความ) ⭐️
+        function triggerNotify(type, tableStr) {
+            const notifyEl = document.getElementById('dynamic-notify');
+            if(!notifyEl) return;
+
+            let msg = "";
+            let cssClass = "toast-notify";
+
+            if (type === 'call') {
+                msg = `ลูกค้า โต๊ะ ${tableStr} กำลังเรียกพนักงานด่วน (คลิกเพื่อปิด)`;
+                cssClass = "toast-notify toast-notify-call";
+                playCallStaffSound();
+            } else if (type === 'new') {
+                msg = `ออเดอร์ใหม่ ✨ มีลูกค้า โต๊ะ ${tableStr} สั่งอาหารมาใหม่! (คลิกเพื่อปิด)`;
+                cssClass = "toast-notify toast-notify-new";
+                playNewOrderSound();
+            } else if (type === 'add') {
+                msg = `สั่งมาเพิ่ม 🔔 ลูกค้า โต๊ะ ${tableStr} สั่งเมนูมาเพิ่มเติม! (คลิกเพื่อปิด)`;
+                cssClass = "toast-notify toast-notify-add";
+                playNewOrderSound();
+            }
+
+            notifyEl.innerText = msg;
+            notifyEl.className = cssClass;
+            notifyEl.style.display = 'block';
+        }
+
         async function refresh() {
             safeStyle('sync-status', 'display', 'inline-block');
             
@@ -505,6 +573,7 @@
                 let historyItemsCount = rpt.reduce(function(acc, curr) { return acc + (parseInt(curr.qty) || 0); }, 0);
                 safeText('order-count', activeItemsCount + historyItemsCount);
                 
+                // --- ⭐️ เช็คการเรียกพนักงาน ---
                 let activeCalls = (data.calls || []).filter(c => !clearedCalls[c.table]);
                 Object.keys(clearedCalls).forEach(t => {
                     if (!data.calls || !data.calls.some(c => c.table.toString() === t.toString())) {
@@ -512,10 +581,9 @@
                     }
                 });
                 if (activeCalls.length > 0) {
-                    safeText('call-table-no', activeCalls[activeCalls.length - 1].table);
-                    safeStyle('call-notify', 'display', 'block');
-                    if(isSoundEnabled) audioCues.call.play().catch(e=>{});
-                } else { safeStyle('call-notify', 'display', 'none'); }
+                    let lastCallTable = activeCalls[activeCalls.length - 1].table;
+                    triggerNotify('call', lastCallTable);
+                }
 
                 for(let i=1; i<=15; i++) {
                     let tile = document.getElementById(`map-t-${i}`);
@@ -529,7 +597,7 @@
                 }
 
                 renderOrders(data.orders || []);
-                filterStock(); // Load matching items from stock
+                renderStock(data.menu || []);
                 renderPerformance(rpt);
                 renderAttendanceLog(data.attendance || []);
                 
@@ -547,13 +615,18 @@
             }
         }
 
+        // ⭐️ แสดงออเดอร์ และระบบแจ้งเตือนออเดอร์ใหม่ฉลาดขึ้น ⭐️
         function renderOrders(orders) {
             const store = document.getElementById('order-sec');
             const takeaway = document.getElementById('takeaway-sec');
             const l = langPack[currentLang] || langPack.th;
             let groups = {};
             let globalMistakeDetected = false;
-            let isNewOrderAdded = false;
+
+            // ตัวแปรสำหรับเช็คแจ้งเตือน
+            let hasFreshNewOrder = false;
+            let hasFreshAddedOrder = false;
+            let notifyTableStr = "";
 
             orders.forEach(o => {
                 if(!groups[o.table]) groups[o.table] = {items:[], total:0, rows:[], time:o.time};
@@ -588,7 +661,22 @@
                     let pillClass = "pill-new";
                     let mapColorClass = "map-new";
 
-                    if(hasNewItem) isNewOrderAdded = true;
+                    // ⭐️ ตรรกะตรวจจับออเดอร์ที่เพิ่งเข้าใหม่เพื่อแจ้งเตือน (ซ่อนไม่ให้เด้งรัวๆ) ⭐️
+                    groups[tableId].items.forEach(i => {
+                        let isItemNew = (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
+                        let isSubsequentItem = (i.time !== firstBatchTime);
+                        let orderKey = `${i.orderId}_${i.status}`; 
+                        
+                        if (isItemNew && !notifiedOrders.has(orderKey)) {
+                            notifiedOrders.add(orderKey);
+                            notifyTableStr = tableId;
+                            if (hasSubsequentOrders || hasCookingItem || hasServingItem) {
+                                hasFreshAddedOrder = true;
+                            } else {
+                                hasFreshNewOrder = true;
+                            }
+                        }
+                    });
 
                     if (isPayingMode) {
                         thaiStatusText = "ลูกค้ารอเช็คบิล";
@@ -651,9 +739,9 @@
                                     
                                     if (isItemNew) {
                                         if (hasExistingItems || isSubsequentItem) {
-                                            newItemBadge = `<span class="badge-new-item">สั่งมาเพิ่ม</span>`;
+                                            newItemBadge = `<span class="badge-new-item">สั่งมาเพิ่ม 🔔</span>`;
                                         } else {
-                                            newItemBadge = `<span class="badge-new-item" style="background:#3b82f6;">ออเดอร์ใหม่</span>`;
+                                            newItemBadge = `<span class="badge-new-item" style="background:#3b82f6;">ออเดอร์ใหม่ ✨</span>`;
                                         }
                                     }
                                     
@@ -663,39 +751,29 @@
                                         cleanDetails = [...new Set(detailsArray)].join(', ');
                                     }
 
-                                    let sBadgeColor = "#e5e7eb"; let sTextColor = "#6b7280";
-                                    if (i.status === "กำลังทำ") { sBadgeColor = "#fef3c7"; sTextColor = "#d97706"; }
-                                    else if (i.status === "รอเสิร์ฟ" || i.status === "เสิร์ฟแล้ว") { sBadgeColor = "#d1fae5"; sTextColor = "#059669"; }
-                                    else { sBadgeColor = "#f3f4f6"; sTextColor = "#4b5563"; }
-
-                                    let statusBadge = `<span style="background:${sBadgeColor}; color:${sTextColor}; padding:3px 6px; border-radius:4px; font-size:11px; font-weight:700; margin-left:8px; vertical-align:middle;">${i.status}</span>`;
-
                                     return `
-                                    <div class="item-row" style="flex-direction:column; gap:8px;">
-                                        <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%;">
-                                            <div class="item-info">
-                                                <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge} ${statusBadge}
-                                                ${hasDetails ? `<br><div class="item-details-highlight">${cleanDetails}</div>` : ''}
-                                            </div>
-                                            <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
+                                    <div class="item-row" style="align-items:flex-start;">
+                                        <div class="item-info">
+                                            <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge}
+                                            ${hasDetails ? `<br><div class="item-details-highlight">${cleanDetails}</div>` : ''}
+                                            <br><button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:8px;">${l.void}</button>
                                         </div>
-                                        <div style="display:flex; gap:6px; align-items:center; width:100%; border-top:1px dashed var(--border); padding-top:8px;">
-                                            <button class="btn-outline" style="padding:4px 10px; font-size:11px; border-radius:4px;" onclick="handleSingleItemStatus(${i.rowNum}, 'กำลังทำ')">เตรียมทำ</button>
-                                            <button class="btn-outline" style="padding:4px 10px; font-size:11px; border-radius:4px;" onclick="handleSingleItemStatus(${i.rowNum}, 'เสิร์ฟแล้ว')">เสิร์ฟ</button>
-                                            <button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin:0; margin-left:auto; text-decoration:none;">ลบรายการ</button>
-                                        </div>
+                                        <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
                                     </div>`;
                                 }).join('')}
                             </div>
                             <hr style="border:none; border-top:1px dashed var(--border); margin:15px 0;">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-size:22px; font-weight:800;">฿${groups[tableId].total.toLocaleString()}</span>
+                                <div style="display:flex; gap:6px;">
+                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'กำลังทำ')">${l.cook}</button>
+                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}</button>
+                                </div>
                             </div>
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
                                 <button class="btn-outline" onclick="promptMoveTable('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_move_table || 'ย้ายโต๊ะ'}</button>
                                 <button class="btn-outline" onclick="openManualOrderModal('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_add_item || 'เพิ่มเมนู'}</button>
                             </div>
-                            <button class="btn-outline" onclick="handleVoidTable('${tableId}')" style="margin-top:8px; width:100%; border:1px solid #fca5a5; color:#ef4444; background:#fef2f2; padding:10px; font-weight:700;">ลบทั้งโต๊ะ (ยกเลิกบิล)</button>
                             <button class="btn-black" onclick="openPayModal('${tableId}')" style="margin-top:8px;">${l.collect}</button>
                         </div></div>`;
                 });
@@ -704,42 +782,14 @@
             
             if(store) store.innerHTML = genCards(true);
             if(takeaway) takeaway.innerHTML = genCards(false);
-            
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
 
-            if(isNewOrderAdded && isSoundEnabled && isAudioUnlocked) audioCues.newOrder.play().catch(e=>{});
-        }
-
-        function handleSingleItemStatus(rowNum, status) {
-            if(fullData && fullData.orders) {
-                let item = fullData.orders.find(o => o.rowNum === rowNum);
-                if(item) item.status = status;
-                renderOrders(fullData.orders);
+            // ⭐️ เรียกฟังก์ชันการแจ้งเตือนเสียงและแถบข้อความ ⭐️
+            if (hasFreshAddedOrder) {
+                triggerNotify('add', notifyTableStr);
+            } else if (hasFreshNewOrder) {
+                triggerNotify('new', notifyTableStr);
             }
-            fetch(API_URL, {
-                method:'POST', mode:'no-cors',
-                body: JSON.stringify({ action:'updateStatus', rowNums: [rowNum], status: status, apiKey: API_KEY })
-            });
-        }
-
-        async function handleVoidTable(tableId) {
-            if(!confirm(`ยืนยันลบออเดอร์ทั้งหมดของโต๊ะ ${tableId} ใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)`)) return;
-            
-            const orderSec = document.getElementById('order-sec');
-            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>กำลังลบออเดอร์ทั้งโต๊ะ...</div>";
-
-            const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
-            if(rows.length === 0) return;
-
-            try {
-                await fetch(API_URL, {
-                    method:'POST', mode:'no-cors',
-                    body: JSON.stringify({ action:'updateStatus', rowNums: rows, status: 'void', apiKey: API_KEY })
-                });
-            } catch(e) { console.error("Void Table Error:", e); }
-            
-            lastFingerprint = "";
-            setTimeout(() => refresh(), 1000);
         }
 
         async function promptMoveTable(oldTable) {
@@ -748,7 +798,7 @@
             if (!newTable || newTable.trim() === "") return;
 
             const orderSec = document.getElementById('order-sec');
-            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>Moving table data...</div>";
+            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ Moving table data...</div>";
 
             try {
                 await fetch(API_URL, {
@@ -784,6 +834,7 @@
             safeText('p-table-title', isNaN(tableId) ? tableId : "TABLE " + tableId);
             safeText('p-total-price', "฿" + pTotal.toLocaleString());
 
+            // ⭐️ ทำให้หมายเหตุหน้าจ่ายเงินใหญ่ด้วย และกรองคำซ้ำ ⭐️
             safeHtml('p-bill-items', orders.map(i => {
                 const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
                 let cleanDetails = "";
@@ -847,7 +898,7 @@
             safeStyle('pay-modal', 'display', 'none');
             
             const orderSec = document.getElementById('order-sec');
-            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>กำลังเคลียร์บิล... รอสักครู่ครับ</div>";
+            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ กำลังเคลียร์บิล... รอสักครู่ครับ</div>";
             
             try {
                 await fetch(API_URL, {
@@ -950,14 +1001,14 @@
                             <th style="text-align:center;">Price/Unit</th>
                             <th style="text-align:center;">Total Sales</th>
                             <th style="text-align:center;">Profit/Unit</th>
-                            <th style="text-align:right;">Profit</th>
+                            <th style="text-align:right;">Total Profit</th>
                         </tr>
                     </thead>
                     <tbody>`;
             
             report.forEach(i => {
                 let qty = i.qty || 1;
-                let revenue = i.revenue || 0;
+                let revenue = i.revenue || 0; 
                 let totalProfit = i.profit || 0;
                 
                 let pricePerUnit = Math.round(revenue / qty);
@@ -967,10 +1018,10 @@
                     <tr>
                         <td><b>${i.name}</b></td>
                         <td style="text-align:center; font-weight:600;">${qty}</td>
-                        <td style="text-align:center;">฿${pricePerUnit.toLocaleString()}</td>
-                        <td style="text-align:center; font-weight:600;">฿${revenue.toLocaleString()}</td>
+                        <td style="text-align:center; color:#3b82f6;">฿${pricePerUnit.toLocaleString()}</td>
+                        <td style="text-align:center; font-weight:700;">฿${revenue.toLocaleString()}</td>
                         <td style="text-align:center; color:#10b981;">฿${profitPerUnit.toLocaleString()}</td>
-                        <td style="text-align:right; font-weight:700;">฿${totalProfit.toLocaleString()}</td>
+                        <td style="text-align:right; font-weight:800;">฿${totalProfit.toLocaleString()}</td>
                     </tr>`;
             });
 
@@ -978,39 +1029,9 @@
             safeHtml('report-content', tableHtml);
         }
 
-        // ⭐️ ฟังก์ชันประเมินหมวดหมู่เมนูจากชื่อโดยอัตโนมัติ ⭐️
-        function getCategoryFromName(name) {
-            if (/ข้าว|กะเพรา|ผัดพริก|ไข่เจียว/.test(name)) return 'เมนูข้าว';
-            if (/เส้น|สปาเก็ตตี้|มาม่า|ผัดไทย|ก๋วยเตี๋ยว|มักกะโรนี|อูด้ง|พาสต้า/.test(name)) return 'เมนูเส้น';
-            if (/ยำ|ลาบ|พล่า|น้ำตก/.test(name)) return 'เมนูยำ';
-            if (/ทอด|เฟรนช์ฟรายส์|นักเก็ต|ไก่ป๊อป|ลูกชิ้น|ปอเปี๊ยะ|ชีส|ขนมปัง|โทสต์|เกี๊ยว|ทานเล่น/.test(name)) return 'ของทานเล่น';
-            if (/ชา|กาแฟ|นม|น้ำ|โซดา|สมูทตี้|ปั่น|อเมริกาโน่|เอสเพรสโซ|คาปูชิโน่|ลาเต้|มัคคิอาโต้|มอคค่า|โกโก้/.test(name)) return 'เครื่องดื่ม';
-            return 'อื่นๆ';
-        }
-
-        // ⭐️ ฟังก์ชันสำหรับการกรองตารางคลังสินค้า ⭐️
-        function filterStock() {
-            if(!fullData || !fullData.menu) return;
-            const term = document.getElementById('stock-search-input').value.toLowerCase();
-            const cat = document.getElementById('stock-category-filter').value;
-            
-            const filteredMenu = fullData.menu.filter(m => {
-                const name = m[0].toLowerCase();
-                const matchSearch = name.includes(term);
-                let matchCat = true;
-                if (cat !== 'all') {
-                    const itemCat = getCategoryFromName(m[0]);
-                    matchCat = (itemCat === cat);
-                }
-                return matchSearch && matchCat;
-            });
-            
-            renderStockList(filteredMenu);
-        }
-
-        function renderStockList(menuToRender) {
+        function renderStock(menu) {
             const l = langPack[currentLang] || langPack.th;
-            safeHtml('stock-list-body', menuToRender.map(m => {
+            safeHtml('stock-list-body', menu.map(m => {
                 const isOut = m[5] === 'หมด' || m[5] === 'OUT OF STOCK';
                 return `
                 <tr>
@@ -1019,7 +1040,7 @@
                     <td style="font-weight:700; font-size:12px; color:${isOut ? '#ef4444':'#10b981'};">${isOut ? l.status_out : l.status_normal}</td>
                     <td><button class="btn-outline" style="padding:6px 12px;" onclick="handleStockToggle('${m[0]}','${isOut ? 'ปกติ':'หมด'}')">${l.toggle}</button></td>
                 </tr>`;
-            }).join('') || `<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่พบรายการคลังสินค้า</td></tr>`);
+            }).join(''));
         }
         
         async function handleStockToggle(name, status) { 
@@ -1030,43 +1051,6 @@
             }
             lastFingerprint = "";
             refresh(); 
-        }
-
-        // ⭐️ ฟังก์ชันสำหรับปิด/เปิด คลังสินค้ายกหมวดหมู่ ⭐️
-        async function bulkToggleCategoryStock(status) {
-            if(!fullData || !fullData.menu) return;
-            const cat = document.getElementById('stock-category-filter').value;
-            if (cat === 'all') {
-                alert("กรุณาเลือกหมวดหมู่ที่ต้องการทำรายการก่อนครับ");
-                return;
-            }
-            
-            if (!confirm(`ยืนยันตั้งสถานะหมวด "${cat}" เป็น "${status}" ทั้งหมดหรือไม่?`)) return;
-            
-            // หาเมนูที่อยู่ในหมวดหมู่นี้ และสถานะปัจจุบันยังไม่ตรงกับเป้าหมาย (เพื่อลดการยิง API ซ้ำ)
-            const itemsToUpdate = fullData.menu.filter(m => getCategoryFromName(m[0]) === cat && m[5] !== status);
-            
-            if (itemsToUpdate.length === 0) {
-                alert("ไม่มีเมนูที่ต้องอัปเดตสถานะในหมวดหมู่นี้");
-                return;
-            }
-
-            // Optimistic UI Update (เปลี่ยนสีและแสดงผลให้เห็นทันทีที่หน้าจอ)
-            itemsToUpdate.forEach(m => m[5] = status);
-            filterStock();
-
-            // ทยอยยิง API ไปปรับสถานะ
-            for (let m of itemsToUpdate) {
-                try {
-                    await fetch(API_URL, {
-                        method:'POST', mode:'no-cors', 
-                        body:JSON.stringify({action:'updateStock', type:'menu', name:m[0], status:status, apiKey: API_KEY})
-                    });
-                } catch(e) {}
-            }
-            
-            lastFingerprint = "";
-            setTimeout(() => refresh(), 1500);
         }
 
         function drawChart() {
@@ -1318,6 +1302,7 @@
             if(!manualCart.length) return;
             const ch = document.getElementById('manual-channel'); 
             const channelVal = ch ? ch.value : 'LINE';
+            
             const btnConfirm = document.getElementById('btn-manual-confirm');
             const originalText = btnConfirm.innerText;
             btnConfirm.innerText = "SENDING...";
@@ -1326,6 +1311,7 @@
             } catch(e) {
                 console.error("Submit Order Error:", e);
             }
+            
             btnConfirm.innerText = originalText;
             safeStyle('manual-order-modal', 'display', 'none'); 
             lastFingerprint = ""; 
@@ -1360,6 +1346,7 @@
             }
         }
         
+        // Auto refresh mechanisms
         setInterval(updateClock, 1000); 
         refresh(); 
         setInterval(refresh, 5000); 
@@ -1371,3 +1358,4 @@
     </script>
 </body>
 </html>
+แก้ไชบัคที่บางทีเพิ่มเมนูของโต๊ะไม่ได้กับบางทีกดลบบิลทั้งโต๊ะก็ไม่ได้ให้หน่อยครับ

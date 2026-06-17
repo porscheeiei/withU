@@ -77,7 +77,7 @@
         .badge-new-item {
             background: #ef4444; color: #ffffff; padding: 4px 8px; border-radius: 6px;
             font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle;
-            animation: urgentAlertBlink 1s infinite alternate;
+            animation: alertCallBlink 1s infinite alternate;
         }
         
         .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 8px; }
@@ -102,22 +102,22 @@
         /* ⭐️ Styles สำหรับ Toast Notification หลากสี ⭐️ */
         .toast-notify { 
             position: fixed; top: 0; left: 0; width: 100%; color: #ffffff; 
-            padding: 18px 30px; display: none; font-size: 18px; font-weight: 800; text-align: center; 
+            padding: 20px 30px; display: none; font-size: 20px; font-weight: 800; text-align: center; 
             z-index: 99999; cursor: pointer;
             letter-spacing: 0.5px;
         }
         .toast-notify-call { background: #ef4444; box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5); animation: alertCallBlink 0.5s infinite alternate; }
-        .toast-notify-new { background: #3b82f6; box-shadow: 0 6px 25px rgba(59, 130, 246, 0.5); animation: alertNewBlink 0.5s infinite alternate; }
+        .toast-notify-new { background: #10b981; box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); animation: alertNewBlink 0.5s infinite alternate; }
         .toast-notify-add { background: #f59e0b; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.5); animation: alertAddBlink 0.5s infinite alternate; }
 
         @keyframes alertCallBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
-        @keyframes alertNewBlink { from { background: #3b82f6; } to { background: #1e3a8a; } }
+        @keyframes alertNewBlink { from { background: #10b981; } to { background: #064e3b; } }
         @keyframes alertAddBlink { from { background: #f59e0b; } to { background: #78350f; } }
 
         .closing-banner {
             width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: alertCallBlink 0.5s infinite alternate;
         }
-        /* 📱 Mobile & Tablet Responsive CSS */
+        
         @media (max-width: 1024px) {
             .map-grid { grid-template-columns: repeat(10, 1fr); }
             .report-grid { grid-template-columns: 1fr; }
@@ -145,10 +145,12 @@
             return false;
         };
         
-        // ⭐️ ระบบเสียงสังเคราะห์ (Web Audio API) ทะลวงบล็อก Browser ดัง 100% ⭐️
+        // ⭐️ ระบบเสียงสังเคราะห์ (Web Audio API) ทะลวงบล็อก Browser 100% ⭐️
         let audioCtx = null;
         let isSoundEnabled = true;
         let notifiedOrders = new Set(); // ตัวแปรจำว่าเคยแจ้งเตือนออเดอร์ไหนไปแล้วบ้าง
+        let currentNotifyTable = "";
+        let currentNotifyType = "";
 
         function initAudio() {
             if (!audioCtx) {
@@ -162,7 +164,7 @@
         // ปลดล็อกระบบเสียงทันทีเมื่อผู้ใช้คลิกหน้าจอครั้งแรก
         document.body.addEventListener('click', initAudio, { once: true });
 
-        // เสียง 1: ออเดอร์ใหม่ (กังวานและยาวขึ้น)
+        // เสียง 1: ออเดอร์ใหม่ (ดังกังวานคล้ายกระดิ่งโรงแรม)
         function playNewOrderSound() {
             if (!isSoundEnabled) return;
             initAudio();
@@ -172,17 +174,17 @@
             const gainNode = audioCtx.createGain();
             
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime); // C6 Note
-            osc.frequency.exponentialRampToValueAtTime(523.25, audioCtx.currentTime + 1.0); // ยาว 1 วินาที
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Note A5
+            osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.1); // Note C6
             
-            gainNode.gain.setValueAtTime(1, audioCtx.currentTime); // ดังสุด
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0);
+            gainNode.gain.setValueAtTime(1, audioCtx.currentTime); // ดังสุด 100%
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5); // ลากเสียงยาว 1.5 วินาที
             
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             
             osc.start();
-            osc.stop(audioCtx.currentTime + 1.0);
+            osc.stop(audioCtx.currentTime + 1.5);
         }
 
         // เสียง 2: เรียกพนักงาน (จังหวะฉุกเฉิน)
@@ -197,11 +199,11 @@
             osc.type = 'square';
             osc.frequency.setValueAtTime(800, audioCtx.currentTime);
             
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
             gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime + 0.2);
             gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.3);
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime + 0.4);
+            gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime + 0.4);
             gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.5);
 
             osc.connect(gainNode);
@@ -215,17 +217,60 @@
             isSoundEnabled = !isSoundEnabled; 
             document.getElementById('btn-sound').innerText = isSoundEnabled ? '🔊 SOUND ON' : '🔇 SOUND OFF'; 
             if(isSoundEnabled) {
-                playNewOrderSound(); // เทสเสียงเมื่อเปิด
+                playNewOrderSound(); // เทสเสียงเมื่อกดเปิด
             }
+        }
+
+        // ⭐️ ฟังก์ชันเปิดแถบแจ้งเตือน (แยกสี/แยกข้อความ) ⭐️
+        function triggerNotify(type, tableStr) {
+            const notifyEl = document.getElementById('dynamic-notify');
+            if(!notifyEl) return;
+            
+            currentNotifyTable = tableStr;
+            currentNotifyType = type;
+
+            let msg = "";
+            let cssClass = "toast-notify";
+
+            if (type === 'call') {
+                msg = `ลูกค้า โต๊ะ ${tableStr} กำลังเรียกพนักงานด่วน (คลิกเพื่อปิด)`;
+                cssClass = "toast-notify toast-notify-call";
+                playCallStaffSound();
+            } else if (type === 'new') {
+                msg = `มีลูกค้าโต๊ะ ${tableStr} สั่งอาหารมาแล้ว! (คลิกเพื่อปิด)`;
+                cssClass = "toast-notify toast-notify-new";
+                playNewOrderSound();
+            } else if (type === 'add') {
+                msg = `โต๊ะหมายเลข ${tableStr} สั่งเมนูมาเพิ่ม! (คลิกเพื่อปิด)`;
+                cssClass = "toast-notify toast-notify-add";
+                playNewOrderSound();
+            }
+
+            notifyEl.innerText = msg;
+            notifyEl.className = cssClass;
+            notifyEl.style.display = 'block';
+        }
+
+        // ⭐️ ฟังก์ชันล้าง/ปิดแถบแจ้งเตือน ⭐️
+        function clearDynamicNotify() {
+            safeStyle('dynamic-notify', 'display', 'none');
+            // ถ้าเป็นการปิดแจ้งเตือนเรียกพนักงาน ให้ซิงค์ไปหลังบ้านด้วย
+            if(currentNotifyType === 'call' && currentNotifyTable) {
+               clearedCalls[currentNotifyTable] = true; 
+               fetch(API_URL + "?action=clearCall&table=" + currentNotifyTable, { method: 'GET', mode: 'no-cors' });
+            }
+            currentNotifyType = "";
+            currentNotifyTable = "";
         }
     </script>
     
+    <!-- ⭐️ แถบแจ้งเตือนรวม (สลับสีตามสถานการณ์) ⭐️ -->
     <div id="dynamic-notify" class="toast-notify" onclick="clearDynamicNotify()"></div>
 
     <div class="op-bar">
         <div style="display:flex; gap:8px; align-items:center;">
             <button id="btn-sound" onclick="toggleSound()" style="background:transparent; border:1px solid #fff; color:#fff; border-radius:4px; font-size:10px; cursor:pointer;">🔊 SOUND ON</button>
-            <span id="sync-status" style="display:none; color:#10b981; font-weight:800; font-size:11px; margin-left:10px; animation: mapPulse 0.5s infinite alternate;">🔄 SYNCING...</span>
+            <span id="sync-status" style="display:none; color:#10b981; font-weight:800; font-size:11px; margin-left:10px; animation: alertCallBlink 0.5s infinite alternate;">🔄 SYNCING...</span>
             <div style="margin-left:10px;">CLOSING IN: <span id="close-timer">00:00:00</span></div>
         </div>
         <div id="mistake-log" style="font-weight: 700; color: #ef4444; display:none; text-transform: uppercase; letter-spacing: 1px;">MISTAKE DETECTED</div>
@@ -509,38 +554,6 @@
             safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase());
         }
 
-        // ⭐️ ฟังก์ชันล้างและปิดแถบแจ้งเตือน ⭐️
-        function clearDynamicNotify() {
-            safeStyle('dynamic-notify', 'display', 'none');
-        }
-
-        // ⭐️ ฟังก์ชันเปิดแถบแจ้งเตือน (แยกสีและข้อความ) ⭐️
-        function triggerNotify(type, tableStr) {
-            const notifyEl = document.getElementById('dynamic-notify');
-            if(!notifyEl) return;
-
-            let msg = "";
-            let cssClass = "toast-notify";
-
-            if (type === 'call') {
-                msg = `ลูกค้า โต๊ะ ${tableStr} กำลังเรียกพนักงานด่วน (คลิกเพื่อปิด)`;
-                cssClass = "toast-notify toast-notify-call";
-                playCallStaffSound();
-            } else if (type === 'new') {
-                msg = `ออเดอร์ใหม่ ✨ มีลูกค้า โต๊ะ ${tableStr} สั่งอาหารมาใหม่! (คลิกเพื่อปิด)`;
-                cssClass = "toast-notify toast-notify-new";
-                playNewOrderSound();
-            } else if (type === 'add') {
-                msg = `สั่งมาเพิ่ม 🔔 ลูกค้า โต๊ะ ${tableStr} สั่งเมนูมาเพิ่มเติม! (คลิกเพื่อปิด)`;
-                cssClass = "toast-notify toast-notify-add";
-                playNewOrderSound();
-            }
-
-            notifyEl.innerText = msg;
-            notifyEl.className = cssClass;
-            notifyEl.style.display = 'block';
-        }
-
         async function refresh() {
             safeStyle('sync-status', 'display', 'inline-block');
             
@@ -573,16 +586,24 @@
                 let historyItemsCount = rpt.reduce(function(acc, curr) { return acc + (parseInt(curr.qty) || 0); }, 0);
                 safeText('order-count', activeItemsCount + historyItemsCount);
                 
-                // --- ⭐️ เช็คการเรียกพนักงาน ---
                 let activeCalls = (data.calls || []).filter(c => !clearedCalls[c.table]);
                 Object.keys(clearedCalls).forEach(t => {
                     if (!data.calls || !data.calls.some(c => c.table.toString() === t.toString())) {
                         delete clearedCalls[t];
                     }
                 });
+                
+                // ⭐️ ตรวจสอบการเรียกพนักงาน ⭐️
                 if (activeCalls.length > 0) {
                     let lastCallTable = activeCalls[activeCalls.length - 1].table;
-                    triggerNotify('call', lastCallTable);
+                    let notifyEl = document.getElementById('dynamic-notify');
+                    if (notifyEl && notifyEl.style.display !== 'block') {
+                        triggerNotify('call', lastCallTable);
+                    }
+                } else { 
+                    if (currentNotifyType === 'call') {
+                        safeStyle('dynamic-notify', 'display', 'none'); 
+                    }
                 }
 
                 for(let i=1; i<=15; i++) {
@@ -615,15 +636,14 @@
             }
         }
 
-        // ⭐️ แสดงออเดอร์ และระบบแจ้งเตือนออเดอร์ใหม่ฉลาดขึ้น ⭐️
         function renderOrders(orders) {
             const store = document.getElementById('order-sec');
             const takeaway = document.getElementById('takeaway-sec');
             const l = langPack[currentLang] || langPack.th;
             let groups = {};
             let globalMistakeDetected = false;
-
-            // ตัวแปรสำหรับเช็คแจ้งเตือน
+            
+            // ⭐️ ตัวแปรสำหรับจับอีเวนต์เพื่อยิงแจ้งเตือน
             let hasFreshNewOrder = false;
             let hasFreshAddedOrder = false;
             let notifyTableStr = "";
@@ -655,13 +675,14 @@
                     let isPayingMode = (safeStorageGet('cds_paying_table', '') == tableId || status === "paying");
                     
                     let firstBatchTime = groups[tableId].items[0].time;
+                    let hasExistingItems = groups[tableId].items.some(i => i.status !== "รับออเดอร์" && i.status !== "active" && i.status !== "PENDING" && i.status !== "NEW");
                     let hasSubsequentOrders = groups[tableId].items.some(i => i.time !== firstBatchTime && (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW"));
 
                     let thaiStatusText = "ออเดอร์ใหม่";
                     let pillClass = "pill-new";
                     let mapColorClass = "map-new";
 
-                    // ⭐️ ตรรกะตรวจจับออเดอร์ที่เพิ่งเข้าใหม่เพื่อแจ้งเตือน (ซ่อนไม่ให้เด้งรัวๆ) ⭐️
+                    // ⭐️ เช็คเพื่อแสดงแจ้งเตือน (ซ่อนไม่ให้เด้งรัวๆ) ⭐️
                     groups[tableId].items.forEach(i => {
                         let isItemNew = (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
                         let isSubsequentItem = (i.time !== firstBatchTime);
@@ -670,7 +691,7 @@
                         if (isItemNew && !notifiedOrders.has(orderKey)) {
                             notifiedOrders.add(orderKey);
                             notifyTableStr = tableId;
-                            if (hasSubsequentOrders || hasCookingItem || hasServingItem) {
+                            if (hasExistingItems || isSubsequentItem) {
                                 hasFreshAddedOrder = true;
                             } else {
                                 hasFreshNewOrder = true;
@@ -707,8 +728,6 @@
                     const s2 = (status === "กำลังทำ" || status === "COOK" || thaiStatusText.indexOf("ทำอาหาร") !== -1) ? "active" : "";
                     const s3 = (status === "รอเสิร์ฟ" || status === "SERVE" || thaiStatusText.indexOf("เสิร์ฟ") !== -1) ? "active" : "";
                     let isSlaLate = wait > 15;
-
-                    let hasExistingItems = groups[tableId].items.some(i => i.status !== "รับออเดอร์" && i.status !== "active" && i.status !== "PENDING" && i.status !== "NEW");
 
                     html += `<div class="order-card ${isSlaLate ? 'sla-trigger' : ''}">
                         <div class="card-head">
@@ -782,9 +801,10 @@
             
             if(store) store.innerHTML = genCards(true);
             if(takeaway) takeaway.innerHTML = genCards(false);
+            
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
 
-            // ⭐️ เรียกฟังก์ชันการแจ้งเตือนเสียงและแถบข้อความ ⭐️
+            // ⭐️ เรียกการแจ้งเตือนเสียง+แถบ ถ้ามีของใหม่ ⭐️
             if (hasFreshAddedOrder) {
                 triggerNotify('add', notifyTableStr);
             } else if (hasFreshNewOrder) {
@@ -834,7 +854,6 @@
             safeText('p-table-title', isNaN(tableId) ? tableId : "TABLE " + tableId);
             safeText('p-total-price', "฿" + pTotal.toLocaleString());
 
-            // ⭐️ ทำให้หมายเหตุหน้าจ่ายเงินใหญ่ด้วย และกรองคำซ้ำ ⭐️
             safeHtml('p-bill-items', orders.map(i => {
                 const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
                 let cleanDetails = "";
@@ -1191,11 +1210,6 @@
             if (n === 'report') setTimeout(drawChart, 150);
         }
 
-        function clearCallNotify() { 
-            const t = document.getElementById('call-table-no').innerText; clearedCalls[t] = true; 
-            fetch(API_URL + "?action=clearCall&table=" + t, { method: 'GET', mode: 'no-cors' }); safeStyle('call-notify', 'display', 'none');
-        }
-
         function openManualOrderModal(targetTable = null) {
             manualCart = []; 
             document.getElementById('manual-search').value = ""; 
@@ -1351,6 +1365,7 @@
         refresh(); 
         setInterval(refresh, 5000); 
 
+        // Reload the whole page every 15 minutes to prevent memory leaks / browser hang
         setInterval(function() {
             window.location.reload();
         }, 900000);
@@ -1358,4 +1373,3 @@
     </script>
 </body>
 </html>
-แก้ไชบัคที่บางทีเพิ่มเมนูของโต๊ะไม่ได้กับบางทีกดลบบิลทั้งโต๊ะก็ไม่ได้ให้หน่อยครับ

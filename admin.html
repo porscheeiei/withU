@@ -54,7 +54,7 @@
         .track-step.active.step-new, .track-step.active.step-cooking, .track-step.active.step-serving { background: #000000; color: #ffffff; }
         .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
         .pill-ordered-more, .pill-waiting-bill { background: #000000; color: #ffffff; border: 1px solid #000000; }
-        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; }
+        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; flex-direction: column; gap: 8px; }
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 700; font-size: 16px; }
 
@@ -77,7 +77,7 @@
         .badge-new-item {
             background: #ef4444; color: #ffffff; padding: 4px 8px; border-radius: 6px;
             font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle;
-            animation: alertCallBlink 1s infinite alternate;
+            animation: urgentAlertBlink 1s infinite alternate;
         }
         
         .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 8px; }
@@ -109,7 +109,6 @@
         .toast-notify-call { background: #ef4444; box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5); animation: alertCallBlink 0.5s infinite alternate; }
         .toast-notify-new { background: #10b981; box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); animation: alertNewBlink 0.5s infinite alternate; }
         .toast-notify-add { background: #f59e0b; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.5); animation: alertAddBlink 0.5s infinite alternate; }
-        /* ⭐️ สีใหม่ สำหรับแจ้งเตือนขอเช็คบิล ⭐️ */
         .toast-notify-pay { background: #8b5cf6; box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5); animation: alertPayBlink 0.5s infinite alternate; }
 
         @keyframes alertCallBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
@@ -120,7 +119,7 @@
         .closing-banner {
             width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: alertCallBlink 0.5s infinite alternate;
         }
-        /* 📱 Mobile & Tablet Responsive CSS */
+        
         @media (max-width: 1024px) {
             .map-grid { grid-template-columns: repeat(10, 1fr); }
             .report-grid { grid-template-columns: 1fr; }
@@ -306,7 +305,6 @@
         }
     </script>
     
-    <!-- ⭐️ แถบแจ้งเตือนรวม (สลับสีตามสถานการณ์) ⭐️ -->
     <div id="dynamic-notify" class="toast-notify" onclick="clearDynamicNotify()"></div>
 
     <div class="op-bar">
@@ -826,14 +824,42 @@
                                         cleanDetails = [...new Set(detailsArray)].join(', ');
                                     }
 
+                                    // ⭐️ สร้างสถานะรายเมนู ⭐️
+                                    let itemStatus = i.status || "รับออเดอร์";
+                                    let itemStatusText = "รอดำเนินการ";
+                                    let itemStatusColor = "#737373";
+
+                                    if (isItemNew) {
+                                        itemStatusText = "รอทำ";
+                                        itemStatusColor = "#f59e0b"; // สีส้ม
+                                    } else if (itemStatus === "กำลังทำ" || itemStatus === "COOK" || itemStatus === "COOKING") {
+                                        itemStatusText = "กำลังทำ";
+                                        itemStatusColor = "#3b82f6"; // สีฟ้า
+                                    } else if (itemStatus === "รอเสิร์ฟ" || itemStatus === "SERVE" || itemStatus === "SERVING") {
+                                        itemStatusText = "เสิร์ฟแล้ว";
+                                        itemStatusColor = "#10b981"; // สีเขียว
+                                    }
+
+                                    let itemStatusBadge = `<span style="font-size:11px; font-weight:800; color:${itemStatusColor}; border:1px solid ${itemStatusColor}; background:rgba(255,255,255,0.8); padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle;">${itemStatusText}</span>`;
+
                                     return `
-                                    <div class="item-row" style="align-items:flex-start;">
-                                        <div class="item-info">
-                                            <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge}
-                                            ${hasDetails ? `<br><div class="item-details-highlight">${cleanDetails}</div>` : ''}
-                                            <br><button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:8px;">${l.void}</button>
+                                    <div class="item-row" style="align-items:flex-start; flex-direction:column; gap:8px;">
+                                        <div class="item-info" style="width:100%;">
+                                            <div style="display:flex; justify-content:space-between; width:100%;">
+                                                <div>
+                                                    <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge} ${itemStatusBadge}
+                                                </div>
+                                                <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
+                                            </div>
+                                            
+                                            ${hasDetails ? `<div class="item-details-highlight">${cleanDetails}</div>` : ''}
+                                            
+                                            <div style="margin-top:12px; display:flex; gap:6px; align-items:center;">
+                                                <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#3b82f6; border-color:#bfdbfe;" onclick="handleSingleItemStatus(${i.rowNum}, 'กำลังทำ')">🍳 เตรียมทำ</button>
+                                                <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#10b981; border-color:#a7f3d0;" onclick="handleSingleItemStatus(${i.rowNum}, 'รอเสิร์ฟ')">🛎️ เสิร์ฟ</button>
+                                                <button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:0; margin-left:10px;">${l.void}</button>
+                                            </div>
                                         </div>
-                                        <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
                                     </div>`;
                                 }).join('')}
                             </div>
@@ -841,14 +867,15 @@
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-size:22px; font-weight:800;">฿${groups[tableId].total.toLocaleString()}</span>
                                 <div style="display:flex; gap:6px;">
-                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'กำลังทำ')">${l.cook}</button>
-                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}</button>
+                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'กำลังทำ')">${l.cook}ทั้งโต๊ะ</button>
+                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}ทั้งโต๊ะ</button>
                                 </div>
                             </div>
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
                                 <button class="btn-outline" onclick="promptMoveTable('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_move_table || 'ย้ายโต๊ะ'}</button>
                                 <button class="btn-outline" onclick="openManualOrderModal('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_add_item || 'เพิ่มเมนู'}</button>
                             </div>
+                            <button class="btn-outline" onclick="handleVoidTable('${tableId}')" style="margin-top:8px; width:100%; border:1px solid #fca5a5; color:#ef4444; background:#fef2f2; padding:10px; font-weight:700;">ลบทั้งโต๊ะ (ยกเลิกบิล)</button>
                             <button class="btn-black" onclick="openPayModal('${tableId}')" style="margin-top:8px;">${l.collect}</button>
                         </div></div>`;
                 });
@@ -857,9 +884,10 @@
             
             if(store) store.innerHTML = genCards(true);
             if(takeaway) takeaway.innerHTML = genCards(false);
+            
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
 
-            // ⭐️ เรียกลำดับความสำคัญของการแจ้งเตือน ⭐️
+            // ⭐️ เรียกการแจ้งเตือนเสียง+แถบ ถ้ามีของใหม่ ⭐️
             if (hasFreshPayRequest) {
                 triggerNotify('pay', notifyTableStr);
             } else if (hasFreshAddedOrder) {
@@ -867,6 +895,38 @@
             } else if (hasFreshNewOrder) {
                 triggerNotify('new', notifyTableStr);
             }
+        }
+
+        function handleSingleItemStatus(rowNum, status) {
+            if(fullData && fullData.orders) {
+                let item = fullData.orders.find(o => o.rowNum === rowNum);
+                if(item) item.status = status;
+                renderOrders(fullData.orders);
+            }
+            fetch(API_URL, {
+                method:'POST', mode:'no-cors',
+                body: JSON.stringify({ action:'updateStatus', rowNums: [rowNum], status: status, apiKey: API_KEY })
+            });
+        }
+
+        async function handleVoidTable(tableId) {
+            if(!confirm(`ยืนยันลบออเดอร์ทั้งหมดของโต๊ะ ${tableId} ใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)`)) return;
+            
+            const orderSec = document.getElementById('order-sec');
+            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>กำลังลบออเดอร์ทั้งโต๊ะ...</div>";
+
+            const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
+            if(rows.length === 0) return;
+
+            try {
+                await fetch(API_URL, {
+                    method:'POST', mode:'no-cors',
+                    body: JSON.stringify({ action:'updateStatus', rowNums: rows, status: 'void', apiKey: API_KEY })
+                });
+            } catch(e) { console.error("Void Table Error:", e); }
+            
+            lastFingerprint = "";
+            setTimeout(() => refresh(), 1000);
         }
 
         async function promptMoveTable(oldTable) {
@@ -1066,6 +1126,7 @@
             safeHtml('ai-insights-block', insightHtml);
         }
 
+        // ⭐️ แก้ไขตารางผลประกอบการให้แสดง ราคาขาย, ยอดรวมขาย, และกำไร/ชิ้น ⭐️
         function renderPerformance(report) {
             safeText('report-date-text', "PERFORMANCE DATA OVERVIEW - " + new Date().toLocaleDateString('en-GB', {dateStyle:'full'}).toUpperCase());
             
@@ -1268,6 +1329,11 @@
             if (n === 'report') setTimeout(drawChart, 150);
         }
 
+        function clearCallNotify() { 
+            const t = document.getElementById('call-table-no').innerText; clearedCalls[t] = true; 
+            fetch(API_URL + "?action=clearCall&table=" + t, { method: 'GET', mode: 'no-cors' }); safeStyle('call-notify', 'display', 'none');
+        }
+
         function openManualOrderModal(targetTable = null) {
             manualCart = []; 
             document.getElementById('manual-search').value = ""; 
@@ -1418,10 +1484,12 @@
             }
         }
         
+        // Auto refresh mechanisms
         setInterval(updateClock, 1000); 
         refresh(); 
         setInterval(refresh, 5000); 
 
+        // Reload the whole page every 15 minutes to prevent memory leaks / browser hang
         setInterval(function() {
             window.location.reload();
         }, 900000);

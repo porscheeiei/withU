@@ -58,7 +58,6 @@
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 700; font-size: 16px; }
 
-        /* ⭐️ ไฮไลต์หมายเหตุตัวใหญ่ กระแทกตา ⭐️ */
         .item-details-highlight {
             display: inline-block;
             color: #ef4444;
@@ -73,7 +72,6 @@
         }
         [data-theme="dark"] .item-details-highlight { background: #450a0a; color: #fca5a5; border-color: #991b1b; }
 
-        /* ⭐️ ป้ายกำกับ สั่งมาใหม่ ⭐️ */
         .badge-new-item {
             background: #ef4444; color: #ffffff; padding: 4px 8px; border-radius: 6px;
             font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle;
@@ -109,7 +107,6 @@
         .closing-banner {
             width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: urgentAlertBlink 0.5s infinite alternate;
         }
-        /* 📱 Mobile & Tablet Responsive CSS */
         @media (max-width: 1024px) {
             .map-grid { grid-template-columns: repeat(10, 1fr); }
             .report-grid { grid-template-columns: 1fr; }
@@ -137,7 +134,6 @@
             return false;
         };
         
-        // ⭐️ ระบบเสียงของ Google + ปลดล็อก Browser อัตโนมัติ
         const audioCues = {
             newOrder: new Audio('https://actions.google.com/sounds/v1/alarms/ding.ogg'),
             call: new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg')
@@ -160,7 +156,7 @@
 
         function toggleSound() { 
             isSoundEnabled = !isSoundEnabled; 
-            document.getElementById('btn-sound').innerText = isSoundEnabled ? '🔊 SOUND ON' : '🔇 SOUND OFF'; 
+            document.getElementById('btn-sound').innerText = isSoundEnabled ? 'SOUND ON' : 'SOUND OFF'; 
             if(isSoundEnabled) {
                 audioCues.newOrder.currentTime = 0;
                 audioCues.newOrder.play().catch(e=>{});
@@ -174,8 +170,8 @@
     
     <div class="op-bar">
         <div style="display:flex; gap:8px; align-items:center;">
-            <button id="btn-sound" onclick="toggleSound()" style="background:transparent; border:1px solid #fff; color:#fff; border-radius:4px; font-size:10px; cursor:pointer;">🔊 SOUND ON</button>
-            <span id="sync-status" style="display:none; color:#10b981; font-weight:800; font-size:11px; margin-left:10px; animation: urgentAlertBlink 1s infinite alternate;">🔄 SYNCING...</span>
+            <button id="btn-sound" onclick="toggleSound()" style="background:transparent; border:1px solid #fff; color:#fff; border-radius:4px; font-size:10px; cursor:pointer;">SOUND ON</button>
+            <span id="sync-status" style="display:none; color:#10b981; font-weight:800; font-size:11px; margin-left:10px; animation: urgentAlertBlink 1s infinite alternate;">SYNCING...</span>
             <div style="margin-left:10px;">CLOSING IN: <span id="close-timer">00:00:00</span></div>
         </div>
         <div id="mistake-log" style="font-weight: 700; color: #ef4444; display:none; text-transform: uppercase; letter-spacing: 1px;">MISTAKE DETECTED</div>
@@ -213,21 +209,39 @@
             <button onclick="showSec('stock')" class="tab-btn" id="t-stock">Stock</button>
             <button onclick="showSec('report')" class="tab-btn" id="t-report">Performance</button>
         </div>
+        
         <div id="order-sec" class="order-grid"></div>
         <div id="takeaway-sec" class="order-grid" style="display:none;"></div>
-        <div id="stock-sec" style="display:none; overflow-x: auto;">
-            <table class="report-table" style="background: var(--surface); min-width: 600px;">
-                <thead>
-                    <tr>
-                        <th id="th-stock-name">Item Name</th>
-                        <th id="th-stock-cost">Cost</th>
-                        <th id="th-stock-status">Status</th>
-                        <th id="th-stock-ctrl">Control</th>
-                    </tr>
-                </thead>
-                <tbody id="stock-list-body"></tbody>
-            </table>
+        
+        <div id="stock-sec" style="display:none; flex-direction:column; gap:15px;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap; background:var(--surface); padding:15px; border-radius:12px; border:1px solid var(--border);">
+                <input type="text" id="stock-search-input" placeholder="ค้นหาเมนู..." style="flex:1; min-width:200px; padding:10px; border-radius:6px; border:1px solid var(--border);" oninput="filterStock()">
+                <select id="stock-category-filter" style="width:auto; min-width:150px; padding:10px; border-radius:6px; border:1px solid var(--border);" onchange="filterStock()">
+                    <option value="all">ทุกหมวดหมู่</option>
+                    <option value="เครื่องดื่ม">เครื่องดื่ม</option>
+                    <option value="เมนูเส้น">เมนูเส้น</option>
+                    <option value="เมนูยำ">เมนูยำ</option>
+                    <option value="ของทานเล่น">ของทานเล่น</option>
+                    <option value="เมนูข้าว">เมนูข้าว</option>
+                </select>
+                <button class="btn-outline" style="border-color:#ef4444; color:#ef4444;" onclick="bulkToggleCategoryStock('หมด')">ปิดหมวดหมู่นี้</button>
+                <button class="btn-outline" style="border-color:#10b981; color:#10b981;" onclick="bulkToggleCategoryStock('ปกติ')">เปิดหมวดหมู่นี้</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="report-table" style="background: var(--surface); min-width: 600px;">
+                    <thead>
+                        <tr>
+                            <th id="th-stock-name">Item Name</th>
+                            <th id="th-stock-cost">Cost</th>
+                            <th id="th-stock-status">Status</th>
+                            <th id="th-stock-ctrl">Control</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stock-list-body"></tbody>
+                </table>
+            </div>
         </div>
+
         <div id="report-sec" style="display:none;">
             <div id="printable-report">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
@@ -405,7 +419,7 @@
             applyLanguagePack();
             if(fullData) { 
                 renderOrders(fullData.orders || []); 
-                renderStock(fullData.menu || []); 
+                filterStock(); // Update to use filter function
                 renderPerformance((fullData.analytics && fullData.analytics.report) ? fullData.analytics.report : []); 
             }
         }
@@ -515,7 +529,7 @@
                 }
 
                 renderOrders(data.orders || []);
-                renderStock(data.menu || []);
+                filterStock(); // Load matching items from stock
                 renderPerformance(rpt);
                 renderAttendanceLog(data.attendance || []);
                 
@@ -637,20 +651,18 @@
                                     
                                     if (isItemNew) {
                                         if (hasExistingItems || isSubsequentItem) {
-                                            newItemBadge = `<span class="badge-new-item">สั่งมาเพิ่ม 🔔</span>`;
+                                            newItemBadge = `<span class="badge-new-item">สั่งมาเพิ่ม</span>`;
                                         } else {
-                                            newItemBadge = `<span class="badge-new-item" style="background:#3b82f6;">ออเดอร์ใหม่ ✨</span>`;
+                                            newItemBadge = `<span class="badge-new-item" style="background:#3b82f6;">ออเดอร์ใหม่</span>`;
                                         }
                                     }
                                     
-                                    // ⭐️ ตัวกรองคำซ้ำสำหรับหมายเหตุ ⭐️
                                     let cleanDetails = "";
                                     if (hasDetails) {
                                         let detailsArray = i.details.split(',').map(s => s.trim()).filter(s => s !== '');
                                         cleanDetails = [...new Set(detailsArray)].join(', ');
                                     }
 
-                                    // ⭐️ สถานะป้ายกำกับรายเมนู ⭐️
                                     let sBadgeColor = "#e5e7eb"; let sTextColor = "#6b7280";
                                     if (i.status === "กำลังทำ") { sBadgeColor = "#fef3c7"; sTextColor = "#d97706"; }
                                     else if (i.status === "รอเสิร์ฟ" || i.status === "เสิร์ฟแล้ว") { sBadgeColor = "#d1fae5"; sTextColor = "#059669"; }
@@ -695,13 +707,10 @@
             
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
 
-            // เล่นเสียงเวลามีออเดอร์ใหม่โผล่มา
             if(isNewOrderAdded && isSoundEnabled && isAudioUnlocked) audioCues.newOrder.play().catch(e=>{});
         }
 
-        // ⭐️ ฟังก์ชันย่อยสำหรับปุ่มอัปเดตสถานะเมนูรายตัว ⭐️
         function handleSingleItemStatus(rowNum, status) {
-            // Optimistic update
             if(fullData && fullData.orders) {
                 let item = fullData.orders.find(o => o.rowNum === rowNum);
                 if(item) item.status = status;
@@ -713,12 +722,11 @@
             });
         }
 
-        // ⭐️ ฟังก์ชันสำหรับลบทั้งโต๊ะ (ล้างบิลทิ้ง) ⭐️
         async function handleVoidTable(tableId) {
             if(!confirm(`ยืนยันลบออเดอร์ทั้งหมดของโต๊ะ ${tableId} ใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)`)) return;
             
             const orderSec = document.getElementById('order-sec');
-            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ กำลังลบออเดอร์ทั้งโต๊ะ...</div>";
+            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>กำลังลบออเดอร์ทั้งโต๊ะ...</div>";
 
             const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
             if(rows.length === 0) return;
@@ -740,7 +748,7 @@
             if (!newTable || newTable.trim() === "") return;
 
             const orderSec = document.getElementById('order-sec');
-            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ Moving table data...</div>";
+            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>Moving table data...</div>";
 
             try {
                 await fetch(API_URL, {
@@ -776,7 +784,6 @@
             safeText('p-table-title', isNaN(tableId) ? tableId : "TABLE " + tableId);
             safeText('p-total-price', "฿" + pTotal.toLocaleString());
 
-            // ⭐️ ทำให้หมายเหตุหน้าจ่ายเงินใหญ่ด้วย และกรองคำซ้ำ ⭐️
             safeHtml('p-bill-items', orders.map(i => {
                 const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
                 let cleanDetails = "";
@@ -840,7 +847,7 @@
             safeStyle('pay-modal', 'display', 'none');
             
             const orderSec = document.getElementById('order-sec');
-            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ กำลังเคลียร์บิล... รอสักครู่ครับ</div>";
+            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>กำลังเคลียร์บิล... รอสักครู่ครับ</div>";
             
             try {
                 await fetch(API_URL, {
@@ -971,9 +978,39 @@
             safeHtml('report-content', tableHtml);
         }
 
-        function renderStock(menu) {
+        // ⭐️ ฟังก์ชันประเมินหมวดหมู่เมนูจากชื่อโดยอัตโนมัติ ⭐️
+        function getCategoryFromName(name) {
+            if (/ข้าว|กะเพรา|ผัดพริก|ไข่เจียว/.test(name)) return 'เมนูข้าว';
+            if (/เส้น|สปาเก็ตตี้|มาม่า|ผัดไทย|ก๋วยเตี๋ยว|มักกะโรนี|อูด้ง|พาสต้า/.test(name)) return 'เมนูเส้น';
+            if (/ยำ|ลาบ|พล่า|น้ำตก/.test(name)) return 'เมนูยำ';
+            if (/ทอด|เฟรนช์ฟรายส์|นักเก็ต|ไก่ป๊อป|ลูกชิ้น|ปอเปี๊ยะ|ชีส|ขนมปัง|โทสต์|เกี๊ยว|ทานเล่น/.test(name)) return 'ของทานเล่น';
+            if (/ชา|กาแฟ|นม|น้ำ|โซดา|สมูทตี้|ปั่น|อเมริกาโน่|เอสเพรสโซ|คาปูชิโน่|ลาเต้|มัคคิอาโต้|มอคค่า|โกโก้/.test(name)) return 'เครื่องดื่ม';
+            return 'อื่นๆ';
+        }
+
+        // ⭐️ ฟังก์ชันสำหรับการกรองตารางคลังสินค้า ⭐️
+        function filterStock() {
+            if(!fullData || !fullData.menu) return;
+            const term = document.getElementById('stock-search-input').value.toLowerCase();
+            const cat = document.getElementById('stock-category-filter').value;
+            
+            const filteredMenu = fullData.menu.filter(m => {
+                const name = m[0].toLowerCase();
+                const matchSearch = name.includes(term);
+                let matchCat = true;
+                if (cat !== 'all') {
+                    const itemCat = getCategoryFromName(m[0]);
+                    matchCat = (itemCat === cat);
+                }
+                return matchSearch && matchCat;
+            });
+            
+            renderStockList(filteredMenu);
+        }
+
+        function renderStockList(menuToRender) {
             const l = langPack[currentLang] || langPack.th;
-            safeHtml('stock-list-body', menu.map(m => {
+            safeHtml('stock-list-body', menuToRender.map(m => {
                 const isOut = m[5] === 'หมด' || m[5] === 'OUT OF STOCK';
                 return `
                 <tr>
@@ -982,7 +1019,7 @@
                     <td style="font-weight:700; font-size:12px; color:${isOut ? '#ef4444':'#10b981'};">${isOut ? l.status_out : l.status_normal}</td>
                     <td><button class="btn-outline" style="padding:6px 12px;" onclick="handleStockToggle('${m[0]}','${isOut ? 'ปกติ':'หมด'}')">${l.toggle}</button></td>
                 </tr>`;
-            }).join(''));
+            }).join('') || `<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่พบรายการคลังสินค้า</td></tr>`);
         }
         
         async function handleStockToggle(name, status) { 
@@ -993,6 +1030,43 @@
             }
             lastFingerprint = "";
             refresh(); 
+        }
+
+        // ⭐️ ฟังก์ชันสำหรับปิด/เปิด คลังสินค้ายกหมวดหมู่ ⭐️
+        async function bulkToggleCategoryStock(status) {
+            if(!fullData || !fullData.menu) return;
+            const cat = document.getElementById('stock-category-filter').value;
+            if (cat === 'all') {
+                alert("กรุณาเลือกหมวดหมู่ที่ต้องการทำรายการก่อนครับ");
+                return;
+            }
+            
+            if (!confirm(`ยืนยันตั้งสถานะหมวด "${cat}" เป็น "${status}" ทั้งหมดหรือไม่?`)) return;
+            
+            // หาเมนูที่อยู่ในหมวดหมู่นี้ และสถานะปัจจุบันยังไม่ตรงกับเป้าหมาย (เพื่อลดการยิง API ซ้ำ)
+            const itemsToUpdate = fullData.menu.filter(m => getCategoryFromName(m[0]) === cat && m[5] !== status);
+            
+            if (itemsToUpdate.length === 0) {
+                alert("ไม่มีเมนูที่ต้องอัปเดตสถานะในหมวดหมู่นี้");
+                return;
+            }
+
+            // Optimistic UI Update (เปลี่ยนสีและแสดงผลให้เห็นทันทีที่หน้าจอ)
+            itemsToUpdate.forEach(m => m[5] = status);
+            filterStock();
+
+            // ทยอยยิง API ไปปรับสถานะ
+            for (let m of itemsToUpdate) {
+                try {
+                    await fetch(API_URL, {
+                        method:'POST', mode:'no-cors', 
+                        body:JSON.stringify({action:'updateStock', type:'menu', name:m[0], status:status, apiKey: API_KEY})
+                    });
+                } catch(e) {}
+            }
+            
+            lastFingerprint = "";
+            setTimeout(() => refresh(), 1500);
         }
 
         function drawChart() {

@@ -80,8 +80,8 @@
             animation: alertCallBlink 1s infinite alternate;
         }
         
-        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 8px; }
-        .btn-void:hover { color: #ef4444; }
+        .btn-void { background: #fef2f2; border: 1px solid #fca5a5; color: #ef4444; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; }
+        .btn-void:hover { background: #ef4444; color: #ffffff; border-color: #ef4444; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
         .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: var(--text-main); }
         .btn-outline:hover { background: #000000; color: #ffffff; border-color: #000000; }
@@ -351,19 +351,36 @@
         </div>
         <div id="order-sec" class="order-grid"></div>
         <div id="takeaway-sec" class="order-grid" style="display:none;"></div>
-        <div id="stock-sec" style="display:none; overflow-x: auto;">
-            <table class="report-table" style="background: var(--surface); min-width: 600px;">
-                <thead>
-                    <tr>
-                        <th id="th-stock-name">Item Name</th>
-                        <th id="th-stock-cost">Cost</th>
-                        <th id="th-stock-status">Status</th>
-                        <th id="th-stock-ctrl">Control</th>
-                    </tr>
-                </thead>
-                <tbody id="stock-list-body"></tbody>
-            </table>
+        
+        <div id="stock-sec" style="display:none; flex-direction:column; gap:15px;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap; background:var(--surface); padding:15px; border-radius:12px; border:1px solid var(--border);">
+                <input type="text" id="stock-search-input" placeholder="ค้นหาเมนู..." style="flex:1; min-width:200px; padding:10px; border-radius:6px; border:1px solid var(--border);" oninput="filterStock()">
+                <select id="stock-category-filter" style="width:auto; min-width:150px; padding:10px; border-radius:6px; border:1px solid var(--border);" onchange="filterStock()">
+                    <option value="all">ทุกหมวดหมู่</option>
+                    <option value="เครื่องดื่ม">เครื่องดื่ม</option>
+                    <option value="เมนูเส้น">เมนูเส้น</option>
+                    <option value="เมนูยำ">เมนูยำ</option>
+                    <option value="ของทานเล่น">ของทานเล่น</option>
+                    <option value="เมนูข้าว">เมนูข้าว</option>
+                </select>
+                <button class="btn-outline" style="border-color:#ef4444; color:#ef4444;" onclick="bulkToggleCategoryStock('หมด')">ปิดหมวดหมู่นี้</button>
+                <button class="btn-outline" style="border-color:#10b981; color:#10b981;" onclick="bulkToggleCategoryStock('ปกติ')">เปิดหมวดหมู่นี้</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="report-table" style="background: var(--surface); min-width: 600px;">
+                    <thead>
+                        <tr>
+                            <th id="th-stock-name">Item Name</th>
+                            <th id="th-stock-cost">Cost</th>
+                            <th id="th-stock-status">Status</th>
+                            <th id="th-stock-ctrl">Control</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stock-list-body"></tbody>
+                </table>
+            </div>
         </div>
+
         <div id="report-sec" style="display:none;">
             <div id="printable-report">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
@@ -541,7 +558,7 @@
             applyLanguagePack();
             if(fullData) { 
                 renderOrders(fullData.orders || []); 
-                renderStock(fullData.menu || []); 
+                filterStock(); // Update to use filter function
                 renderPerformance((fullData.analytics && fullData.analytics.report) ? fullData.analytics.report : []); 
             }
         }
@@ -663,7 +680,7 @@
                 }
 
                 renderOrders(data.orders || []);
-                renderStock(data.menu || []);
+                filterStock(); // Load matching items from stock
                 renderPerformance(rpt);
                 renderAttendanceLog(data.attendance || []);
                 
@@ -692,6 +709,7 @@
             // ตัวแปรสำหรับเช็คแจ้งเตือน
             let hasFreshNewOrder = false;
             let hasFreshAddedOrder = false;
+            let hasFreshPayRequest = false; // ⭐️ ตัวแปรใหม่ตรวจจับการขอเช็คบิล
             let notifyTableStr = "";
 
             orders.forEach(o => {
@@ -711,7 +729,10 @@
 
             const genCards = (isStore) => {
                 let html = "";
-                Object.keys(groups).filter(t => isStore ? !isNaN(t) : isNaN(t)).forEach(tableId => {
+                Object.keys(groups).filter(t => {
+                    const isDeliv = ["LINE", "GRAB", "LINEMAN", "TAKEAWAY"].includes(String(t).toUpperCase().trim());
+                    return isStore ? !isDeliv : isDeliv;
+                }).forEach(tableId => {
                     const wait = getTimeDiff(groups[tableId].time);
                     const status = lastActionMap[tableId] || groups[tableId].items[0].status || "รับออเดอร์";
                     
@@ -727,6 +748,19 @@
                     let thaiStatusText = "ออเดอร์ใหม่";
                     let pillClass = "pill-new";
                     let mapColorClass = "map-new";
+
+                    // ⭐️ ตรรกะตรวจจับการแจ้งเตือน (ซ่อนไม่ให้เด้งรัวๆ) ⭐️
+                    if (isPayingMode) {
+                        let payKey = `table_${tableId}_paying`;
+                        if (!notifiedOrders.has(payKey)) {
+                            notifiedOrders.add(payKey);
+                            notifyTableStr = tableId;
+                            hasFreshPayRequest = true;
+                        }
+                    } else {
+                        // ถ้าไม่ได้อยู่สถานะจ่ายเงินแล้ว ให้เคลียร์ memory ทิ้ง
+                        notifiedOrders.delete(`table_${tableId}_paying`);
+                    }
 
                     groups[tableId].items.forEach(i => {
                         let isItemNew = (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
@@ -880,7 +914,9 @@
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
 
             // ⭐️ เรียกการแจ้งเตือนเสียง+แถบ ถ้ามีของใหม่ ⭐️
-            if (hasFreshAddedOrder) {
+            if (hasFreshPayRequest) {
+                triggerNotify('pay', notifyTableStr);
+            } else if (hasFreshAddedOrder) {
                 triggerNotify('add', notifyTableStr);
             } else if (hasFreshNewOrder) {
                 triggerNotify('new', notifyTableStr);
@@ -1116,6 +1152,7 @@
             safeHtml('ai-insights-block', insightHtml);
         }
 
+        // ⭐️ แก้ไขตารางผลประกอบการให้แสดง ราคาขาย, ยอดรวมขาย, และกำไร/ชิ้น ⭐️
         function renderPerformance(report) {
             safeText('report-date-text', "PERFORMANCE DATA OVERVIEW - " + new Date().toLocaleDateString('en-GB', {dateStyle:'full'}).toUpperCase());
             
@@ -1178,6 +1215,87 @@
             }
             lastFingerprint = "";
             refresh(); 
+        }
+
+        // ⭐️ ฟังก์ชันประเมินหมวดหมู่เมนูจากชื่อโดยอัตโนมัติ ⭐️
+        function getCategoryFromName(name) {
+            if (/ข้าว|กะเพรา|ผัดพริก|ไข่เจียว/.test(name)) return 'เมนูข้าว';
+            if (/เส้น|สปาเก็ตตี้|มาม่า|ผัดไทย|ก๋วยเตี๋ยว|มักกะโรนี|อูด้ง|พาสต้า/.test(name)) return 'เมนูเส้น';
+            if (/ยำ|ลาบ|พล่า|น้ำตก/.test(name)) return 'เมนูยำ';
+            if (/ทอด|เฟรนช์ฟรายส์|นักเก็ต|ไก่ป๊อป|ลูกชิ้น|ปอเปี๊ยะ|ชีส|ขนมปัง|โทสต์|เกี๊ยว|ทานเล่น/.test(name)) return 'ของทานเล่น';
+            if (/ชา|กาแฟ|นม|น้ำ|โซดา|สมูทตี้|ปั่น|อเมริกาโน่|เอสเพรสโซ|คาปูชิโน่|ลาเต้|มัคคิอาโต้|มอคค่า|โกโก้/.test(name)) return 'เครื่องดื่ม';
+            return 'อื่นๆ';
+        }
+
+        // ⭐️ ฟังก์ชันสำหรับการกรองตารางคลังสินค้า ⭐️
+        function filterStock() {
+            if(!fullData || !fullData.menu) return;
+            const term = document.getElementById('stock-search-input').value.toLowerCase();
+            const cat = document.getElementById('stock-category-filter').value;
+            
+            const filteredMenu = fullData.menu.filter(m => {
+                const name = m[0].toLowerCase();
+                const matchSearch = name.includes(term);
+                let matchCat = true;
+                if (cat !== 'all') {
+                    const itemCat = getCategoryFromName(m[0]);
+                    matchCat = (itemCat === cat);
+                }
+                return matchSearch && matchCat;
+            });
+            
+            renderStockList(filteredMenu);
+        }
+
+        function renderStockList(menuToRender) {
+            const l = langPack[currentLang] || langPack.th;
+            safeHtml('stock-list-body', menuToRender.map(m => {
+                const isOut = m[5] === 'หมด' || m[5] === 'OUT OF STOCK';
+                return `
+                <tr>
+                    <td style="font-weight:600; padding:14px 12px;">${m[0]}</td>
+                    <td style="color:var(--text-muted);">฿${m[6]||0}</td>
+                    <td style="font-weight:700; font-size:12px; color:${isOut ? '#ef4444':'#10b981'};">${isOut ? l.status_out : l.status_normal}</td>
+                    <td><button class="btn-outline" style="padding:6px 12px;" onclick="handleStockToggle('${m[0]}','${isOut ? 'ปกติ':'หมด'}')">${l.toggle}</button></td>
+                </tr>`;
+            }).join('') || `<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่พบรายการคลังสินค้า</td></tr>`);
+        }
+        
+        // ⭐️ ฟังก์ชันสำหรับปิด/เปิด คลังสินค้ายกหมวดหมู่ ⭐️
+        async function bulkToggleCategoryStock(status) {
+            if(!fullData || !fullData.menu) return;
+            const cat = document.getElementById('stock-category-filter').value;
+            if (cat === 'all') {
+                alert("กรุณาเลือกหมวดหมู่ที่ต้องการทำรายการก่อนครับ");
+                return;
+            }
+            
+            if (!confirm(`ยืนยันตั้งสถานะหมวด "${cat}" เป็น "${status}" ทั้งหมดหรือไม่?`)) return;
+            
+            // หาเมนูที่อยู่ในหมวดหมู่นี้ และสถานะปัจจุบันยังไม่ตรงกับเป้าหมาย (เพื่อลดการยิง API ซ้ำ)
+            const itemsToUpdate = fullData.menu.filter(m => getCategoryFromName(m[0]) === cat && m[5] !== status);
+            
+            if (itemsToUpdate.length === 0) {
+                alert("ไม่มีเมนูที่ต้องอัปเดตสถานะในหมวดหมู่นี้");
+                return;
+            }
+
+            // Optimistic UI Update (เปลี่ยนสีและแสดงผลให้เห็นทันทีที่หน้าจอ)
+            itemsToUpdate.forEach(m => m[5] = status);
+            filterStock();
+
+            // ทยอยยิง API ไปปรับสถานะ
+            for (let m of itemsToUpdate) {
+                try {
+                    await fetch(API_URL, {
+                        method:'POST', mode:'no-cors', 
+                        body:JSON.stringify({action:'updateStock', type:'menu', name:m[0], status:status, apiKey: API_KEY})
+                    });
+                } catch(e) {}
+            }
+            
+            lastFingerprint = "";
+            setTimeout(() => refresh(), 1500);
         }
 
         function drawChart() {

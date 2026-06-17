@@ -54,7 +54,7 @@
         .track-step.active.step-new, .track-step.active.step-cooking, .track-step.active.step-serving { background: #000000; color: #ffffff; }
         .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
         .pill-ordered-more, .pill-waiting-bill { background: #000000; color: #ffffff; border: 1px solid #000000; }
-        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; flex-direction: column; gap: 8px; }
+        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; }
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 700; font-size: 16px; }
 
@@ -77,11 +77,11 @@
         .badge-new-item {
             background: #ef4444; color: #ffffff; padding: 4px 8px; border-radius: 6px;
             font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle;
-            animation: urgentAlertBlink 1s infinite alternate;
+            animation: alertCallBlink 1s infinite alternate;
         }
         
-        .btn-void { background: #fef2f2; border: 1px solid #fca5a5; color: #ef4444; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; }
-        .btn-void:hover { background: #ef4444; color: #ffffff; border-color: #ef4444; }
+        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 8px; }
+        .btn-void:hover { color: #ef4444; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
         .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: var(--text-main); }
         .btn-outline:hover { background: #000000; color: #ffffff; border-color: #000000; }
@@ -109,15 +109,18 @@
         .toast-notify-call { background: #ef4444; box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5); animation: alertCallBlink 0.5s infinite alternate; }
         .toast-notify-new { background: #10b981; box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); animation: alertNewBlink 0.5s infinite alternate; }
         .toast-notify-add { background: #f59e0b; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.5); animation: alertAddBlink 0.5s infinite alternate; }
+        /* ⭐️ สีใหม่ สำหรับแจ้งเตือนขอเช็คบิล ⭐️ */
+        .toast-notify-pay { background: #8b5cf6; box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5); animation: alertPayBlink 0.5s infinite alternate; }
 
         @keyframes alertCallBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
         @keyframes alertNewBlink { from { background: #10b981; } to { background: #064e3b; } }
         @keyframes alertAddBlink { from { background: #f59e0b; } to { background: #78350f; } }
+        @keyframes alertPayBlink { from { background: #8b5cf6; } to { background: #4c1d95; } }
 
         .closing-banner {
             width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: alertCallBlink 0.5s infinite alternate;
         }
-        
+        /* 📱 Mobile & Tablet Responsive CSS */
         @media (max-width: 1024px) {
             .map-grid { grid-template-columns: repeat(10, 1fr); }
             .report-grid { grid-template-columns: 1fr; }
@@ -172,17 +175,13 @@
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            
             osc.type = 'sine';
             osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
             osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.1); 
-            
             gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5); 
-            
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
             osc.start();
             osc.stop(audioCtx.currentTime + 1.5);
         }
@@ -192,20 +191,32 @@
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            
             osc.type = 'square';
             osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            
             gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
             gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.1);
             gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime + 0.2);
             gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.3);
             gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime + 0.4);
             gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.5);
-
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // ⭐️ เสียง 3: เรียกเก็บเงิน/จ่ายตัง (เสียงติ๊ง-ติ๊ง แบบได้เงิน) ⭐️
+        function triggerPaySound() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'triangle'; 
+            osc.frequency.setValueAtTime(987.77, audioCtx.currentTime); // Note B5
+            osc.frequency.setValueAtTime(1318.51, audioCtx.currentTime + 0.1); // Note E6
+            gainNode.gain.setValueAtTime(0.8, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.5);
         }
@@ -218,10 +229,13 @@
             
             if (type === 'call') {
                 triggerCallStaffSound();
-                soundLoopInterval = setInterval(triggerCallStaffSound, 2000); // ดังซ้ำทุก 2 วิ
+                soundLoopInterval = setInterval(triggerCallStaffSound, 2000); 
+            } else if (type === 'pay') {
+                triggerPaySound();
+                soundLoopInterval = setInterval(triggerPaySound, 2000); // ดังซ้ำทุก 2 วิ
             } else {
                 triggerNewOrderSound();
-                soundLoopInterval = setInterval(triggerNewOrderSound, 3000); // ดังซ้ำทุก 3 วิ
+                soundLoopInterval = setInterval(triggerNewOrderSound, 3000); 
             }
         }
 
@@ -264,6 +278,9 @@
             } else if (type === 'add') {
                 msg = `สั่งมาเพิ่ม 🔔 โต๊ะหมายเลข ${tableStr} สั่งเมนูมาเพิ่ม! (คลิกที่นี่เพื่อปิดแจ้งเตือน)`;
                 cssClass = "toast-notify toast-notify-add";
+            } else if (type === 'pay') {
+                msg = `💰 โต๊ะหมายเลข ${tableStr} ขอเช็คบิล! (คลิกที่นี่เพื่อปิดแจ้งเตือน)`;
+                cssClass = "toast-notify toast-notify-pay";
             }
 
             notifyEl.innerText = msg;
@@ -289,6 +306,7 @@
         }
     </script>
     
+    <!-- ⭐️ แถบแจ้งเตือนรวม (สลับสีตามสถานการณ์) ⭐️ -->
     <div id="dynamic-notify" class="toast-notify" onclick="clearDynamicNotify()"></div>
 
     <div class="op-bar">
@@ -660,16 +678,18 @@
             }
         }
 
+        // ⭐️ แสดงออเดอร์ และระบบแจ้งเตือนออเดอร์ใหม่ฉลาดขึ้น ⭐️
         function renderOrders(orders) {
             const store = document.getElementById('order-sec');
             const takeaway = document.getElementById('takeaway-sec');
             const l = langPack[currentLang] || langPack.th;
             let groups = {};
             let globalMistakeDetected = false;
-            
-            // ⭐️ ตัวแปรสำหรับจับอีเวนต์เพื่อยิงแจ้งเตือน
+
+            // ตัวแปรสำหรับเช็คแจ้งเตือน
             let hasFreshNewOrder = false;
             let hasFreshAddedOrder = false;
+            let hasFreshPayRequest = false; // ⭐️ ตัวแปรใหม่ตรวจจับการขอเช็คบิล
             let notifyTableStr = "";
 
             orders.forEach(o => {
@@ -706,7 +726,19 @@
                     let pillClass = "pill-new";
                     let mapColorClass = "map-new";
 
-                    // ⭐️ เช็คเพื่อแสดงแจ้งเตือน (ซ่อนไม่ให้เด้งรัวๆ) ⭐️
+                    // ⭐️ ตรรกะตรวจจับการแจ้งเตือน (ซ่อนไม่ให้เด้งรัวๆ) ⭐️
+                    if (isPayingMode) {
+                        let payKey = `table_${tableId}_paying`;
+                        if (!notifiedOrders.has(payKey)) {
+                            notifiedOrders.add(payKey);
+                            notifyTableStr = tableId;
+                            hasFreshPayRequest = true;
+                        }
+                    } else {
+                        // ถ้าไม่ได้อยู่สถานะจ่ายเงินแล้ว ให้เคลียร์ memory ทิ้ง
+                        notifiedOrders.delete(`table_${tableId}_paying`);
+                    }
+
                     groups[tableId].items.forEach(i => {
                         let isItemNew = (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
                         let isSubsequentItem = (i.time !== firstBatchTime);
@@ -794,42 +826,14 @@
                                         cleanDetails = [...new Set(detailsArray)].join(', ');
                                     }
 
-                                    // ⭐️ สร้างสถานะรายเมนู ⭐️
-                                    let itemStatus = i.status || "รับออเดอร์";
-                                    let itemStatusText = "รอดำเนินการ";
-                                    let itemStatusColor = "#737373";
-
-                                    if (isItemNew) {
-                                        itemStatusText = "รอทำ";
-                                        itemStatusColor = "#f59e0b"; // สีส้ม
-                                    } else if (itemStatus === "กำลังทำ" || itemStatus === "COOK" || itemStatus === "COOKING") {
-                                        itemStatusText = "กำลังทำ";
-                                        itemStatusColor = "#3b82f6"; // สีฟ้า
-                                    } else if (itemStatus === "รอเสิร์ฟ" || itemStatus === "SERVE" || itemStatus === "SERVING") {
-                                        itemStatusText = "เสิร์ฟแล้ว";
-                                        itemStatusColor = "#10b981"; // สีเขียว
-                                    }
-
-                                    let itemStatusBadge = `<span style="font-size:11px; font-weight:800; color:${itemStatusColor}; border:1px solid ${itemStatusColor}; background:rgba(255,255,255,0.8); padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle;">${itemStatusText}</span>`;
-
                                     return `
                                     <div class="item-row" style="align-items:flex-start;">
-                                        <div class="item-info" style="width:100%;">
-                                            <div style="display:flex; justify-content:space-between; width:100%;">
-                                                <div>
-                                                    <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge} ${itemStatusBadge}
-                                                </div>
-                                                <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
-                                            </div>
-                                            
-                                            ${hasDetails ? `<div class="item-details-highlight">${cleanDetails}</div>` : ''}
-                                            
-                                            <div style="margin-top:12px; display:flex; gap:6px; align-items:center;">
-                                                <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#3b82f6; border-color:#bfdbfe;" onclick="handleItemStatusUpdate(${i.rowNum}, 'กำลังทำ')">🍳 เตรียมทำ</button>
-                                                <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#10b981; border-color:#a7f3d0;" onclick="handleItemStatusUpdate(${i.rowNum}, 'รอเสิร์ฟ')">🛎️ เสิร์ฟ</button>
-                                                <button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:0; margin-left:10px;">${l.void}</button>
-                                            </div>
+                                        <div class="item-info">
+                                            <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge}
+                                            ${hasDetails ? `<br><div class="item-details-highlight">${cleanDetails}</div>` : ''}
+                                            <br><button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:8px;">${l.void}</button>
                                         </div>
+                                        <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
                                     </div>`;
                                 }).join('')}
                             </div>
@@ -837,15 +841,14 @@
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-size:22px; font-weight:800;">฿${groups[tableId].total.toLocaleString()}</span>
                                 <div style="display:flex; gap:6px;">
-                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'กำลังทำ')">${l.cook}ทั้งโต๊ะ</button>
-                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}ทั้งโต๊ะ</button>
+                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'กำลังทำ')">${l.cook}</button>
+                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}</button>
                                 </div>
                             </div>
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
                                 <button class="btn-outline" onclick="promptMoveTable('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_move_table || 'ย้ายโต๊ะ'}</button>
                                 <button class="btn-outline" onclick="openManualOrderModal('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_add_item || 'เพิ่มเมนู'}</button>
                             </div>
-                            <button class="btn-outline" onclick="handleVoidTable('${tableId}')" style="margin-top:8px; width:100%; border:1px solid #fca5a5; color:#ef4444; background:#fef2f2; padding:10px; font-weight:700;">ลบทั้งโต๊ะ (ยกเลิกบิล)</button>
                             <button class="btn-black" onclick="openPayModal('${tableId}')" style="margin-top:8px;">${l.collect}</button>
                         </div></div>`;
                 });
@@ -854,47 +857,16 @@
             
             if(store) store.innerHTML = genCards(true);
             if(takeaway) takeaway.innerHTML = genCards(false);
-            
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
 
-            // ⭐️ เรียกการแจ้งเตือนเสียง+แถบ ถ้ามีของใหม่ ⭐️
-            if (hasFreshAddedOrder) {
+            // ⭐️ เรียกลำดับความสำคัญของการแจ้งเตือน ⭐️
+            if (hasFreshPayRequest) {
+                triggerNotify('pay', notifyTableStr);
+            } else if (hasFreshAddedOrder) {
                 triggerNotify('add', notifyTableStr);
             } else if (hasFreshNewOrder) {
                 triggerNotify('new', notifyTableStr);
             }
-        }
-
-        function handleItemStatusUpdate(rowNum, status) {
-            if(fullData && fullData.orders) {
-                let item = fullData.orders.find(o => o.rowNum === rowNum);
-                if(item) item.status = status;
-                renderOrders(fullData.orders);
-            }
-            fetch(API_URL, {
-                method:'POST', mode:'no-cors',
-                body: JSON.stringify({ action:'updateStatus', rowNums: [rowNum], status: status, apiKey: API_KEY })
-            });
-        }
-
-        async function handleVoidTable(tableId) {
-            if(!confirm(`ยืนยันลบออเดอร์ทั้งหมดของโต๊ะ ${tableId} ใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)`)) return;
-            
-            const orderSec = document.getElementById('order-sec');
-            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>กำลังลบออเดอร์ทั้งโต๊ะ...</div>";
-
-            const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
-            if(rows.length === 0) return;
-
-            try {
-                await fetch(API_URL, {
-                    method:'POST', mode:'no-cors',
-                    body: JSON.stringify({ action:'updateStatus', rowNums: rows, status: 'void', apiKey: API_KEY })
-                });
-            } catch(e) { console.error("Void Table Error:", e); }
-            
-            lastFingerprint = "";
-            setTimeout(() => refresh(), 1000);
         }
 
         async function promptMoveTable(oldTable) {
@@ -939,6 +911,7 @@
             safeText('p-table-title', isNaN(tableId) ? tableId : "TABLE " + tableId);
             safeText('p-total-price', "฿" + pTotal.toLocaleString());
 
+            // ⭐️ ทำให้หมายเหตุหน้าจ่ายเงินใหญ่ด้วย และกรองคำซ้ำ ⭐️
             safeHtml('p-bill-items', orders.map(i => {
                 const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
                 let cleanDetails = "";

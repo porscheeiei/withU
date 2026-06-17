@@ -284,8 +284,8 @@
             <div class="stepper">
                 <div class="step" id="st-1"><div class="circle">1</div><b>รับออเดอร์</b></div>
                 <div class="step" id="st-2"><div class="circle">2</div><b>กำลังปรุง</b></div>
-                <div class="step" id="st-3"><div class="circle">3</div><b>จัดเตรียม</b></div>
-                <div class="step" id="st-4"><div class="circle">4</div><b>เสิร์ฟแล้ว</b></div>
+                <div class="step" id="st-3"><div class="circle">3</div><b>กำลังเสิร์ฟ</b></div>
+                <div class="step" id="st-4"><div class="circle">4</div><b>ชำระเงิน</b></div>
             </div>
             <div id="stat-list" style="text-align:left; border-top:1px solid var(--border); padding-top:24px; margin-bottom:32px;"></div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding: 24px; background: var(--gray-light); border-radius: 20px;">
@@ -692,12 +692,41 @@
         }
     }
 
+    // ⭐️ แจ้งแอดมินเมื่อขอเช็คบิล ⭐️
     function clearSession() { document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:24px 8px;"><div style="font-size:64px; margin-bottom:24px;">👋</div><h2 style="font-family:var(--font-head); font-weight:800; font-size:24px; color:var(--primary);">ต้องการเช็คบิล?</h2><p style="color:var(--secondary); margin-bottom:40px; font-size:15px;">เมื่อยืนยัน ระบบจะเรียกพนักงานมาเก็บเงินที่โต๊ะทันที</p><button class="add-cart-btn" style="width:100%;" onclick="executeClearSession()">ยืนยันการเช็คบิล</button><button onclick="document.getElementById('modal').style.display='none'" style="margin-top:16px; background:none; border:none; color:var(--secondary); font-family:var(--font-head); font-weight:700; cursor:pointer; width:100%; padding:12px;">ย้อนกลับ</button></div>`; document.getElementById('modal').style.display = 'flex'; }
     
-    function executeClearSession() { 
-        localStorage.removeItem('withu_table'); 
-        localStorage.removeItem('withu_order_active'); 
-        window.location.href = window.location.pathname; 
+    async function executeClearSession() { 
+        // สั่งให้ขึ้น Loading
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `<div style="text-align:center; padding:60px 0;"><div class="pulse-loader"></div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 22px;">กำลังแจ้งพนักงาน...</h2></div>`;
+        
+        try {
+            // ยิงแจ้งเตือนเช็คบิล (ใช้ action callStaff แต่ใส่เหตุผลเป็น pay)
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ 
+                    action: 'callStaff', 
+                    apiKey: API_KEY, 
+                    table: currentTable, 
+                    reason: 'pay' 
+                }) 
+            });
+            
+            body.innerHTML = `<div style="text-align:center; padding:60px 0;"><div style="font-size:72px; margin-bottom:16px;">💰</div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 24px; color:var(--primary);">กรุณารอสักครู่</h2><p style="color:var(--secondary); font-size:15px; margin-top:8px;">พนักงานกำลังนำบิลไปให้ท่านที่โต๊ะค่ะ</p></div>`;
+            
+            // รอให้ลูกค้าดูข้อความ 3 วิ แล้วค่อยลบ Session และกลับหน้าแรก
+            setTimeout(() => {
+                localStorage.removeItem('withu_table'); 
+                localStorage.removeItem('withu_order_active'); 
+                window.location.href = window.location.pathname; 
+            }, 3000);
+            
+        } catch (e) { 
+            console.error("Payment Request Error:", e);
+            alert("เกิดข้อผิดพลาดในการแจ้งพนักงาน กรุณาลองใหม่อีกครั้ง");
+            document.getElementById('modal').style.display='none';
+        }
     }
     
     function showStatus() { document.getElementById('modal').style.display='none'; document.getElementById('menu-view').style.display='none'; document.getElementById('status-view').style.display='block'; document.getElementById('status-table-no').innerText = currentTable; chk(); if(!sInterval) sInterval = setInterval(chk, 15000); }
@@ -712,7 +741,11 @@
                 if(!autoCloseTimer) {
                     let sec = 30; autoCloseTimer = setInterval(() => {
                         sec--; document.getElementById('auto-close-msg').innerText = `ระบบจะปิดอัตโนมัติใน 00:${sec<10?'0':''}${sec}`;
-                        if(sec <= 0) executeClearSession();
+                        if(sec <= 0) {
+                            localStorage.removeItem('withu_table'); 
+                            localStorage.removeItem('withu_order_active'); 
+                            window.location.href = window.location.pathname;
+                        }
                     }, 1000);
                 } return; 
             }

@@ -54,7 +54,7 @@
         .track-step.active.step-new, .track-step.active.step-cooking, .track-step.active.step-serving { background: #000000; color: #ffffff; }
         .table-status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 900; letter-spacing: 0.3px; display: inline-block; text-transform: uppercase; background: rgba(0, 0, 0, 0.05); color: var(--text-main); border: 1px solid var(--text-main); }
         .pill-ordered-more, .pill-waiting-bill { background: #000000; color: #ffffff; border: 1px solid #000000; }
-        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; }
+        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; align-items: flex-start; flex-direction: column; gap: 8px; }
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 700; font-size: 16px; }
 
@@ -77,11 +77,11 @@
         .badge-new-item {
             background: #ef4444; color: #ffffff; padding: 4px 8px; border-radius: 6px;
             font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle;
-            animation: alertCallBlink 1s infinite alternate;
+            animation: urgentAlertBlink 1s infinite alternate;
         }
         
-        .btn-void { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 8px; }
-        .btn-void:hover { color: #ef4444; }
+        .btn-void { background: #fef2f2; border: 1px solid #fca5a5; color: #ef4444; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; }
+        .btn-void:hover { background: #ef4444; color: #ffffff; border-color: #ef4444; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
         .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: var(--text-main); }
         .btn-outline:hover { background: #000000; color: #ffffff; border-color: #000000; }
@@ -148,9 +148,12 @@
         // ⭐️ ระบบเสียงสังเคราะห์ (Web Audio API) ทะลวงบล็อก Browser 100% ⭐️
         let audioCtx = null;
         let isSoundEnabled = true;
-        let notifiedOrders = new Set(); // ตัวแปรจำว่าเคยแจ้งเตือนออเดอร์ไหนไปแล้วบ้าง
+        let notifiedOrders = new Set(); 
         let currentNotifyTable = "";
         let currentNotifyType = "";
+        
+        // ⭐️ ตัวแปรควบคุมการ Loop เสียง
+        let soundLoopInterval = null; 
 
         function initAudio() {
             if (!audioCtx) {
@@ -165,20 +168,17 @@
         document.body.addEventListener('click', initAudio, { once: true });
 
         // เสียง 1: ออเดอร์ใหม่ (ดังกังวานคล้ายกระดิ่งโรงแรม)
-        function playNewOrderSound() {
-            if (!isSoundEnabled) return;
-            initAudio();
+        function triggerNewOrderSound() {
             if (!audioCtx) return;
-            
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Note A5
-            osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.1); // Note C6
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+            osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.1); 
             
-            gainNode.gain.setValueAtTime(1, audioCtx.currentTime); // ดังสุด 100%
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5); // ลากเสียงยาว 1.5 วินาที
+            gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5); 
             
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
@@ -188,11 +188,8 @@
         }
 
         // เสียง 2: เรียกพนักงาน (จังหวะฉุกเฉิน)
-        function playCallStaffSound() {
-            if (!isSoundEnabled) return;
-            initAudio();
+        function triggerCallStaffSound() {
             if (!audioCtx) return;
-
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
@@ -213,15 +210,41 @@
             osc.stop(audioCtx.currentTime + 0.5);
         }
 
+        // ⭐️ ฟังก์ชันสั่งให้เสียงดังซ้ำๆ วนไปเรื่อยๆ จนกว่าจะกดปิดแถบ
+        function startLoopingSound(type) {
+            if (!isSoundEnabled) return;
+            initAudio();
+            stopLoopingSound(); // เคลียร์ของเก่าก่อนเริ่มใหม่
+            
+            if (type === 'call') {
+                triggerCallStaffSound();
+                soundLoopInterval = setInterval(triggerCallStaffSound, 2000); // ดังซ้ำทุก 2 วิ
+            } else {
+                triggerNewOrderSound();
+                soundLoopInterval = setInterval(triggerNewOrderSound, 3000); // ดังซ้ำทุก 3 วิ
+            }
+        }
+
+        // ⭐️ ฟังก์ชันหยุดเสียง Loop ⭐️
+        function stopLoopingSound() {
+            if (soundLoopInterval) {
+                clearInterval(soundLoopInterval);
+                soundLoopInterval = null;
+            }
+        }
+
         function toggleSound() { 
             isSoundEnabled = !isSoundEnabled; 
             document.getElementById('btn-sound').innerText = isSoundEnabled ? '🔊 SOUND ON' : '🔇 SOUND OFF'; 
             if(isSoundEnabled) {
-                playNewOrderSound(); // เทสเสียงเมื่อกดเปิด
+                initAudio();
+                triggerNewOrderSound(); // เทสเสียงเมื่อกดเปิด
+            } else {
+                stopLoopingSound(); // ถ้าปิดเสียง ให้หยุด Loop ด้วย
             }
         }
 
-        // ⭐️ ฟังก์ชันเปิดแถบแจ้งเตือน (แยกสี/แยกข้อความ) ⭐️
+        // ⭐️ ฟังก์ชันเปิดแถบแจ้งเตือน (แยกสี/แยกข้อความ) และสั่งให้เสียงดังวนลูป ⭐️
         function triggerNotify(type, tableStr) {
             const notifyEl = document.getElementById('dynamic-notify');
             if(!notifyEl) return;
@@ -233,38 +256,39 @@
             let cssClass = "toast-notify";
 
             if (type === 'call') {
-                msg = `ลูกค้า โต๊ะ ${tableStr} กำลังเรียกพนักงานด่วน (คลิกเพื่อปิด)`;
+                msg = `ลูกค้า โต๊ะ ${tableStr} กำลังเรียกพนักงานด่วน (คลิกที่นี่เพื่อปิดแจ้งเตือน)`;
                 cssClass = "toast-notify toast-notify-call";
-                playCallStaffSound();
             } else if (type === 'new') {
-                msg = `มีลูกค้าโต๊ะ ${tableStr} สั่งอาหารมาแล้ว! (คลิกเพื่อปิด)`;
+                msg = `ออเดอร์ใหม่ ✨ มีลูกค้าโต๊ะ ${tableStr} สั่งอาหารมาแล้ว! (คลิกที่นี่เพื่อปิดแจ้งเตือน)`;
                 cssClass = "toast-notify toast-notify-new";
-                playNewOrderSound();
             } else if (type === 'add') {
-                msg = `โต๊ะหมายเลข ${tableStr} สั่งเมนูมาเพิ่ม! (คลิกเพื่อปิด)`;
+                msg = `สั่งมาเพิ่ม 🔔 โต๊ะหมายเลข ${tableStr} สั่งเมนูมาเพิ่ม! (คลิกที่นี่เพื่อปิดแจ้งเตือน)`;
                 cssClass = "toast-notify toast-notify-add";
-                playNewOrderSound();
             }
 
             notifyEl.innerText = msg;
             notifyEl.className = cssClass;
             notifyEl.style.display = 'block';
+
+            startLoopingSound(type); // สั่งเสียง Loop ทำงานทันที
         }
 
-        // ⭐️ ฟังก์ชันล้าง/ปิดแถบแจ้งเตือน ⭐️
+        // ⭐️ ฟังก์ชันกดคลิกที่แถบแจ้งเตือน เพื่อล้างข้อความและหยุดเสียง ⭐️
         function clearDynamicNotify() {
             safeStyle('dynamic-notify', 'display', 'none');
+            stopLoopingSound(); // 🔴 หยุดเสียงแจ้งเตือนที่ดังวนอยู่
+
             // ถ้าเป็นการปิดแจ้งเตือนเรียกพนักงาน ให้ซิงค์ไปหลังบ้านด้วย
             if(currentNotifyType === 'call' && currentNotifyTable) {
                clearedCalls[currentNotifyTable] = true; 
                fetch(API_URL + "?action=clearCall&table=" + currentNotifyTable, { method: 'GET', mode: 'no-cors' });
             }
+            
             currentNotifyType = "";
             currentNotifyTable = "";
         }
     </script>
     
-    <!-- ⭐️ แถบแจ้งเตือนรวม (สลับสีตามสถานการณ์) ⭐️ -->
     <div id="dynamic-notify" class="toast-notify" onclick="clearDynamicNotify()"></div>
 
     <div class="op-bar">
@@ -770,14 +794,42 @@
                                         cleanDetails = [...new Set(detailsArray)].join(', ');
                                     }
 
+                                    // ⭐️ สร้างสถานะรายเมนู ⭐️
+                                    let itemStatus = i.status || "รับออเดอร์";
+                                    let itemStatusText = "รอดำเนินการ";
+                                    let itemStatusColor = "#737373";
+
+                                    if (isItemNew) {
+                                        itemStatusText = "รอทำ";
+                                        itemStatusColor = "#f59e0b"; // สีส้ม
+                                    } else if (itemStatus === "กำลังทำ" || itemStatus === "COOK" || itemStatus === "COOKING") {
+                                        itemStatusText = "กำลังทำ";
+                                        itemStatusColor = "#3b82f6"; // สีฟ้า
+                                    } else if (itemStatus === "รอเสิร์ฟ" || itemStatus === "SERVE" || itemStatus === "SERVING") {
+                                        itemStatusText = "เสิร์ฟแล้ว";
+                                        itemStatusColor = "#10b981"; // สีเขียว
+                                    }
+
+                                    let itemStatusBadge = `<span style="font-size:11px; font-weight:800; color:${itemStatusColor}; border:1px solid ${itemStatusColor}; background:rgba(255,255,255,0.8); padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle;">${itemStatusText}</span>`;
+
                                     return `
                                     <div class="item-row" style="align-items:flex-start;">
-                                        <div class="item-info">
-                                            <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge}
-                                            ${hasDetails ? `<br><div class="item-details-highlight">${cleanDetails}</div>` : ''}
-                                            <br><button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:8px;">${l.void}</button>
+                                        <div class="item-info" style="width:100%;">
+                                            <div style="display:flex; justify-content:space-between; width:100%;">
+                                                <div>
+                                                    <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge} ${itemStatusBadge}
+                                                </div>
+                                                <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
+                                            </div>
+                                            
+                                            ${hasDetails ? `<div class="item-details-highlight">${cleanDetails}</div>` : ''}
+                                            
+                                            <div style="margin-top:12px; display:flex; gap:6px; align-items:center;">
+                                                <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#3b82f6; border-color:#bfdbfe;" onclick="handleItemStatusUpdate(${i.rowNum}, 'กำลังทำ')">🍳 เตรียมทำ</button>
+                                                <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#10b981; border-color:#a7f3d0;" onclick="handleItemStatusUpdate(${i.rowNum}, 'รอเสิร์ฟ')">🛎️ เสิร์ฟ</button>
+                                                <button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:0; margin-left:10px;">${l.void}</button>
+                                            </div>
                                         </div>
-                                        <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
                                     </div>`;
                                 }).join('')}
                             </div>
@@ -785,14 +837,15 @@
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-size:22px; font-weight:800;">฿${groups[tableId].total.toLocaleString()}</span>
                                 <div style="display:flex; gap:6px;">
-                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'กำลังทำ')">${l.cook}</button>
-                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}</button>
+                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'กำลังทำ')">${l.cook}ทั้งโต๊ะ</button>
+                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}ทั้งโต๊ะ</button>
                                 </div>
                             </div>
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
                                 <button class="btn-outline" onclick="promptMoveTable('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_move_table || 'ย้ายโต๊ะ'}</button>
                                 <button class="btn-outline" onclick="openManualOrderModal('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_add_item || 'เพิ่มเมนู'}</button>
                             </div>
+                            <button class="btn-outline" onclick="handleVoidTable('${tableId}')" style="margin-top:8px; width:100%; border:1px solid #fca5a5; color:#ef4444; background:#fef2f2; padding:10px; font-weight:700;">ลบทั้งโต๊ะ (ยกเลิกบิล)</button>
                             <button class="btn-black" onclick="openPayModal('${tableId}')" style="margin-top:8px;">${l.collect}</button>
                         </div></div>`;
                 });
@@ -810,6 +863,38 @@
             } else if (hasFreshNewOrder) {
                 triggerNotify('new', notifyTableStr);
             }
+        }
+
+        function handleItemStatusUpdate(rowNum, status) {
+            if(fullData && fullData.orders) {
+                let item = fullData.orders.find(o => o.rowNum === rowNum);
+                if(item) item.status = status;
+                renderOrders(fullData.orders);
+            }
+            fetch(API_URL, {
+                method:'POST', mode:'no-cors',
+                body: JSON.stringify({ action:'updateStatus', rowNums: [rowNum], status: status, apiKey: API_KEY })
+            });
+        }
+
+        async function handleVoidTable(tableId) {
+            if(!confirm(`ยืนยันลบออเดอร์ทั้งหมดของโต๊ะ ${tableId} ใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)`)) return;
+            
+            const orderSec = document.getElementById('order-sec');
+            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>กำลังลบออเดอร์ทั้งโต๊ะ...</div>";
+
+            const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
+            if(rows.length === 0) return;
+
+            try {
+                await fetch(API_URL, {
+                    method:'POST', mode:'no-cors',
+                    body: JSON.stringify({ action:'updateStatus', rowNums: rows, status: 'void', apiKey: API_KEY })
+                });
+            } catch(e) { console.error("Void Table Error:", e); }
+            
+            lastFingerprint = "";
+            setTimeout(() => refresh(), 1000);
         }
 
         async function promptMoveTable(oldTable) {
@@ -1360,12 +1445,10 @@
             }
         }
         
-        // Auto refresh mechanisms
         setInterval(updateClock, 1000); 
         refresh(); 
         setInterval(refresh, 5000); 
 
-        // Reload the whole page every 15 minutes to prevent memory leaks / browser hang
         setInterval(function() {
             window.location.reload();
         }, 900000);

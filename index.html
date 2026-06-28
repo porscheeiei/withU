@@ -224,9 +224,10 @@
 <div id="app-header" class="top-bar" style="display:none;">
     <div class="brand">WITHU <span>CHILL</span></div>
     <div class="header-actions">
+        <button class="call-btn" onclick="toggleLanguage()" style="background:var(--gray-light); color:var(--primary); margin-right:8px;" id="btn-lang-toggle">EN / TH</button>
         <button class="call-btn" onclick="openCall()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-            เรียกพนักงาน
+            <span data-i18n="call_staff">เรียกพนักงาน</span>
         </button>
         <span id="display-table" class="table-badge"></span>
     </div>
@@ -246,10 +247,10 @@
                 <line x1="9" y1="15" x2="9.01" y2="15" stroke-width="2"></line>
             </svg>
         </div>
-        <h2 style="font-family:var(--font-head); font-weight:800; font-size:26px; margin:0 0 8px 0; color:var(--primary); letter-spacing:-0.03em;">ยินดีต้อนรับครับ</h2>
+        <h2 style="font-family:var(--font-head); font-weight:800; font-size:26px; margin:0 0 8px 0; color:var(--primary); letter-spacing:-0.03em;" data-i18n="welcome">ยินดีต้อนรับครับ</h2>
         <h3 style="font-family:var(--font-head); font-weight:700; font-size:15px; margin:0 0 20px 0; color:var(--gold); text-transform: uppercase;">WITHU CHILL</h3>
-        <p style="color:var(--primary); font-size:15px; font-weight:600; margin-bottom:12px; font-family:var(--font-body); line-height:1.6;">โปรดสแกนคิวอาร์โค้ดของโต๊ะที่ท่านนั่ง เพื่อเข้าสู่เมนู</p>
-        <p style="color:var(--secondary); font-size:13px; margin-bottom:0; font-family:var(--font-body); line-height:1.6;">กรุณาสแกน QR Code ที่ตั้งอยู่บริเวณโต๊ะ ระบบจะพาท่านเข้าสู่หน้าจอการสั่งอาหารโดยอัตโนมัติ<br><br><span style="font-size:12px; font-weight:500;">หากต้องการความช่วยเหลือ กรุณาเรียกพนักงาน</span></p>
+        <p style="color:var(--primary); font-size:15px; font-weight:600; margin-bottom:12px; font-family:var(--font-body); line-height:1.6;" data-i18n="scan_prompt">โปรดสแกนคิวอาร์โค้ดของโต๊ะที่ท่านนั่ง เพื่อเข้าสู่เมนู</p>
+        <p style="color:var(--secondary); font-size:13px; margin-bottom:0; font-family:var(--font-body); line-height:1.6;" data-i18n="scan_sub">กรุณาสแกน QR Code ที่ตั้งอยู่บริเวณโต๊ะ ระบบจะพาท่านเข้าสู่หน้าจอการสั่งอาหารโดยอัตโนมัติ</p>
     </div>
 </div>
 
@@ -280,21 +281,21 @@
     <div class="app-container" style="padding-top:40px;">
         <div class="status-card">
             <h2 class="status-header">Order Table <span id="status-table-no">-</span></h2>
-            <div id="queue-info" class="queue-badge">กำลังซิงค์ข้อมูล...</div>
+            <div id="queue-info" class="queue-badge" data-i18n="syncing">กำลังซิงค์ข้อมูล...</div>
             <div class="stepper">
-                <div class="step" id="st-1"><div class="circle">1</div><b>รับออเดอร์</b></div>
-                <div class="step" id="st-2"><div class="circle">2</div><b>กำลังปรุง</b></div>
-                <div class="step" id="st-3"><div class="circle">3</div><b>กำลังเสิร์ฟ</b></div>
-                <div class="step" id="st-4"><div class="circle">4</div><b>ชำระเงิน</b></div>
+                <div class="step" id="st-1"><div class="circle">1</div><b data-i18n="step_1">รับออเดอร์</b></div>
+                <div class="step" id="st-2"><div class="circle">2</div><b data-i18n="step_2">กำลังปรุง</b></div>
+                <div class="step" id="st-3"><div class="circle">3</div><b data-i18n="step_3">กำลังเสิร์ฟ</b></div>
+                <div class="step" id="st-4"><div class="circle">4</div><b data-i18n="step_4">ชำระเงิน</b></div>
             </div>
             <div id="stat-list" style="text-align:left; border-top:1px solid var(--border); padding-top:24px; margin-bottom:32px;"></div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding: 24px; background: var(--gray-light); border-radius: 20px;">
-                <span style="font-family:var(--font-head); font-weight:700; color:var(--secondary); font-size:16px;">ยอดชำระสุทธิ</span>
+                <span style="font-family:var(--font-head); font-weight:700; color:var(--secondary); font-size:16px;" data-i18n="net_total">ยอดชำระสุทธิ</span>
                 <span style="font-family:var(--font-head); font-weight:900; font-size:28px; color:var(--primary);">฿<span id="stat-sum">0</span></span>
             </div>
             
-            <button class="add-cart-btn" style="width: 100%; margin-bottom: 12px; background: var(--surface); color: var(--primary); border: 2px solid var(--primary); box-shadow: none;" onclick="orderMore()">สั่งสินค้าเพิ่มเติม</button>
-            <button class="btn-finish-red" style="margin-top: 0;" onclick="clearSession()">ต้องการเช็คบิล</button>
+            <button class="add-cart-btn" style="width: 100%; margin-bottom: 12px; background: var(--surface); color: var(--primary); border: 2px solid var(--primary); box-shadow: none;" onclick="orderMore()" data-i18n="order_more">สั่งสินค้าเพิ่มเติม</button>
+            <button class="btn-finish-red" style="margin-top: 0;" onclick="clearSession()" data-i18n="call_bill">ต้องการเช็คบิล</button>
             
             <div id="auto-close-msg" style="margin-top:24px; font-family:var(--font-head); font-size:13px; color:var(--text-light); font-weight:600;"></div>
         </div>
@@ -303,11 +304,11 @@
 
 <div id="cart-bar" class="cart-bar">
     <div class="cart-info">
-        <div class="cart-label">ตะกร้าของคุณ</div>
-        <div class="cart-total"><span id="cart-count">0</span> รายการ</div>
+        <div class="cart-label" data-i18n="cart_title">ตะกร้าของคุณ</div>
+        <div class="cart-total"><span id="cart-count">0</span> <span data-i18n="items">รายการ</span></div>
     </div>
     <button class="btn-checkout-pill" onclick="openReceipt()">
-        ยอดรวม ฿<span id="cart-sum-val">0</span>
+        <span data-i18n="total" style="margin-right:4px;">ยอดรวม</span> ฿<span id="cart-sum-val">0</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
     </button>
 </div>
@@ -323,7 +324,97 @@
     let currentTable = "", cart = [], fullMenu = [], toppingsData = [], toppingsData2 = [], currentS = {}, currentSpicy = {}, itemOpt = {}, itemExpanded = {}, itemQty = {}, currentF = "ทั้งหมด", currentSubF = "ทั้งหมด", currentSearch = "", sInterval, autoCloseTimer;
     let currentBannerIndex = 0, bannerSliderInterval = null, touchStartX = 0, touchEndX = 0;
 
+    let currentLang = localStorage.getItem('withu_lang') || 'th';
+    const customerLangPack = {
+        th: {
+            call_staff: "เรียกพนักงาน", welcome: "ยินดีต้อนรับครับ", scan_prompt: "โปรดสแกนคิวอาร์โค้ดของโต๊ะที่ท่านนั่ง เพื่อเข้าสู่เมนู",
+            scan_sub: "กรุณาสแกน QR Code ที่ตั้งอยู่บริเวณโต๊ะ ระบบจะพาท่านเข้าสู่หน้าจอการสั่งอาหารโดยอัตโนมัติ", search_menu: "ค้นหาเมนูที่คุณชื่นชอบ...",
+            cart_title: "ตะกร้าของคุณ", items: "รายการ", total: "ยอดรวม", order_summary: "ตรวจสอบรายการอาหารก่อนยืนยัน", remove: "นำออก",
+            note_prompt: "ระบุหมายเหตุ (ถ้ามี)", note_placeholder: "เพิ่มหมายเหตุ (เช่น ไม่ใส่ผัก, แยกน้ำแข็ง...)", net_total: "ยอดรวมสุทธิ",
+            confirm_order: "ยืนยันออเดอร์ (Confirm)", order: "Order", syncing: "กำลังซิงค์ข้อมูล...", step_1: "รับออเดอร์", step_2: "กำลังปรุง",
+            step_3: "กำลังเสิร์ฟ", step_4: "ชำระเงิน", order_more: "สั่งสินค้าเพิ่มเติม", home: "หน้าแรก", call_bill: "ต้องการเช็คบิล",
+            call_confirm_title: "ต้องการเช็คบิล?", call_confirm_sub: "เมื่อยืนยัน ระบบจะเรียกพนักงานมาเก็บเงินที่โต๊ะทันที",
+            call_confirm_btn: "ยืนยันการเช็คบิล", back: "ย้อนกลับ", calling: "กำลังแจ้งพนักงาน...", wait_bill: "กรุณารอสักครู่ พนักงานกำลังนำบิลไปให้ท่านที่โต๊ะค่ะ",
+            queue_0: "ออเดอร์ของท่านกำลังดำเนินการเป็นคิวต่อไป", queue_n: "มีออเดอร์ก่อนหน้าท่านอีก {n} คิว", queue_prep: "ออเดอร์ของท่านอยู่ในขั้นตอนการเตรียม",
+            sold_out: "Out of Stock", add_to_cart: "เพิ่มลงตะกร้า", sweetness: "ระดับความหวาน (Sweetness)", spiciness: "ระดับความเผ็ด (Spiciness)",
+            frappe: "เพิ่มปั่น (Frappe)", extra: "พิเศษ (Extra/Upsize)", topping_drink: "เพิ่มท็อปปิ้ง (Add-ons)", topping_food: "เพิ่มท็อปปิ้ง (Toppings)",
+            all: "ทั้งหมด", view_all: "ดูทั้งหมด", drink_desc: "เครื่องดื่มสูตรพรีเมียม รังสรรค์พิเศษ", food_desc: "ปรุงสดใหม่ด้วยวัตถุดิบคัดสรร",
+            call_modal_title: "เรียกพนักงาน", call_modal_sub: "พนักงานของเราจะรีบไปดูแลที่โต๊ะของท่านค่ะ", call_modal_btn: "ยืนยันการเรียก",
+            call_modal_cancel: "ยกเลิก", calling_staff: "Calling Staff...", call_ack: "รับทราบค่ะ", call_coming: "พนักงานกำลังไปดูแลที่โต๊ะ",
+            all_cat: "ทั้งหมด", empty_cart: "ตะกร้าว่างเปล่า", table: "โต๊ะ", price_sign: "฿"
+        },
+        en: {
+            call_staff: "Call Staff", welcome: "Welcome", scan_prompt: "Please scan the QR code on your table to access the menu",
+            scan_sub: "Scan the QR code located on your table to automatically enter the ordering screen.", search_menu: "Search for your favorite menu...",
+            cart_title: "Your Cart", items: "items", total: "Total", order_summary: "Review items before confirming", remove: "Remove",
+            note_prompt: "Add a note (Optional)", note_placeholder: "e.g., No veggies, ice on the side...", net_total: "Net Total",
+            confirm_order: "Confirm Order", order: "Order", syncing: "Syncing data...", step_1: "Order Placed", step_2: "Cooking",
+            step_3: "Serving", step_4: "Payment", order_more: "Order More", home: "Home", call_bill: "Request Bill",
+            call_confirm_title: "Request Bill?", call_confirm_sub: "Staff will come to your table for payment.",
+            call_confirm_btn: "Confirm Request", back: "Back", calling: "Notifying staff...", wait_bill: "Please wait, staff will bring the bill to your table.",
+            queue_0: "Your order is up next.", queue_n: "{n} orders ahead of you.", queue_prep: "Your order is being prepared.",
+            sold_out: "Out of Stock", add_to_cart: "Add to Cart", sweetness: "Sweetness Level", spiciness: "Spiciness Level",
+            frappe: "Frappe (+฿10)", extra: "Extra/Upsize (+฿10)", topping_drink: "Add-ons", topping_food: "Toppings",
+            all: "All", view_all: "View All", drink_desc: "Premium crafted beverage", food_desc: "Freshly cooked with premium ingredients",
+            call_modal_title: "Call Staff", call_modal_sub: "Our staff will attend to you shortly.", call_modal_btn: "Confirm Call",
+            call_modal_cancel: "Cancel", calling_staff: "Calling Staff...", call_ack: "Acknowledged", call_coming: "Staff is on the way",
+            all_cat: "All", empty_cart: "Cart is empty", table: "Table", price_sign: "฿"
+        }
+    };
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'en' ? 'th' : 'en';
+        localStorage.setItem('withu_lang', currentLang);
+        applyLanguagePack();
+        if (fullMenu.length > 0) renderMenu(currentF);
+    }
+
+    function translate(key) {
+        return (customerLangPack[currentLang] && customerLangPack[currentLang][key]) ? customerLangPack[currentLang][key] : key;
+    }
+
+    function applyLanguagePack() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (customerLangPack[currentLang] && customerLangPack[currentLang][key]) {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = customerLangPack[currentLang][key];
+                } else {
+                    el.innerText = customerLangPack[currentLang][key];
+                }
+            }
+        });
+    }
+
+    const menuDictionary = {
+        "เครื่องดื่ม": "Beverages", "ขนมปัง": "Toast", "เมนูเส้น": "Noodles", "เมนูข้าว": "Rice Dishes", "ของทานเล่น": "Appetizers", "เมนูยำ": "Spicy Salads", "หมาล่าทอด": "Fried Mala", "อื่นๆ": "Others",
+        "น้ำเปล่า/น้ำอัดลม": "Water/Sodas", "กาแฟ": "Coffee", "ชา": "Tea", "นม": "Milk", "มัทฉะ": "Matcha", "โกโก้": "Cocoa", "สมูทตี้": "Smoothies", "โซดา": "Soda", "หน้าเดียว": "Single Topping", "ทูโทน": "Two-Tone", "เมนูต้ม": "Boiled/Soup", "เมนูผัด": "Stir-fried", "เมนูแห้ง": "Dry", "ไก่กรอบ": "Crispy Chicken", "ข้าว+ยำ": "Rice & Salad", "กระเพรา": "Basil Stir-fry", "ไข่เจียว": "Omelet", "ทั่วไป": "General",
+        "น้ำเปล่า": "Water", "โค้กกระป๋อง": "Canned Coke", "อเมริกาโน่": "Americano", "อเมริกาโน่ส้ม": "Orange Americano", "อเมริกาโน่สตรอว์เบอร์รี่": "Strawberry Americano", "เอสเพรชโซ": "Espresso", "คาปูชิโน่": "Cappuccino", "คาราเมลมัคคิอาโต้": "Caramel Macchiato", "ลาเต้": "Latte", "มอคค่า": "Mocha", "ชาไทย": "Thai Tea", "ชาเขียว": "Green Tea", "ชาเงาะเบสชาไทย": "Rambutan Thai Tea", "ชาเงาะเบสเขียว": "Rambutan Green Tea", "ชาดำเย็น": "Iced Black Tea", "ชาโกโก้": "Cocoa Tea", "ชามะนาว": "Lemon Tea", "ชานมไต้หวัน": "Taiwanese Milk Tea", "ชาพีช": "Peach Tea", "ชาลิ้นจี่": "Lychee Tea", "ชาเขียวใส": "Clear Green Tea", "ชาไทยลาเต้": "Thai Tea Latte", "ชาเขียวลาเต้": "Green Tea Latte", "นมสด": "Fresh Milk", "นมสดคาราเมล": "Caramel Fresh Milk", "นมสดมิ้นท์": "Mint Fresh Milk", "มิ้นท์ลาเต้": "Mint Latte", "นมชมพู": "Pink Milk", "นมสดสตรอว์เบอร์รี": "Strawberry Fresh Milk", "เพียวมัทฉะ": "Pure Matcha", "มัทฉะลาเต้": "Matcha Latte", "มัทฉะโกโก้": "Matcha Cocoa", "มัทฉะชาไทย": "Matcha Thai Tea", "มัทฉะเอสเพรสโซ": "Matcha Espresso", "มัทฉะสตรอว์เบอร์รี": "Strawberry Matcha", "โกโก้": "Cocoa", "ดาร์กโกโก้": "Dark Cocoa", "โกโก้ลาเต้": "Cocoa Latte", "โกโก้สตรอว์เบอร์รี": "Strawberry Cocoa", "โกโก้มิ้นท์": "Mint Cocoa", "โกโก้คาราเมล": "Caramel Cocoa", "โกโก้นมชมพู": "Pink Milk Cocoa", "โกโก้ชาไทย": "Thai Tea Cocoa", "สตรอว์เบอร์รีสมูทตี้": "Strawberry Smoothie", "สตรอว์เบอร์รีนมสดสมูทตี้": "Strawberry Milk Smoothie", "แตงโมสมูทตี้": "Watermelon Smoothie", "มะม่วงสมูทตี้": "Mango Smoothie", "แดงโซดา": "Red Syrup Soda", "แดงโซดามะนาว": "Red Syrup Lemon Soda", "ลิ้นจี่โซดา": "Lychee Soda", "สตรอว์เบอร์รีโซดา": "Strawberry Soda", "บลูฮาวายโซดา": "Blue Hawaii Soda", "บ๊วยโซดา": "Plum Soda", "บ๊วยเปรี้ยวโซดา": "Sour Plum Soda", "พีชโซดา": "Peach Soda", "มิ้นท์โซดา": "Mint Soda", "ขนมปังหน้าเนยนม": "Butter & Condensed Milk Toast", "ขนมปังหน้าเนยนมคาราเมล": "Butter, Milk & Caramel Toast", "ขนมปังหน้าสังขยา": "Pandan Custard Toast", "ขนมปังหน้าช็อกโกแลต": "Chocolate Toast", "ขนมปังหน้าสตอเบอร์รี่": "Strawberry Toast", "ขนมปังช็อค + เนยนม": "Choc & Butter Milk Toast", "ขนมปังช็อค + สตอเบอร์รี่": "Choc & Strawberry Toast", "ขนมปังช็อค + สังขยา": "Choc & Custard Toast", "ขนมปังเนยนม + สังขยา": "Butter Milk & Custard Toast", "ขนมปังเนยนม + สตอเบอร์รี่": "Butter Milk & Strawberry Toast", "มาม่าต้มยำไก่สับ": "Tom Yum Noodles w/ Minced Chicken", "มาม่าต้มยำทะเล": "Tom Yum Noodles w/ Seafood", "มาม่าต้มยำหน้ารวม": "Tom Yum Noodles Mixed", "มาม่าผัดไข่": "Stir-fried Noodles w/ Egg", "มาม่าผัดกระเพราไก่สับ": "Basil Noodles w/ Minced Chicken", "มาม่าไก่กรอบเกาหลี": "Korean Crispy Chicken Noodles", "มาม่าผัดกระเพราไก่กรอบ": "Basil Noodles w/ Crispy Chicken", "ข้าวแกงกะหรี่ไก่กรอบ": "Crispy Chicken Curry Rice", "ข้าวหน้าไก่กรอบ": "Crispy Chicken Rice", "ข้าวหน้าไก่กรอบเทอริยากิ": "Teriyaki Crispy Chicken Rice", "ข้าวหน้าไก่กรอบซอสเผ็ดเกาหลี": "Spicy Korean Crispy Chicken Rice", "ข้าวหน้าไก่กรอบปาปิก้า": "Paprika Crispy Chicken Rice", "ข้าวหน้าไก่กรอบวิ้งค์แซ่บ": "Spicy Zab Crispy Chicken Rice", "ข้าวหน้าไก่กรอบผงชีส": "Cheese Powder Crispy Chicken Rice", "ข้าวยำไก่แซ่บ": "Spicy Chicken Salad w/ Rice", "ข้าวผัดกระเพราไก่": "Basil Minced Chicken on Rice", "ข้าวผัดกระเพราไก่กรอบ": "Basil Crispy Chicken on Rice", "ข้าวผัดกระเพราหมึก": "Basil Squid on Rice", "ข้าวผัดกระเพรากุ้ง": "Basil Shrimp on Rice", "ข้าวผัดกระเพราเนื้อ": "Basil Beef on Rice", "ข้าวผัดกระเพราทะเล": "Basil Seafood on Rice", "ข้าวไข่เจียวไก่สับ": "Minced Chicken Omelet on Rice", "เฟรนฟราย": "French Fries", "ไส้กรอกแดง": "Red Sausage", "ชีสบอล": "Cheese Balls", "นักเก็ต": "Nuggets", "ไก่ป๊อป": "Chicken Pop", "หอมทอด": "Onion Rings", "เอ็นไก่ทอด": "Fried Chicken Tendons", "ปลาทิพย์": "Fried Fish Sticks", "กะโปะ(สินค้าจากนราธิวาส)": "Fish Crackers", "ปูอัดทอดกรอบ": "Crispy Crab Sticks", "ไก่ทอด": "Fried Chicken", "ยำไก่แซ่บ": "Spicy Chicken Salad", "ยำมาม่า": "Spicy Noodle Salad", "ยำวุ้นเส้น": "Spicy Glass Noodle Salad", "ยำเล็บมือนาง": "Spicy Chicken Feet Salad", "ยำเส้นเล็กไก่ยอ": "Spicy Small Noodle Salad w/ Chicken Roll", "ยำเส้นเล็กกุ้งสด": "Spicy Small Noodle Salad w/ Fresh Shrimp", "ยำไก่ยอ": "Spicy Chicken Roll Salad", "ยำไข่ดาว": "Spicy Fried Egg Salad", "ยำข้าวโพด": "Spicy Corn Salad", "ยำเส้นแก้ว": "Spicy Glass Noodle Salad", "ยำรวมมิตร": "Mixed Spicy Salad", "เนื้อย่าง": "Grilled Beef", "ไส้กรอกอีสาน": "Isan Sausage", "ไก่พันเห็ด": "Mushroom Wrapped w/ Chicken",
+        "บุกบราวน์ชูการ์               ": "Brown Sugar Jelly", "บุกบราวน์ชูการ์": "Brown Sugar Jelly", "ครีมชีส": "Cream Cheese", "ช็อคขูด": "Grated Chocolate", "เฉ๊าก๋วย": "Grass Jelly", "ไซรัปสตอ": "Strawberry Syrup", "ไซรัปคาราเมล": "Caramel Syrup", "ไข่ดาว              ": "Fried Egg", "ไข่ดาว": "Fried Egg", "ไข่เจียว": "Omelet", "ไก่กรอบ": "Crispy Chicken",
+        "ไม่เผ็ด": "Not Spicy", "เผ็ดน้อย": "Mild", "เผ็ดปานกลาง": "Medium", "เผ็ดมาก": "Very Spicy",
+        "หวาน": "Sweet", "ปั่น": "Frappe", "พิเศษ": "Extra", "เผ็ด": "Spicy",
+        "ปกติ": "Normal", "หมด": "Sold Out"
+    };
+
+    function tMenu(text) {
+        if (!text) return "";
+        if (currentLang === 'en') {
+            let t = text.toString().trim();
+            if (menuDictionary[t]) return menuDictionary[t];
+            // Multi-item translations (e.g., "หวาน 100%, ปั่น")
+            let parts = t.split(',').map(p => {
+                p = p.trim();
+                if (p.startsWith("หวาน ")) return "Sweet " + p.replace("หวาน ", "");
+                if (menuDictionary[p]) return menuDictionary[p];
+                return p;
+            });
+            if (parts.join(', ') !== t) return parts.join(', ');
+        }
+        return text;
+    }
+
     window.onload = async () => {
+        applyLanguagePack();
         const urlParams = new URLSearchParams(window.location.search);
         const urlTable = urlParams.get('table');
         
@@ -411,9 +502,9 @@
         if (bannerBlock) bannerBlock.style.display = (f === "ทั้งหมด" && currentSearch === "") ? "block" : "none";
 
         let cats = [...new Set(fullMenu.map(r => r[2] || "อื่นๆ"))];
-        n.innerHTML = `<div onclick="renderMenu('ทั้งหมด')" class="nav-pill ${f==='ทั้งหมด'?'active':''}">ทั้งหมด</div>` + cats.map(c => `<div onclick="renderMenu('${c}')" class="nav-pill ${f===c?'active':''}">${c}</div>`).join('');
+        n.innerHTML = `<div onclick="renderMenu('ทั้งหมด')" class="nav-pill ${f==='ทั้งหมด'?'active':''}">${translate('all_cat')}</div>` + cats.map(c => `<div onclick="renderMenu('${c}')" class="nav-pill ${f===c?'active':''}">${tMenu(c)}</div>`).join('');
         let subCats = [...new Set(fullMenu.filter(r => r[2] === f && r[3] && r[3] !== "").map(r => r[3]))];
-        if (subCats.length > 0) { sn.style.display = 'flex'; sn.innerHTML = `<div onclick="filterSub('ทั้งหมด')" class="sub-pill ${currentSubF==='ทั้งหมด'?'active':''}">ดูทั้งหมด</div>` + subCats.map(sc => `<div onclick="filterSub('${sc}')" class="sub-pill ${currentSubF===sc?'active':''}">${sc}</div>`).join(''); } else { sn.style.display = 'none'; }
+        if (subCats.length > 0) { sn.style.display = 'flex'; sn.innerHTML = `<div onclick="filterSub('ทั้งหมด')" class="sub-pill ${currentSubF==='ทั้งหมด'?'active':''}">${translate('view_all')}</div>` + subCats.map(sc => `<div onclick="filterSub('${sc}')" class="sub-pill ${currentSubF===sc?'active':''}">${tMenu(sc)}</div>`).join(''); } else { sn.style.display = 'none'; }
         updateDisplay();
     }
 
@@ -435,8 +526,8 @@
             let showTopping = false;
             let toppingLabel = "";
             
-            if (isD) { showTopping = true; toppingLabel = "เพิ่มท็อปปิ้ง (Add-ons)"; } 
-            else if (isFoodWithTopping) { showTopping = true; toppingLabel = "เพิ่มท็อปปิ้ง (Toppings2)"; } 
+            if (isD) { showTopping = true; toppingLabel = translate('topping_drink'); } 
+            else if (isFoodWithTopping) { showTopping = true; toppingLabel = translate('topping_food'); } 
             else { showTopping = false; }
             
             let isExp = itemExpanded[idx] || false;
@@ -459,15 +550,15 @@
                     </div>
                     <div class="menu-info">
                         ${badgeHtml}
-                        <h3>${r[0]}</h3>
-                        <div class="menu-desc">${isD ? 'เครื่องดื่มสูตรพรีเมียม รังสรรค์พิเศษ' : 'ปรุงสดใหม่ด้วยวัตถุดิบคัดสรร'}</div>
+                        <h3>${tMenu(r[0])}</h3>
+                        <div class="menu-desc">${isD ? translate('drink_desc') : translate('food_desc')}</div>
                         <div class="price">฿${r[1]}</div>
                     </div>
                 </div>
 
                 ${isAvail && isD ? `
                 <div class="option-section">
-                    <div class="opt-label">ระดับความหวาน (Sweetness)</div>
+                    <div class="opt-label">${translate('sweetness')}</div>
                     <div class="segmented-control">
                         ${['0%','25%','50%','75%','100%'].map(l=>`<div class="seg-btn ${currentS[idx]===l?'active':''}" onclick="setS(${idx},'${l}')">${l}</div>`).join('')}
                     </div>
@@ -475,20 +566,20 @@
                 
                 ${cat === "เครื่องดื่ม" ? `
                 <div class="smoothie-btn ${itemOpt[idx].smoothie?'active':''}" onclick="tS(${idx})">
-                    <span>เพิ่มปั่น (Frappe)</span><span class="price-add">+฿10</span>
+                    <span>${translate('frappe')}</span><span class="price-add">+฿10</span>
                 </div>` : ''}
                 ` : ''}
                 
                 ${isAvail && (isFoodWithTopping || isYumOrSnack) ? `
                 <div class="option-section">
-                    <div class="opt-label">ระดับความเผ็ด (Spiciness)</div>
+                    <div class="opt-label">${translate('spiciness')}</div>
                     <div class="segmented-control">
-                        ${['ไม่เผ็ด','เผ็ดน้อย','เผ็ดปานกลาง','เผ็ดมาก'].map(l=>`<div class="seg-btn ${currentSpicy[idx]===l?'active':''}" onclick="setSpicy(${idx},'${l}')" style="font-size:12px; padding:10px 2px; white-space:nowrap;">${l}</div>`).join('')}
+                        ${['ไม่เผ็ด','เผ็ดน้อย','เผ็ดปานกลาง','เผ็ดมาก'].map(l=>`<div class="seg-btn ${currentSpicy[idx]===l?'active':''}" onclick="setSpicy(${idx},'${l}')" style="font-size:12px; padding:10px 2px; white-space:nowrap;">${tMenu(l)}</div>`).join('')}
                     </div>
                 </div>
                 
                 <div class="special-btn ${itemOpt[idx].special?'active':''}" onclick="tSpecial(${idx})">
-                    <span>พิเศษ (Extra/Upsize)</span><span class="price-add">+฿10</span>
+                    <span>${translate('extra')}</span><span class="price-add">+฿10</span>
                 </div>
                 ` : ''}
 
@@ -505,7 +596,7 @@
                             <div class="top-chip ${isActive ? 'active':''} ${t[2]==='หมด'?'sold-out':''}" onclick="tT(${idx},'${t[0]}')">
                                 <div class="top-chip-name">
                                     ${isActive ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
-                                    ${t[0]}
+                                    ${tMenu(t[0])}
                                 </div>
                                 <span class="top-chip-price">+${t[1]}</span>
                             </div>`;
@@ -525,7 +616,7 @@
                         <button class="lux-btn" onclick="updateQty(${idx},1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                     </div>` : ''}
                     <button class="add-cart-btn" onclick="addC('${r[0]}',${r[1]},${idx},${isD},${isFoodWithTopping || isYumOrSnack})">
-                        ${isAvail ? 'เพิ่มลงตะกร้า' : 'Out of Stock'}
+                        ${isAvail ? translate('add_to_cart') : translate('sold_out')}
                     </button>
                 </div>
             </div>`;
@@ -609,7 +700,7 @@
     function updateUI() { document.getElementById('cart-bar').style.display = cart.length > 0 ? 'flex' : 'none'; let total = cart.reduce((s,i)=>s+i.total,0); document.getElementById('cart-sum-val').innerText = total.toLocaleString(); document.getElementById('cart-count').innerText = cart.length; }
     
     function openReceipt() {
-        let h = `<div class="chk-header"><h2 class="chk-title">Order Summary</h2><p style="color:var(--secondary); font-size:14px; margin-top:4px; font-family:var(--font-body);">ตรวจสอบรายการอาหารก่อนยืนยัน</p></div>`;
+        let h = `<div class="chk-header"><h2 class="chk-title">Order Summary</h2><p style="color:var(--secondary); font-size:14px; margin-top:4px; font-family:var(--font-body);">${translate('order_summary')}</p></div>`;
         cart.forEach((i,idx) => {
             let mObj = fullMenu.find(x => x[0] === i.name);
             let imgUrl = mObj && mObj[4] ? mObj[4] : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=200&auto=format&fit=crop';
@@ -619,26 +710,26 @@
                 <img src="${imgUrl}" class="chk-img">
                 <div class="chk-details">
                     <div class="chk-name-row">
-                        <div class="chk-name"><span class="chk-qty">${i.qty}x</span> ${i.name}</div>
+                        <div class="chk-name"><span class="chk-qty">${i.qty}x</span> ${tMenu(i.name)}</div>
                         <div class="chk-price">฿${i.total.toLocaleString()}</div>
                     </div>
-                    <div class="chk-options">${i.sweetness}</div>
-                    <div class="chk-remove" onclick="rem(${idx})">นำออก</div>
+                    <div class="chk-options">${tMenu(i.sweetness)}</div>
+                    <div class="chk-remove" onclick="rem(${idx})">${translate('remove')}</div>
                 </div>
             </div>`;
         });
         
         h += `<div style="margin: 24px 0 10px 0;">
-                <label class="opt-label" style="font-size:12px; margin-bottom:8px; display:block;">ระบุหมายเหตุ (ถ้ามี)</label>
-                <textarea id="global-note" class="cart-note" rows="2" placeholder="เพิ่มหมายเหตุ (เช่น ไม่ใส่ผัก, แยกน้ำแข็ง...)" style="margin:0;"></textarea>
+                <label class="opt-label" style="font-size:12px; margin-bottom:8px; display:block;">${translate('note_prompt')}</label>
+                <textarea id="global-note" class="cart-note" rows="2" placeholder="${translate('note_placeholder')}" style="margin:0;"></textarea>
               </div>`;
               
         h += `
             <div class="chk-summary">
-                <span class="summary-label">ยอดรวมสุทธิ</span>
-                <span class="summary-total">฿${cart.reduce((s,i)=>s+i.total,0).toLocaleString()}</span>
+                <span class="summary-label">${translate('net_total')}</span>
+                <span class="summary-total">${translate('price_sign')}${cart.reduce((s,i)=>s+i.total,0).toLocaleString()}</span>
             </div>
-            <button class="add-cart-btn" style="margin-top:24px; height: 64px; width: 100%;" onclick="sub()">ยืนยันออเดอร์ (Confirm)</button>`;
+            <button class="add-cart-btn" style="margin-top:24px; height: 64px; width: 100%;" onclick="sub()">${translate('confirm_order')}</button>`;
         document.getElementById('modal-body').innerHTML = h; document.getElementById('modal').style.display = 'flex';
     }
     
@@ -658,11 +749,11 @@
         const payload = { action: 'submitOrder', apiKey: API_KEY, table: currentTable, cart: cart };
 
         localStorage.setItem('withu_order_active', 'true');
-        document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:60px 0;"><div class="pulse-loader"></div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 22px;">Sending Order...</h2></div>`;
+        document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:60px 0;"><div class="pulse-loader"></div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 22px;">${translate('del_sending')}</h2></div>`;
         
         try {
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:60px 0;"><div style="font-size:72px; margin-bottom:16px;">✨</div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 24px; color:var(--primary);">ออเดอร์ส่งถึงครัวแล้ว</h2><p style="color:var(--secondary); font-size:15px; margin-top:8px;">โปรดรอรับอาหารสักครู่นะคะ</p></div>`;
+            document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:60px 0;"><div style="font-size:72px; margin-bottom:16px;">✨</div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 24px; color:var(--primary);">${translate('del_success')}</h2><p style="color:var(--secondary); font-size:15px; margin-top:8px;">${translate('del_wait')}</p></div>`;
             cart = []; updateUI(); setTimeout(() => { showStatus(); }, 2000);
         } catch (e) {
             console.error(e); alert("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง"); openReceipt();
@@ -673,12 +764,12 @@
     
     async function confirmCall() {
         const body = document.getElementById('modal-body');
-        body.innerHTML = `<div style="text-align:center; padding:60px 0;"><div class="pulse-loader"></div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 22px;">Calling Staff...</h2></div>`;
+        body.innerHTML = `<div style="text-align:center; padding:60px 0;"><div class="pulse-loader"></div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 22px;">${translate('calling_staff')}</h2></div>`;
         document.getElementById('modal').style.display = 'flex'; document.getElementById('call-modal').style.display = 'none';
 
         try {
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'callStaff', apiKey: API_KEY, table: currentTable, reason: 'ทั่วไป' }) });
-            body.innerHTML = `<div style="text-align:center; padding:60px 0;"><div style="font-size:72px; margin-bottom:16px;">✨</div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 24px; color:var(--primary);">รับทราบค่ะ</h2><p style="color:var(--secondary); font-size:15px; margin-top:8px;">พนักงานกำลังไปดูแลที่โต๊ะ</p></div>`;
+            body.innerHTML = `<div style="text-align:center; padding:60px 0;"><div style="font-size:72px; margin-bottom:16px;">✨</div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 24px; color:var(--primary);">${translate('call_ack')}</h2><p style="color:var(--secondary); font-size:15px; margin-top:8px;">${translate('call_coming')}</p></div>`;
             setTimeout(() => { document.getElementById('modal').style.display='none'; }, 2000);
         } catch (e) { document.getElementById('modal').style.display='none'; }
     }
@@ -693,12 +784,12 @@
     }
 
     // ⭐️ แจ้งแอดมินเมื่อขอเช็คบิล ⭐️
-    function clearSession() { document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:24px 8px;"><div style="font-size:64px; margin-bottom:24px;">👋</div><h2 style="font-family:var(--font-head); font-weight:800; font-size:24px; color:var(--primary);">ต้องการเช็คบิล?</h2><p style="color:var(--secondary); margin-bottom:40px; font-size:15px;">เมื่อยืนยัน ระบบจะเรียกพนักงานมาเก็บเงินที่โต๊ะทันที</p><button class="add-cart-btn" style="width:100%;" onclick="executeClearSession()">ยืนยันการเช็คบิล</button><button onclick="document.getElementById('modal').style.display='none'" style="margin-top:16px; background:none; border:none; color:var(--secondary); font-family:var(--font-head); font-weight:700; cursor:pointer; width:100%; padding:12px;">ย้อนกลับ</button></div>`; document.getElementById('modal').style.display = 'flex'; }
+    function clearSession() { document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:24px 8px;"><div style="font-size:64px; margin-bottom:24px;">👋</div><h2 style="font-family:var(--font-head); font-weight:800; font-size:24px; color:var(--primary);">${translate('call_confirm_title')}</h2><p style="color:var(--secondary); margin-bottom:40px; font-size:15px;">${translate('call_confirm_sub')}</p><button class="add-cart-btn" style="width:100%;" onclick="executeClearSession()">${translate('call_confirm_btn')}</button><button onclick="document.getElementById('modal').style.display='none'" style="margin-top:16px; background:none; border:none; color:var(--secondary); font-family:var(--font-head); font-weight:700; cursor:pointer; width:100%; padding:12px;">${translate('back')}</button></div>`; document.getElementById('modal').style.display = 'flex'; }
     
     async function executeClearSession() { 
         // สั่งให้ขึ้น Loading
         const body = document.getElementById('modal-body');
-        body.innerHTML = `<div style="text-align:center; padding:60px 0;"><div class="pulse-loader"></div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 22px;">กำลังแจ้งพนักงาน...</h2></div>`;
+        body.innerHTML = `<div style="text-align:center; padding:60px 0;"><div class="pulse-loader"></div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 22px;">${translate('calling')}</h2></div>`;
         
         try {
             // ยิงแจ้งเตือนเช็คบิล (ใช้ action callStaff แต่ใส่เหตุผลเป็น pay)
@@ -713,7 +804,7 @@
                 }) 
             });
             
-            body.innerHTML = `<div style="text-align:center; padding:60px 0;"><div style="font-size:72px; margin-bottom:16px;">💰</div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 24px; color:var(--primary);">กรุณารอสักครู่</h2><p style="color:var(--secondary); font-size:15px; margin-top:8px;">พนักงานกำลังนำบิลไปให้ท่านที่โต๊ะค่ะ</p></div>`;
+            body.innerHTML = `<div style="text-align:center; padding:60px 0;"><div style="font-size:72px; margin-bottom:16px;">💰</div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 24px; color:var(--primary);">${translate('call_ack')}</h2><p style="color:var(--secondary); font-size:15px; margin-top:8px;">${translate('wait_bill')}</p></div>`;
             
             // รอให้ลูกค้าดูข้อความ 3 วิ แล้วค่อยลบ Session และกลับหน้าแรก
             setTimeout(() => {
@@ -755,9 +846,9 @@
             const myRank = allTablesInQueue.indexOf(currentTable.toString());
             const qEl = document.getElementById('queue-info');
             
-            if (myRank === 0) { qEl.innerText = "ออเดอร์ของท่านกำลังดำเนินการเป็นคิวต่อไป"; }
-            else if (myRank > 0) { qEl.innerText = `มีออเดอร์ก่อนหน้าท่านอีก ${myRank} คิว`; }
-            else { qEl.innerText = "ออเดอร์ของท่านอยู่ในขั้นตอนการเตรียม"; }
+            if (myRank === 0) { qEl.innerText = translate('queue_0'); }
+            else if (myRank > 0) { qEl.innerText = translate('queue_n').replace('{n}', myRank); }
+            else { qEl.innerText = translate('queue_prep'); }
 
             let minVal = 4, totalSum = 0; 
             const p = {"active":1, "รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "completed":4, "สำเร็จ":4};
@@ -773,8 +864,8 @@
                 let displayStatus = o.status === 'active' ? 'รับออเดอร์' : (o.status === 'completed' ? 'สำเร็จ' : o.status);
                 let statusColor = displayStatus === 'สำเร็จ' ? 'var(--success)' : 'var(--gold)';
                 return `<div style="display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border); text-align:left; align-items:center;">
-                    <span style="font-family:var(--font-head); font-weight:700; font-size:15px; color:var(--primary);">${o.qty}x ${o.menu}</span>
-                    <b style="color:${statusColor}; font-size:13px; font-weight:700; background:var(--gray-light); padding:6px 12px; border-radius:12px;">${displayStatus}</b>
+                    <span style="font-family:var(--font-head); font-weight:700; font-size:15px; color:var(--primary);">${o.qty}x ${tMenu(o.menu)}</span>
+                    <b style="color:${statusColor}; font-size:13px; font-weight:700; background:var(--gray-light); padding:6px 12px; border-radius:12px;">${tMenu(displayStatus)}</b>
                 </div>`;
             }).join('');
         } catch(e) { console.error("Status check failed", e); }

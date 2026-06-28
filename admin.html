@@ -139,6 +139,57 @@
             .action-btns button { flex: 1; font-size: 10px; padding: 8px 10px; }
             .op-bar { flex-direction: column; gap: 5px; padding: 10px; text-align: center; }
         }
+
+        /* Sidebar styles */
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1999; display: none; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: var(--surface); z-index: 2000;
+            transform: translateX(-100%); transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid var(--border);
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        .sidebar-header {
+            padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+        }
+        .sidebar-logo {
+            font-weight: 800; font-size: 18px; letter-spacing: -0.5px;
+        }
+        .sidebar-close {
+            background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-main);
+        }
+        .sidebar-menu {
+            padding: 15px; flex-grow: 1; display: flex; flex-direction: column; gap: 8px;
+        }
+        .sidebar-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 8px;
+            color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 14px;
+            transition: background 0.2s; border: none; background: transparent; cursor: pointer; text-align: left; width: 100%;
+        }
+        .sidebar-item:hover {
+            background: var(--slate);
+        }
+        .sidebar-item.active {
+            background: var(--slate); border: 1px solid var(--text-main);
+        }
+        .sidebar-item i {
+            font-style: normal; font-size: 18px; width: 24px; text-align: center;
+        }
+        .sidebar-divider {
+            height: 1px; background: var(--border); margin: 10px 0;
+        }
+        .sidebar-footer {
+            padding: 15px; border-top: 1px solid var(--border);
+        }
+        .hamburger-btn {
+            background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-main); margin-right: 15px; display: flex; align-items: center;
+        }
+        .badge {
+            font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: var(--text-main); color: var(--surface); margin-left: auto;
+        }
     </style>
 </head>
 <body>
@@ -304,8 +355,54 @@
             currentNotifyType = "";
             currentNotifyTable = "";
         }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.style.display = 'none', 300);
+            } else {
+                sidebar.classList.add('open');
+                overlay.style.display = 'block';
+                setTimeout(() => overlay.style.opacity = '1', 10);
+            }
+        }
     </script>
     
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">WITHU ADMIN</div>
+            <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+        </div>
+        <div class="sidebar-menu">
+            <button class="sidebar-item" onclick="showSec('orders'); toggleSidebar();" id="sb-orders"><i>🏪</i> ออเดอร์หน้าร้าน</button>
+            <button class="sidebar-item" onclick="showSec('takeaway'); toggleSidebar();" id="sb-takeaway"><i>🛵</i> เดลิเวอรี</button>
+            <button class="sidebar-item" onclick="showSec('stock'); toggleSidebar();" id="sb-stock"><i>📦</i> คลังสินค้า</button>
+            <button class="sidebar-item" onclick="showSec('report'); toggleSidebar();" id="sb-report"><i>📈</i> ผลประกอบการ</button>
+            <div class="sidebar-divider"></div>
+            <button class="sidebar-item" onclick="openManualOrderModal(null); toggleSidebar();"><i>📝</i> สร้างออเดอร์นอกระบบ</button>
+            <button class="sidebar-item" onclick="toggleAttendance(); toggleSidebar();"><i>🧑‍💼</i> ตอกบัตรพนักงาน</button>
+            <div class="sidebar-divider"></div>
+            <button class="sidebar-item" onclick="toggleTheme(); toggleSidebar();"><i>🌗</i> สลับโหมดสี</button>
+            <button class="sidebar-item" onclick="toggleLanguage(); toggleSidebar();"><i>🌐</i> เปลี่ยนภาษา</button>
+            <div class="sidebar-divider"></div>
+            <button class="sidebar-item" onclick="handleLogout()" style="color: #ef4444;"><i>🚪</i> ออกจากระบบ</button>
+        </div>
+    </div>
+
+    <div id="login-overlay" style="position:fixed; inset:0; background:var(--bg); z-index:999999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div style="background:var(--surface); padding:40px; border-radius:12px; box-shadow:var(--shadow); border:1px solid var(--border); width:90%; max-width:400px; text-align:center;">
+            <h2 style="margin:0 0 10px 0; font-size:24px; font-weight:800; letter-spacing:-0.5px;">WITHU ADMIN</h2>
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:25px;">กรุณาใส่รหัส PIN เพื่อเข้าสู่ระบบ</p>
+            <input type="password" id="login-pin" placeholder="PIN" style="width:100%; padding:15px; border-radius:8px; border:1px solid var(--border); font-size:24px; text-align:center; margin-bottom:20px; letter-spacing:10px; font-weight:800;">
+            <button onclick="checkLogin()" class="btn-black" style="width:100%; padding:15px; border-radius:8px; font-size:14px;">LOGIN</button>
+            <p id="login-error" style="color:#ef4444; font-size:13px; font-weight:700; margin-top:15px; display:none;">รหัสผ่านไม่ถูกต้อง!</p>
+        </div>
+    </div>
+
     <div id="dynamic-notify" class="toast-notify" onclick="clearDynamicNotify()"></div>
 
     <div class="op-bar">
@@ -319,7 +416,10 @@
     </div>
 
     <nav class="top-nav">
-        <div class="logo">WITHU ADMIN</div>
+        <div style="display: flex; align-items: center;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+            <div class="logo">WITHU ADMIN</div>
+        </div>
         <div class="action-btns" style="display: flex; gap: 8px;">
             <button class="tab-btn" onclick="toggleLanguage()" style="border: 1px solid #000;" id="btn-lang">EN / TH</button>
             <button class="tab-btn" onclick="openManualOrderModal(null)" id="btn-add-nav">ADD ORDER</button>
@@ -417,7 +517,14 @@
             <h2 id="p-table-title" style="margin:0; font-size:20px; text-transform:uppercase;">TABLE -</h2>
             <div id="p-bill-items" style="margin: 15px 0; border-top: 1px solid var(--border); padding-top: 12px; max-height: 150px; overflow-y: auto;"></div>
             <small style="text-transform: uppercase; font-weight: 700; color: var(--text-muted); font-size: 10px;" id="lbl-total-due">Total Amount</small>
-            <div id="p-total-price" style="font-size: 32px; font-weight: 800; margin: 5px 0 20px 0;">฿0</div>
+            <div id="p-total-price" style="font-size: 32px; font-weight: 800; margin: 5px 0 10px 0;">฿0</div>
+            
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+                <label style="font-size: 12px; font-weight: 700; color: #10b981;">🎁 ระบบสะสมแต้ม (ทุก 50 บาท = 1 แต้ม)</label>
+                <input type="tel" id="p-customer-phone" placeholder="เบอร์โทรศัพท์ลูกค้า (เว้นว่างได้)" style="margin-top: 5px; border-color: #10b981;">
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 5px;" id="p-points-display">แต้มที่จะได้รับ: 0 แต้ม</div>
+            </div>
+
             <div id="p-methods" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <div class="pay-tile" onclick="selectPayMethod('qr')" id="btn-method-qr">PROMPTPAY</div>
                 <div class="pay-tile" onclick="selectPayMethod('cash')" id="btn-method-cash">CASH</div>
@@ -996,6 +1103,11 @@
             
             safeText('p-table-title', isNaN(tableId) ? tableId : "TABLE " + tableId);
             safeText('p-total-price', "฿" + pTotal.toLocaleString());
+            
+            const pointsToEarn = Math.floor(pTotal / 50);
+            const phoneInput = document.getElementById('p-customer-phone');
+            if (phoneInput) phoneInput.value = "";
+            safeText('p-points-display', `แต้มที่จะได้รับ: ${pointsToEarn} แต้ม`);
 
             // ⭐️ ทำให้หมายเหตุหน้าจ่ายเงินใหญ่ด้วย และกรองคำซ้ำ ⭐️
             safeHtml('p-bill-items', orders.map(i => {
@@ -1064,6 +1176,10 @@
             if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ กำลังเคลียร์บิล... รอสักครู่ครับ</div>";
             
             try {
+                const phoneInput = document.getElementById('p-customer-phone');
+                const customerPhone = phoneInput ? phoneInput.value.trim() : "";
+                const earnedPoints = Math.floor(pTotal / 50);
+
                 await fetch(API_URL, {
                     method: 'POST', 
                     mode: 'no-cors', 
@@ -1073,6 +1189,8 @@
                         rowNums: pRows, 
                         paymentMethod: method, 
                         change: actualChange,
+                        customerPhone: customerPhone,
+                        earnedPoints: earnedPoints,
                         apiKey: API_KEY
                     })
                 });
@@ -1591,15 +1709,66 @@
             }
         }
         
-        // Auto refresh mechanisms
-        setInterval(updateClock, 1000); 
-        refresh(); 
-        setInterval(refresh, 5000); 
+        const ADMIN_PIN = "123456";
+        let refreshInterval = null;
+        let clockInterval = null;
+        let reloadInterval = null;
 
-        // Reload the whole page every 15 minutes to prevent memory leaks / browser hang
-        setInterval(function() {
-            window.location.reload();
-        }, 900000);
+        function checkLogin() {
+            const pin = document.getElementById('login-pin').value;
+            if(pin === ADMIN_PIN || pin === API_KEY) {
+                safeStorageSet('withu_admin_logged_in', 'true');
+                document.getElementById('login-overlay').style.display = 'none';
+                initApp();
+            } else {
+                safeStyle('login-error', 'display', 'block');
+                setTimeout(() => safeStyle('login-error', 'display', 'none'), 3000);
+            }
+        }
+
+        function handleLogout() {
+            if(!confirm("ต้องการออกจากระบบใช่หรือไม่?")) return;
+            safeStorageRemove('withu_admin_logged_in');
+            document.getElementById('login-pin').value = '';
+            document.getElementById('login-overlay').style.display = 'flex';
+            
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && sidebar.classList.contains('open')) toggleSidebar();
+            
+            if (refreshInterval) clearInterval(refreshInterval);
+            if (clockInterval) clearInterval(clockInterval);
+            if (reloadInterval) clearInterval(reloadInterval);
+        }
+
+        function initApp() {
+            if (clockInterval) clearInterval(clockInterval);
+            if (refreshInterval) clearInterval(refreshInterval);
+            if (reloadInterval) clearInterval(reloadInterval);
+            
+            updateClock();
+            clockInterval = setInterval(updateClock, 1000); 
+            refresh(); 
+            refreshInterval = setInterval(refresh, 5000); 
+            reloadInterval = setInterval(function() {
+                window.location.reload();
+            }, 900000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if(safeStorageGet('withu_admin_logged_in') === 'true') {
+                document.getElementById('login-overlay').style.display = 'none';
+                initApp();
+            } else {
+                document.getElementById('login-overlay').style.display = 'flex';
+            }
+            
+            const pinInput = document.getElementById('login-pin');
+            if (pinInput) {
+                pinInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') checkLogin();
+                });
+            }
+        });
 
     </script>
 </body>

@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>WITHU | Premium Ordering</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://img1.pic.in.th" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           LUXURY DESIGN SYSTEM 2026
+           ========================================= */
+        :root { 
+            --bg: #FAFAFA;
+            --surface: #FFFFFF;
+            --primary: #111111;
+            --secondary: #666666;
+            --border: #ECECEC;
+            --gold: #C9A86A;
+            --gold-light: #FDFBF7;
+            --success: #16A34A;
+            --danger: #DC2626;
+            --gray-light: #F9F9F9;
+            
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+            --radius-xl: 28px;
+            --radius-pill: 100px;
+            
+            --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.03);
+            --shadow-float: 0 24px 48px rgba(0, 0, 0, 0.08);
+            --glass-blur: blur(30px);
+            
+            --font-head: 'Plus Jakarta Sans', 'Prompt', sans-serif;
+            --font-body: 'Inter', 'Prompt', sans-serif;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); margin: 0; color: var(--primary); font-family: var(--font-body); -webkit-font-smoothing: antialiased; padding-bottom: 120px; letter-spacing: -0.01em; line-height: 1.6; }
+        
+        .app-container { width: 100%; max-width: 600px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- LUXURY TOP BAR --- */
+        .top-bar { 
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); 
+            padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 0.5px solid rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 1000;
+        }
+        .brand { font-family: var(--font-head); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: var(--primary); display: flex; align-items: center; gap: 8px;}
+        .brand span { font-weight: 600; color: var(--gold); font-size: 14px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .table-badge { background: var(--primary); color: #fff; padding: 6px 16px; border-radius: var(--radius-pill); font-family: var(--font-head); font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+        .call-btn { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 8px 16px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 6px; cursor: pointer; transition: var(--transition); font-family: var(--font-head); font-size: 13px; font-weight: 700; }
+        .call-btn:active { transform: scale(0.95); background: var(--gray-light); }
+
+        /* --- APPLE-STYLE SEARCH BAR --- */
+        .search-area { position: sticky; top: 65px; z-index: 950; background: var(--bg); padding: 16px 0 8px 0; }
+        .search-wrapper { position: relative; width: 100%; }
+        .search-input { width: 100%; height: 56px; padding: 0 45px 0 52px; border-radius: 28px; border: 1px solid var(--border); background: var(--surface); font-family: var(--font-body); font-size: 16px; font-weight: 500; color: var(--primary); outline: none; box-shadow: var(--shadow-soft); transition: var(--transition); }
+        .search-input:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(201, 168, 106, 0.1); }
+        .search-input::placeholder { color: var(--secondary); font-weight: 400; }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--secondary); pointer-events: none; transition: var(--transition); }
+        .search-input:focus + .search-icon { color: var(--gold); }
+        
+        .clear-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: var(--border); color: var(--secondary); border-radius: 50%; width: 22px; height: 22px; display: none; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); animation: fadeIn 0.3s ease; }
+        .clear-icon:active { transform: translateY(-50%) scale(0.9); background: var(--secondary); color: var(--surface); }
+
+        /* --- MORPHING CATEGORY NAV --- */
+        #category-nav { display: flex; overflow-x: auto; padding: 8px 20px 16px 20px; scrollbar-width: none; gap: 12px; position: sticky; top: 145px; z-index: 940; background: var(--bg); }
+        #category-nav::-webkit-scrollbar { display: none; }
+        .nav-pill { background: var(--surface); color: var(--secondary); border: 1px solid var(--border); padding: 12px 28px; border-radius: var(--radius-pill); font-family: var(--font-head); font-size: 14px; white-space: nowrap; cursor: pointer; font-weight: 600; transition: var(--transition); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .nav-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+        #sub-category-nav { display: none; overflow-x: auto; padding: 4px 20px 20px 20px; scrollbar-width: none; gap: 8px; animation: slideDown 0.4s ease; position: sticky; top: 212px; z-index: 930; background: var(--bg); }
+        #sub-category-nav::-webkit-scrollbar { display: none; }
+        .sub-pill { background: transparent; color: var(--secondary); padding: 8px 20px; border-radius: var(--radius-pill); font-family: var(--font-head); font-size: 13px; white-space: nowrap; cursor: pointer; font-weight: 600; border: 1px solid var(--border); transition: var(--transition); }
+        .sub-pill.active { background: var(--gray-light); color: var(--primary); border-color: var(--primary); }
+
+        /* --- LUXURY BANNER SECTION --- */
+        .banner-container { width: 100%; position: relative; margin: 8px 0 32px 0; border-radius: 32px; overflow: hidden; box-shadow: var(--shadow-soft); aspect-ratio: 16 / 9; background: var(--surface); }
+        .banner-wrapper { display: flex; width: 100%; height: 100%; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .banner-slide { min-width: 100%; height: 100%; position: relative; }
+        .banner-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .banner-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); }
+        
+        .banner-dots { position: absolute; top: 16px; right: 24px; display: flex; gap: 6px; z-index: 10; }
+        .banner-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); transition: var(--transition); cursor: pointer; }
+        .banner-dot.active { background: #ffffff; width: 18px; border-radius: 4px; }
+
+        /* --- PREMIUM MENU CARD --- */
+        .menu-item { background: var(--surface); border-radius: 28px; padding: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-soft); margin-bottom: 24px; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); transition: var(--transition); position: relative; }
+        .menu-card-core { display: flex; gap: 20px; align-items: stretch; margin-bottom: 20px; }
+        
+        .menu-img-wrap { position: relative; width: 140px; height: 140px; flex-shrink: 0; border-radius: 24px; overflow: hidden; background: var(--gray-light); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .menu-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
+        .menu-item:hover .menu-img { transform: scale(1.08); }
+        
+        .menu-info { display: flex; flex-direction: column; justify-content: center; padding: 4px 0; flex-grow: 1; }
+        .lux-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--gold-light); border: 1px solid rgba(201,168,106,0.2); padding: 4px 10px; border-radius: var(--radius-pill); font-family: var(--font-head); font-size: 10px; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; width: fit-content; }
+        .menu-item h3 { font-family: var(--font-head); margin: 0 0 6px 0; font-size: 18px; font-weight: 700; color: var(--primary); line-height: 1.3; }
+        .menu-desc { font-family: var(--font-body); font-size: 13px; color: var(--secondary); font-weight: 400; line-height: 1.5; margin-bottom: auto; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .price { font-family: var(--font-head); font-weight: 800; font-size: 20px; color: var(--primary); margin-top: 12px; }
+
+        /* --- OPTIONS: SEGMENTED CONTROL --- */
+        .option-section { padding-top: 20px; border-top: 1px solid var(--border); margin-bottom: 20px; }
+        .opt-label { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
+        
+        .segmented-control { display: flex; background: var(--gray-light); padding: 4px; border-radius: 20px; gap: 4px; position: relative; }
+        .seg-btn { flex: 1; text-align: center; padding: 12px 0; border-radius: 16px; font-family: var(--font-head); font-size: 13px; font-weight: 600; color: var(--secondary); cursor: pointer; transition: var(--transition); z-index: 1; position: relative; }
+        .seg-btn.active { color: #fff; font-weight: 700; background: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        /* --- PREMIUM CHIPS FOR TOPPINGS & SPECIALS --- */
+        .smoothie-btn, .special-btn { width: 100%; display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 16px 20px; border-radius: var(--radius-md); font-family: var(--font-head); font-size: 14px; font-weight: 600; color: var(--primary); cursor: pointer; border: 1px solid var(--border); transition: var(--transition); margin-bottom: 16px; }
+        .smoothie-btn.active, .special-btn.active { border-color: var(--gold); background: var(--gold-light); color: var(--gold); box-shadow: 0 4px 15px rgba(201,168,106,0.15); }
+        .smoothie-btn .price-add, .special-btn .price-add { font-weight: 800; }
+
+        .acc-toggle { font-family: var(--font-head); font-size: 14px; color: var(--primary); font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; transition: var(--transition); border-bottom: 1px solid transparent; }
+        .acc-toggle:active { opacity: 0.7; }
+        .topping-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .top-chip { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); border-radius: 18px; padding: 16px; cursor: pointer; transition: var(--transition); background: var(--surface); }
+        .top-chip:active { transform: scale(0.97); }
+        .top-chip.active { border-color: var(--gold); background: var(--gold-light); box-shadow: 0 4px 15px rgba(201,168,106,0.12); }
+        .top-chip-name { display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--primary); }
+        .top-chip-price { font-family: var(--font-head); color: var(--secondary); font-weight: 700; font-size: 13px; }
+        .top-chip.active .top-chip-price { color: var(--gold); }
+
+        /* --- CIRCULAR LUXURY QUANTITY --- */
+        .action-row { display: flex; gap: 16px; align-items: center; margin-top: 24px; }
+        .lux-qty { display: flex; align-items: center; gap: 16px; background: transparent; padding: 0; }
+        .lux-btn { width: 48px; height: 48px; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; font-family: var(--font-head); font-size: 20px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--primary); box-shadow: var(--shadow-soft); transition: var(--transition); }
+        .lux-btn:active { transform: scale(0.9); background: var(--gray-light); }
+        
+        .lux-num { font-family: var(--font-head); font-size: 18px; font-weight: 700; width: 28px; text-align: center; cursor: pointer; transition: color 0.2s; }
+        .lux-num:active { color: var(--gold); }
+        .lux-num-input { width: 45px; text-align: center; border: 1px solid var(--gold); border-radius: 8px; font-family: var(--font-head); font-size: 18px; font-weight: 700; background: var(--surface); color: var(--primary); outline: none; padding: 4px; box-shadow: 0 0 0 3px rgba(201,168,106,0.1); }
+        .lux-num-input::-webkit-outer-spin-button, .lux-num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        /* --- ADD TO CART BUTTON --- */
+        .add-cart-btn { flex: 1; background: var(--primary); color: #fff; border: none; height: 56px; border-radius: 28px; font-family: var(--font-head); font-weight: 700; font-size: 15px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
+        .add-cart-btn:active { transform: scale(0.96); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        /* --- FLOATING LUXURY CART BAR --- */
+        .cart-bar { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 500px; background: rgba(17, 17, 17, 0.85); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); padding: 12px 12px 12px 24px; border-radius: var(--radius-pill); display: none; justify-content: space-between; align-items: center; z-index: 1100; box-shadow: var(--shadow-float); border: 1px solid rgba(255,255,255,0.1); animation: elasticSlideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .cart-info { color: #fff; }
+        .cart-label { font-family: var(--font-body); font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.6); margin-bottom: 2px; }
+        .cart-total { font-family: var(--font-head); font-size: 18px; font-weight: 800; }
+        .btn-checkout-pill { background: #fff; color: var(--primary); border: none; padding: 0 24px; height: 48px; border-radius: 24px; font-family: var(--font-head); font-weight: 800; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px; }
+        .btn-checkout-pill:active { transform: scale(0.95); }
+
+        /* --- CHECKOUT MODAL (CLEAN & PREMIUM) --- */
+        .custom-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); display: none; z-index: 5000; align-items: flex-end; justify-content: center; }
+        .custom-modal { background: var(--surface); width: 100%; max-width: 600px; padding: 40px 24px 48px 24px; border-radius: 32px 32px 0 0; animation: slideUpModal 0.5s cubic-bezier(0.16, 1, 0.3, 1); max-height: 90vh; overflow-y: auto; }
+        
+        .chk-header { margin-bottom: 32px; text-align: center; }
+        .chk-title { font-family: var(--font-head); font-weight: 800; font-size: 24px; margin: 0; color: var(--primary); }
+        
+        .chk-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 0; border-bottom: 1px solid var(--border); gap: 16px; }
+        .chk-img { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; background: var(--gray-light); flex-shrink: 0; }
+        .chk-details { flex-grow: 1; }
+        .chk-name-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+        .chk-name { font-family: var(--font-head); font-weight: 700; font-size: 15px; color: var(--primary); }
+        .chk-price { font-family: var(--font-head); font-weight: 800; font-size: 16px; color: var(--primary); }
+        .chk-options { font-family: var(--font-body); font-size: 13px; color: var(--secondary); margin-bottom: 8px; }
+        .chk-actions { display: flex; align-items: center; gap: 12px; }
+        .chk-remove { color: var(--danger); font-size: 12px; font-weight: 600; font-family: var(--font-head); cursor: pointer; padding: 4px 0; }
+        
+        .cart-note { width: 100%; padding: 16px 20px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--gray-light); font-family: var(--font-body); font-size: 14px; margin: 24px 0; outline: none; resize: none; transition: var(--transition); }
+        .cart-note:focus { border-color: var(--primary); background: var(--surface); box-shadow: var(--shadow-soft); }
+        
+        .chk-summary { background: var(--gray-light); border-radius: 24px; padding: 24px; margin-top: 16px; }
+        .summary-row { display: flex; justify-content: space-between; align-items: center; }
+        .summary-label { font-family: var(--font-body); font-weight: 500; font-size: 14px; color: var(--secondary); }
+        .summary-total { font-family: var(--font-head); font-weight: 900; font-size: 28px; color: var(--primary); }
+
+        /* --- LANDING / WELCOME OVERLAY --- */
+        #table-overlay { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; background: rgba(250,250,250,0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
+        .landing-card { background: var(--surface); padding: 56px 40px; border-radius: 40px; text-align: center; width: 90%; max-width: 420px; box-shadow: var(--shadow-float); border: 1px solid rgba(0,0,0,0.05); animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        /* --- STATUS PAGE --- */
+        .status-card { background: var(--surface); border-radius: 32px; padding: 48px 32px; box-shadow: var(--shadow-float); border: 1px solid var(--border); text-align: center; }
+        .status-header { font-family: var(--font-head); font-weight: 900; font-size: 28px; margin-bottom: 8px; color: var(--primary); letter-spacing: -0.02em; }
+        .queue-badge { font-family: var(--font-head); color: var(--primary); font-weight: 700; font-size: 15px; background: var(--gray-light); padding: 16px; border-radius: var(--radius-md); margin-bottom: 40px; display: inline-block; width: 100%; border: 1px solid var(--border); }
+        
+        .stepper { display: flex; justify-content: space-between; margin: 40px 0; position: relative; }
+        .stepper::before { content: ''; position: absolute; top: 20px; left: 10%; right: 10%; height: 2px; background: var(--border); z-index: 0; }
+        .step { position: relative; z-index: 1; flex: 1; }
+        .circle { width: 40px; height: 40px; background: var(--surface); border: 2px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 800; margin: 0 auto 12px auto; color: var(--text-light); font-size: 14px; transition: var(--transition); }
+        .step.active .circle { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 8px 24px rgba(0,0,0,0.15); transform: scale(1.1); }
+        .step b { font-family: var(--font-head); font-size: 12px; color: var(--secondary); font-weight: 600; display: block; transition: var(--transition); }
+        .step.active b { color: var(--primary); font-weight: 800; }
+        
+        .btn-finish-red { width: 100%; padding: 18px; border-radius: 28px; border: 1px solid var(--border); background: var(--surface); color: var(--danger); font-family: var(--font-head); font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition); margin-top: 12px; }
+        .btn-finish-red:active { background: var(--accent-light); border-color: var(--danger); }
+
+        .pulse-loader { width: 56px; height: 56px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 24px auto; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpModal { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes elasticSlideUp { 0% { transform: translateX(-50%) translateY(100px); opacity: 0; } 60% { transform: translateX(-50%) translateY(-10px); opacity: 1; } 100% { transform: translateX(-50%) translateY(0); opacity: 1; } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .sold-out { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
+        .btn-lang-toggle { background: var(--surface); color: var(--primary); border: 2px solid var(--border); padding: 8px 16px; border-radius: 20px; font-family: var(--font-head); font-weight: 800; font-size: 13px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-soft); margin-right: 8px; }
+        .btn-lang-toggle:hover { border-color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<div id="app-header" class="top-bar" style="display:none;">
+    <div class="brand">WITHU <span>DELIVERY</span></div>
+    <div class="header-actions">
+        <button class="btn-lang-toggle" onclick="toggleLanguage()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            EN / TH
+        </button>
+        <span id="display-table" class="table-badge" style="background:var(--gold); color:#000;"></span>
+    </div>
+</div>
+
+<div id="table-overlay">
+    <div class="landing-card">
+        <div style="margin-bottom: 24px; display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; background: var(--gray-light); border-radius: 20px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5">
+                <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2"></line>
+                <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2"></line>
+                <line x1="15" y1="15" x2="15.01" y2="15" stroke-width="2"></line>
+                <line x1="9" y1="15" x2="9.01" y2="15" stroke-width="2"></line>
+            </svg>
+        </div>
+        <h2 style="font-family:var(--font-head); font-weight:800; font-size:26px; margin:0 0 8px 0; color:var(--primary); letter-spacing:-0.03em;" data-i18n="welcome">ยินดีต้อนรับครับ</h2>
+        <h3 style="font-family:var(--font-head); font-weight:700; font-size:15px; margin:0 0 20px 0; color:var(--gold); text-transform: uppercase;">WITHU CHILL</h3>
+        <p style="color:var(--primary); font-size:15px; font-weight:600; margin-bottom:12px; font-family:var(--font-body); line-height:1.6;" data-i18n="scan_prompt">โปรดสแกนคิวอาร์โค้ดของโต๊ะที่ท่านนั่ง เพื่อเข้าสู่เมนู</p>
+        <p style="color:var(--secondary); font-size:13px; margin-bottom:0; font-family:var(--font-body); line-height:1.6;"><span data-i18n="scan_sub">กรุณาสแกน QR Code ที่ตั้งอยู่บริเวณโต๊ะ ระบบจะพาท่านเข้าสู่หน้าจอการสั่งอาหารโดยอัตโนมัติ</span></p>
+    </div>
+</div>
+
+<div id="menu-view" style="display:none;">
+    <div class="app-container">
+        <div class="search-area">
+            <div class="search-wrapper">
+                <span class="search-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                <input type="text" id="menu-search" class="search-input" placeholder="ค้นหาเมนูที่คุณชื่นชอบ..." oninput="handleSearch()" data-i18n="search_menu">
+                <span id="clear-search" class="clear-icon" onclick="clearSearch()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>
+            </div>
+        </div>
+        
+        <div id="category-nav"></div>
+        <div id="sub-category-nav"></div>
+
+        <div class="banner-container" id="banner-carousel-block">
+            <div class="banner-wrapper" id="banner-track"></div>
+            <div class="banner-overlay"></div>
+            <div class="banner-dots" id="banner-dots"></div>
+        </div>
+
+        <div id="main-content"></div>
+    </div>
+</div>
+
+<div id="status-view" style="display:none;">
+    <div class="app-container" style="padding-top:40px;">
+        <div class="status-card">
+            <h2 class="status-header">Order <span id="status-table-no">-</span></h2>
+            <div id="queue-info" class="queue-badge" data-i18n="syncing">กำลังซิงค์ข้อมูล...</div>
+            <div class="stepper">
+                <div class="step" id="st-1"><div class="circle">1</div><b data-i18n="step_1">รับออเดอร์</b></div>
+                <div class="step" id="st-2"><div class="circle">2</div><b data-i18n="step_2">กำลังปรุง</b></div>
+                <div class="step" id="st-3"><div class="circle">3</div><b data-i18n="step_3_del">กำลังจัดส่ง</b></div>
+                <div class="step" id="st-4"><div class="circle">4</div><b data-i18n="step_4_del">จัดส่งสำเร็จ</b></div>
+            </div>
+            <div id="stat-list" style="text-align:left; border-top:1px solid var(--border); padding-top:24px; margin-bottom:32px;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding: 24px; background: var(--gray-light); border-radius: 20px;">
+                <span style="font-family:var(--font-head); font-weight:700; color:var(--secondary); font-size:16px;" data-i18n="net_total">ยอดชำระสุทธิ</span>
+                <span style="font-family:var(--font-head); font-weight:900; font-size:28px; color:var(--primary);">฿<span id="stat-sum">0</span></span>
+            </div>
+            <button class="add-cart-btn" style="width: 100%; margin-bottom: 12px; background: var(--surface); color: var(--primary); border: 2px solid var(--primary); box-shadow: none;" onclick="orderMore()" data-i18n="home">หน้าแรก</button>
+            
+            <div id="auto-close-msg" style="margin-top:24px; font-family:var(--font-head); font-size:13px; color:var(--text-light); font-weight:600;"></div>
+        </div>
+    </div>
+</div>
+
+<div id="cart-bar" class="cart-bar">
+    <div class="cart-info">
+        <div class="cart-label" data-i18n="cart_title">ตะกร้าของคุณ</div>
+        <div class="cart-total"><span id="cart-count">0</span> <span data-i18n="items">รายการ</span></div>
+    </div>
+    <button class="btn-checkout-pill" onclick="openReceipt()">
+        <span data-i18n="total" style="margin-right:4px;">ยอดรวม</span> ฿<span id="cart-sum-val">0</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+</div>
+
+<div id="modal" class="custom-overlay" onclick="if(event.target==this)this.style.display='none'">
+    <div id="modal-body" class="custom-modal"></div>
+</div>
+
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec"; 
+    const API_KEY = "WITHU_SECRET_2026"; 
+    
+    let currentTable = "", cart = [], fullMenu = [], toppingsData = [], toppingsData2 = [], currentS = {}, currentSpicy = {}, itemOpt = {}, itemExpanded = {}, itemQty = {}, currentF = "ทั้งหมด", currentSubF = "ทั้งหมด", currentSearch = "", sInterval, autoCloseTimer;
+    let currentBannerIndex = 0, bannerSliderInterval = null, touchStartX = 0, touchEndX = 0;
+
+    let currentLang = localStorage.getItem('withu_lang') || 'th';
+    const customerLangPack = {
+        th: {
+            welcome: "ยินดีต้อนรับครับ", scan_prompt: "โปรดสแกนคิวอาร์โค้ดของโต๊ะที่ท่านนั่ง เพื่อเข้าสู่เมนู",
+            scan_sub: "กรุณาสแกน QR Code ที่ตั้งอยู่บริเวณโต๊ะ ระบบจะพาท่านเข้าสู่หน้าจอการสั่งอาหารโดยอัตโนมัติ", search_menu: "ค้นหาเมนูที่คุณชื่นชอบ...",
+            cart_title: "ตะกร้าของคุณ", items: "รายการ", total: "ยอดรวม", order_summary: "ตรวจสอบรายการอาหารก่อนยืนยัน", remove: "นำออก",
+            note_prompt: "ระบุหมายเหตุ/ที่อยู่จัดส่ง", note_placeholder: "ชื่อผู้รับ, เบอร์โทร, ที่อยู่จัดส่ง...", net_total: "ยอดรวมสุทธิ",
+            confirm_order: "ยืนยันออเดอร์ (Confirm)", order: "Order", syncing: "กำลังซิงค์ข้อมูล...", step_1: "รับออเดอร์", step_2: "กำลังปรุง",
+            step_3_del: "กำลังจัดส่ง", step_4_del: "จัดส่งสำเร็จ", order_more: "หน้าแรก", home: "หน้าแรก",
+            queue_0: "ออเดอร์ของท่านกำลังดำเนินการเป็นคิวต่อไป", queue_n: "มีออเดอร์ก่อนหน้าท่านอีก {n} คิว", queue_prep: "ออเดอร์ของท่านอยู่ในขั้นตอนการเตรียม",
+            sold_out: "Out of Stock", add_to_cart: "เพิ่มลงตะกร้า", sweetness: "ระดับความหวาน (Sweetness)", spiciness: "ระดับความเผ็ด (Spiciness)",
+            frappe: "เพิ่มปั่น (Frappe)", extra: "พิเศษ (Extra/Upsize)", topping_drink: "เพิ่มท็อปปิ้ง (Add-ons)", topping_food: "เพิ่มท็อปปิ้ง (Toppings)",
+            all: "ทั้งหมด", view_all: "ดูทั้งหมด", drink_desc: "เครื่องดื่มสูตรพรีเมียม รังสรรค์พิเศษ", food_desc: "ปรุงสดใหม่ด้วยวัตถุดิบคัดสรร",
+            all_cat: "ทั้งหมด", empty_cart: "ตะกร้าว่างเปล่า", table: "โต๊ะ", price_sign: "฿", pay_cash: "เงินสด (Cash)", pay_qr: "สแกนจ่าย (QR Code)",
+            del_sending: "Sending Order...", del_success: "ส่งออเดอร์สำเร็จแล้ว", del_wait: "ระบบได้รับออเดอร์เดลิเวอร์รี่ของท่านแล้ว"
+        },
+        en: {
+            welcome: "Welcome", scan_prompt: "Please scan the QR code on your table to access the menu",
+            scan_sub: "Scan the QR code located on your table to automatically enter the ordering screen.", search_menu: "Search for your favorite menu...",
+            cart_title: "Your Cart", items: "items", total: "Total", order_summary: "Review items before confirming", remove: "Remove",
+            note_prompt: "Delivery Details / Note", note_placeholder: "Name, Phone, Address...", net_total: "Net Total",
+            confirm_order: "Confirm Order", order: "Order", syncing: "Syncing data...", step_1: "Order Placed", step_2: "Cooking",
+            step_3_del: "Delivering", step_4_del: "Delivered", order_more: "Home", home: "Home",
+            queue_0: "Your order is up next.", queue_n: "{n} orders ahead of you.", queue_prep: "Your order is being prepared.",
+            sold_out: "Out of Stock", add_to_cart: "Add to Cart", sweetness: "Sweetness Level", spiciness: "Spiciness Level",
+            frappe: "Frappe (+฿10)", extra: "Extra/Upsize (+฿10)", topping_drink: "Add-ons", topping_food: "Toppings",
+            all: "All", view_all: "View All", drink_desc: "Premium crafted beverage", food_desc: "Freshly cooked with premium ingredients",
+            all_cat: "All", empty_cart: "Cart is empty", table: "Table", price_sign: "฿", pay_cash: "Cash", pay_qr: "QR Scan",
+            del_sending: "Sending Order...", del_success: "Order Placed Successfully", del_wait: "Your delivery order has been received"
+        }
+    };
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'en' ? 'th' : 'en';
+        localStorage.setItem('withu_lang', currentLang);
+        applyLanguagePack();
+        if (fullMenu.length > 0) renderMenu(currentF);
+    }
+
+    function translate(key) {
+        return (customerLangPack[currentLang] && customerLangPack[currentLang][key]) ? customerLangPack[currentLang][key] : key;
+    }
+
+    function applyLanguagePack() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (customerLangPack[currentLang] && customerLangPack[currentLang][key]) {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = customerLangPack[currentLang][key];
+                } else {
+                    el.innerText = customerLangPack[currentLang][key];
+                }
+            }
+        });
+    }
+
+    const menuDictionary = {
+        "เครื่องดื่ม": "Beverages", "ขนมปัง": "Toast", "เมนูเส้น": "Noodles", "เมนูข้าว": "Rice Dishes", "ของทานเล่น": "Appetizers", "เมนูยำ": "Spicy Salads", "หมาล่าทอด": "Fried Mala", "อื่นๆ": "Others",
+        "น้ำเปล่า/น้ำอัดลม": "Water/Sodas", "กาแฟ": "Coffee", "ชา": "Tea", "นม": "Milk", "มัทฉะ": "Matcha", "โกโก้": "Cocoa", "สมูทตี้": "Smoothies", "โซดา": "Soda", "หน้าเดียว": "Single Topping", "ทูโทน": "Two-Tone", "เมนูต้ม": "Boiled/Soup", "เมนูผัด": "Stir-fried", "เมนูแห้ง": "Dry", "ไก่กรอบ": "Crispy Chicken", "ข้าว+ยำ": "Rice & Salad", "กระเพรา": "Basil Stir-fry", "ไข่เจียว": "Omelet", "ทั่วไป": "General",
+        "น้ำเปล่า": "Water", "โค้กกระป๋อง": "Canned Coke", "อเมริกาโน่": "Americano", "อเมริกาโน่ส้ม": "Orange Americano", "อเมริกาโน่สตรอว์เบอร์รี่": "Strawberry Americano", "เอสเพรชโซ": "Espresso", "คาปูชิโน่": "Cappuccino", "คาราเมลมัคคิอาโต้": "Caramel Macchiato", "ลาเต้": "Latte", "มอคค่า": "Mocha", "ชาไทย": "Thai Tea", "ชาเขียว": "Green Tea", "ชาเงาะเบสชาไทย": "Rambutan Thai Tea", "ชาเงาะเบสเขียว": "Rambutan Green Tea", "ชาดำเย็น": "Iced Black Tea", "ชาโกโก้": "Cocoa Tea", "ชามะนาว": "Lemon Tea", "ชานมไต้หวัน": "Taiwanese Milk Tea", "ชาพีช": "Peach Tea", "ชาลิ้นจี่": "Lychee Tea", "ชาเขียวใส": "Clear Green Tea", "ชาไทยลาเต้": "Thai Tea Latte", "ชาเขียวลาเต้": "Green Tea Latte", "นมสด": "Fresh Milk", "นมสดคาราเมล": "Caramel Fresh Milk", "นมสดมิ้นท์": "Mint Fresh Milk", "มิ้นท์ลาเต้": "Mint Latte", "นมชมพู": "Pink Milk", "นมสดสตรอว์เบอร์รี": "Strawberry Fresh Milk", "เพียวมัทฉะ": "Pure Matcha", "มัทฉะลาเต้": "Matcha Latte", "มัทฉะโกโก้": "Matcha Cocoa", "มัทฉะชาไทย": "Matcha Thai Tea", "มัทฉะเอสเพรสโซ": "Matcha Espresso", "มัทฉะสตรอว์เบอร์รี": "Strawberry Matcha", "โกโก้": "Cocoa", "ดาร์กโกโก้": "Dark Cocoa", "โกโก้ลาเต้": "Cocoa Latte", "โกโก้สตรอว์เบอร์รี": "Strawberry Cocoa", "โกโก้มิ้นท์": "Mint Cocoa", "โกโก้คาราเมล": "Caramel Cocoa", "โกโก้นมชมพู": "Pink Milk Cocoa", "โกโก้ชาไทย": "Thai Tea Cocoa", "สตรอว์เบอร์รีสมูทตี้": "Strawberry Smoothie", "สตรอว์เบอร์รีนมสดสมูทตี้": "Strawberry Milk Smoothie", "แตงโมสมูทตี้": "Watermelon Smoothie", "มะม่วงสมูทตี้": "Mango Smoothie", "แดงโซดา": "Red Syrup Soda", "แดงโซดามะนาว": "Red Syrup Lemon Soda", "ลิ้นจี่โซดา": "Lychee Soda", "สตรอว์เบอร์รีโซดา": "Strawberry Soda", "บลูฮาวายโซดา": "Blue Hawaii Soda", "บ๊วยโซดา": "Plum Soda", "บ๊วยเปรี้ยวโซดา": "Sour Plum Soda", "พีชโซดา": "Peach Soda", "มิ้นท์โซดา": "Mint Soda", "ขนมปังหน้าเนยนม": "Butter & Condensed Milk Toast", "ขนมปังหน้าเนยนมคาราเมล": "Butter, Milk & Caramel Toast", "ขนมปังหน้าสังขยา": "Pandan Custard Toast", "ขนมปังหน้าช็อกโกแลต": "Chocolate Toast", "ขนมปังหน้าสตอเบอร์รี่": "Strawberry Toast", "ขนมปังช็อค + เนยนม": "Choc & Butter Milk Toast", "ขนมปังช็อค + สตอเบอร์รี่": "Choc & Strawberry Toast", "ขนมปังช็อค + สังขยา": "Choc & Custard Toast", "ขนมปังเนยนม + สังขยา": "Butter Milk & Custard Toast", "ขนมปังเนยนม + สตอเบอร์รี่": "Butter Milk & Strawberry Toast", "มาม่าต้มยำไก่สับ": "Tom Yum Noodles w/ Minced Chicken", "มาม่าต้มยำทะเล": "Tom Yum Noodles w/ Seafood", "มาม่าต้มยำหน้ารวม": "Tom Yum Noodles Mixed", "มาม่าผัดไข่": "Stir-fried Noodles w/ Egg", "มาม่าผัดกระเพราไก่สับ": "Basil Noodles w/ Minced Chicken", "มาม่าไก่กรอบเกาหลี": "Korean Crispy Chicken Noodles", "มาม่าผัดกระเพราไก่กรอบ": "Basil Noodles w/ Crispy Chicken", "ข้าวแกงกะหรี่ไก่กรอบ": "Crispy Chicken Curry Rice", "ข้าวหน้าไก่กรอบ": "Crispy Chicken Rice", "ข้าวหน้าไก่กรอบเทอริยากิ": "Teriyaki Crispy Chicken Rice", "ข้าวหน้าไก่กรอบซอสเผ็ดเกาหลี": "Spicy Korean Crispy Chicken Rice", "ข้าวหน้าไก่กรอบปาปิก้า": "Paprika Crispy Chicken Rice", "ข้าวหน้าไก่กรอบวิ้งค์แซ่บ": "Spicy Zab Crispy Chicken Rice", "ข้าวหน้าไก่กรอบผงชีส": "Cheese Powder Crispy Chicken Rice", "ข้าวยำไก่แซ่บ": "Spicy Chicken Salad w/ Rice", "ข้าวผัดกระเพราไก่": "Basil Minced Chicken on Rice", "ข้าวผัดกระเพราไก่กรอบ": "Basil Crispy Chicken on Rice", "ข้าวผัดกระเพราหมึก": "Basil Squid on Rice", "ข้าวผัดกระเพรากุ้ง": "Basil Shrimp on Rice", "ข้าวผัดกระเพราเนื้อ": "Basil Beef on Rice", "ข้าวผัดกระเพราทะเล": "Basil Seafood on Rice", "ข้าวไข่เจียวไก่สับ": "Minced Chicken Omelet on Rice", "เฟรนฟราย": "French Fries", "ไส้กรอกแดง": "Red Sausage", "ชีสบอล": "Cheese Balls", "นักเก็ต": "Nuggets", "ไก่ป๊อป": "Chicken Pop", "หอมทอด": "Onion Rings", "เอ็นไก่ทอด": "Fried Chicken Tendons", "ปลาทิพย์": "Fried Fish Sticks", "กะโปะ(สินค้าจากนราธิวาส)": "Fish Crackers", "ปูอัดทอดกรอบ": "Crispy Crab Sticks", "ไก่ทอด": "Fried Chicken", "ยำไก่แซ่บ": "Spicy Chicken Salad", "ยำมาม่า": "Spicy Noodle Salad", "ยำวุ้นเส้น": "Spicy Glass Noodle Salad", "ยำเล็บมือนาง": "Spicy Chicken Feet Salad", "ยำเส้นเล็กไก่ยอ": "Spicy Small Noodle Salad w/ Chicken Roll", "ยำเส้นเล็กกุ้งสด": "Spicy Small Noodle Salad w/ Fresh Shrimp", "ยำไก่ยอ": "Spicy Chicken Roll Salad", "ยำไข่ดาว": "Spicy Fried Egg Salad", "ยำข้าวโพด": "Spicy Corn Salad", "ยำเส้นแก้ว": "Spicy Glass Noodle Salad", "ยำรวมมิตร": "Mixed Spicy Salad", "เนื้อย่าง": "Grilled Beef", "ไส้กรอกอีสาน": "Isan Sausage", "ไก่พันเห็ด": "Mushroom Wrapped w/ Chicken",
+        "บุกบราวน์ชูการ์               ": "Brown Sugar Jelly", "บุกบราวน์ชูการ์": "Brown Sugar Jelly", "ครีมชีส": "Cream Cheese", "ช็อคขูด": "Grated Chocolate", "เฉ๊าก๋วย": "Grass Jelly", "ไซรัปสตอ": "Strawberry Syrup", "ไซรัปคาราเมล": "Caramel Syrup", "ไข่ดาว              ": "Fried Egg", "ไข่ดาว": "Fried Egg", "ไข่เจียว": "Omelet", "ไก่กรอบ": "Crispy Chicken",
+        "ไม่เผ็ด": "Not Spicy", "เผ็ดน้อย": "Mild", "เผ็ดปานกลาง": "Medium", "เผ็ดมาก": "Very Spicy",
+        "หวาน": "Sweet", "ปั่น": "Frappe", "พิเศษ": "Extra", "เผ็ด": "Spicy",
+        "ปกติ": "Normal", "หมด": "Sold Out"
+    };
+
+    function tMenu(text) {
+        if (!text) return "";
+        if (currentLang === 'en') {
+            let t = text.toString().trim();
+            if (menuDictionary[t]) return menuDictionary[t];
+            let parts = t.split(',').map(p => {
+                p = p.trim();
+                if (p.startsWith("หวาน ")) return "Sweet " + p.replace("หวาน ", "");
+                if (menuDictionary[p]) return menuDictionary[p];
+                return p;
+            });
+            if (parts.join(', ') !== t) return parts.join(', ');
+        }
+        return text;
+    }
+
+    window.onload = async () => {
+        applyLanguagePack();
+        if (localStorage.getItem('withu_table') && localStorage.getItem('withu_order_active') === 'true') { 
+            currentTable = localStorage.getItem('withu_table'); 
+            startApp(); 
+            showStatus(); 
+        } else {
+            currentTable = "ORD-" + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem('withu_table', currentTable);
+            startApp();
+        }
+    }
+
+    function startApp() { document.getElementById("display-table").innerText = currentTable; const overlay = document.getElementById("table-overlay"); if (overlay) overlay.style.display = "none"; document.getElementById("menu-view").style.display = "block"; document.getElementById("app-header").style.display = "flex"; loadMenu(); }
+
+    async function loadMenu() { 
+        const cachedMenu = localStorage.getItem('withu_cached_menu');
+        if(cachedMenu) { 
+            const d = JSON.parse(cachedMenu); 
+            fullMenu = d.menu; 
+            toppingsData = d.toppings || []; 
+            toppingsData2 = d.toppings2 || []; 
+            renderMenu("ทั้งหมด"); 
+            if(d.banners) renderBanners(d.banners); 
+        }
+        fetch(API_URL + "?action=getMenu").then(r=>r.json()).then(d=>{
+            if(d.menu) { 
+                localStorage.setItem('withu_cached_menu', JSON.stringify(d)); 
+                fullMenu = d.menu; 
+                toppingsData = d.toppings || []; 
+                toppingsData2 = d.toppings2 || []; 
+                renderMenu(currentF); 
+                renderBanners(d.banners); 
+            }
+        });
+    }
+
+    function renderBanners(bannersArray) {
+        const track = document.getElementById("banner-track");
+        const dotsContainer = document.getElementById("banner-dots");
+        if (!track || !dotsContainer) return;
+        let defaultBanners = [ "https://img1.pic.in.th/images/eiei-3.md.png", "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1920&auto=format&fit=crop" ];
+        let targetBanners = (bannersArray && bannersArray.length > 0) ? bannersArray : defaultBanners;
+        track.innerHTML = targetBanners.map(url => `<div class="banner-slide"><img src="${url}" loading="lazy" alt="Banner"></div>`).join('');
+        dotsContainer.innerHTML = targetBanners.map((_, i) => `<div class="banner-dot ${i===0?'active':''}" onclick="moveToBanner(${i})"></div>`).join('');
+        currentBannerIndex = 0; updateBannerPosition();
+        if (bannerSliderInterval) clearInterval(bannerSliderInterval);
+        if (targetBanners.length > 1) { bannerSliderInterval = setInterval(autoSlideBanners, 4000); setupBannerTouchEvents(); }
+    }
+
+    function autoSlideBanners() { const slides = document.querySelectorAll(".banner-slide"); if (slides.length === 0) return; currentBannerIndex = (currentBannerIndex + 1) % slides.length; updateBannerPosition(); }
+    function moveToBanner(index) { currentBannerIndex = index; updateBannerPosition(); if (bannerSliderInterval) { clearInterval(bannerSliderInterval); bannerSliderInterval = setInterval(autoSlideBanners, 4000); } }
+    function updateBannerPosition() {
+        const track = document.getElementById("banner-track"); const dots = document.querySelectorAll(".banner-dot");
+        if (!track) return; track.style.transform = `translateX(-${currentBannerIndex * 100}%)`;
+        dots.forEach((dot, idx) => dot.classList.toggle("active", idx === currentBannerIndex));
+    }
+
+    function setupBannerTouchEvents() {
+        const container = document.getElementById("banner-carousel-block"); if (!container) return;
+        container.addEventListener("touchstart", e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+        container.addEventListener("touchend", e => { touchEndX = e.changedTouches[0].screenX; handleBannerSwipe(); }, {passive: true});
+    }
+
+    function handleBannerSwipe() {
+        const slides = document.querySelectorAll(".banner-slide"); if (slides.length <= 1) return;
+        if (touchStartX - touchEndX > 50) { currentBannerIndex = (currentBannerIndex + 1) % slides.length; updateBannerPosition(); } 
+        else if (touchEndX - touchStartX > 50) { currentBannerIndex = (currentBannerIndex - 1 + slides.length) % slides.length; updateBannerPosition(); }
+    }
+
+    function renderMenu(f) {
+        currentF = f; currentSubF = "ทั้งหมด";
+        const n = document.getElementById('category-nav'); const sn = document.getElementById('sub-category-nav');
+        const bannerBlock = document.getElementById('banner-carousel-block');
+        if (bannerBlock) bannerBlock.style.display = (f === "ทั้งหมด" && currentSearch === "") ? "block" : "none";
+
+        let cats = [...new Set(fullMenu.map(r => r[2] || "อื่นๆ"))];
+        n.innerHTML = `<div onclick="renderMenu('ทั้งหมด')" class="nav-pill ${f==='ทั้งหมด'?'active':''}">${translate('all_cat')}</div>` + cats.map(c => `<div onclick="renderMenu('${c}')" class="nav-pill ${f===c?'active':''}">${tMenu(c)}</div>`).join('');
+        let subCats = [...new Set(fullMenu.filter(r => r[2] === f && r[3] && r[3] !== "").map(r => r[3]))];
+        if (subCats.length > 0) { sn.style.display = 'flex'; sn.innerHTML = `<div onclick="filterSub('ทั้งหมด')" class="sub-pill ${currentSubF==='ทั้งหมด'?'active':''}">${translate('view_all')}</div>` + subCats.map(sc => `<div onclick="filterSub('${sc}')" class="sub-pill ${currentSubF===sc?'active':''}">${tMenu(sc)}</div>`).join(''); } else { sn.style.display = 'none'; }
+        updateDisplay();
+    }
+
+    function filterSub(sc) { currentSubF = sc; document.querySelectorAll('.sub-pill').forEach(p => p.classList.toggle('active', p.innerText === sc || (sc === "ทั้งหมด" && p.innerText === "ดูทั้งหมด"))); updateDisplay(); }
+
+    function updateDisplay() {
+        const m = document.getElementById('main-content');
+        const filtered = fullMenu.filter(r => (currentF === "ทั้งหมด" || r[2] === currentF) && (currentSubF === "ทั้งหมด" || r[3] === currentSubF) && r[0].toLowerCase().includes(currentSearch));
+        
+        m.innerHTML = filtered.map((r) => {
+            const idx = fullMenu.findIndex(item => item[0] === r[0]);
+            
+            let isAvail = (r[5] !== "หมด");
+            let cat = r[2] || "";
+            let isD = (cat === "เครื่องดื่ม" || cat === "สมูทตี้");
+            let isFoodWithTopping = (cat === "เมนูเส้น" || cat === "เมนูข้าว"); 
+            let isYumOrSnack = (cat === "เมนูยำ" || cat === "ยำ" || cat === "ของทานเล่น");
+            
+            let showTopping = false;
+            let toppingLabel = "";
+            
+            if (isD) { showTopping = true; toppingLabel = "เพิ่มท็อปปิ้ง (Add-ons)"; } 
+            else if (isFoodWithTopping) { showTopping = true; toppingLabel = "เพิ่มท็อปปิ้ง (Toppings2)"; } 
+            else { showTopping = false; }
+            
+            let isExp = itemExpanded[idx] || false;
+            
+            if(!itemQty[idx]) itemQty[idx] = 1; 
+            if(isD && !currentS[idx]) currentS[idx] = "100%"; 
+            if((isFoodWithTopping || isYumOrSnack) && !currentSpicy[idx]) currentSpicy[idx] = "เผ็ดปานกลาง"; 
+            if(!itemOpt[idx]) itemOpt[idx] = { toppings: [], smoothie: false, special: false }; 
+            
+            let badgeText = r[7] ? r[7].toString().trim() : "";
+            let badgeHtml = badgeText ? `<span class="lux-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> ${badgeText}</span>` : "";
+
+            let currentToppingsList = isD ? toppingsData : toppingsData2;
+
+            return `
+            <div class="menu-item ${isAvail ? '' : 'sold-out'}">
+                <div class="menu-card-core">
+                    <div class="menu-img-wrap">
+                        <img src="${r[4]||'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=400&auto=format&fit=crop'}" class="menu-img" loading="lazy" decoding="async">
+                    </div>
+                    <div class="menu-info">
+                        ${badgeHtml}
+                        <h3>${tMenu(r[0])}</h3>
+                        <div class="menu-desc">${isD ? translate('drink_desc') : translate('food_desc')}</div>
+                        <div class="price">฿${r[1]}</div>
+                    </div>
+                </div>
+
+                ${isAvail && isD ? `
+                <div class="option-section">
+                    <div class="opt-label">${translate('sweetness')}</div>
+                    <div class="segmented-control">
+                        ${['0%','25%','50%','75%','100%'].map(l=>`<div class="seg-btn ${currentS[idx]===l?'active':''}" onclick="setS(${idx},'${l}')">${l}</div>`).join('')}
+                    </div>
+                </div>
+                
+                ${cat === "เครื่องดื่ม" ? `
+                <div class="smoothie-btn ${itemOpt[idx].smoothie?'active':''}" onclick="tS(${idx})">
+                    <span>${translate('frappe')}</span><span class="price-add">+฿10</span>
+                </div>` : ''}
+                ` : ''}
+                
+                ${isAvail && (isFoodWithTopping || isYumOrSnack) ? `
+                <div class="option-section">
+                    <div class="opt-label">${translate('spiciness')}</div>
+                    <div class="segmented-control">
+                        ${['ไม่เผ็ด','เผ็ดน้อย','เผ็ดปานกลาง','เผ็ดมาก'].map(l=>`<div class="seg-btn ${currentSpicy[idx]===l?'active':''}" onclick="setSpicy(${idx},'${l}')" style="font-size:12px; padding:10px 2px; white-space:nowrap;">${tMenu(l)}</div>`).join('')}
+                    </div>
+                </div>
+                
+                <div class="special-btn ${itemOpt[idx].special?'active':''}" onclick="tSpecial(${idx})">
+                    <span>${translate('extra')}</span><span class="price-add">+฿10</span>
+                </div>
+                ` : ''}
+
+                ${isAvail && showTopping ? `
+                <div class="acc-toggle" onclick="toggleAcc(${idx})">
+                    <span>${toppingLabel}</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: ${isExp ? 'rotate(180deg)' : 'none'}; transition: 0.3s;"><path d="M6 9l6 6 6-6"/></svg>
+                </div>
+                <div style="display:${isExp?'block':'none'}">
+                    <div class="topping-grid">
+                        ${currentToppingsList.map(t => {
+                            const isActive = itemOpt[idx].toppings.includes(t[0]);
+                            return `
+                            <div class="top-chip ${isActive ? 'active':''} ${t[2]==='หมด'?'sold-out':''}" onclick="tT(${idx},'${t[0]}')">
+                                <div class="top-chip-name">
+                                    ${isActive ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+                                    ${tMenu(t[0])}
+                                </div>
+                                <span class="top-chip-price">+${t[1]}</span>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="action-row">
+                    ${isAvail ? `
+                    <div class="lux-qty">
+                        <button class="lux-btn" onclick="updateQty(${idx},-1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        
+                        <span class="lux-num" id="qty-lbl-${idx}" onclick="editQty(${idx})">${itemQty[idx]}</span>
+                        <input type="number" class="lux-num-input" id="qty-inp-${idx}" style="display:none;" value="${itemQty[idx]}" onblur="saveQty(${idx})" onkeypress="if(event.key==='Enter') saveQty(${idx})">
+                        
+                        <button class="lux-btn" onclick="updateQty(${idx},1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                    </div>` : ''}
+                    <button class="add-cart-btn" onclick="addC('${r[0]}',${r[1]},${idx},${isD},${isFoodWithTopping || isYumOrSnack})">
+                        ${isAvail ? translate('add_to_cart') : translate('sold_out')}
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function editQty(idx) {
+        document.getElementById(`qty-lbl-${idx}`).style.display = 'none';
+        let inp = document.getElementById(`qty-inp-${idx}`);
+        inp.style.display = 'inline-block';
+        inp.value = itemQty[idx];
+        inp.focus();
+        inp.select();
+    }
+    
+    function saveQty(idx) {
+        let inp = document.getElementById(`qty-inp-${idx}`);
+        let val = parseInt(inp.value);
+        if (isNaN(val) || val < 1) val = 1;
+        itemQty[idx] = val;
+        inp.style.display = 'none';
+        document.getElementById(`qty-lbl-${idx}`).style.display = 'inline-block';
+        updateDisplay();
+    }
+
+    function updateQty(idx, val) { itemQty[idx] = Math.max(1, itemQty[idx] + val); updateDisplay(); }
+    function toggleAcc(idx) { itemExpanded[idx] = !itemExpanded[idx]; updateDisplay(); }
+    function setS(i, l) { currentS[i] = l; updateDisplay(); }
+    function setSpicy(i, l) { currentSpicy[i] = l; updateDisplay(); }
+    function tSpecial(i) { itemOpt[i].special = !itemOpt[i].special; updateDisplay(); }
+    
+    function tS(i) { itemOpt[i].smoothie = !itemOpt[i].smoothie; updateDisplay(); }
+    function tT(i, n) { let t = itemOpt[i].toppings; itemOpt[i].toppings = t.includes(n) ? t.filter(x => x !== n) : [...t, n]; updateDisplay(); }
+    
+    function handleSearch() { 
+        currentSearch = document.getElementById('menu-search').value.toLowerCase(); 
+        document.getElementById('clear-search').style.display = currentSearch.length > 0 ? 'flex' : 'none';
+        renderMenu(currentF); 
+    }
+    
+    function clearSearch() {
+        document.getElementById('menu-search').value = '';
+        handleSearch();
+    }
+
+    function addC(n, p, idx, isD, isFood) {
+        let basePrice = parseFloat(p), extras = 0, det = [], qty = itemQty[idx];
+        
+        let mObj = fullMenu[idx];
+        let cat = mObj[2] || "";
+        let isFoodWithTopping = (cat === "เมนูเส้น" || cat === "เมนูข้าว"); 
+        
+        if(isD) { 
+            det.push("หวาน " + currentS[idx]); 
+            if(itemOpt[idx].smoothie) { extras += 10; det.push("ปั่น"); } 
+        }
+        
+        if(isFood) {
+            det.push(currentSpicy[idx]);
+            if(itemOpt[idx].special) { extras += 10; det.push("พิเศษ"); }
+        }
+
+        let currentToppingsList = isD ? toppingsData : (isFoodWithTopping ? toppingsData2 : []);
+        
+        itemOpt[idx].toppings.forEach(tn => { 
+            let tObj = currentToppingsList.find(x => x[0] === tn); 
+            if(tObj) { extras += parseFloat(tObj[1]); det.push(tn); } 
+        }); 
+
+        cart.push({name: n, price: basePrice + extras, qty: qty, total: (basePrice + extras) * qty, sweetness: det.join(", ")||'-'}); 
+        
+        itemQty[idx] = 1; 
+        itemOpt[idx] = { toppings: [], smoothie: false, special: false }; 
+        currentS[idx] = "100%"; 
+        currentSpicy[idx] = "เผ็ดปานกลาง"; 
+        itemExpanded[idx] = false;
+        
+        updateUI();
+    }
+
+    function updateUI() { document.getElementById('cart-bar').style.display = cart.length > 0 ? 'flex' : 'none'; let total = cart.reduce((s,i)=>s+i.total,0); document.getElementById('cart-sum-val').innerText = total.toLocaleString(); document.getElementById('cart-count').innerText = cart.length; }
+    
+    function openReceipt() {
+        let h = `<div class="chk-header"><h2 class="chk-title">Order Summary</h2><p style="color:var(--secondary); font-size:14px; margin-top:4px; font-family:var(--font-body);">ตรวจสอบรายการอาหารก่อนยืนยัน</p></div>`;
+        cart.forEach((i,idx) => {
+            let mObj = fullMenu.find(x => x[0] === i.name);
+            let imgUrl = mObj && mObj[4] ? mObj[4] : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=200&auto=format&fit=crop';
+            
+            h += `
+            <div class="chk-item">
+                <img src="${imgUrl}" class="chk-img">
+                <div class="chk-details">
+                    <div class="chk-name-row">
+                        <div class="chk-name"><span class="chk-qty">${i.qty}x</span> ${tMenu(i.name)}</div>
+                        <div class="chk-price">฿${i.total.toLocaleString()}</div>
+                    </div>
+                    <div class="chk-options">${tMenu(i.sweetness)}</div>
+                    <div class="chk-remove" onclick="rem(${idx})">นำออก</div>
+                </div>
+            </div>`;
+        });
+        
+        let total = cart.reduce((s,i)=>s+i.total,0);
+
+        h += `<div style="margin: 24px 0 10px 0;">
+                <label class="opt-label" style="font-size:14px; margin-bottom:8px; display:block;">ข้อมูลการจัดส่ง</label>
+                <input type="tel" id="del-phone" class="cart-note" style="margin-bottom:12px; padding:12px; margin-top:0;" placeholder="เบอร์โทรติดต่อ (จำเป็น)" oninput="checkPhone(this.value)">
+                <textarea id="del-address" class="cart-note" rows="2" placeholder="สถานที่ส่ง (จำเป็น)" style="margin-bottom:12px; padding:12px; margin-top:0;"></textarea>
+                <textarea id="del-note" class="cart-note" rows="1" placeholder="หมายเหตุสถานที่วางของ (ถ้ามี)" style="margin-bottom:12px; padding:12px; margin-top:0;"></textarea>
+                
+                <label class="opt-label" style="font-size:14px; margin-bottom:8px; display:block; margin-top:20px;">วิธีการชำระเงิน</label>
+                <div class="segmented-control" style="margin-bottom:16px;">
+                    <div class="seg-btn active" id="pay-cash" onclick="selPay('cash')">เงินสดปลายทาง</div>
+                    <div class="seg-btn" id="pay-qr" onclick="selPay('qr')">สแกนจ่าย</div>
+                </div>
+                
+                <div id="cash-sec" style="display:block;">
+                    <input type="number" id="cash-given" class="cart-note" style="padding:12px; margin-top:0;" placeholder="จำนวนเงินที่จ่าย (บาท) เพื่อเตรียมเงินทอน">
+                </div>
+                <div id="qr-sec" style="display:none; text-align:center;">
+                    <img src="https://promptpay.io/0931805507/${total}.png" style="width:160px; height:160px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
+                    <div style="font-size:14px; font-weight:700; margin-bottom:12px; color:var(--primary);">ยอดชำระ: ฿${total.toLocaleString()}</div>
+                    <input type="file" id="slip-upload" accept="image/*" style="display:block; margin:0 auto; font-size:13px; margin-bottom:16px;">
+                </div>
+              </div>`;
+              
+        h += `
+            <div class="chk-summary">
+                <span class="summary-label">${translate('total_amount')}</span>
+                <span class="summary-total">฿${total.toLocaleString()}</span>
+            </div>
+            <button class="add-cart-btn" style="margin-top:24px; height: 64px; width: 100%;" onclick="sub()">${translate('confirm_order')}</button>`;
+        document.getElementById('modal-body').innerHTML = h; document.getElementById('modal').style.display = 'flex';
+    }
+
+    function selPay(m) {
+        document.getElementById('pay-cash').classList.toggle('active', m === 'cash');
+        document.getElementById('pay-qr').classList.toggle('active', m === 'qr');
+        document.getElementById('cash-sec').style.display = m === 'cash' ? 'block' : 'none';
+        document.getElementById('qr-sec').style.display = m === 'qr' ? 'block' : 'none';
+    }
+    
+    function checkPhone(val) {
+        let v = val.replace(/\D/g, '');
+        if (v.length >= 9) {
+            let addressBook = JSON.parse(localStorage.getItem('withu_address_book') || '{}');
+            if (addressBook[v] && document.getElementById('del-address').value.trim() === '') {
+                document.getElementById('del-address').value = addressBook[v];
+            }
+        }
+    }
+    
+    function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
+
+    async function sub() { 
+        const phone = document.getElementById('del-phone').value.trim();
+        const address = document.getElementById('del-address').value.trim();
+        const note = document.getElementById('del-note').value.trim();
+        const isCash = document.getElementById('pay-cash').classList.contains('active');
+        const cashGiven = document.getElementById('cash-given') ? document.getElementById('cash-given').value.trim() : '';
+        const slipFile = document.getElementById('slip-upload') ? document.getElementById('slip-upload').files[0] : null;
+
+        if (!phone || !address) {
+            alert("กรุณาระบุเบอร์โทรติดต่อและสถานที่ส่งให้ครบถ้วน");
+            return;
+        }
+        if (isCash && !cashGiven) {
+            alert("กรุณาระบุจำนวนเงินสดที่จ่าย เพื่อเตรียมเงินทอน");
+            return;
+        }
+        if (!isCash && !slipFile) {
+            alert("กรุณาแนบสลิปการโอนเงิน");
+            return;
+        }
+
+        let paymentDetail = isCash ? `เงินสด (รับมา ${cashGiven})` : "สแกนโอนแล้ว (แนบสลิป)";
+
+        if(cart.length > 0) {
+            cart.forEach(item => { 
+                let details = item.sweetness && item.sweetness !== '-' ? item.sweetness : '';
+                item.note = details; 
+            }); 
+        }
+
+        let deliveryText = `โทร:${phone} | ส่ง:${address}`;
+        if (note) deliveryText += ` | หมายเหตุ:${note}`;
+        deliveryText += ` | จ่าย:${paymentDetail}`;
+        
+        const payload = { 
+            action: 'submitOrder', 
+            apiKey: API_KEY, 
+            table: currentTable, 
+            cart: cart, 
+            delivery: deliveryText, // ส่งข้อมูลเดลิเวอรี่แยกต่างหาก
+            orderType: 'delivery' 
+        };
+
+        let addressBook = JSON.parse(localStorage.getItem('withu_address_book') || '{}');
+        let cleanPhone = phone.replace(/\D/g, '');
+        if (cleanPhone) {
+            addressBook[cleanPhone] = address;
+            localStorage.setItem('withu_address_book', JSON.stringify(addressBook));
+        }
+
+        localStorage.setItem('withu_order_active', 'true');
+        document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:60px 0;"><div class="pulse-loader"></div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 22px;">Sending Order...</h2></div>`;
+        
+        let proceedSubmit = async (base64Slip) => {
+            if (base64Slip) payload.slipImage = base64Slip;
+            try {
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:60px 0;"><div style="font-size:56px; margin-bottom:16px; color:var(--success);">✓</div><h2 style="font-family:var(--font-head); font-weight:800; font-size: 24px; color:var(--primary);">รับออเดอร์แล้ว</h2><p style="color:var(--secondary); font-size:15px; margin-top:8px;">โปรดรอการจัดส่งสักครู่นะคะ</p></div>`;
+                cart = []; updateUI(); setTimeout(() => { showStatus(); }, 2000);
+            } catch (e) {
+                console.error(e); alert("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง"); openReceipt();
+            }
+        };
+
+        if (slipFile) {
+            let reader = new FileReader();
+            reader.onload = function(e) { proceedSubmit(e.target.result); };
+            reader.readAsDataURL(slipFile);
+        } else {
+            proceedSubmit(null);
+        }
+    }
+
+    // Removed unneeded functions
+    
+    function orderMore() {
+        document.getElementById('status-view').style.display = 'none';
+        document.getElementById('menu-view').style.display = 'block';
+        if (sInterval) {
+            clearInterval(sInterval);
+            sInterval = null;
+        }
+    }
+
+    function showStatus() { document.getElementById('modal').style.display='none'; document.getElementById('menu-view').style.display='none'; document.getElementById('status-view').style.display='block'; document.getElementById('status-table-no').innerText = currentTable; chk(); if(!sInterval) sInterval = setInterval(chk, 15000); }
+    
+    async function chk() {
+        try {
+            const r = await fetch(API_URL + "?action=getAdminData&ts=" + Date.now()); const d = await r.json(); 
+            const myOrders = d.orders.filter(o => o.table.toString() == currentTable.toString());
+
+            if (myOrders.length === 0) { 
+                upS(4); document.getElementById('queue-info').innerText = "Thank you for dining with us.";
+                if(!autoCloseTimer) {
+                    let sec = 30; autoCloseTimer = setInterval(() => {
+                        sec--; document.getElementById('auto-close-msg').innerText = `ระบบจะปิดอัตโนมัติใน 00:${sec<10?'0':''}${sec}`;
+                        if(sec <= 0) {
+                            localStorage.removeItem('withu_table'); 
+                            localStorage.removeItem('withu_order_active'); 
+                            window.location.href = window.location.pathname;
+                        }
+                    }, 1000);
+                } return; 
+            }
+
+            const activeOrders = d.orders.filter(o => o.status !== "สำเร็จ" && o.status !== "completed");
+            const allTablesInQueue = [...new Set(activeOrders.map(o => o.table.toString()))];
+            const myRank = allTablesInQueue.indexOf(currentTable.toString());
+            const qEl = document.getElementById('queue-info');
+            
+            if (myRank === 0) { qEl.innerText = "ออเดอร์ของท่านกำลังดำเนินการเป็นคิวต่อไป"; }
+            else if (myRank > 0) { qEl.innerText = `มีออเดอร์ก่อนหน้าท่านอีก ${myRank} คิว`; }
+            else { qEl.innerText = "ออเดอร์ของท่านอยู่ในขั้นตอนการเตรียม"; }
+
+            let minVal = 4, totalSum = 0; 
+            const p = {"active":1, "รับออเดอร์":1, "กำลังทำ":2, "รอเสิร์ฟ":3, "completed":4, "สำเร็จ":4};
+            
+            myOrders.forEach(o => { 
+                let statusVal = p[o.status] || 1; if (statusVal < minVal) minVal = statusVal; 
+                totalSum += parseFloat(String(o.total).replace(/,/g,'')) || 0; 
+            });
+            
+            upS(minVal); 
+            document.getElementById('stat-sum').innerText = totalSum.toLocaleString();
+            document.getElementById('stat-list').innerHTML = myOrders.map(o => {
+                let displayStatus = o.status === 'active' ? 'รับออเดอร์' : (o.status === 'completed' ? 'สำเร็จ' : o.status);
+                let statusColor = displayStatus === 'สำเร็จ' ? 'var(--success)' : 'var(--gold)';
+                return `<div style="display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border); text-align:left; align-items:center;">
+                    <span style="font-family:var(--font-head); font-weight:700; font-size:15px; color:var(--primary);">${o.qty}x ${tMenu(o.menu)}</span>
+                    <b style="color:${statusColor}; font-size:13px; font-weight:700; background:var(--gray-light); padding:6px 12px; border-radius:12px;">${tMenu(displayStatus)}</b>
+                </div>`;
+            }).join('');
+        } catch(e) { console.error("Status check failed", e); }
+    }
+    
+    function upS(s) { for(let i=1;i<=4;i++) { const el = document.getElementById('st-'+i); if(el) el.classList.toggle('active', i<=s); } }
+</script>
+</body>
+</html>

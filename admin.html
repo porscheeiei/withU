@@ -378,18 +378,19 @@
             <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
         </div>
         <div class="sidebar-menu">
-            <button class="sidebar-item" onclick="showSec('orders'); toggleSidebar();" id="sb-orders"><i>🏪</i> ออเดอร์หน้าร้าน</button>
-            <button class="sidebar-item" onclick="showSec('takeaway'); toggleSidebar();" id="sb-takeaway"><i>🛵</i> เดลิเวอรี</button>
-            <button class="sidebar-item" onclick="showSec('stock'); toggleSidebar();" id="sb-stock"><i>📦</i> คลังสินค้า</button>
-            <button class="sidebar-item" onclick="showSec('report'); toggleSidebar();" id="sb-report"><i>📈</i> ผลประกอบการ</button>
+            <button class="sidebar-item" onclick="showSec('orders'); toggleSidebar();" id="sb-orders"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:text-bottom;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>ออเดอร์หน้าร้าน</button>
+            <button class="sidebar-item" onclick="showSec('takeaway'); toggleSidebar();" id="sb-takeaway"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:text-bottom;"><circle cx="10" cy="20.5" r="1"/><circle cx="18" cy="20.5" r="1"/><path d="M2.5 2.5h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6l1.6-8.4H7.1"/></svg>เดลิเวอรี</button>
+            <button class="sidebar-item" onclick="showSec('stock'); toggleSidebar();" id="sb-stock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:text-bottom;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>คลังสินค้า</button>
+            <button class="sidebar-item" onclick="showSec('report'); toggleSidebar();" id="sb-report"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:text-bottom;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>ผลประกอบการ</button>
+            <button class="sidebar-item" onclick="showSec('points'); toggleSidebar();" id="sb-points"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:text-bottom;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>ระบบสมาชิก (แต้ม)</button>
             <div class="sidebar-divider"></div>
-            <button class="sidebar-item" onclick="openManualOrderModal(null); toggleSidebar();"><i>📝</i> สร้างออเดอร์นอกระบบ</button>
-            <button class="sidebar-item" onclick="toggleAttendance(); toggleSidebar();"><i>🧑‍💼</i> ตอกบัตรพนักงาน</button>
+            <button class="sidebar-item" onclick="openManualOrderModal(null); toggleSidebar();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:text-bottom;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>สร้างออเดอร์นอกระบบ</button>
+            <button class="sidebar-item" onclick="toggleAttendance(); toggleSidebar();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:text-bottom;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>ตอกบัตรพนักงาน</button>
             <div class="sidebar-divider"></div>
-            <button class="sidebar-item" onclick="toggleTheme(); toggleSidebar();"><i>🌗</i> สลับโหมดสี</button>
-            <button class="sidebar-item" onclick="toggleLanguage(); toggleSidebar();"><i>🌐</i> เปลี่ยนภาษา</button>
+            <button class="sidebar-item" onclick="toggleTheme(); toggleSidebar();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:text-bottom;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>สลับโหมดสี</button>
+            <button class="sidebar-item" onclick="toggleLanguage(); toggleSidebar();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:text-bottom;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>เปลี่ยนภาษา</button>
             <div class="sidebar-divider"></div>
-            <button class="sidebar-item" onclick="handleLogout()" style="color: #ef4444;"><i>🚪</i> ออกจากระบบ</button>
+            <button class="sidebar-item" onclick="handleLogout()" style="color: #ef4444;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:text-bottom;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>ออกจากระบบ</button>
         </div>
     </div>
 
@@ -512,6 +513,24 @@
             </div>
         </div>
     </div>
+    
+        <div id="points-sec" style="display:none; padding: 20px;">
+            <div style="background:var(--surface); padding:25px; border-radius:12px; border:1px solid var(--border); box-shadow:var(--shadow);">
+                <h2 style="margin:0 0 20px 0; letter-spacing:-0.5px;">ระบบสมาชิก (Customer Points)</h2>
+                <div style="display:flex; gap:10px; margin-bottom: 25px; flex-wrap: wrap;">
+                    <input type="tel" id="point-phone-input" placeholder="เบอร์โทรศัพท์ (เช่น 0812345678)" style="flex:1; min-width:200px; padding:12px; font-size:16px;">
+                    <input type="number" id="point-val-input" placeholder="จำนวนแต้ม" style="width:120px; padding:12px; font-size:16px;">
+                    <button class="btn-black" onclick="savePoint()" style="padding: 12px 24px;">บันทึก / แก้ไข</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="report-table" style="width:100%; text-align:center;">
+                        <thead><tr><th>เบอร์โทรศัพท์</th><th>แต้มสะสม</th><th>จัดการ</th></tr></thead>
+                        <tbody id="points-list-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     <div id="pay-modal" class="modal-overlay">
         <div class="modal-card">
             <h2 id="p-table-title" style="margin:0; font-size:20px; text-transform:uppercase;">TABLE -</h2>
@@ -602,6 +621,34 @@
         </div>
     </div>
     <script>
+        function loadPoints() {
+            const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
+            let html = '';
+            for(let phone in db) {
+                html += `<tr><td>${phone}</td><td style="font-size:18px; font-weight:800; color:var(--primary);">${db[phone]}</td><td><button class="btn-outline" style="border-color:var(--danger); color:var(--danger); padding:6px 12px;" onclick="deletePoint('${phone}')">ลบข้อมูล</button></td></tr>`;
+            }
+            safeHtml('points-list-body', html || '<tr><td colspan="3" style="text-align:center; padding:30px; color:var(--text-muted);">ยังไม่มีข้อมูลสมาชิก</td></tr>');
+        }
+        function savePoint() {
+            const phone = document.getElementById('point-phone-input').value.trim();
+            const pts = parseInt(document.getElementById('point-val-input').value);
+            if(!phone || isNaN(pts)) return alert("กรุณาใส่เบอร์โทรศัพท์และจำนวนแต้มให้ถูกต้อง");
+            const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
+            db[phone] = pts;
+            safeStorageSet('withu_points_db', JSON.stringify(db));
+            document.getElementById('point-phone-input').value = '';
+            document.getElementById('point-val-input').value = '';
+            loadPoints();
+            alert("บันทึกข้อมูลสำเร็จ!");
+        }
+        function deletePoint(phone) {
+            if(!confirm('ยืนยันการลบข้อมูลแต้มของเบอร์ ' + phone + ' หรือไม่?')) return;
+            const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
+            delete db[phone];
+            safeStorageSet('withu_points_db', JSON.stringify(db));
+            loadPoints();
+        }
+
         const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
         const API_KEY = "WITHU_SECRET_2026"; 
         
@@ -1456,7 +1503,7 @@
 
         async function loadFaceApiModels() {
             if (isAiModelsLoaded) return;
-            const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights/';
+            const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
             try {
                 await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
@@ -1548,8 +1595,15 @@
         }
 
         function showSec(n) { 
-            ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec'].forEach(s => safeStyle(s, 'display', 'none')); 
-            safeStyle(n + '-sec', 'display', (n === 'report' ? 'block' : 'grid')); 
+            ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec', 'points-sec'].forEach(s => safeStyle(s, 'display', 'none')); 
+            
+            if (n === 'points') {
+                safeStyle('points-sec', 'display', 'block');
+                loadPoints();
+            } else {
+                safeStyle(n + '-sec', 'display', (n === 'report' ? 'block' : 'grid')); 
+            }
+            
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); 
             if (n === 'report') setTimeout(drawChart, 150);
         }

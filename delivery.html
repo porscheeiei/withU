@@ -753,13 +753,18 @@
         if (note) deliveryText += ` | หมายเหตุ:${note}`;
         deliveryText += ` | จ่าย:${paymentDetail}`;
         
+        let totalForPoints = cart.reduce((s,i)=>s+i.total,0);
+        let earnedPoints = Math.floor(totalForPoints / 50);
+
         const payload = { 
             action: 'submitOrder', 
             apiKey: API_KEY, 
             table: currentTable, 
             cart: cart, 
             delivery: deliveryText, // ส่งข้อมูลเดลิเวอรี่แยกต่างหาก
-            orderType: 'delivery' 
+            orderType: 'delivery',
+            customerPhone: cleanPhone,
+            earnedPoints: earnedPoints
         };
 
         let addressBook = JSON.parse(localStorage.getItem('withu_address_book') || '{}');

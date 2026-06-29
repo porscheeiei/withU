@@ -1153,7 +1153,19 @@
             
             const pointsToEarn = Math.floor(pTotal / 50);
             const phoneInput = document.getElementById('p-customer-phone');
-            if (phoneInput) phoneInput.value = "";
+            if (phoneInput) {
+                let extractedPhone = "";
+                for (let o of orders) {
+                    if (o.details) {
+                        let m = o.details.match(/โทร\s*:\s*([\d]+)/);
+                        if (m) {
+                            extractedPhone = m[1];
+                            break;
+                        }
+                    }
+                }
+                phoneInput.value = extractedPhone;
+            }
             safeText('p-points-display', `แต้มที่จะได้รับ: ${pointsToEarn} แต้ม`);
 
             // ⭐️ ทำให้หมายเหตุหน้าจ่ายเงินใหญ่ด้วย และกรองคำซ้ำ ⭐️

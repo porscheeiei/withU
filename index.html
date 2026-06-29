@@ -722,15 +722,33 @@
             </div>`;
         });
         
+        let savedPhone = localStorage.getItem('withu_dinein_phone') || '';
         h += `<div style="margin: 24px 0 10px 0;">
                 <label class="opt-label" style="font-size:12px; margin-bottom:8px; display:block;">${translate('note_prompt')}</label>
-                <textarea id="global-note" class="cart-note" rows="2" placeholder="${translate('note_placeholder')}" style="margin:0;"></textarea>
+                <textarea id="global-note" class="cart-note" rows="2" placeholder="${translate('note_placeholder')}" style="margin:0; margin-bottom:12px;"></textarea>
+                
+                <label class="opt-label" style="font-size:12px; margin-bottom:8px; display:block; color:var(--primary);">🎁 สมาชิกระบบสะสมแต้ม</label>
+                <input type="tel" id="reward-phone" class="cart-note" placeholder="เบอร์โทรศัพท์สะสมแต้ม (ถ้ามี)" style="margin:0; padding:12px;" oninput="savePhoneLocally(this.value)" value="${savedPhone}">
               </div>`;
               
+        let total = cart.reduce((s,i)=>s+i.total,0);
+        let earnPoints = Math.floor(total / 50);
+
         h += `
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16,185,129,0.3); padding: 12px 16px; border-radius: 12px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="font-size: 20px;">🎁</div>
+                    <div>
+                        <div style="font-size: 13px; font-weight: 700; color: #059669;">WITHU REWARDS</div>
+                        <div style="font-size: 11px; color: #047857; opacity: 0.8;">ทุก 50 บาท รับ 1 แต้ม</div>
+                    </div>
+                </div>
+                <div style="font-size: 16px; font-weight: 800; color: #10b981;">+${earnPoints} แต้ม</div>
+            </div>
+            
             <div class="chk-summary">
                 <span class="summary-label">${translate('net_total')}</span>
-                <span class="summary-total">${translate('price_sign')}${cart.reduce((s,i)=>s+i.total,0).toLocaleString()}</span>
+                <span class="summary-total">${translate('price_sign')}${total.toLocaleString()}</span>
             </div>
             <button class="add-cart-btn" style="margin-top:24px; height: 64px; width: 100%;" onclick="sub()">${translate('confirm_order')}</button>`;
         document.getElementById('modal-body').innerHTML = h; document.getElementById('modal').style.display = 'flex';
@@ -738,8 +756,18 @@
     
     function rem(i) { cart.splice(i, 1); updateUI(); cart.length > 0 ? openReceipt() : document.getElementById('modal').style.display = 'none'; }
 
+    function savePhoneLocally(val) {
+        let clean = val.replace(/\D/g, '');
+        if(clean.length >= 9) localStorage.setItem('withu_dinein_phone', clean);
+    }
+
     async function sub() { 
-        const globalNote = document.getElementById('global-note').value.trim();
+        let globalNote = document.getElementById('global-note').value.trim();
+        const rewardPhone = document.getElementById('reward-phone') ? document.getElementById('reward-phone').value.replace(/\D/g, '') : '';
+        
+        if (rewardPhone) {
+            globalNote = globalNote ? globalNote + ` | โทร: ${rewardPhone}` : `โทร: ${rewardPhone}`;
+        }
 
         if(cart.length > 0) {
             cart.forEach(item => { 

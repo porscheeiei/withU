@@ -691,7 +691,21 @@
                 </div>
               </div>`;
               
+        let total = cart.reduce((s,i)=>s+i.total,0);
+        let earnPoints = Math.floor(total / 50);
+
         h += `
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16,185,129,0.3); padding: 12px 16px; border-radius: 12px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="font-size: 20px;">🎁</div>
+                    <div>
+                        <div style="font-size: 13px; font-weight: 700; color: #059669;">WITHU REWARDS</div>
+                        <div style="font-size: 11px; color: #047857; opacity: 0.8;">ทุก 50 บาท รับ 1 แต้ม</div>
+                    </div>
+                </div>
+                <div style="font-size: 16px; font-weight: 800; color: #10b981;">+${earnPoints} แต้ม</div>
+            </div>
+            
             <div class="chk-summary">
                 <span class="summary-label">${translate('total_amount')}</span>
                 <span class="summary-total">฿${total.toLocaleString()}</span>
@@ -755,6 +769,7 @@
         
         let totalForPoints = cart.reduce((s,i)=>s+i.total,0);
         let earnedPoints = Math.floor(totalForPoints / 50);
+        let cleanPhone = phone.replace(/\D/g, '');
 
         const payload = { 
             action: 'submitOrder', 
@@ -768,7 +783,6 @@
         };
 
         let addressBook = JSON.parse(localStorage.getItem('withu_address_book') || '{}');
-        let cleanPhone = phone.replace(/\D/g, '');
         if (cleanPhone) {
             addressBook[cleanPhone] = address;
             localStorage.setItem('withu_address_book', JSON.stringify(addressBook));

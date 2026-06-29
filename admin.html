@@ -1253,6 +1253,15 @@
                         apiKey: API_KEY
                     })
                 });
+
+                if (customerPhone && earnedPoints > 0) {
+                    const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
+                    db[customerPhone] = (db[customerPhone] || 0) + earnedPoints;
+                    safeStorageSet('withu_points_db', JSON.stringify(db));
+                    if (document.getElementById('points-sec') && document.getElementById('points-sec').style.display !== 'none') {
+                        loadPoints();
+                    }
+                }
             } catch(e) {
                 console.error("Payment API Error:", e);
             }

@@ -9,7 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <style>
         :root {
-            --bg: #fcfcfd; --surface: #ffffff; --text-main: #000000; --text-muted: #737373;
+            --bg: #fcfcfd; --surface: #ffffff; --text-main: #000000;
+            --text-accent: #3b82f6; --text-muted: #737373;
             --accent: #000000; --border: #e5e5e5; --slate: #f5f5f5;
             --radius: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
@@ -58,7 +59,7 @@
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 700; font-size: 16px; }
 
-        /* ⭐️ ไฮไลต์หมายเหตุตัวใหญ่ กระแทกตา ⭐️ */
+        /* <i class='fas fa-star'></i>️ ไฮไลต์หมายเหตุตัวใหญ่ กระแทกตา ⭐️ */
         .item-details-highlight {
             display: inline-block;
             color: #ef4444;
@@ -191,6 +192,7 @@
             font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: var(--text-main); color: var(--surface); margin-left: auto;
         }
     </style>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>
 </head>
 <body>
     <script>
@@ -298,9 +300,87 @@
             }
         }
 
+        
+        // --- Settings Logic ---
+        
+        function saveBusinessHours() {
+            const days = Array.from(document.querySelectorAll('#bh-days input:checked')).map(cb => parseInt(cb.value));
+            const start = document.getElementById('bh-start').value;
+            const end = document.getElementById('bh-end').value;
+            
+            const bh = { days, start, end };
+            localStorage.setItem('withu_business_hours', JSON.stringify(bh));
+            if (typeof showToast === 'function') {
+                showToast('บันทึกเวลาทำการแล้ว', 'new');
+            }
+        }
+        
+        function loadBusinessHours() {
+            try {
+                const bhStr = localStorage.getItem('withu_business_hours');
+                if (bhStr) {
+                    const bh = JSON.parse(bhStr);
+                    document.querySelectorAll('#bh-days input').forEach(cb => {
+                        cb.checked = bh.days.includes(parseInt(cb.value));
+                    });
+                    if (bh.start) document.getElementById('bh-start').value = bh.start;
+                    if (bh.end) document.getElementById('bh-end').value = bh.end;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function loadSettings() {
+            loadBusinessHours();
+            const status = localStorage.getItem('withu_store_open') !== 'false'; // default true
+            const statusCheckbox = document.getElementById('store-open-status');
+            if (statusCheckbox) statusCheckbox.checked = status;
+            
+            const pp = localStorage.getItem('withu_promptpay') || '';
+            const ppInput = document.getElementById('store-promptpay');
+            if (ppInput) ppInput.value = pp;
+            
+            updateSoundBtnUI();
+        }
+
+        function toggleStoreStatus() {
+            const isOpen = document.getElementById('store-open-status').checked;
+            localStorage.setItem('withu_store_open', isOpen);
+            if (typeof showToast === 'function') {
+                showToast(isOpen ? 'เปิดร้านแล้ว' : 'ปิดร้านแล้ว', 'new');
+            }
+        }
+
+        function savePromptPay() {
+            const pp = document.getElementById('store-promptpay').value;
+            localStorage.setItem('withu_promptpay', pp);
+            if (typeof showToast === 'function') {
+                showToast('บันทึก PromptPay แล้ว', 'new');
+            }
+        }
+
+        function updateSoundBtnUI() {
+            const btn = document.getElementById('btn-sound-setting');
+            if (btn) {
+                if (isSoundEnabled) {
+                    btn.innerHTML = '<i class="fas fa-volume-up"></i> ปิดเสียงแจ้งเตือน';
+                    btn.style.color = '#ef4444';
+                    btn.style.borderColor = '#ef4444';
+                } else {
+                    btn.innerHTML = '<i class="fas fa-volume-mute"></i> เปิดเสียงแจ้งเตือน';
+                    btn.style.color = '#3b82f6';
+                    btn.style.borderColor = '#3b82f6';
+                }
+            }
+            // Also update top floating button if exists
+            const topBtn = document.getElementById('btn-sound');
+            if (topBtn) {
+                topBtn.innerHTML = isSoundEnabled ? '<i class="fas fa-volume-up"></i> SOUND ON' : '<i class="fas fa-volume-mute"></i> SOUND OFF';
+            }
+        }
+
         function toggleSound() { 
             isSoundEnabled = !isSoundEnabled; 
-            document.getElementById('btn-sound').innerText = isSoundEnabled ? '🔊 SOUND ON' : '🔇 SOUND OFF'; 
+            updateSoundBtnUI(); 
             if(isSoundEnabled) {
                 initAudio();
                 triggerNewOrderSound(); // เทสเสียงเมื่อกดเปิด
@@ -482,15 +562,71 @@
             </div>
         </div>
 
-        <div id="report-sec" style="display:none;">
-            <div id="printable-report">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
-                    <h2 style="margin:0; letter-spacing:-1px;" id="lbl-perf-title">DAILY PERFORMANCE REPORT</h2>
-                    <div style="display:flex; gap:8px;">
-                        <button class="tab-btn active" id="btn-peak" onclick="switchChart('peak')" style="border:1px solid var(--border);">HOURLY</button>
-                        <button class="tab-btn" id="btn-day" onclick="switchChart('day')" style="border:1px solid var(--border);">DAILY</button>
-                    </div>
+        
+    <div id="report-sec" style="display:none; padding:20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="font-size: 24px; font-weight: 800;"><i class="fas fa-chart-bar"></i> รายงานยอดขายและประวัติ</h2>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-outline" onclick="switchReportTab('dashboard')" id="rtab-dashboard" style="border-color: #3b82f6; color: #3b82f6; background: rgba(59,130,246,0.1);"><i class="fas fa-chart-pie"></i> ภาพรวม (Dashboard)</button>
+                <button class="btn-outline" onclick="switchReportTab('history')" id="rtab-history"><i class="fas fa-history"></i> ประวัติการขาย (History)</button>
+            </div>
+        </div>
+
+        <div id="report-dashboard">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
+                <button class="btn-black" onclick="renderReport('1d')" style="flex: 1; min-width: 80px; background: #3b82f6;">1 วัน</button>
+                <button class="btn-black" onclick="renderReport('7d')" style="flex: 1; min-width: 80px; background: var(--text-main);">7 วัน</button>
+                <button class="btn-black" onclick="renderReport('30d')" style="flex: 1; min-width: 80px; background: var(--text-main);">1 เดือน</button>
+                <button class="btn-black" onclick="renderReport('all')" style="flex: 1; min-width: 80px; background: var(--text-main);">ทั้งหมด</button>
+            </div>
+
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div class="ai-card">
+                    <p style="font-size: 12px; color: var(--text-muted); font-weight: 700;">ยอดขายรวม</p>
+                    <p style="font-size: 24px; font-weight: 800; color: #3b82f6;">฿<span id="rep-total">0</span></p>
                 </div>
+                <div class="ai-card">
+                    <p style="font-size: 12px; color: var(--text-muted); font-weight: 700;">จำนวนออเดอร์</p>
+                    <p style="font-size: 24px; font-weight: 800;" id="rep-count">0</p>
+                </div>
+                <div class="ai-card">
+                    <p style="font-size: 12px; color: var(--text-muted); font-weight: 700;">เมนูขายดีที่สุด</p>
+                    <p style="font-size: 16px; font-weight: 800; margin-top: 5px;" id="rep-top-menu">-</p>
+                </div>
+            </div>
+
+            <div class="ai-card" style="width: 100%; overflow-x: auto;">
+                <h3 style="font-size: 14px; margin-bottom: 15px;"><i class="fas fa-chart-line"></i> กราฟยอดขาย</h3>
+                <div style="min-width: 600px; height: 300px;">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="report-history" style="display: none;">
+            <div class="ai-card" style="padding: 0;">
+                <div style="overflow-x: auto;">
+                    <table class="report-table" style="min-width: 800px; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>เวลา</th>
+                                <th>รหัสออเดอร์</th>
+                                <th>โต๊ะ/ช่องทาง</th>
+                                <th>ยอดรวม</th>
+                                <th>การชำระเงิน</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
                 <p id="report-date-text" style="color: var(--text-muted); font-size: 13px; text-transform: uppercase; margin-bottom: 25px;"></p>
                 
                 <div class="report-grid">
@@ -514,1337 +650,80 @@
         </div>
     </div>
     
-        <div id="points-sec" style="display:none; padding: 20px;">
-            <div style="background:var(--surface); padding:25px; border-radius:12px; border:1px solid var(--border); box-shadow:var(--shadow);">
-                <h2 style="margin:0 0 20px 0; letter-spacing:-0.5px;">ระบบสมาชิก (Customer Points)</h2>
-                <div style="display:flex; gap:10px; margin-bottom: 25px; flex-wrap: wrap;">
-                    <input type="tel" id="point-phone-input" placeholder="เบอร์โทรศัพท์ (เช่น 0812345678)" style="flex:1; min-width:200px; padding:12px; font-size:16px;">
-                    <input type="number" id="point-val-input" placeholder="จำนวนแต้ม" style="width:120px; padding:12px; font-size:16px;">
-                    <button class="btn-black" onclick="savePoint()" style="padding: 12px 24px;">บันทึก / แก้ไข</button>
-                </div>
-                <div style="overflow-x:auto;">
-                    <table class="report-table" style="width:100%; text-align:center;">
-                        <thead><tr><th>เบอร์โทรศัพท์</th><th>แต้มสะสม</th><th>จัดการ</th></tr></thead>
-                        <tbody id="points-list-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-    <div id="pay-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h2 id="p-table-title" style="margin:0; font-size:20px; text-transform:uppercase;">TABLE -</h2>
-            <div id="p-bill-items" style="margin: 15px 0; border-top: 1px solid var(--border); padding-top: 12px; max-height: 150px; overflow-y: auto;"></div>
-            <small style="text-transform: uppercase; font-weight: 700; color: var(--text-muted); font-size: 10px;" id="lbl-total-due">Total Amount</small>
-            <div id="p-total-price" style="font-size: 32px; font-weight: 800; margin: 5px 0 10px 0;">฿0</div>
-            
-            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
-                <label style="font-size: 12px; font-weight: 700; color: #10b981;">🎁 ระบบสะสมแต้ม (ทุก 50 บาท = 1 แต้ม)</label>
-                <input type="tel" id="p-customer-phone" placeholder="เบอร์โทรศัพท์ลูกค้า (เว้นว่างได้)" style="margin-top: 5px; border-color: #10b981;">
-                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 5px;" id="p-points-display">แต้มที่จะได้รับ: 0 แต้ม</div>
-            </div>
-
-            <div id="p-methods" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="pay-tile" onclick="selectPayMethod('qr')" id="btn-method-qr">PROMPTPAY</div>
-                <div class="pay-tile" onclick="selectPayMethod('cash')" id="btn-method-cash">CASH</div>
-            </div>
-            <div id="p-qr-area" style="display:none; text-align:center;">
-                <img id="p-qr-img" style="width:180px; height:180px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px;" alt="PromptPay QR">
-                <button class="btn-black" onclick="finalPay('พร้อมเพย์')" id="btn-confirm-pay">CONFIRM</button>
-            </div>
-            <div id="p-cash-area" style="display:none;">
-                <input type="number" id="p-cash-input" placeholder="Received" oninput="calcChange()">
-                <div id="p-change-display" style="font-size: 18px; font-weight: 700; margin: 15px 0; display:none;"></div>
-                <button id="p-cash-submit" class="btn-black" onclick="finalPay('เงินสด')">CLOSE BILL</button>
-            </div>
-            <button onclick="closePayModal()" style="margin-top:20px; width:100%; border:none; background:none; color:var(--text-muted); cursor:pointer; font-size:12px; text-decoration:underline;" id="btn-cancel-pay">CANCEL</button>
-        </div>
-    </div>
-    <div id="manual-order-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h2 style="margin:0; font-size:18px; margin-bottom:15px;" id="lbl-manual-title">CREATE MANUAL ORDER</h2>
-            
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <select id="manual-channel" style="font-weight:700;"></select>
-            </div>
-            <input type="text" id="manual-search" placeholder=" ค้นหาเมนู..." oninput="renderManualMenu()" style="margin-bottom: 10px; font-size: 13px; padding: 8px;">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                <select id="manual-sweetness" style="font-size:12px; padding:8px;">
-                    <option value="">ความหวาน/เผ็ด ปกติ</option>
-                    <option value="หวานน้อย 50%">หวานน้อย (50%)</option>
-                    <option value="ไม่หวาน 0%">ไม่หวาน (0%)</option>
-                    <option value="ไม่เผ็ด">ไม่เผ็ด</option>
-                    <option value="เผ็ดน้อย">เผ็ดน้อย</option>
-                    <option value="เผ็ดมาก">เผ็ดมาก</option>
-                    <option value="พิเศษ">ไซส์พิเศษ (+10)</option>
-                </select>
-                <select id="manual-topping" style="font-size:12px; padding:8px;">
-                    <option value="" data-price="0">ไม่มีท็อปปิ้ง</option>
-                </select>
-            </div>
-            <div id="manual-menu-list" style="max-height: 200px; overflow-y:auto; border:1px solid var(--border); border-radius: 8px; padding: 5px;"></div>
-            
-            <div style="background:var(--slate); padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 13px;">
-                <div id="manual-cart-items" style="max-height: 150px; overflow-y:auto;"></div>
-                <div style="display:flex; justify-content:space-between; font-weight:800; border-top:1px solid var(--border); padding-top: 8px; margin-top: 8px;">
-                    <span id="lbl-manual-total">TOTAL</span><span id="manual-total-price">฿0</span>
-                </div>
-            </div>
-            
-            <div class="btn-group" style="grid-template-columns: 1fr 1fr; margin-top:15px;">
-                <button class="btn-outline" onclick="document.getElementById('manual-order-modal').style.display='none'" id="btn-manual-cancel">CANCEL</button>
-                <button class="btn-black" onclick="submitManualOrder()" style="margin:0;" id="btn-manual-confirm">CONFIRM</button>
-            </div>
-        </div>
-    </div>
-    <div id="att-modal" class="modal-overlay">
-        <div class="modal-card" style="max-width:420px; text-align:center;">
-            <h2 style="margin:0; font-size:18px;" id="lbl-staff-title">STAFF CLOCK</h2>
-            <p style="color:var(--text-muted); font-size:11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 5px 0 0 0;" id="ai-status">AI MODELS LOADING...</p>
-            
-            <div style="position:relative; width:100%; max-width:320px; height:240px; margin:15px auto; background:#000000; border-radius:8px; overflow:hidden; border:1px solid var(--border);">
-                <video id="webcam" autoplay muted playsinline width="320" height="240" style="object-fit: cover; width:100%; height:100%;"></video>
-            </div>
-            <input type="text" id="staff-name" placeholder="Staff Name" style="text-align:center; padding:12px; font-size:15px; border-radius:6px; margin-bottom:15px;">
-            
-            <div style="display:grid; grid-template-columns: 1fr; gap:10px; margin-bottom:15px;">
-                <button id="btn-scan-face" class="btn-black" onclick="startFaceRecognition()" style="margin-top:0;">SCAN FACE TO CLOCK</button>
-            </div>
-            
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button class="btn-outline" onclick="registerFaceProfile()" id="btn-reg-face">REGISTER FACE</button>
-                <button class="btn-outline" onclick="toggleAttendance()" id="btn-staff-close">CLOSE</button>
-            </div>
-            
-            <hr style="border:none; border-top:1px solid var(--border); margin:20px 0;">
-            <div id="att-log" style="text-align:left; font-size:12px; max-height:120px; overflow-y:auto;"></div>
-        </div>
-    </div>
-    <script>
-        function loadPoints() {
-            const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
-            let html = '';
-            for(let phone in db) {
-                html += `<tr><td>${phone}</td><td style="font-size:18px; font-weight:800; color:var(--primary);">${db[phone]}</td><td><button class="btn-outline" style="border-color:var(--danger); color:var(--danger); padding:6px 12px;" onclick="deletePoint('${phone}')">ลบข้อมูล</button></td></tr>`;
-            }
-            safeHtml('points-list-body', html || '<tr><td colspan="3" style="text-align:center; padding:30px; color:var(--text-muted);">ยังไม่มีข้อมูลสมาชิก</td></tr>');
-        }
-        function savePoint() {
-            const phone = document.getElementById('point-phone-input').value.trim();
-            const pts = parseInt(document.getElementById('point-val-input').value);
-            if(!phone || isNaN(pts)) return alert("กรุณาใส่เบอร์โทรศัพท์และจำนวนแต้มให้ถูกต้อง");
-            const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
-            db[phone] = pts;
-            safeStorageSet('withu_points_db', JSON.stringify(db));
-            document.getElementById('point-phone-input').value = '';
-            document.getElementById('point-val-input').value = '';
-            loadPoints();
-            alert("บันทึกข้อมูลสำเร็จ!");
-        }
-        function deletePoint(phone) {
-            if(!confirm('ยืนยันการลบข้อมูลแต้มของเบอร์ ' + phone + ' หรือไม่?')) return;
-            const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
-            delete db[phone];
-            safeStorageSet('withu_points_db', JSON.stringify(db));
-            loadPoints();
-        }
-
-        const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
-        const API_KEY = "WITHU_SECRET_2026"; 
         
-        let fullData = null, manualCart = [], salesChartInst = null;
-        let pTable = "", pTotal = 0, pRows = [];
-        let lastActionMap = {};
-        let isAiModelsLoaded = false, localStream = null, currentChartMode = 'peak';
-        let isScanningLocked = false; 
-        let clearedCalls = {};
-        let lastFingerprint = ""; 
-
-        function safeStyle(id, prop, val) { const el = document.getElementById(id); if (el) { el.style[prop] = val; return true; } return false; }
-        function safeText(id, txt) { const el = document.getElementById(id); if (el) { el.innerText = txt; return true; } return false; }
-        function safeHtml(id, html) { const el = document.getElementById(id); if (el) { el.innerHTML = html; return true; } return false; }
+    <div id="points-sec" style="display:none; padding:20px;">
+        <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 20px;"><i class="fas fa-star"></i> ระบบสมาชิก (แต้ม)</h2>
         
-        function safeStorageGet(key, defVal) { try { return localStorage.getItem(key) || defVal; } catch(e) { return defVal; } }
-        function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
-        function safeStorageRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
+        <div class="ai-card" style="margin-bottom: 20px;">
+            <h3 style="font-size: 16px; margin-bottom: 15px;"><i class="fas fa-user-plus"></i> เพิ่ม / แก้ไข ข้อมูลสมาชิก</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <input type="tel" id="pts-phone" placeholder="เบอร์โทรศัพท์ (09XXXXXXXX)" style="padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                <input type="text" id="pts-name" placeholder="ชื่อลูกค้า (ไม่บังคับ)" style="padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                <input type="number" id="pts-val" placeholder="จำนวนแต้ม" value="0" style="padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+            </div>
+            <button class="btn-black" onclick="savePointData()" style="margin-top: 15px; background: #3b82f6;"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
+        </div>
 
-        let currentLang = safeStorageGet('withu_lang', 'th');
-        const langPack = {
-            th: {
-                btn_add: "เพิ่มออเดอร์", btn_staff: "พนักงาน", btn_export: "ส่งออก PDF",
-                profit: "กำไรสุทธิวันนี้", revenue: "ยอดขายวันนี้", speed: "ความเร็วบริการเฉลี่ย", orders: "ออเดอร์วันนี้",
-                tab_orders: "ออเดอร์หน้าร้าน", tab_takeaway: "เดลิเวอรี", tab_stock: "คลังสินค้า", tab_report: "ผลประกอบการ",
-                no_orders: "ไม่มีออเดอร์ค้างในระบบ", mins_ago: "นาทีที่แล้ว", cook: "เตรียม", serve: "เสิร์ฟ",
-                collect: "เรียกเก็บเงิน", total_due: "ยอดรวมที่ต้องชำระ", cancel: "ยกเลิก", confirm: "ยืนยัน",
-                th_name: "ชื่อเมนู", th_cost: "ต้นทุน", th_status: "สถานะ", th_ctrl: "จัดการ", void: "ลบรายการ",
-                status_normal: "ปกติ", status_out: "หมด", toggle: "สลับสถานะ", live_map: "แผนผังร้านแบบ Real-time",
-                heat_title: "อันดับเมนูขายดี (Heat Menu)", ai_title: "AI วิเคราะห์ธุรกิจ", manual_title: "สร้างออเดอร์นอกระบบ",
-                perf_title: "รายงานสรุปยอดขาย", btn_peak: "รายชั่วโมง", btn_day: "รายวัน", staff_title: "ตอกบัตรพนักงาน",
-                ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI พร้อมใช้งาน", scan_btn: "สแกนใบหน้าตอกบัตร", reg_btn: "ลงทะเบียนใบหน้า",
-                mistake: "ตรวจพบข้อมูลผิดปกติ", btn_move_table: "ย้ายโต๊ะ", btn_add_item: "เพิ่มเมนู"
-            },
-            en: {
-                btn_add: "ADD ORDER", btn_staff: "STAFF", btn_export: "EXPORT PDF",
-                profit: "Gross Profit", revenue: "Revenue", speed: "Avg Service", orders: "Orders Today",
-                tab_orders: "Store", tab_takeaway: "Delivery", tab_stock: "Stock", tab_report: "Performance",
-                no_orders: "NO PENDING ORDERS", mins_ago: "MINS AGO", cook: "COOK", serve: "SERVE",
-                collect: "COLLECT PAYMENT", total_due: "Total Due", cancel: "CANCEL", confirm: "CONFIRM",
-                th_name: "Item Name", th_cost: "Cost", th_status: "Status", th_ctrl: "Control", void: "VOID",
-                status_normal: "NORMAL", status_out: "OUT OF STOCK", toggle: "TOGGLE", live_map: "Live Restaurant Map",
-                heat_title: "Heat Menu (Best Sellers)", ai_title: "AI Business Advisor", manual_title: "CREATE MANUAL ORDER",
-                perf_title: "DAILY PERFORMANCE REPORT", btn_peak: "HOURLY", btn_day: "DAILY", staff_title: "STAFF CLOCK",
-                ai_loading: "AI MODELS LOADING...", ai_ready: "AI SYSTEM READY", scan_btn: "SCAN FACE TO CLOCK", reg_btn: "REGISTER FACE",
-                mistake: "MISTAKE DETECTED", btn_move_table: "MOVE TABLE", btn_add_item: "ADD ITEM"
-            }
-        };
-
-        function toggleTheme() {
-            const currentTheme = document.body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.body.setAttribute('data-theme', newTheme);
-            safeStorageSet('withu_theme', newTheme);
-            if (salesChartInst) drawChart(); 
-        }
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'th' : 'en';
-            safeStorageSet('withu_lang', currentLang);
-            applyLanguagePack();
-            if(fullData) { 
-                renderOrders(fullData.orders || []); 
-                filterStock(); // Update to use filter function
-                renderPerformance((fullData.analytics && fullData.analytics.report) ? fullData.analytics.report : []); 
-            }
-        }
-
-        function applyLanguagePack() {
-            if (!langPack[currentLang]) currentLang = 'th';
-            const l = langPack[currentLang];
-            
-            safeText('btn-add-nav', l.btn_add);
-            safeText('btn-staff-nav', l.btn_staff);
-            safeText('btn-export-nav', l.btn_export);
-            safeText('lbl-stat-profit', l.profit);
-            safeText('lbl-stat-revenue', l.revenue);
-            safeText('lbl-stat-speed', l.speed);
-            safeText('lbl-stat-orders', l.orders);
-            safeText('t-orders', l.tab_orders);
-            safeText('t-takeaway', l.tab_takeaway);
-            safeText('t-stock', l.tab_stock);
-            safeText('t-report', l.tab_report);
-            safeText('lbl-live-map', l.live_map);
-            safeText('th-stock-name', l.th_name);
-            safeText('th-stock-cost', l.th_cost);
-            safeText('th-stock-status', l.th_status);
-            safeText('th-stock-ctrl', l.th_ctrl);
-            safeText('lbl-heat-title', l.heat_title);
-            safeText('lbl-ai-title', l.ai_title);
-            safeText('lbl-perf-title', l.perf_title);
-            safeText('lbl-total-due', l.total_due);
-            safeText('btn-cancel-pay', l.cancel);
-            safeText('lbl-manual-total', "TOTAL"); 
-            safeText('btn-manual-cancel', l.cancel);
-            safeText('btn-manual-confirm', l.confirm);
-            safeText('btn-peak', l.btn_peak);
-            safeText('btn-day', l.btn_day);
-            safeText('lbl-staff-title', l.staff_title);
-            safeText('btn-scan-face', l.scan_btn);
-            safeText('btn-reg-face', l.reg_btn);
-            safeText('mistake-log', l.mistake);
-            if(!isAiModelsLoaded) safeText('ai-status', l.ai_loading);
-        }
-
-        function updateClock() {
-            const now = new Date();
-            const close = new Date(); close.setHours(23, 59, 59);
-            let diff = close - now;
-            if(diff < 0) { safeText('close-timer', "CLOSED"); return; }
-            let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-            
-            safeText('close-timer', `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`);
-            safeStyle('cleanup-reminder', 'display', (h == 0 && m <= 30) ? 'block' : 'none');
-            safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase());
-        }
-
-        async function refresh() {
-            safeStyle('sync-status', 'display', 'inline-block');
-            
-            try {
-                if(!API_URL || API_URL.includes("วางลิงก์")) return;
-                const response = await fetch(API_URL + "?action=getAdminData", { redirect: 'follow' });
-                const text = await response.text();
-                let data;
-                
-                try {
-                    data = JSON.parse(text);
-                } catch(e) {
-                    console.error("JSON Parse Error Bypass", e);
-                    return; 
-                }
-                if (data.fingerprint && data.fingerprint === lastFingerprint) {
-                    return; 
-                }
-                lastFingerprint = data.fingerprint || "";
-                fullData = data;
-                
-                const analytics = data.analytics || {};
-                const rev = analytics.revenue || 0;
-                const prof = analytics.profit || 0; 
-                const rpt = analytics.report || [];
-                safeText('rev-val', "฿" + (typeof rev === 'number' ? rev.toLocaleString() : '0'));
-                safeText('prof-val', "฿" + (typeof prof === 'number' ? prof.toLocaleString() : '0'));
-                
-                let activeItemsCount = (data.orders || []).reduce(function(acc, curr) { return acc + (parseInt(curr.qty) || 0); }, 0);
-                let historyItemsCount = rpt.reduce(function(acc, curr) { return acc + (parseInt(curr.qty) || 0); }, 0);
-                safeText('order-count', activeItemsCount + historyItemsCount);
-                
-                let activeCalls = (data.calls || []).filter(c => !clearedCalls[c.table]);
-                Object.keys(clearedCalls).forEach(t => {
-                    if (!data.calls || !data.calls.some(c => c.table.toString() === t.toString())) {
-                        delete clearedCalls[t];
-                    }
-                });
-                
-                // ⭐️ ตรวจสอบการเรียกพนักงาน / เช็คบิล ⭐️
-                if (activeCalls.length > 0) {
-                    let lastCall = activeCalls[activeCalls.length - 1];
-                    let notifyEl = document.getElementById('dynamic-notify');
-                    if (notifyEl && notifyEl.style.display !== 'block') {
-                        if (lastCall.reason === 'pay' || lastCall.reason === 'เช็คบิล') {
-                            triggerNotify('pay', lastCall.table);
-                        } else {
-                            triggerNotify('call', lastCall.table);
-                        }
-                    }
-                } else { 
-                    if (currentNotifyType === 'call' || currentNotifyType === 'pay') {
-                        safeStyle('dynamic-notify', 'display', 'none'); 
-                    }
-                }
-
-                for(let i=1; i<=15; i++) {
-                    let tile = document.getElementById(`map-t-${i}`);
-                    if(tile) tile.className = "map-table";
-                }
-                if(activeCalls.length > 0) {
-                    activeCalls.forEach(c => {
-                        let tile = document.getElementById(`map-t-${c.table}`);
-                        if(tile) tile.classList.add("alert-trigger");
-                    });
-                }
-
-                renderOrders(data.orders || []);
-                filterStock(); // Load matching items from stock
-                renderPerformance(rpt);
-                renderAttendanceLog(data.attendance || []);
-                
-                const safeAnalytics = data.analytics ? data.analytics : {revenue:0, report:[]};
-                renderAIInsights(safeAnalytics, data.orders || []);
-                
-                const avg = data.orders && data.orders.length > 0 ? (data.orders.reduce((s,o) => s + getTimeDiff(o.time), 0) / data.orders.length).toFixed(1) : "0.0";
-                safeText('avg-speed', avg + " MINS");
-                
-                drawChart();
-            } catch(e) { 
-                console.error("Sync Failure:", e); 
-            } finally {
-                safeStyle('sync-status', 'display', 'none');
-            }
-        }
-
-        // ⭐️ แสดงออเดอร์ และระบบแจ้งเตือนออเดอร์ใหม่ฉลาดขึ้น ⭐️
-        function renderOrders(orders) {
-            const store = document.getElementById('order-sec');
-            const takeaway = document.getElementById('takeaway-sec');
-            const l = langPack[currentLang] || langPack.th;
-            let groups = {};
-            let globalMistakeDetected = false;
-
-            // ตัวแปรสำหรับเช็คแจ้งเตือน
-            let hasFreshNewOrder = false;
-            let hasFreshAddedOrder = false;
-            let hasFreshPayRequest = false; // ⭐️ ตัวแปรใหม่ตรวจจับการขอเช็คบิล
-            let notifyTableStr = "";
-
-            orders.forEach(o => {
-                if(!groups[o.table]) groups[o.table] = {items:[], total:0, rows:[], time:o.time};
-                groups[o.table].items.push(o);
-                groups[o.table].total += parseFloat(String(o.total).replace(/,/g,'')) || 0;
-                groups[o.table].rows.push(o.rowNum);
-            });
-
-            for(let i=1; i<=15; i++) {
-                let payingTable = safeStorageGet('cds_paying_table', null);
-                if(payingTable == i) {
-                    let tile = document.getElementById(`map-t-${i}`);
-                    if(tile) { tile.className = "map-table alert-trigger"; }
-                }
-            }
-
-            const genCards = (isStore) => {
-                let html = "";
-                Object.keys(groups).filter(t => {
-                    const isDeliv = ["LINE", "GRAB", "LINEMAN", "TAKEAWAY"].includes(String(t).toUpperCase().trim());
-                    return isStore ? !isDeliv : isDeliv;
-                }).forEach(tableId => {
-                    const wait = getTimeDiff(groups[tableId].time);
-                    const status = lastActionMap[tableId] || groups[tableId].items[0].status || "รับออเดอร์";
-                    
-                    let hasNewItem = groups[tableId].items.some(i => i.status === "รับออเดอร์" || i.status === "PENDING" || i.status === "NEW" || i.status === "active");
-                    let hasCookingItem = groups[tableId].items.some(i => i.status === "กำลังทำ" || i.status === "COOKING" || i.status === "COOK");
-                    let hasServingItem = groups[tableId].items.some(i => i.status === "รอเสิร์ฟ" || i.status === "SERVING" || i.status === "SERVE");
-                    let isPayingMode = (safeStorageGet('cds_paying_table', '') == tableId || status === "paying");
-                    
-                    let firstBatchTime = groups[tableId].items[0].time;
-                    let hasExistingItems = groups[tableId].items.some(i => i.status !== "รับออเดอร์" && i.status !== "active" && i.status !== "PENDING" && i.status !== "NEW");
-                    let hasSubsequentOrders = groups[tableId].items.some(i => i.time !== firstBatchTime && (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW"));
-
-                    let thaiStatusText = "ออเดอร์ใหม่";
-                    let pillClass = "pill-new";
-                    let mapColorClass = "map-new";
-
-                    // ⭐️ ตรรกะตรวจจับการแจ้งเตือน (ซ่อนไม่ให้เด้งรัวๆ) ⭐️
-                    if (isPayingMode) {
-                        let payKey = `table_${tableId}_paying`;
-                        if (!notifiedOrders.has(payKey)) {
-                            notifiedOrders.add(payKey);
-                            notifyTableStr = tableId;
-                            hasFreshPayRequest = true;
-                        }
-                    } else {
-                        // ถ้าไม่ได้อยู่สถานะจ่ายเงินแล้ว ให้เคลียร์ memory ทิ้ง
-                        notifiedOrders.delete(`table_${tableId}_paying`);
-                    }
-
-                    groups[tableId].items.forEach(i => {
-                        let isItemNew = (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
-                        let isSubsequentItem = (i.time !== firstBatchTime);
-                        let orderKey = `${i.orderId}_${i.status}`; 
-                        
-                        if (isItemNew && !notifiedOrders.has(orderKey)) {
-                            notifiedOrders.add(orderKey);
-                            notifyTableStr = tableId;
-                            if (hasExistingItems || isSubsequentItem) {
-                                hasFreshAddedOrder = true;
-                            } else {
-                                hasFreshNewOrder = true;
-                            }
-                        }
-                    });
-
-                    if (isPayingMode) {
-                        thaiStatusText = "ลูกค้ารอเช็คบิล";
-                        pillClass = "pill-waiting-bill";
-                        mapColorClass = "map-waiting-bill";
-                    } else if (hasNewItem && (hasCookingItem || hasServingItem || hasSubsequentOrders)) { 
-                        thaiStatusText = "ลูกค้าสั่งมาเพิ่ม";
-                        pillClass = "pill-ordered-more";
-                        mapColorClass = "map-ordered-more";
-                    } else if (hasServingItem) {
-                        thaiStatusText = "รอจัดเสิร์ฟ";
-                        pillClass = "pill-serving";
-                        mapColorClass = "map-serving";
-                    } else if (hasCookingItem) {
-                        thaiStatusText = "กำลังทำอาหาร";
-                        pillClass = "pill-cooking";
-                        mapColorClass = "map-cooking";
-                    }
-
-                    if(!isNaN(tableId)) {
-                        let tile = document.getElementById(`map-t-${tableId}`);
-                        if(tile && !tile.classList.contains("alert-trigger")) {
-                            tile.className = `map-table ${mapColorClass}`;
-                        }
-                    }
-
-                    const s1 = (status === "รับออเดอร์" || status === "active" || status === "PENDING" || thaiStatusText.indexOf("ใหม่") !== -1 || thaiStatusText.indexOf("เพิ่ม") !== -1) ? "active" : "";
-                    const s2 = (status === "กำลังทำ" || status === "COOK" || thaiStatusText.indexOf("ทำอาหาร") !== -1) ? "active" : "";
-                    const s3 = (status === "รอเสิร์ฟ" || status === "SERVE" || thaiStatusText.indexOf("เสิร์ฟ") !== -1) ? "active" : "";
-                    let isSlaLate = wait > 15;
-
-                    html += `<div class="order-card ${isSlaLate ? 'sla-trigger' : ''}">
-                        <div class="card-head">
-                            <div style="width: 100%;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <b style="font-size:20px; letter-spacing:-0.5px;">${isNaN(tableId) ? tableId : 'TABLE '+tableId}</b>
-                                    <span class="table-status-pill ${pillClass}">${thaiStatusText}</span>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-                                    <small style="font-weight:700; color:var(--text-muted);">${wait} ${l.mins_ago}</small>
-                                </div>
-                                <div class="track-bar">
-                                    <span class="track-step step-new ${s1}">1. ออเดอร์</span>
-                                    <span class="track-step step-cooking ${s2}">2. กำลังทำ</span>
-                                    <span class="track-step step-serving ${s3}">3. จัดเสิร์ฟ</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div style="flex-grow:1;">
-                                ${groups[tableId].items.map(i => {
-                                    if(i.qty > 10) globalMistakeDetected = true;
-                                    const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
-                                    
-                                    let isItemNew = (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
-                                    let isSubsequentItem = (i.time !== firstBatchTime); 
-                                    let newItemBadge = "";
-                                    
-                                    if (isItemNew) {
-                                        if (hasExistingItems || isSubsequentItem) {
-                                            newItemBadge = `<span class="badge-new-item">สั่งมาเพิ่ม 🔔</span>`;
-                                        } else {
-                                            newItemBadge = `<span class="badge-new-item" style="background:#3b82f6;">ออเดอร์ใหม่ ✨</span>`;
-                                        }
-                                    }
-                                    
-                                    // ⭐️ ตัวกรองคำซ้ำสำหรับหมายเหตุ ⭐️
-                                    let cleanDetails = "";
-                                    if (hasDetails) {
-                                        let detailsArray = i.details.split(',').map(s => s.trim()).filter(s => s !== '');
-                                        cleanDetails = [...new Set(detailsArray)].join(', ');
-                                    }
-
-                                    // ⭐️ สร้างสถานะรายเมนู ⭐️
-                                    let itemStatus = i.status || "รับออเดอร์";
-                                    let itemStatusText = "รอดำเนินการ";
-                                    let itemStatusColor = "#737373";
-
-                                    if (isItemNew) {
-                                        itemStatusText = "รอทำ";
-                                        itemStatusColor = "#f59e0b"; // สีส้ม
-                                    } else if (itemStatus === "กำลังทำ" || itemStatus === "COOK" || itemStatus === "COOKING") {
-                                        itemStatusText = "กำลังทำ";
-                                        itemStatusColor = "#3b82f6"; // สีฟ้า
-                                    } else if (itemStatus === "รอเสิร์ฟ" || itemStatus === "SERVE" || itemStatus === "SERVING") {
-                                        itemStatusText = "เสิร์ฟแล้ว";
-                                        itemStatusColor = "#10b981"; // สีเขียว
-                                    }
-
-                                    let itemStatusBadge = `<span style="font-size:11px; font-weight:800; color:${itemStatusColor}; border:1px solid ${itemStatusColor}; background:rgba(255,255,255,0.8); padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle;">${itemStatusText}</span>`;
-
-                                    return `
-                                    <div class="item-row" style="align-items:flex-start; flex-direction:column; gap:8px;">
-                                        <div class="item-info" style="width:100%;">
-                                            <div style="display:flex; justify-content:space-between; width:100%;">
-                                                <div>
-                                                    <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge} ${itemStatusBadge}
-                                                </div>
-                                                <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
-                                            </div>
-                                            
-                                            ${hasDetails ? `<div class="item-details-highlight">${cleanDetails}</div>` : ''}
-                                            
-                                            <div style="margin-top:12px; display:flex; gap:6px; align-items:center;">
-                                                <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#3b82f6; border-color:#bfdbfe;" onclick="handleSingleItemStatus(${i.rowNum}, 'กำลังทำ')">🍳 เตรียมทำ</button>
-                                                <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#10b981; border-color:#a7f3d0;" onclick="handleSingleItemStatus(${i.rowNum}, 'รอเสิร์ฟ')">🛎️ เสิร์ฟ</button>
-                                                <button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:0; margin-left:10px;">${l.void}</button>
-                                            </div>
-                                        </div>
-                                    </div>`;
-                                }).join('')}
-                            </div>
-                            <hr style="border:none; border-top:1px dashed var(--border); margin:15px 0;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-size:22px; font-weight:800;">฿${groups[tableId].total.toLocaleString()}</span>
-                                <div style="display:flex; gap:6px;">
-                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'กำลังทำ')">${l.cook}ทั้งโต๊ะ</button>
-                                    <button class="btn-outline" style="font-weight:700;" onclick="handleStatusUpdate('${tableId}', 'รอเสิร์ฟ')">${l.serve}ทั้งโต๊ะ</button>
-                                </div>
-                            </div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
-                                <button class="btn-outline" onclick="promptMoveTable('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_move_table || 'ย้ายโต๊ะ'}</button>
-                                <button class="btn-outline" onclick="openManualOrderModal('${tableId}')" style="background:var(--slate); border:none; padding:10px;">${l.btn_add_item || 'เพิ่มเมนู'}</button>
-                            </div>
-                            <button class="btn-outline" onclick="handleVoidTable('${tableId}')" style="margin-top:8px; width:100%; border:1px solid #fca5a5; color:#ef4444; background:#fef2f2; padding:10px; font-weight:700;">ลบทั้งโต๊ะ (ยกเลิกบิล)</button>
-                            <button class="btn-black" onclick="openPayModal('${tableId}')" style="margin-top:8px;">${l.collect}</button>
-                        </div></div>`;
-                });
-                return html || `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted); font-size:14px; font-weight:500;">${l.no_orders}</div>`;
-            };
-            
-            if(store) store.innerHTML = genCards(true);
-            if(takeaway) takeaway.innerHTML = genCards(false);
-            
-            safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
-
-            // ⭐️ เรียกการแจ้งเตือนเสียง+แถบ ถ้ามีของใหม่ ⭐️
-            if (hasFreshPayRequest) {
-                triggerNotify('pay', notifyTableStr);
-            } else if (hasFreshAddedOrder) {
-                triggerNotify('add', notifyTableStr);
-            } else if (hasFreshNewOrder) {
-                triggerNotify('new', notifyTableStr);
-            }
-        }
-
-        function handleSingleItemStatus(rowNum, status) {
-            if(fullData && fullData.orders) {
-                let item = fullData.orders.find(o => o.rowNum === rowNum);
-                if(item) item.status = status;
-                renderOrders(fullData.orders);
-            }
-            fetch(API_URL, {
-                method:'POST', mode:'no-cors',
-                body: JSON.stringify({ action:'updateStatus', rowNums: [rowNum], status: status, apiKey: API_KEY })
-            });
-        }
-
-        async function handleVoidTable(tableId) {
-            if(!confirm(`ยืนยันลบออเดอร์ทั้งหมดของโต๊ะ ${tableId} ใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)`)) return;
-            
-            const orderSec = document.getElementById('order-sec');
-            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>กำลังลบออเดอร์ทั้งโต๊ะ...</div>";
-
-            const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
-            if(rows.length === 0) return;
-
-            try {
-                await fetch(API_URL, {
-                    method:'POST', mode:'no-cors',
-                    body: JSON.stringify({ action:'updateStatus', rowNums: rows, status: 'void', apiKey: API_KEY })
-                });
-            } catch(e) { console.error("Void Table Error:", e); }
-            
-            lastFingerprint = "";
-            setTimeout(() => refresh(), 1000);
-        }
-
-        async function promptMoveTable(oldTable) {
-            const msg = currentLang === 'th' ? `ต้องการย้ายข้อมูลโต๊ะ ${oldTable} ไปที่โต๊ะเบอร์อะไร?` : `Move table ${oldTable} to which table number?`;
-            const newTable = prompt(msg);
-            if (!newTable || newTable.trim() === "") return;
-
-            const orderSec = document.getElementById('order-sec');
-            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ Moving table data...</div>";
-
-            try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ 
-                        action: 'moveTable', 
-                        apiKey: API_KEY, 
-                        oldTable: oldTable, 
-                        newTable: newTable.trim() 
-                    })
-                });
-            } catch (e) {
-                console.error("Move table error:", e);
-            }
-            lastFingerprint = ""; 
-            setTimeout(() => refresh(), 1000);
-        }
-
-        function handleMapTableClick(tableId) {
-            if(!fullData || !fullData.orders) return;
-            const hasActiveOrder = fullData.orders.filter(o => o.table.toString() === tableId.toString()).length > 0;
-            if(hasActiveOrder) openPayModal(tableId);
-        }
-
-        function openPayModal(tableId) {
-            if(!fullData || !fullData.orders) return;
-            const orders = fullData.orders.filter(o => o.table.toString() === tableId.toString());
-            if(!orders.length) return;
-            pTable = tableId; pRows = orders.map(o => o.rowNum);
-            pTotal = orders.reduce((s,o) => s + (parseFloat(String(o.total).replace(/,/g,'')) || 0), 0);
-            
-            safeText('p-table-title', isNaN(tableId) ? tableId : "TABLE " + tableId);
-            safeText('p-total-price', "฿" + pTotal.toLocaleString());
-            
-            const pointsToEarn = Math.floor(pTotal / 50);
-            const phoneInput = document.getElementById('p-customer-phone');
-            if (phoneInput) {
-                let extractedPhone = "";
-                for (let o of orders) {
-                    if (o.details) {
-                        let m = o.details.match(/โทร\s*:\s*([\d]+)/);
-                        if (m) {
-                            extractedPhone = m[1];
-                            break;
-                        }
-                    }
-                }
-                phoneInput.value = extractedPhone;
-            }
-            safeText('p-points-display', `แต้มที่จะได้รับ: ${pointsToEarn} แต้ม`);
-
-            // ⭐️ ทำให้หมายเหตุหน้าจ่ายเงินใหญ่ด้วย และกรองคำซ้ำ ⭐️
-            safeHtml('p-bill-items', orders.map(i => {
-                const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
-                let cleanDetails = "";
-                if (hasDetails) {
-                    let detailsArray = i.details.split(',').map(s => s.trim()).filter(s => s !== '');
-                    cleanDetails = [...new Set(detailsArray)].join(', ');
-                }
-                return `<div style="display:flex; justify-content:space-between; font-size:15px; margin-bottom:10px; border-bottom:1px dashed var(--border); padding-bottom:10px;">
-                    <div>
-                        <span style="font-weight:600; font-size:16px;">${i.qty}x ${i.menu}</span>
-                        ${hasDetails ? `<br><b style="color:#ef4444; font-size:15px;">(${cleanDetails})</b>` : ''}
-                    </div>
-                    <b style="font-size:16px;">฿${i.total}</b>
-                </div>`;
-            }).join(''));
-            
-            safeStorageSet('cds_paying_table', tableId.toString());
-            safeStorageSet('cds_cash_received', '0');
-            safeStyle('p-qr-area', 'display', 'none');
-            safeStyle('p-cash-area', 'display', 'none');
-            safeStyle('p-methods', 'display', 'grid');
-            safeStyle('pay-modal', 'display', 'flex');
-        }
-
-        function selectPayMethod(m) {
-            safeStyle('p-methods', 'display', 'none');
-            if(m === 'qr') { 
-                const img = document.getElementById('p-qr-img'); 
-                if(img) img.src = `https://promptpay.io/0931805507/${pTotal}.png`; 
-                safeStyle('p-qr-area', 'display', 'block'); 
-            } else { 
-                const input = document.getElementById('p-cash-input'); if(input) input.value = ""; 
-                safeStyle('p-cash-area', 'display', 'block'); 
-                setTimeout(function(){ if(input) input.focus(); }, 150); 
-            }
-        }
-
-        function calcChange() {
-            const input = document.getElementById('p-cash-input');
-            const rec = input ? (parseFloat(input.value) || 0) : 0;
-            const diff = rec - pTotal;
-            safeStorageSet('cds_cash_received', rec.toString());
-            if(rec >= pTotal) { 
-                safeText('p-change-display', "ทอนเงิน: ฿" + diff.toLocaleString()); 
-                safeStyle('p-change-display', 'display', 'block'); 
-                safeStyle('p-cash-submit', 'display', 'block'); 
-            } else { 
-                safeStyle('p-change-display', 'display', 'none'); safeStyle('p-cash-submit', 'display', 'none'); 
-            }
-        }
-
-        async function finalPay(method) {
-            if(!confirm("ต้องการปิดยอดชำระเงินนี้?")) return;
-            
-            let actualChange = "0";
-            if (method === 'เงินสด') {
-                let rec = parseFloat(document.getElementById('p-cash-input').value) || 0;
-                let diff = rec - pTotal;
-                actualChange = diff > 0 ? diff.toString() : "0";
-            }
-            safeStyle('pay-modal', 'display', 'none');
-            
-            const orderSec = document.getElementById('order-sec');
-            if(orderSec) orderSec.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:50px; font-weight:700; color:var(--text-muted);'>⏳ กำลังเคลียร์บิล... รอสักครู่ครับ</div>";
-            
-            try {
-                const phoneInput = document.getElementById('p-customer-phone');
-                const customerPhone = phoneInput ? phoneInput.value.trim() : "";
-                const earnedPoints = Math.floor(pTotal / 50);
-
-                await fetch(API_URL, {
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    body: JSON.stringify({
-                        action: 'closeBill', 
-                        table: pTable, 
-                        rowNums: pRows, 
-                        paymentMethod: method, 
-                        change: actualChange,
-                        customerPhone: customerPhone,
-                        earnedPoints: earnedPoints,
-                        apiKey: API_KEY
-                    })
-                });
-
-                if (customerPhone && earnedPoints > 0) {
-                    const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
-                    db[customerPhone] = (db[customerPhone] || 0) + earnedPoints;
-                    safeStorageSet('withu_points_db', JSON.stringify(db));
-                    if (document.getElementById('points-sec') && document.getElementById('points-sec').style.display !== 'none') {
-                        loadPoints();
-                    }
-                }
-            } catch(e) {
-                console.error("Payment API Error:", e);
-            }
-            
-            safeStorageRemove('cds_paying_table');
-            safeStorageSet('cds_cash_received', '0');
-            lastFingerprint = ""; 
-            
-            setTimeout(() => { refresh(); }, 2500);
-        }
-        
-        function closePayModal() { 
-            safeStorageRemove('cds_paying_table');
-            actionCall('setPaymentStatus', {table: pTable, status: 'idle'}); 
-            safeStorageSet('cds_cash_received', '0'); 
-            safeStyle('pay-modal', 'display', 'none');
-            lastFingerprint = "";
-            refresh();
-        }
-
-        function handleStatusUpdate(tableId, status) {
-            lastActionMap[tableId] = status;
-            if(fullData && fullData.orders) {
-                fullData.orders.forEach(o => { if(o.table.toString() === tableId.toString()) o.status = status; });
-                renderOrders(fullData.orders);
-            }
-            const rows = fullData.orders.filter(o => o.table.toString() === tableId.toString()).map(o => o.rowNum);
-            if (rows.length === 0) return;
-            
-            fetch(API_URL, {
-                method:'POST', 
-                mode:'no-cors', 
-                body: JSON.stringify({
-                    action:'updateStatus', 
-                    rowNums: rows, 
-                    status: status, 
-                    apiKey: API_KEY
-                })
-            });
-        }
-
-        async function handleVoidItem(rowNum) {
-            if(!confirm("ยืนยันลบเมนูนี้ออกจากบิล?")) return;
-            try {
-                await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'voidItem', rowNum: rowNum, orderId: rowNum, apiKey: API_KEY})});
-            } catch(e) {
-                console.error("Void Item Error:", e);
-            }
-            lastFingerprint = "";
-            refresh();
-        }
-
-        function renderAIInsights(summary, activeOrders) {
-            if(!summary || !summary.report) return;
-            const topProducts = summary.report.slice(0, 3);
-            safeHtml('heat-menu-list', topProducts.map((p, index) => `
-                <div style="font-size:14px; font-weight:600; padding:6px 0; border-bottom:1px dashed var(--border);">
-                    ${index+1}. ${p.name} <span style="color:var(--blue); font-size:12px;">(ขายแล้ว ${p.qty})</span>
-                </div>`).join('') || "ไม่มีข้อมูล");
-            const totalMins = activeOrders.reduce((s,o) => s + getTimeDiff(o.time), 0);
-            const avgSpeed = activeOrders.length > 0 ? parseFloat((totalMins / activeOrders.length).toFixed(1)) : 0;
-            
-            let insightHtml = "";
-            if (summary.revenue > 3000) {
-                insightHtml += `<div class="ai-node">ยอดขายวันนี้เติบโตสูงกว่าเป้าหมายเฉลี่ย แนะนำให้พนักงานกระตุ้นยอดขายกลุ่มท็อปปิ้งพรีเมียมเพิ่มขึ้น</div>`;
-            } else {
-                insightHtml += `<div class="ai-node">ยอดขายปัจจุบันอยู่ในเกณฑ์เสถียร แนะนำให้เพิ่มเซ็ตเมนูคู่เบเกอรี่เพื่อดันยอดขายรวม</div>`;
-            }
-            if (avgSpeed > 12) {
-                insightHtml += `<div class="ai-node">คำเตือน: ความเร็วการปรุงเฉลี่ยล่าช้าเกิน 12 นาที อาจเกิดคอขวดในห้องเครื่อง กรุณาตรวจสอบอัตรากำลังพนักงาน</div>`;
-            } else {
-                insightHtml += `<div class="ai-node">ความเร็วการจัดเตรียมเมนูอยู่ในเกณฑ์ดีเยี่ยม สามารถรักษามาตรฐานงานบริการได้ดีมาก</div>`;
-            }
-            safeHtml('ai-insights-block', insightHtml);
-        }
-
-        // ⭐️ แก้ไขตารางผลประกอบการให้แสดง ราคาขาย, ยอดรวมขาย, และกำไร/ชิ้น ⭐️
-        function renderPerformance(report) {
-            safeText('report-date-text', "PERFORMANCE DATA OVERVIEW - " + new Date().toLocaleDateString('en-GB', {dateStyle:'full'}).toUpperCase());
-            
-            let tableHtml = `
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th style="text-align:center;">Sold</th>
-                            <th style="text-align:center;">Price/Unit</th>
-                            <th style="text-align:center;">Total Sales</th>
-                            <th style="text-align:center;">Profit/Unit</th>
-                            <th style="text-align:right;">Total Profit</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-            
-            report.forEach(i => {
-                let qty = i.qty || 1;
-                let revenue = i.revenue || 0; 
-                let totalProfit = i.profit || 0;
-                
-                let pricePerUnit = Math.round(revenue / qty);
-                let profitPerUnit = Math.round(totalProfit / qty);
-
-                tableHtml += `
+        <div style="overflow-x: auto;">
+            <table class="report-table" id="points-table" style="min-width: 600px;">
+                <thead>
                     <tr>
-                        <td><b>${i.name}</b></td>
-                        <td style="text-align:center; font-weight:600;">${qty}</td>
-                        <td style="text-align:center; color:#3b82f6;">฿${pricePerUnit.toLocaleString()}</td>
-                        <td style="text-align:center; font-weight:700;">฿${revenue.toLocaleString()}</td>
-                        <td style="text-align:center; color:#10b981;">฿${profitPerUnit.toLocaleString()}</td>
-                        <td style="text-align:right; font-weight:800;">฿${totalProfit.toLocaleString()}</td>
-                    </tr>`;
-            });
+                        <th>เบอร์โทรศัพท์</th>
+                        <th>ชื่อลูกค้า</th>
+                        <th>แต้มสะสม</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="points-list"></tbody>
+            </table>
+        </div>
+    </div>
 
-            tableHtml += `</tbody></table>`;
-            safeHtml('report-content', tableHtml);
-        }
-
-        function renderStock(menu) {
-            const l = langPack[currentLang] || langPack.th;
-            safeHtml('stock-list-body', menu.map(m => {
-                const isOut = m[5] === 'หมด' || m[5] === 'OUT OF STOCK';
-                return `
-                <tr>
-                    <td style="font-weight:600; padding:14px 12px;">${m[0]}</td>
-                    <td style="color:var(--text-muted);">฿${m[6]||0}</td>
-                    <td style="font-weight:700; font-size:12px; color:${isOut ? '#ef4444':'#10b981'};">${isOut ? l.status_out : l.status_normal}</td>
-                    <td><button class="btn-outline" style="padding:6px 12px;" onclick="handleStockToggle('${m[0]}','${isOut ? 'ปกติ':'หมด'}')">${l.toggle}</button></td>
-                </tr>`;
-            }).join(''));
-        }
-        
-        async function handleStockToggle(name, status) { 
-            try {
-                await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateStock', type:'menu', name:name, status:status, apiKey: API_KEY})}); 
-            } catch(e) {
-                console.error("Stock Toggle Error:", e);
-            }
-            lastFingerprint = "";
-            refresh(); 
-        }
-
-        // ⭐️ ฟังก์ชันประเมินหมวดหมู่เมนูจากชื่อโดยอัตโนมัติ ⭐️
-        function getCategoryFromName(name) {
-            if (/ข้าว|กะเพรา|ผัดพริก|ไข่เจียว/.test(name)) return 'เมนูข้าว';
-            if (/เส้น|สปาเก็ตตี้|มาม่า|ผัดไทย|ก๋วยเตี๋ยว|มักกะโรนี|อูด้ง|พาสต้า/.test(name)) return 'เมนูเส้น';
-            if (/ยำ|ลาบ|พล่า|น้ำตก/.test(name)) return 'เมนูยำ';
-            if (/ทอด|เฟรนช์ฟรายส์|นักเก็ต|ไก่ป๊อป|ลูกชิ้น|ปอเปี๊ยะ|ชีส|ขนมปัง|โทสต์|เกี๊ยว|ทานเล่น/.test(name)) return 'ของทานเล่น';
-            if (/ชา|กาแฟ|นม|น้ำ|โซดา|สมูทตี้|ปั่น|อเมริกาโน่|เอสเพรสโซ|คาปูชิโน่|ลาเต้|มัคคิอาโต้|มอคค่า|โกโก้/.test(name)) return 'เครื่องดื่ม';
-            return 'อื่นๆ';
-        }
-
-        // ⭐️ ฟังก์ชันสำหรับการกรองตารางคลังสินค้า ⭐️
-        function filterStock() {
-            if(!fullData || !fullData.menu) return;
-            const term = document.getElementById('stock-search-input').value.toLowerCase();
-            const cat = document.getElementById('stock-category-filter').value;
+    
+    <!-- Manual Order Modal Revamp -->
+    <div id="manual-order-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+                <h3 style="margin: 0; font-size: 20px; font-weight: 800;"><i class="fas fa-cart-plus"></i> เพิ่มออเดอร์ (Manual)</h3>
+                <button onclick="document.getElementById('manual-order-modal').style.display='none'" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
             
-            const filteredMenu = fullData.menu.filter(m => {
-                const name = m[0].toLowerCase();
-                const matchSearch = name.includes(term);
-                let matchCat = true;
-                if (cat !== 'all') {
-                    const itemCat = getCategoryFromName(m[0]);
-                    matchCat = (itemCat === cat);
-                }
-                return matchSearch && matchCat;
-            });
-            
-            renderStockList(filteredMenu);
-        }
-
-        function renderStockList(menuToRender) {
-            const l = langPack[currentLang] || langPack.th;
-            safeHtml('stock-list-body', menuToRender.map(m => {
-                const isOut = m[5] === 'หมด' || m[5] === 'OUT OF STOCK';
-                return `
-                <tr>
-                    <td style="font-weight:600; padding:14px 12px;">${m[0]}</td>
-                    <td style="color:var(--text-muted);">฿${m[6]||0}</td>
-                    <td style="font-weight:700; font-size:12px; color:${isOut ? '#ef4444':'#10b981'};">${isOut ? l.status_out : l.status_normal}</td>
-                    <td><button class="btn-outline" style="padding:6px 12px;" onclick="handleStockToggle('${m[0]}','${isOut ? 'ปกติ':'หมด'}')">${l.toggle}</button></td>
-                </tr>`;
-            }).join('') || `<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่พบรายการคลังสินค้า</td></tr>`);
-        }
-        
-        // ⭐️ ฟังก์ชันสำหรับปิด/เปิด คลังสินค้ายกหมวดหมู่ ⭐️
-        async function bulkToggleCategoryStock(status) {
-            if(!fullData || !fullData.menu) return;
-            const cat = document.getElementById('stock-category-filter').value;
-            if (cat === 'all') {
-                alert("กรุณาเลือกหมวดหมู่ที่ต้องการทำรายการก่อนครับ");
-                return;
-            }
-            
-            if (!confirm(`ยืนยันตั้งสถานะหมวด "${cat}" เป็น "${status}" ทั้งหมดหรือไม่?`)) return;
-            
-            // หาเมนูที่อยู่ในหมวดหมู่นี้ และสถานะปัจจุบันยังไม่ตรงกับเป้าหมาย (เพื่อลดการยิง API ซ้ำ)
-            const itemsToUpdate = fullData.menu.filter(m => getCategoryFromName(m[0]) === cat && m[5] !== status);
-            
-            if (itemsToUpdate.length === 0) {
-                alert("ไม่มีเมนูที่ต้องอัปเดตสถานะในหมวดหมู่นี้");
-                return;
-            }
-
-            // Optimistic UI Update (เปลี่ยนสีและแสดงผลให้เห็นทันทีที่หน้าจอ)
-            itemsToUpdate.forEach(m => m[5] = status);
-            filterStock();
-
-            // ทยอยยิง API ไปปรับสถานะ
-            for (let m of itemsToUpdate) {
-                try {
-                    await fetch(API_URL, {
-                        method:'POST', mode:'no-cors', 
-                        body:JSON.stringify({action:'updateStock', type:'menu', name:m[0], status:status, apiKey: API_KEY})
-                    });
-                } catch(e) {}
-            }
-            
-            lastFingerprint = "";
-            setTimeout(() => refresh(), 1500);
-        }
-
-        function drawChart() {
-            try {
-                if(!fullData || !fullData.analytics) return;
-                const reportSec = document.getElementById('report-sec');
-                if(!reportSec || reportSec.style.display === 'none' || reportSec.style.display === '') return;
-                const canvas = document.getElementById('salesChart'); if(!canvas || canvas.offsetParent === null) return; 
-                const ctx = canvas.getContext('2d');
-                let labels = [], data = [];
-                const isDark = document.body.getAttribute('data-theme') === 'dark';
-                
-                if(currentChartMode === 'peak') {
-                    labels = Array.from({length: 24}, function(_, i) { return i + ":00" }); 
-                    data = (fullData.analytics.peakHours || []);
-                } else {
-                    labels = (fullData.analytics.chartDaily || []).map(i => i.date || ''); 
-                    data = (fullData.analytics.chartDaily || []).map(i => i.total || 0);
-                }
-                
-                if(salesChartInst) salesChartInst.destroy();
-                if (!labels || labels.length === 0 || !data || data.length === 0) {
-                    console.warn("No chart data available");
-                    return;
-                }
-                salesChartInst = new Chart(ctx, {
-                    type: 'bar',
-                    data: { labels: labels, datasets: [{ data: data, backgroundColor: isDark ? '#ffffff' : '#000000', borderRadius: 4 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                });
-            } catch (e) { console.error("Chart Rendering Aborted:", e); }
-        }
-
-        function switchChart(mode) { 
-            currentChartMode = mode; 
-            const pBtn = document.getElementById('btn-peak'); const dBtn = document.getElementById('btn-day');
-            if(pBtn) pBtn.classList.toggle('active', mode==='peak'); if(dBtn) dBtn.classList.toggle('active', mode==='day');
-            drawChart();
-        }
-
-        async function loadFaceApiModels() {
-            if (isAiModelsLoaded) return;
-            const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
-            try {
-                await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
-                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-                isAiModelsLoaded = true;
-                const faceCount = (fullData && fullData.faceProfiles) ? fullData.faceProfiles.length : 0;
-                safeText('ai-status', currentLang === 'th' ? `ระบบ AI พร้อมทำงาน (คลังใบหน้า: ${faceCount} คน)` : `AI READY (${faceCount} profiles)`);
-            } catch (e) { safeText('ai-status', "AI MODEL ERROR"); }
-        }
-
-        async function toggleAttendance() {
-            let m = document.getElementById('att-modal'); if(!m) return;
-            if (m.style.display === 'none' || m.style.display === '') {
-                safeStyle('att-modal', 'display', 'flex'); isScanningLocked = false; applyLanguagePack();
-                await loadFaceApiModels(); startWebcam();
-            } else { safeStyle('att-modal', 'display', 'none'); stopWebcam(); }
-        }
-
-        function startWebcam() {
-            const video = document.getElementById('webcam'); if(!video) return;
-            navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: "user" } })
-                .then(stream => { localStream = stream; video.srcObject = stream; })
-                .catch(err => console.error("Webcam blocked", err));
-        }
-
-        function stopWebcam() {
-            if (localStream) { localStream.getTracks().forEach(track => track.stop()); localStream = null; }
-            const video = document.getElementById('webcam'); if(video) video.srcObject = null;
-        }
-
-        async function startFaceRecognition() {
-            if (!isAiModelsLoaded) return alert("AI SYSTEM NOT READY");
-            if (!fullData || !fullData.faceProfiles || fullData.faceProfiles.length === 0) return alert("NO PROFILES FOUND");
-            const scanBtn = document.getElementById('btn-scan-face'); const originalText = scanBtn ? scanBtn.innerText : "SCAN";
-            if(scanBtn) { scanBtn.innerText = currentLang === 'th' ? "กำลังตรวจใบหน้า..." : "SCANNING..."; safeStyle('btn-scan-face', 'background', '#333333'); }
-            try {
-                const video = document.getElementById('webcam'); if(!video) return;
-                const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-                if (!detection) {
-                    alert("ไม่พบใบหน้า กรุณาขยับให้อยู่ตรงกลางค่ะ");
-                    if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); } return;
-                }
-                const labeledDescriptors = [];
-                fullData.faceProfiles.forEach(p => {
-                    if (p.descriptor && p.descriptor.length > 0) {
-                        try { labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(p.name, [new Float32Array(p.descriptor)])); } catch(err) {}
-                    }
-                });
-                if (labeledDescriptors.length === 0) {
-                    alert("NO DATABASE RECORD"); if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); } return;
-                }
-                const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.60); const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-                if (bestMatch.label !== 'unknown') {
-                    const staffId = bestMatch.label; const records = fullData.attendance ? fullData.attendance.filter(a => a.name === staffId) : [];
-                    let type = "เข้างาน"; if (records.length > 0 && records[records.length - 1].type === "เข้างาน") type = "ออกงาน";
-                    await actionCall('staffClock', { name: staffId, type: type });
-                    alert(`บันทึกเวลาสำเร็จ: ${staffId.toUpperCase()} (${type})`); toggleAttendance(); 
-                } else {
-                    alert("ไม่พบข้อมูลพนักงานคนนี้"); if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); }
-                }
-            } catch (err) { if(scanBtn) { scanBtn.innerText = originalText; safeStyle('btn-scan-face', 'background', '#000000'); } }
-        }
-
-        async function registerFaceProfile() {
-            const el = document.getElementById('staff-name'); const name = el ? el.value.trim() : "";
-            if (!name) return alert("กรุณาใส่ชื่อพนักงานก่อนบันทึกใบหน้า");
-            safeText('ai-status', "CAPTURING PROFILE MATRIX...");
-            const video = document.getElementById('webcam'); if(!video) return;
-            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-            if (!detection) return alert("ตรวจจับใบหน้าล้มเหลว กรุณาเล็งหน้าตรงๆ อีกครั้ง");
-            const descriptorArray = Array.from(detection.descriptor);
-            safeText('ai-status', "SYNCHRONIZING MEMORY...");
-            await actionCall('saveFaceProfile', { name: name, descriptor: descriptorArray });
-            if (!fullData) fullData = { faceProfiles: [] };
-            if (!fullData.faceProfiles) fullData.faceProfiles = [];
-            fullData.faceProfiles = fullData.faceProfiles.filter(p => p.name.toLowerCase() !== name.toLowerCase());
-            fullData.faceProfiles.push({ name: name, descriptor: descriptorArray });
-            safeText('ai-status', "REGISTERED SUCCESSFULLY"); alert(`ลงทะเบียนใบหน้าสำเร็จ: ${name.toUpperCase()}`); toggleAttendance();
-        }
-
-        function renderAttendanceLog(att) { 
-            safeHtml('att-log', (att||[]).map(a => {
-                let displayTime = a.time;
-                if (displayTime && displayTime.includes('T')) {
-                    try { displayTime = new Date(displayTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}); } catch(e){}
-                }
-                return `<div style="padding:6px 0; border-bottom:1px solid var(--border);"><b>${a.name}</b> - ${a.type} @ ${displayTime}</div>`;
-            }).join('')); 
-        }
-
-        function showSec(n) { 
-            ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec', 'points-sec'].forEach(s => safeStyle(s, 'display', 'none')); 
-            
-            if (n === 'points') {
-                safeStyle('points-sec', 'display', 'block');
-                loadPoints();
-            } else {
-                safeStyle(n + '-sec', 'display', (n === 'report' ? 'block' : 'grid')); 
-            }
-            
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); 
-            if (n === 'report') setTimeout(drawChart, 150);
-        }
-
-        function clearCallNotify() { 
-            const t = document.getElementById('call-table-no').innerText; clearedCalls[t] = true; 
-            fetch(API_URL + "?action=clearCall&table=" + t, { method: 'GET', mode: 'no-cors' }); safeStyle('call-notify', 'display', 'none');
-        }
-
-        function openManualOrderModal(targetTable = null) {
-            manualCart = []; 
-            document.getElementById('manual-search').value = ""; 
-            updateManualUI();
-            const ch = document.getElementById('manual-channel');
-            const l = langPack[currentLang] || langPack.th;
-            
-            if (targetTable) {
-                ch.innerHTML = `<option value="${targetTable}" selected>TABLE ${targetTable}</option>`;
-                ch.disabled = true;
-                safeText('lbl-manual-title', currentLang === 'th' ? `เพิ่มเมนูให้โต๊ะ ${targetTable}` : `ADD TO TABLE ${targetTable}`);
-            } else {
-                ch.innerHTML = `
-                    <option value="LINE">LINE OFFICIAL</option>
-                    <option value="GRAB">GRAB FOOD</option>
-                    <option value="LINEMAN">LINEMAN</option>
-                    <option value="TAKEAWAY">COUNTER</option>
-                `;
-                ch.disabled = false;
-                safeText('lbl-manual-title', l.manual_title);
-            }
-            renderManualMenu();
-            
-            let allToppings = [];
-            if(fullData && fullData.toppings) allToppings = allToppings.concat(fullData.toppings);
-            if(fullData && fullData.toppings2) allToppings = allToppings.concat(fullData.toppings2);
-            
-            let uniqueToppingsMap = new Map();
-            allToppings.forEach(t => uniqueToppingsMap.set(t[0], t));
-            let uniqueToppings = Array.from(uniqueToppingsMap.values());
-            const topSelect = document.getElementById('manual-topping');
-            if (topSelect) topSelect.innerHTML = `<option value="" data-price="0">ไม่มีท็อปปิ้ง</option>` + uniqueToppings.map(t => `<option value="${t[0]}" data-price="${t[1]}">+ ${t[0]} (฿${t[1]})</option>`).join('');
-            
-            safeStyle('manual-order-modal', 'display', 'flex');
-        }
-
-        function renderManualMenu() {
-            if(!fullData || !fullData.menu) return;
-            const term = document.getElementById('manual-search').value.toLowerCase();
-            const filteredMenu = fullData.menu.filter(m => m[0].toLowerCase().includes(term));
-            
-            safeHtml('manual-menu-list', filteredMenu.map(m => `
-                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border); align-items:center;">
-                    <span style="font-size:13px; font-weight:600;">${m[0]} (฿${m[1]})</span>
-                    <button onclick="addToManual('${m[0]}', ${m[1]})" style="background:#000; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;">SELECT</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div>
+                    <label style="font-weight: 700; display: block; margin-bottom: 5px; font-size: 14px;">โต๊ะ / ช่องทาง</label>
+                    <select id="mo-table" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); width: 100%; font-size: 14px;">
+                        <option value="Takeaway">Takeaway (กลับบ้าน)</option>
+                        <option value="T-1">T-1</option>
+                        <option value="T-2">T-2</option>
+                        <option value="T-3">T-3</option>
+                        <option value="T-4">T-4</option>
+                        <option value="T-5">T-5</option>
+                    </select>
                 </div>
-            `).join('') || `<div style="padding:10px; text-align:center; font-size:12px; color:var(--text-muted);">ไม่พบเมนูที่ค้นหา</div>`);
-        }
+                <div>
+                    <label style="font-weight: 700; display: block; margin-bottom: 5px; font-size: 14px;">ค้นหาเมนู</label>
+                    <input type="text" id="mo-search" placeholder="พิมพ์ชื่อเมนู..." oninput="filterMoItems()" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); width: 100%; font-size: 14px;">
+                </div>
+            </div>
 
-        function addToManual(name, basePrice) { 
-            let sweet = document.getElementById('manual-sweetness').value;
-            let topEl = document.getElementById('manual-topping');
-            let topName = ""; let topPrice = 0;
-            if (topEl && topEl.selectedIndex > 0) {
-                topName = topEl.options[topEl.selectedIndex].value;
-                topPrice = parseFloat(topEl.options[topEl.selectedIndex].getAttribute('data-price')) || 0;
-            }
-            let finalPrice = basePrice + topPrice;
-            
-            let finalDetail = "";
-            if (sweet !== "") finalDetail += sweet;
-            if (topName !== "") finalDetail += (finalDetail !== "" ? ", " : "") + topName;
-            
-            let existingIdx = manualCart.findIndex(item => item.name === name && item.note === finalDetail);
-            if (existingIdx >= 0) {
-                manualCart[existingIdx].qty += 1;
-                manualCart[existingIdx].total = manualCart[existingIdx].qty * manualCart[existingIdx].price;
-            } else {
-                manualCart.push({ name: name, price: finalPrice, qty: 1, total: finalPrice, note: finalDetail }); 
-            }
-            updateManualUI(); 
-        }
+            <div style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px;" id="mo-menu-list">
+                <!-- Menu items injected here -->
+            </div>
 
-        function adjustManualQty(idx, delta) {
-            manualCart[idx].qty += delta;
-            if(manualCart[idx].qty <= 0) {
-                manualCart.splice(idx, 1);
-            } else {
-                manualCart[idx].total = manualCart[idx].price * manualCart[idx].qty;
-            }
-            updateManualUI();
-        }
+            <div style="background: var(--slate); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 700;">รายการออเดอร์ (<span id="mo-cart-count">0</span>)</h4>
+                <div id="mo-cart-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 10px; font-size: 13px;">
+                    <!-- Cart items injected here -->
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 18px; color: #3b82f6;">
+                    <span>ยอดรวม:</span>
+                    <span>฿<span id="mo-total">0</span></span>
+                </div>
+            </div>
 
-        function updateManualUI() {
-            safeHtml('manual-cart-items', manualCart.map((i,idx) => {
-                let desc = i.name; if(i.note) desc += ` <small style="color:var(--text-muted);">(${i.note})</small>`;
-                return `
-                <div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px;">
-                    <div style="flex:1; padding-right:10px;">
-                        <div style="font-size:13px; font-weight:600;">${desc}</div>
-                        <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-top:2px;">฿${i.price}</div>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <button onclick="adjustManualQty(${idx}, -1)" style="width:28px; height:28px; border:1px solid var(--border); border-radius:6px; background:var(--surface); cursor:pointer; font-weight:bold;">-</button>
-                        <span style="font-size:13px; font-weight:700; width:16px; text-align:center;">${i.qty}</span>
-                        <button onclick="adjustManualQty(${idx}, 1)" style="width:28px; height:28px; border:1px solid var(--border); border-radius:6px; background:#000; color:#fff; cursor:pointer; font-weight:bold;">+</button>
-                    </div>
-                </div>`;
-            }).join(''));
-            safeText('manual-total-price', "฿" + manualCart.reduce((s,i)=>s+i.total,0).toLocaleString());
-        }
+            <button class="btn-black" onclick="submitManualOrder()" style="width: 100%; background: #3b82f6; height: 50px; font-size: 16px;"><i class="fas fa-check-circle"></i> ยืนยันออเดอร์</button>
+        </div>
+    </div>
 
-        async function submitManualOrder() {
-            if(!manualCart.length) return;
-            const ch = document.getElementById('manual-channel'); 
-            const channelVal = ch ? ch.value : 'LINE';
-            
-            const btnConfirm = document.getElementById('btn-manual-confirm');
-            const originalText = btnConfirm.innerText;
-            btnConfirm.innerText = "SENDING...";
-            try {
-                await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action: 'submitOrder', table: channelVal, cart: manualCart, apiKey: API_KEY})});
-            } catch(e) {
-                console.error("Submit Order Error:", e);
-            }
-            
-            btnConfirm.innerText = originalText;
-            safeStyle('manual-order-modal', 'display', 'none'); 
-            lastFingerprint = ""; 
-            setTimeout(() => refresh(), 1000); 
-        }
-
-        function getTimeDiff(t) { const now = new Date(); const d = new Date(t); return isNaN(d.getTime()) ? 0 : Math.floor((now-d)/60000); }
-        
-        async function actionCall(action, params) { 
-            try { 
-                const payload = {action, apiKey: API_KEY, ...params};
-                await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(payload)}); 
-                refresh(); 
-            } catch(e) { 
-                console.error(e); 
-            } 
-        }
-
-        const savedTheme = safeStorageGet('withu_theme', 'light'); 
-        document.body.setAttribute('data-theme', savedTheme);
-        applyLanguagePack(); 
-        
-        const mapGrid = document.getElementById('live-map-grid');
-        if (mapGrid) {
-            for(let i=1; i<=15; i++) {
-                const tile = document.createElement('div');
-                tile.className = 'map-table';
-                tile.id = `map-t-${i}`;
-                tile.textContent = `T-${i}`;
-                tile.onclick = function() { handleMapTableClick(i); };
-                mapGrid.appendChild(tile);
-            }
-        }
-        
-        const ADMIN_PIN = "123456";
-        let refreshInterval = null;
-        let clockInterval = null;
-        let reloadInterval = null;
-
-        function checkLogin() {
-            const pin = document.getElementById('login-pin').value;
-            if(pin === ADMIN_PIN || pin === API_KEY) {
-                safeStorageSet('withu_admin_logged_in', 'true');
-                document.getElementById('login-overlay').style.display = 'none';
-                initApp();
-            } else {
-                safeStyle('login-error', 'display', 'block');
-                setTimeout(() => safeStyle('login-error', 'display', 'none'), 3000);
-            }
-        }
-
-        function handleLogout() {
-            if(!confirm("ต้องการออกจากระบบใช่หรือไม่?")) return;
-            safeStorageRemove('withu_admin_logged_in');
-            document.getElementById('login-pin').value = '';
-            document.getElementById('login-overlay').style.display = 'flex';
-            
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar && sidebar.classList.contains('open')) toggleSidebar();
-            
-            if (refreshInterval) clearInterval(refreshInterval);
-            if (clockInterval) clearInterval(clockInterval);
-            if (reloadInterval) clearInterval(reloadInterval);
-        }
-
-        function initApp() {
-            if (clockInterval) clearInterval(clockInterval);
-            if (refreshInterval) clearInterval(refreshInterval);
-            if (reloadInterval) clearInterval(reloadInterval);
-            
-            updateClock();
-            clockInterval = setInterval(updateClock, 1000); 
-            refresh(); 
-            refreshInterval = setInterval(refresh, 5000); 
-            reloadInterval = setInterval(function() {
-                window.location.reload();
-            }, 900000);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if(safeStorageGet('withu_admin_logged_in') === 'true') {
-                document.getElementById('login-overlay').style.display = 'none';
-                initApp();
-            } else {
-                document.getElementById('login-overlay').style.display = 'flex';
-            }
-            
-            const pinInput = document.getElementById('login-pin');
-            if (pinInput) {
-                pinInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') checkLogin();
-                });
-            }
-        });
-
-    </script>
 </body>
 </html>

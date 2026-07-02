@@ -58,7 +58,7 @@
         .item-row:last-child { border-bottom: none; }
         .item-info b { font-weight: 700; font-size: 16px; }
 
-        /* ⭐️ ไฮไลต์หมายเหตุตัวใหญ่ กระแทกตา ⭐️ */
+        /*  ไฮไลต์หมายเหตุตัวใหญ่ กระแทกตา  */
         .item-details-highlight {
             display: inline-block;
             color: #ef4444;
@@ -73,7 +73,7 @@
         }
         [data-theme="dark"] .item-details-highlight { background: #450a0a; color: #fca5a5; border-color: #991b1b; }
 
-        /* ⭐️ ป้ายกำกับ สั่งมาใหม่ ⭐️ */
+        /*  ป้ายกำกับ สั่งมาใหม่  */
         .badge-new-item {
             background: #ef4444; color: #ffffff; padding: 4px 8px; border-radius: 6px;
             font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle;
@@ -99,7 +99,7 @@
         .pay-tile:hover { background: #000000; color: #ffffff; }
         input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; background: var(--surface); color: var(--text-main); }
         
-        /* ⭐️ Styles สำหรับ Toast Notification หลากสี ⭐️ */
+        /*  Styles สำหรับ Toast Notification หลากสี  */
         .toast-notify { 
             position: fixed; top: 0; left: 0; width: 100%; color: #ffffff; 
             padding: 20px 30px; display: none; font-size: 20px; font-weight: 800; text-align: center; 
@@ -109,7 +109,7 @@
         .toast-notify-call { background: #ef4444; box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5); animation: alertCallBlink 0.5s infinite alternate; }
         .toast-notify-new { background: #10b981; box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); animation: alertNewBlink 0.5s infinite alternate; }
         .toast-notify-add { background: #f59e0b; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.5); animation: alertAddBlink 0.5s infinite alternate; }
-        /* ⭐️ สีใหม่ สำหรับแจ้งเตือนขอเช็คบิล ⭐️ */
+        /*  สีใหม่ สำหรับแจ้งเตือนขอเช็คบิล  */
         .toast-notify-pay { background: #8b5cf6; box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5); animation: alertPayBlink 0.5s infinite alternate; }
 
         @keyframes alertCallBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
@@ -810,14 +810,14 @@ input:focus, select:focus {
             return false;
         };
         
-        // ⭐️ ระบบเสียงสังเคราะห์ (Web Audio API) ทะลวงบล็อก Browser 100% ⭐️
+        //  ระบบเสียงสังเคราะห์ (Web Audio API) ทะลวงบล็อก Browser 100% 
         let audioCtx = null;
         let isSoundEnabled = true;
         let notifiedOrders = new Set(); 
         let currentNotifyTable = "";
         let currentNotifyType = "";
         
-        // ⭐️ ตัวแปรควบคุมการ Loop เสียง
+        //  ตัวแปรควบคุมการ Loop เสียง
         let soundLoopInterval = null; 
 
         function initAudio() {
@@ -867,7 +867,7 @@ input:focus, select:focus {
             osc.stop(audioCtx.currentTime + 0.5);
         }
 
-        // ⭐️ เสียง 3: เรียกเก็บเงิน/จ่ายตัง (เสียงติ๊ง-ติ๊ง แบบได้เงิน) ⭐️
+        //  เสียง 3: เรียกเก็บเงิน/จ่ายตัง (เสียงติ๊ง-ติ๊ง แบบได้เงิน) 
         function triggerPaySound() {
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
@@ -883,7 +883,7 @@ input:focus, select:focus {
             osc.stop(audioCtx.currentTime + 0.5);
         }
 
-        // ⭐️ ฟังก์ชันสั่งให้เสียงดังซ้ำๆ วนไปเรื่อยๆ จนกว่าจะกดปิดแถบ
+        //  ฟังก์ชันสั่งให้เสียงดังซ้ำๆ วนไปเรื่อยๆ จนกว่าจะกดปิดแถบ
         function startLoopingSound(type) {
             if (!isSoundEnabled) return;
             initAudio();
@@ -901,7 +901,7 @@ input:focus, select:focus {
             }
         }
 
-        // ⭐️ ฟังก์ชันหยุดเสียง Loop ⭐️
+        //  ฟังก์ชันหยุดเสียง Loop 
         function stopLoopingSound() {
             if (soundLoopInterval) {
                 clearInterval(soundLoopInterval);
@@ -911,7 +911,7 @@ input:focus, select:focus {
 
         function toggleSound() { 
             isSoundEnabled = !isSoundEnabled; 
-            document.getElementById('btn-sound').innerText = isSoundEnabled ? '🔊 SOUND ON' : '🔇 SOUND OFF'; 
+            document.getElementById('btn-sound').innerText = isSoundEnabled ? 'SOUND ON' : '🔇 SOUND OFF'; 
             if(isSoundEnabled) {
                 initAudio();
                 triggerNewOrderSound(); // เทสเสียงเมื่อกดเปิด
@@ -920,7 +920,7 @@ input:focus, select:focus {
             }
         }
 
-        // ⭐️ ฟังก์ชันเปิดแถบแจ้งเตือน (แยกสี/แยกข้อความ) และสั่งให้เสียงดังวนลูป ⭐️
+        //  ฟังก์ชันเปิดแถบแจ้งเตือน (แยกสี/แยกข้อความ) และสั่งให้เสียงดังวนลูป 
         function triggerNotify(type, tableStr) {
             const notifyEl = document.getElementById('dynamic-notify');
             if(!notifyEl) return;
@@ -952,7 +952,7 @@ input:focus, select:focus {
             startLoopingSound(type); // สั่งเสียง Loop ทำงานทันที
         }
 
-        // ⭐️ ฟังก์ชันกดคลิกที่แถบแจ้งเตือน เพื่อล้างข้อความและหยุดเสียง ⭐️
+        //  ฟังก์ชันกดคลิกที่แถบแจ้งเตือน เพื่อล้างข้อความและหยุดเสียง 
         function clearDynamicNotify() {
             safeStyle('dynamic-notify', 'display', 'none');
             stopLoopingSound(); // 🔴 หยุดเสียงแจ้งเตือนที่ดังวนอยู่
@@ -1017,22 +1017,27 @@ input:focus, select:focus {
 
     <div id="dynamic-notify" class="toast-notify" onclick="clearDynamicNotify()"></div>
 
-    <div class="op-bar">
-        <div style="display:flex; gap:8px; align-items:center;">
-            <button id="btn-sound" onclick="toggleSound()" style="background:transparent; border:1px solid #fff; color:#fff; border-radius:4px; font-size:10px; cursor:pointer;">🔊 SOUND ON</button>
-            <span id="sync-status" style="display:none; color:#10b981; font-weight:800; font-size:11px; margin-left:10px; animation: alertCallBlink 0.5s infinite alternate;">🔄 SYNCING...</span>
-            <div style="margin-left:10px;">CLOSING IN: <span id="close-timer">00:00:00</span></div>
-        </div>
+    
         <div id="mistake-log" style="font-weight: 700; color: #ef4444; display:none; text-transform: uppercase; letter-spacing: 1px;">MISTAKE DETECTED</div>
         <div id="date-now"></div>
     </div>
 
     <nav class="top-nav">
         <div style="display: flex; align-items: center;">
-            <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
-            <div class="logo">WITHU ADMIN</div>
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="logo">WITHU ADMIN</div>
+        <span id="sync-status" style="display:none; color:#10b981; font-weight:800; font-size:11px;"><i class="fas fa-sync-alt fa-spin" style="margin-right: 5px;"></i>SYNCING</span>
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); display: flex; align-items: center;">
+            <span style="background: rgba(59,130,246,0.1); padding: 4px 8px; border-radius: 6px; color: #3b82f6; margin-right: 5px;">CLOSING IN: <span id="close-timer" style="font-weight: 900;">00:00:00</span></span>
+        </div>
+        <div id="date-now" style="font-size: 11px; font-weight: 700; color: var(--text-muted);"></div>
+    </div>
+
         </div>
         <div class="action-btns" style="display: flex; gap: 8px;">
+            <button id="btn-sound" onclick="toggleSound()" class="tab-btn" style="border: 1px solid var(--border); color: #3b82f6;"><i class="fas fa-volume-up"></i></button>
             <button class="tab-btn" onclick="toggleLanguage()" style="border: 1px solid #000;" id="btn-lang">EN / TH</button>
             <button class="tab-btn" onclick="openManualOrderModal(null)" id="btn-add-nav">ADD ORDER</button>
             <button class="tab-btn" onclick="toggleAttendance()" id="btn-staff-nav" style="background: #000; color: #fff;">STAFF</button>
@@ -1416,7 +1421,7 @@ input:focus, select:focus {
                     }
                 });
                 
-                // ⭐️ ตรวจสอบการเรียกพนักงาน / เช็คบิล ⭐️
+                //  ตรวจสอบการเรียกพนักงาน / เช็คบิล 
                 if (activeCalls.length > 0) {
                     let lastCall = activeCalls[activeCalls.length - 1];
                     let notifyEl = document.getElementById('dynamic-notify');
@@ -1463,7 +1468,7 @@ input:focus, select:focus {
             }
         }
 
-        // ⭐️ แสดงออเดอร์ และระบบแจ้งเตือนออเดอร์ใหม่ฉลาดขึ้น ⭐️
+        //  แสดงออเดอร์ และระบบแจ้งเตือนออเดอร์ใหม่ฉลาดขึ้น 
         function renderOrders(orders) {
             const store = document.getElementById('order-sec');
             const takeaway = document.getElementById('takeaway-sec');
@@ -1474,7 +1479,7 @@ input:focus, select:focus {
             // ตัวแปรสำหรับเช็คแจ้งเตือน
             let hasFreshNewOrder = false;
             let hasFreshAddedOrder = false;
-            let hasFreshPayRequest = false; // ⭐️ ตัวแปรใหม่ตรวจจับการขอเช็คบิล
+            let hasFreshPayRequest = false; //  ตัวแปรใหม่ตรวจจับการขอเช็คบิล
             let notifyTableStr = "";
 
             orders.forEach(o => {
@@ -1514,7 +1519,7 @@ input:focus, select:focus {
                     let pillClass = "pill-new";
                     let mapColorClass = "map-new";
 
-                    // ⭐️ ตรรกะตรวจจับการแจ้งเตือน (ซ่อนไม่ให้เด้งรัวๆ) ⭐️
+                    //  ตรรกะตรวจจับการแจ้งเตือน (ซ่อนไม่ให้เด้งรัวๆ) 
                     if (isPayingMode) {
                         let payKey = `table_${tableId}_paying`;
                         if (!notifiedOrders.has(payKey)) {
@@ -1608,14 +1613,14 @@ input:focus, select:focus {
                                         }
                                     }
                                     
-                                    // ⭐️ ตัวกรองคำซ้ำสำหรับหมายเหตุ ⭐️
+                                    //  ตัวกรองคำซ้ำสำหรับหมายเหตุ 
                                     let cleanDetails = "";
                                     if (hasDetails) {
                                         let detailsArray = i.details.split(',').map(s => s.trim()).filter(s => s !== '');
                                         cleanDetails = [...new Set(detailsArray)].join(', ');
                                     }
 
-                                    // ⭐️ สร้างสถานะรายเมนู ⭐️
+                                    //  สร้างสถานะรายเมนู 
                                     let itemStatus = i.status || "รับออเดอร์";
                                     let itemStatusText = "รอดำเนินการ";
                                     let itemStatusColor = "#737373";
@@ -1678,7 +1683,7 @@ input:focus, select:focus {
             
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
 
-            // ⭐️ เรียกการแจ้งเตือนเสียง+แถบ ถ้ามีของใหม่ ⭐️
+            //  เรียกการแจ้งเตือนเสียง+แถบ ถ้ามีของใหม่ 
             if (hasFreshPayRequest) {
                 triggerNotify('pay', notifyTableStr);
             } else if (hasFreshAddedOrder) {
@@ -1779,7 +1784,7 @@ input:focus, select:focus {
             }
             safeText('p-points-display', `แต้มที่จะได้รับ: ${pointsToEarn} แต้ม`);
 
-            // ⭐️ ทำให้หมายเหตุหน้าจ่ายเงินใหญ่ด้วย และกรองคำซ้ำ ⭐️
+            //  ทำให้หมายเหตุหน้าจ่ายเงินใหญ่ด้วย และกรองคำซ้ำ 
             safeHtml('p-bill-items', orders.map(i => {
                 const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
                 let cleanDetails = "";
@@ -1949,7 +1954,7 @@ input:focus, select:focus {
             safeHtml('ai-insights-block', insightHtml);
         }
 
-        // ⭐️ แก้ไขตารางผลประกอบการให้แสดง ราคาขาย, ยอดรวมขาย, และกำไร/ชิ้น ⭐️
+        //  แก้ไขตารางผลประกอบการให้แสดง ราคาขาย, ยอดรวมขาย, และกำไร/ชิ้น 
         function renderPerformance(report) {
             safeText('report-date-text', "PERFORMANCE DATA OVERVIEW - " + new Date().toLocaleDateString('en-GB', {dateStyle:'full'}).toUpperCase());
             
@@ -2014,7 +2019,7 @@ input:focus, select:focus {
             refresh(); 
         }
 
-        // ⭐️ ฟังก์ชันประเมินหมวดหมู่เมนูจากชื่อโดยอัตโนมัติ ⭐️
+        //  ฟังก์ชันประเมินหมวดหมู่เมนูจากชื่อโดยอัตโนมัติ 
         function getCategoryFromName(name) {
             if (/ข้าว|กะเพรา|ผัดพริก|ไข่เจียว/.test(name)) return 'เมนูข้าว';
             if (/เส้น|สปาเก็ตตี้|มาม่า|ผัดไทย|ก๋วยเตี๋ยว|มักกะโรนี|อูด้ง|พาสต้า/.test(name)) return 'เมนูเส้น';
@@ -2024,7 +2029,7 @@ input:focus, select:focus {
             return 'อื่นๆ';
         }
 
-        // ⭐️ ฟังก์ชันสำหรับการกรองตารางคลังสินค้า ⭐️
+        //  ฟังก์ชันสำหรับการกรองตารางคลังสินค้า 
         function filterStock() {
             if(!fullData || !fullData.menu) return;
             const term = document.getElementById('stock-search-input').value.toLowerCase();
@@ -2058,7 +2063,7 @@ input:focus, select:focus {
             }).join('') || `<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่พบรายการคลังสินค้า</td></tr>`);
         }
         
-        // ⭐️ ฟังก์ชันสำหรับปิด/เปิด คลังสินค้ายกหมวดหมู่ ⭐️
+        //  ฟังก์ชันสำหรับปิด/เปิด คลังสินค้ายกหมวดหมู่ 
         async function bulkToggleCategoryStock(status) {
             if(!fullData || !fullData.menu) return;
             const cat = document.getElementById('stock-category-filter').value;

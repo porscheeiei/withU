@@ -208,7 +208,7 @@
 @keyframes fadeSlideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 @keyframes pulseGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.3); } 50% { box-shadow: 0 0 0 8px rgba(59,130,246,0); } }
 
-* { font-family: 'Plus Jakarta Sans', 'Inter', 'Prompt', system-ui, sans-serif !important; }
+*:not(.fas):not(.far):not(.fab):not(.fa) { font-family: 'Plus Jakarta Sans', 'Inter', 'Prompt', system-ui, sans-serif !important; }
 
 body { background: #f8fafc !important; background-image: radial-gradient(at 20% 30%, rgba(59,130,246,0.03) 0%, transparent 50%), radial-gradient(at 80% 70%, rgba(99,102,241,0.03) 0%, transparent 50%) !important; }
 [data-theme="dark"] body { background: #0c0f1a !important; background-image: radial-gradient(at 20% 30%, rgba(59,130,246,0.05) 0%, transparent 50%), radial-gradient(at 80% 70%, rgba(99,102,241,0.04) 0%, transparent 50%) !important; }
@@ -610,27 +610,48 @@ window.renderReport = function(period) {
     btns.forEach(function(b,i) {
         b.style.background = i===pMap[period] ? 'linear-gradient(135deg,#3b82f6,#2563eb)' : 'linear-gradient(135deg,#1e293b,#0f172a)';
     });
-    var dataStr = localStorage.getItem('withu_completed_orders') || '[]';
-    var orders = []; try { orders = JSON.parse(dataStr); } catch(e) {}
-    var now = new Date();
-    var fOrders = orders.filter(function(o) {
-        if(!o.timestamp) return false;
-        var d = new Date(o.timestamp);
-        var diff = Math.ceil(Math.abs(now-d)/(1000*60*60*24));
-        if(period==='1d') return diff<=1 && d.getDate()===now.getDate();
-        if(period==='7d') return diff<=7;
-        if(period==='30d') return diff<=30;
-        return true;
-    });
+    
     var total=0, items={}, byDate={};
-    fOrders.forEach(function(o) {
-        var amt = o.total||o.finalTotal||0; total+=amt;
-        if(o.cart) o.cart.forEach(function(item) { items[item.name] = (items[item.name]||0) + (item.qty||1); });
-        var dk = new Date(o.timestamp).toLocaleDateString('th-TH');
-        byDate[dk] = (byDate[dk]||0) + amt;
-    });
+    var ordersCount = 0;
+    var now = new Date();
+    
+    // Check if we are viewing 1d and have fullData from API
+    if (period === '1d' && window.fullData && window.fullData.analytics && window.fullData.analytics.report && window.fullData.analytics.report.length > 0) {
+        var rpt = window.fullData.analytics.report;
+        total = window.fullData.analytics.revenue || 0;
+        rpt.forEach(function(i) {
+            items[i.name || i[0]] = (items[i.name || i[0]] || 0) + (i.qty || 1);
+            if (!total && i.revenue) total += i.revenue;
+        });
+        ordersCount = rpt.reduce(function(s, i) { return s + (i.qty || 1); }, 0); // Estimate
+        var dk = now.toLocaleDateString('th-TH');
+        byDate[dk] = total;
+    } else {
+        // Fallback to localStorage data
+        var dataStr = localStorage.getItem('withu_completed_orders') || '[]';
+        var orders = []; try { orders = JSON.parse(dataStr); } catch(e) {}
+        
+        var fOrders = orders.filter(function(o) {
+            if(!o.timestamp) return false;
+            var d = new Date(o.timestamp);
+            var diff = Math.ceil(Math.abs(now-d)/(1000*60*60*24));
+            if(period==='1d') return diff<=1 && d.getDate()===now.getDate();
+            if(period==='7d') return diff<=7;
+            if(period==='30d') return diff<=30;
+            return true;
+        });
+        
+        ordersCount = fOrders.length;
+        fOrders.forEach(function(o) {
+            var amt = o.total||o.finalTotal||0; total+=amt;
+            if(o.cart) o.cart.forEach(function(item) { items[item.name] = (items[item.name]||0) + (item.qty||1); });
+            var dk = new Date(o.timestamp).toLocaleDateString('th-TH');
+            byDate[dk] = (byDate[dk]||0) + amt;
+        });
+    }
+
     var te = document.getElementById('rep-total'); if(te) te.innerText = total.toLocaleString();
-    var ce = document.getElementById('rep-count'); if(ce) ce.innerText = fOrders.length;
+    var ce = document.getElementById('rep-count'); if(ce) ce.innerText = ordersCount;
     var topArr = Object.entries(items).sort(function(a,b){return b[1]-a[1];});
     var tme = document.getElementById('rep-top-menu'); if(tme) tme.innerText = topArr.length ? topArr[0][0]+' ('+topArr[0][1]+')' : '-';
     
@@ -902,11 +923,10 @@ window.renderHistory = function() {
             <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
             
     <div style="display: flex; align-items: center; gap: 12px;">
-        <div class="logo">WITHU ADMIN</div>
+        <div class="logo" style="display:flex; align-items:center; gap:10px;">WITHU ADMIN <span id="date-now" style="font-size:12px; color:#3b82f6; font-weight:800; background:rgba(59,130,246,0.1); padding:4px 8px; border-radius:6px; letter-spacing:0.5px;"></span></div>
         <span id="sync-status" style="display:none; font-weight:700; font-size:11px; color:#10b981; background:rgba(16,185,129,0.1); padding:4px 10px; border-radius:6px; border:1px solid rgba(16,185,129,0.2);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px; vertical-align:-1px; animation:spin 1s linear infinite;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>SYNCING</span>
         <div style="font-size:11px; font-weight:700; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
             <span style="background:rgba(59,130,246,0.08); padding:5px 10px; border-radius:8px; color:#3b82f6; font-weight:800; border:1px solid rgba(59,130,246,0.15);">CLOSING IN: <span id="close-timer" style="font-weight:900; color:#2563eb;">00:00:00</span></span>
-            <span id="date-now" style="background:rgba(100,116,139,0.08); padding:5px 10px; border-radius:8px; color:#64748b; font-weight:700; border:1px solid rgba(100,116,139,0.1);"></span>
         </div>
     </div>
 
@@ -1276,7 +1296,7 @@ window.renderHistory = function() {
                     return; 
                 }
                 lastFingerprint = data.fingerprint || "";
-                fullData = data;
+                fullData = data; window.fullData = data;
                 
                 const analytics = data.analytics || {};
                 const rev = analytics.revenue || 0;

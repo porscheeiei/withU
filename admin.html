@@ -21,7 +21,7 @@
         body { background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 60px; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
         .op-bar { background: #000000; color: #ffffff; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: 1px; position: sticky; top: 0; z-index: 1100; font-weight: 600; text-transform: uppercase; }
         
-        .top-nav { background: var(--surface); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 35px; z-index: 1000; }
+        .top-nav { background: var(--surface); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
         .logo { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; text-transform: uppercase; }
         .container { max-width: 1450px; margin: 25px auto; padding: 0 20px; }
         .map-section { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-bottom: 25px; box-shadow: var(--shadow); }
@@ -195,612 +195,487 @@
     
     
 
-<!-- WITHU PREMIUM UI -->
+
+<!-- WITHU ADMIN PREMIUM V3 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-/* =====================================================
-   WITHU ADMIN - PREMIUM UI OVERHAUL
-   Design System: Modern Dark-Light Glassmorphism
-   ===================================================== */
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style id="withu-premium-v3">
+/* === PREMIUM V3 DESIGN SYSTEM === */
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes fadeSlideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pulseGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.3); } 50% { box-shadow: 0 0 0 8px rgba(59,130,246,0); } }
 
-/* --- FONT OVERRIDE --- */
-* { font-family: 'Plus Jakarta Sans', 'Inter', 'Prompt', sans-serif !important; }
+* { font-family: 'Plus Jakarta Sans', 'Inter', 'Prompt', system-ui, sans-serif !important; }
 
-/* --- CSS VARIABLES --- */
-:root {
-  --blue: #3b82f6;
-  --blue-dark: #1d4ed8;
-  --blue-light: rgba(59,130,246,0.12);
-  --green: #10b981;
-  --amber: #f59e0b;
-  --red: #ef4444;
-  --purple: #8b5cf6;
-  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* --- GLOBAL BODY --- */
-body {
-  background: var(--bg) !important;
-  background-image: radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.04) 0%, transparent 50%),
-                    radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.03) 0%, transparent 50%) !important;
-}
-
-/* --- OP BAR (Top Status Bar) --- */
-.op-bar {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
-  padding: 8px 20px !important;
-  font-size: 11px !important;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-}
-.op-bar > div { gap: 15px !important; align-items: center !important; }
-#close-timer { color: #60a5fa !important; font-weight: 900 !important; font-size: 13px !important; }
+body { background: #f8fafc !important; background-image: radial-gradient(at 20% 30%, rgba(59,130,246,0.03) 0%, transparent 50%), radial-gradient(at 80% 70%, rgba(99,102,241,0.03) 0%, transparent 50%) !important; }
+[data-theme="dark"] body { background: #0c0f1a !important; background-image: radial-gradient(at 20% 30%, rgba(59,130,246,0.05) 0%, transparent 50%), radial-gradient(at 80% 70%, rgba(99,102,241,0.04) 0%, transparent 50%) !important; }
 
 /* --- TOP NAV --- */
-.top-nav {
-  background: rgba(255,255,255,0.92) !important;
-  backdrop-filter: blur(20px) saturate(1.8) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(1.8) !important;
-  border-bottom: 1px solid rgba(59,130,246,0.15) !important;
-  padding: 12px 25px !important;
-  box-shadow: 0 1px 20px rgba(0,0,0,0.06) !important;
-}
-[data-theme="dark"] .top-nav {
-  background: rgba(18,18,18,0.95) !important;
-  border-bottom: 1px solid rgba(59,130,246,0.1) !important;
-}
-.logo {
-  font-size: 20px !important;
-  font-weight: 900 !important;
-  letter-spacing: -1px !important;
-  background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}
-[data-theme="dark"] .logo {
-  background: linear-gradient(135deg, #ffffff 0%, #60a5fa 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}
-.hamburger-btn {
-  background: rgba(59,130,246,0.1) !important;
-  border: 1px solid rgba(59,130,246,0.2) !important;
-  border-radius: 10px !important;
-  color: #3b82f6 !important;
-  padding: 8px 12px !important;
-  font-size: 18px !important;
-  transition: var(--transition) !important;
-}
-.hamburger-btn:hover {
-  background: #3b82f6 !important;
-  color: white !important;
-  transform: scale(1.05) !important;
-}
+.top-nav { background: rgba(255,255,255,0.95) !important; backdrop-filter: blur(20px) saturate(1.8) !important; -webkit-backdrop-filter: blur(20px) saturate(1.8) !important; border-bottom: 1px solid rgba(226,232,240,0.8) !important; padding: 10px 24px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.02) !important; top: 0 !important; }
+[data-theme="dark"] .top-nav { background: rgba(15,23,42,0.95) !important; border-bottom: 1px solid rgba(30,41,59,0.8) !important; }
+.logo { font-size: 18px !important; font-weight: 900 !important; letter-spacing: -0.5px !important; color: #0f172a !important; }
+[data-theme="dark"] .logo { color: #f1f5f9 !important; }
+.hamburger-btn { background: rgba(59,130,246,0.08) !important; border: 1px solid rgba(59,130,246,0.15) !important; border-radius: 10px !important; color: #3b82f6 !important; padding: 8px 11px !important; font-size: 16px !important; transition: all 0.2s ease !important; }
+.hamburger-btn:hover { background: #3b82f6 !important; color: #fff !important; transform: scale(1.05) !important; }
 
-/* Action Buttons in Nav */
-.action-btns .tab-btn {
-  border-radius: 10px !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  padding: 8px 16px !important;
-  letter-spacing: 0.3px !important;
-  transition: var(--transition) !important;
-}
-#btn-add-nav {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  color: white !important;
-  border: none !important;
-  box-shadow: 0 4px 12px rgba(59,130,246,0.35) !important;
-}
-#btn-add-nav:hover { transform: translateY(-1px) !important; box-shadow: 0 6px 18px rgba(59,130,246,0.45) !important; }
-#btn-staff-nav {
-  background: linear-gradient(135deg, #1e293b, #0f172a) !important;
-  color: white !important;
-  border: none !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
-}
-#btn-export-nav {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
-  color: white !important;
-  border: none !important;
-  box-shadow: 0 4px 12px rgba(139,92,246,0.35) !important;
-}
+/* Action Buttons */
+.action-btns .tab-btn { border-radius: 10px !important; font-size: 11px !important; font-weight: 700 !important; padding: 8px 16px !important; letter-spacing: 0.3px !important; transition: all 0.2s ease !important; }
+#btn-add-nav { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: #fff !important; border: none !important; box-shadow: 0 2px 8px rgba(59,130,246,0.3) !important; }
+#btn-add-nav:hover { transform: translateY(-1px) !important; box-shadow: 0 4px 15px rgba(59,130,246,0.4) !important; }
+#btn-staff-nav { background: linear-gradient(135deg, #1e293b, #0f172a) !important; color: #fff !important; border: none !important; }
+#btn-export-nav { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; color: #fff !important; border: none !important; }
+#btn-sound { background: rgba(59,130,246,0.08) !important; border: 1px solid rgba(59,130,246,0.2) !important; color: #3b82f6 !important; border-radius: 8px !important; font-weight: 700 !important; }
 
 /* --- SIDEBAR --- */
-.sidebar {
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%) !important;
-  border-right: none !important;
-  box-shadow: 8px 0 30px rgba(0,0,0,0.3) !important;
-  width: 270px !important;
-}
-.sidebar-header {
-  background: rgba(59,130,246,0.1) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-  padding: 24px 20px !important;
-}
-.sidebar-logo {
-  color: white !important;
-  font-size: 20px !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.5px !important;
-  background: linear-gradient(135deg, #fff 0%, #60a5fa 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}
-.sidebar-close {
-  color: rgba(255,255,255,0.6) !important;
-  background: rgba(255,255,255,0.08) !important;
-  border-radius: 8px !important;
-  padding: 6px 10px !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
-  transition: var(--transition) !important;
-}
-.sidebar-close:hover { background: rgba(239,68,68,0.2) !important; color: #ef4444 !important; }
-
-.sidebar-menu { padding: 15px 12px !important; gap: 4px !important; }
-.sidebar-item {
-  color: rgba(255,255,255,0.65) !important;
-  border-radius: 12px !important;
-  padding: 12px 14px !important;
-  font-size: 13.5px !important;
-  font-weight: 600 !important;
-  transition: var(--transition) !important;
-  border: 1px solid transparent !important;
-  letter-spacing: -0.2px;
-}
-.sidebar-item:hover {
-  background: rgba(255,255,255,0.08) !important;
-  color: white !important;
-  border-color: rgba(255,255,255,0.08) !important;
-  transform: translateX(4px) !important;
-}
-.sidebar-item.active {
-  background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(59,130,246,0.1)) !important;
-  color: #60a5fa !important;
-  border-color: rgba(59,130,246,0.3) !important;
-  box-shadow: inset 0 0 20px rgba(59,130,246,0.1) !important;
-  transform: translateX(0) !important;
-}
-.sidebar-divider {
-  background: rgba(255,255,255,0.06) !important;
-  height: 1px !important;
-  margin: 8px 0 !important;
-}
-#sb-settings { color: rgba(100,200,255,0.7) !important; }
-#sb-settings:hover { color: #60a5fa !important; }
-button[onclick*="handleLogout"] { color: rgba(239,68,68,0.7) !important; }
-button[onclick*="handleLogout"]:hover { color: #ef4444 !important; background: rgba(239,68,68,0.1) !important; }
-
-/* --- CONTAINER --- */
-.container { max-width: 1500px !important; padding: 0 24px !important; margin-top: 20px !important; }
+.sidebar { background: linear-gradient(180deg, #0c1929 0%, #111c30 50%, #0c1929 100%) !important; border-right: none !important; box-shadow: 6px 0 25px rgba(0,0,0,0.25) !important; width: 270px !important; }
+.sidebar-header { background: rgba(59,130,246,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; padding: 22px 18px !important; }
+.sidebar-logo { color: #f1f5f9 !important; font-size: 19px !important; font-weight: 900 !important; }
+.sidebar-close { color: rgba(255,255,255,0.5) !important; background: rgba(255,255,255,0.06) !important; border-radius: 8px !important; padding: 5px 9px !important; border: 1px solid rgba(255,255,255,0.08) !important; }
+.sidebar-close:hover { background: rgba(239,68,68,0.15) !important; color: #ef4444 !important; }
+.sidebar-menu { padding: 12px 10px !important; gap: 3px !important; }
+.sidebar-item { color: rgba(255,255,255,0.6) !important; border-radius: 10px !important; padding: 11px 14px !important; font-size: 13px !important; font-weight: 600 !important; transition: all 0.2s ease !important; border: 1px solid transparent !important; }
+.sidebar-item:hover { background: rgba(255,255,255,0.06) !important; color: rgba(255,255,255,0.9) !important; transform: translateX(3px) !important; }
+.sidebar-item.active { background: rgba(59,130,246,0.15) !important; color: #60a5fa !important; border-color: rgba(59,130,246,0.25) !important; }
+.sidebar-divider { background: rgba(255,255,255,0.05) !important; margin: 6px 0 !important; }
+button[onclick*="handleLogout"] { color: rgba(239,68,68,0.6) !important; }
+button[onclick*="handleLogout"]:hover { color: #ef4444 !important; background: rgba(239,68,68,0.08) !important; }
+.badge { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: #fff !important; border-radius: 6px !important; font-weight: 800 !important; box-shadow: 0 2px 6px rgba(59,130,246,0.3) !important; }
 
 /* --- MAP SECTION --- */
-.map-section {
-  background: white !important;
-  border: 1px solid rgba(59,130,246,0.12) !important;
-  border-radius: 20px !important;
-  padding: 24px !important;
-  box-shadow: 0 4px 25px rgba(59,130,246,0.06), 0 1px 4px rgba(0,0,0,0.05) !important;
-  margin-bottom: 24px !important;
-}
-[data-theme="dark"] .map-section {
-  background: #161b27 !important;
-  border: 1px solid rgba(59,130,246,0.15) !important;
-}
-.map-title {
-  font-size: 10px !important;
-  font-weight: 800 !important;
-  letter-spacing: 1.5px !important;
-  color: #3b82f6 !important;
-  text-transform: uppercase !important;
-  margin-bottom: 16px !important;
-}
-.map-table {
-  border-radius: 10px !important;
-  border: 1px solid rgba(0,0,0,0.08) !important;
-  font-size: 10px !important;
-  font-weight: 800 !important;
-  transition: var(--transition) !important;
-  padding: 10px 4px !important;
-  letter-spacing: 0.3px;
-}
-.map-table:hover { transform: scale(1.05) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; z-index: 1 !important; position: relative !important; }
-.map-table.map-new, .map-table.map-cooking, .map-table.map-serving,
-.map-table.map-ordered-more, .map-table.map-waiting-bill {
-  background: linear-gradient(135deg, #1e293b, #0f172a) !important;
-  color: white !important;
-  border-color: transparent !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
-}
-.map-table.alert-trigger {
-  background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
-  box-shadow: 0 4px 20px rgba(239,68,68,0.5) !important;
-}
+.container { max-width: 1500px !important; padding: 0 24px !important; margin-top: 18px !important; }
+.map-section { border-radius: 18px !important; border: 1px solid rgba(226,232,240,0.6) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.02) !important; padding: 22px !important; }
+[data-theme="dark"] .map-section { background: #111827 !important; border-color: rgba(30,41,59,0.5) !important; }
+.map-title { font-size: 10px !important; font-weight: 800 !important; letter-spacing: 1.5px !important; color: #3b82f6 !important; }
+.map-table { border-radius: 10px !important; font-weight: 800 !important; transition: all 0.15s ease !important; font-size: 10px !important; }
+.map-table:hover { transform: scale(1.06) !important; box-shadow: 0 3px 10px rgba(0,0,0,0.08) !important; z-index: 1 !important; position: relative !important; }
+.map-table.map-new, .map-table.map-cooking, .map-table.map-serving, .map-table.map-ordered-more, .map-table.map-waiting-bill { background: linear-gradient(135deg, #1e293b, #0f172a) !important; color: #fff !important; border-color: transparent !important; box-shadow: 0 3px 10px rgba(0,0,0,0.15) !important; }
+.map-table.alert-trigger { background: linear-gradient(135deg, #ef4444, #b91c1c) !important; box-shadow: 0 3px 15px rgba(239,68,68,0.4) !important; }
 
 /* --- STATS CARDS --- */
-.stats-grid { gap: 16px !important; margin-bottom: 24px !important; }
-.stat-card {
-  background: white !important;
-  border-radius: 18px !important;
-  padding: 22px !important;
-  border: 1px solid rgba(59,130,246,0.1) !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important;
-  transition: var(--transition) !important;
-  position: relative;
-  overflow: hidden;
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  border-radius: 18px 18px 0 0;
-}
-.stat-card:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 30px rgba(59,130,246,0.12) !important; }
-[data-theme="dark"] .stat-card { background: #161b27 !important; border-color: rgba(59,130,246,0.15) !important; }
-.stat-card small {
-  font-size: 10px !important;
-  font-weight: 800 !important;
-  letter-spacing: 1.5px !important;
-  color: #6b7280 !important;
-  text-transform: uppercase !important;
-}
-.stat-card h3 { font-size: 28px !important; font-weight: 900 !important; letter-spacing: -1px !important; }
+.stats-grid { gap: 14px !important; margin-bottom: 22px !important; }
+.stat-card { border-radius: 16px !important; padding: 20px !important; border: 1px solid rgba(226,232,240,0.6) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.02) !important; transition: all 0.2s ease !important; position: relative !important; overflow: hidden !important; }
+.stat-card::before { content: '' !important; position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; height: 3px !important; background: linear-gradient(90deg, #3b82f6, #6366f1) !important; }
+.stat-card:hover { transform: translateY(-2px) !important; box-shadow: 0 8px 25px rgba(59,130,246,0.08) !important; }
+[data-theme="dark"] .stat-card { background: #111827 !important; border-color: rgba(30,41,59,0.5) !important; }
+.stat-card small { font-size: 10px !important; font-weight: 800 !important; letter-spacing: 1.5px !important; color: #64748b !important; }
+.stat-card h3 { font-size: 26px !important; font-weight: 900 !important; letter-spacing: -0.5px !important; }
 
 /* --- TAB BAR --- */
-.tab-bar {
-  background: rgba(59,130,246,0.06) !important;
-  border: 1px solid rgba(59,130,246,0.12) !important;
-  border-radius: 14px !important;
-  padding: 5px !important;
-  gap: 4px !important;
-}
-.tab-btn {
-  border-radius: 10px !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  padding: 9px 20px !important;
-  transition: var(--transition) !important;
-  letter-spacing: 0.3px;
-}
-.tab-btn:hover { background: rgba(59,130,246,0.08) !important; color: #3b82f6 !important; }
-.tab-btn.active {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(59,130,246,0.35) !important;
-  border-bottom: none !important;
-}
+.tab-bar { background: rgba(241,245,249,0.8) !important; border: 1px solid rgba(226,232,240,0.6) !important; border-radius: 12px !important; padding: 4px !important; }
+[data-theme="dark"] .tab-bar { background: rgba(30,41,59,0.5) !important; border-color: rgba(51,65,85,0.5) !important; }
+.tab-btn { border-radius: 9px !important; font-size: 11px !important; font-weight: 700 !important; padding: 8px 18px !important; transition: all 0.2s ease !important; }
+.tab-btn:hover { background: rgba(59,130,246,0.06) !important; color: #3b82f6 !important; }
+.tab-btn.active { background: #fff !important; color: #0f172a !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06) !important; border-bottom: none !important; }
+[data-theme="dark"] .tab-btn.active { background: #1e293b !important; color: #f1f5f9 !important; }
 
 /* --- ORDER CARDS --- */
-.order-grid { gap: 18px !important; }
-.order-card {
-  border-radius: 18px !important;
-  border: 1px solid rgba(0,0,0,0.07) !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important;
-  transition: var(--transition) !important;
-  overflow: hidden !important;
-}
-.order-card:hover { transform: translateY(-3px) !important; box-shadow: 0 10px 35px rgba(0,0,0,0.1) !important; }
-.order-card.sla-trigger {
-  border: 2px solid #ef4444 !important;
-  box-shadow: 0 0 20px rgba(239,68,68,0.2) !important;
-}
-[data-theme="dark"] .order-card { border-color: rgba(255,255,255,0.08) !important; background: #161b27 !important; }
-.card-head {
-  background: linear-gradient(135deg, rgba(59,130,246,0.04), rgba(139,92,246,0.03)) !important;
-  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
-  padding: 16px 18px !important;
-}
-[data-theme="dark"] .card-head { background: rgba(255,255,255,0.03) !important; }
-
-.table-status-pill {
-  border-radius: 8px !important;
-  font-size: 10px !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.5px !important;
-  padding: 5px 12px !important;
-  text-transform: uppercase !important;
-}
-
-.track-bar { gap: 4px !important; margin-top: 14px !important; }
-.track-step {
-  border-radius: 8px !important;
-  font-size: 9px !important;
-  font-weight: 800 !important;
-  padding: 5px !important;
-  letter-spacing: 0.3px;
-}
-.track-step.active.step-new { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: white !important; box-shadow: 0 2px 8px rgba(59,130,246,0.4) !important; }
-.track-step.active.step-cooking { background: linear-gradient(135deg, #f59e0b, #d97706) !important; color: white !important; box-shadow: 0 2px 8px rgba(245,158,11,0.4) !important; }
-.track-step.active.step-serving { background: linear-gradient(135deg, #10b981, #059669) !important; color: white !important; box-shadow: 0 2px 8px rgba(16,185,129,0.4) !important; }
+.order-grid { gap: 16px !important; }
+.order-card { border-radius: 16px !important; border: 1px solid rgba(226,232,240,0.6) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.02) !important; transition: all 0.2s ease !important; }
+.order-card:hover { transform: translateY(-2px) !important; box-shadow: 0 8px 30px rgba(0,0,0,0.08) !important; }
+[data-theme="dark"] .order-card { background: #111827 !important; border-color: rgba(30,41,59,0.5) !important; }
+.card-head { background: rgba(248,250,252,0.5) !important; border-bottom: 1px solid rgba(226,232,240,0.5) !important; padding: 16px 18px !important; }
+[data-theme="dark"] .card-head { background: rgba(30,41,59,0.3) !important; }
+.table-status-pill { border-radius: 8px !important; font-size: 10px !important; font-weight: 800 !important; padding: 4px 10px !important; }
+.pill-ordered-more, .pill-waiting-bill { background: linear-gradient(135deg, #1e293b, #0f172a) !important; color: #fff !important; border: none !important; }
+.track-step { border-radius: 8px !important; font-size: 9px !important; font-weight: 800 !important; padding: 5px !important; }
+.track-step.active.step-new { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: #fff !important; box-shadow: 0 2px 6px rgba(59,130,246,0.35) !important; }
+.track-step.active.step-cooking { background: linear-gradient(135deg, #f59e0b, #d97706) !important; color: #fff !important; box-shadow: 0 2px 6px rgba(245,158,11,0.35) !important; }
+.track-step.active.step-serving { background: linear-gradient(135deg, #10b981, #059669) !important; color: #fff !important; box-shadow: 0 2px 6px rgba(16,185,129,0.35) !important; }
 
 /* --- BUTTONS --- */
-.btn-black {
-  background: linear-gradient(135deg, #1e293b, #0f172a) !important;
-  border-radius: 10px !important;
-  font-weight: 800 !important;
-  font-size: 12px !important;
-  letter-spacing: 0.3px !important;
-  transition: var(--transition) !important;
-  border: none !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
-}
-.btn-black:hover {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 6px 20px rgba(59,130,246,0.4) !important;
-}
-.btn-outline {
-  border-radius: 10px !important;
-  font-weight: 700 !important;
-  font-size: 11px !important;
-  border: 1.5px solid rgba(0,0,0,0.12) !important;
-  transition: var(--transition) !important;
-  letter-spacing: 0.3px;
-}
-.btn-outline:hover {
-  background: linear-gradient(135deg, #1e293b, #0f172a) !important;
-  color: white !important;
-  border-color: transparent !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
-}
-[data-theme="dark"] .btn-outline { border-color: rgba(255,255,255,0.15) !important; }
-.btn-void {
-  border-radius: 8px !important;
-  transition: var(--transition) !important;
-}
-.btn-void:hover { transform: scale(1.02) !important; }
+.btn-black { background: linear-gradient(135deg, #1e293b, #0f172a) !important; border-radius: 10px !important; font-weight: 700 !important; font-size: 12px !important; transition: all 0.2s ease !important; border: none !important; box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important; }
+.btn-black:hover { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; transform: translateY(-1px) !important; box-shadow: 0 4px 15px rgba(59,130,246,0.35) !important; }
+.btn-outline { border-radius: 10px !important; font-weight: 700 !important; border: 1.5px solid rgba(226,232,240,0.8) !important; transition: all 0.2s ease !important; }
+.btn-outline:hover { background: #0f172a !important; color: #fff !important; border-color: transparent !important; }
+[data-theme="dark"] .btn-outline { border-color: rgba(51,65,85,0.5) !important; }
+.btn-void { border-radius: 8px !important; transition: all 0.15s ease !important; }
 
-/* --- AI CARDS --- */
-.ai-card {
-  background: white !important;
-  border-radius: 18px !important;
-  border: 1px solid rgba(59,130,246,0.1) !important;
-  padding: 24px !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
-  transition: var(--transition) !important;
-}
-.ai-card:hover { transform: translateY(-2px) !important; box-shadow: 0 8px 30px rgba(59,130,246,0.1) !important; }
-[data-theme="dark"] .ai-card { background: #161b27 !important; border-color: rgba(59,130,246,0.15) !important; }
-.ai-node {
-  border-left: 2px solid #3b82f6 !important;
-  color: var(--text-muted) !important;
-  border-radius: 0 8px 8px 0 !important;
-  background: rgba(59,130,246,0.03) !important;
-  padding: 10px 15px !important;
-}
+/* --- AI CARD --- */
+.ai-card { border-radius: 16px !important; border: 1px solid rgba(226,232,240,0.6) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.02) !important; transition: all 0.2s ease !important; padding: 22px !important; }
+.ai-card:hover { transform: translateY(-1px) !important; box-shadow: 0 6px 20px rgba(59,130,246,0.06) !important; }
+[data-theme="dark"] .ai-card { background: #111827 !important; border-color: rgba(30,41,59,0.5) !important; }
 
 /* --- MODALS --- */
-.modal-overlay {
-  background: rgba(15,23,42,0.7) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-}
-.modal-card {
-  background: white !important;
-  border-radius: 22px !important;
-  border: 1px solid rgba(59,130,246,0.15) !important;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.5) !important;
-  max-width: 500px !important;
-  padding: 30px !important;
-}
-[data-theme="dark"] .modal-card { background: #1e293b !important; border-color: rgba(59,130,246,0.2) !important; }
+.modal-overlay { background: rgba(15,23,42,0.6) !important; backdrop-filter: blur(10px) !important; }
+.modal-card { border-radius: 20px !important; border: 1px solid rgba(226,232,240,0.6) !important; box-shadow: 0 25px 50px rgba(0,0,0,0.15) !important; padding: 28px !important; }
+[data-theme="dark"] .modal-card { background: #1e293b !important; border-color: rgba(51,65,85,0.5) !important; }
 
 /* --- INPUTS --- */
-input, select, textarea {
-  border-radius: 10px !important;
-  border: 1.5px solid rgba(0,0,0,0.1) !important;
-  padding: 12px 16px !important;
-  font-size: 14px !important;
-  transition: var(--transition) !important;
-  background: white !important;
-  font-weight: 500 !important;
-}
-input:focus, select:focus {
-  outline: none !important;
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.12) !important;
-}
-[data-theme="dark"] input, [data-theme="dark"] select {
-  background: #0f172a !important;
-  border-color: rgba(255,255,255,0.1) !important;
-  color: white !important;
-}
+input, select, textarea { border-radius: 10px !important; border: 1.5px solid rgba(226,232,240,0.8) !important; padding: 11px 14px !important; font-size: 14px !important; transition: all 0.2s ease !important; font-weight: 500 !important; }
+input:focus, select:focus { outline: none !important; border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important; }
+[data-theme="dark"] input, [data-theme="dark"] select { background: #0f172a !important; border-color: rgba(51,65,85,0.5) !important; color: #f1f5f9 !important; }
 
-/* --- REPORT TABLE --- */
-.report-table {
-  border-radius: 14px !important;
-  overflow: hidden !important;
-  border: 1px solid rgba(59,130,246,0.1) !important;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.04) !important;
-}
-.report-table th {
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
-  padding: 14px 16px !important;
-  font-size: 10px !important;
-  font-weight: 800 !important;
-  letter-spacing: 1px !important;
-  color: #64748b !important;
-  border-bottom: 1px solid rgba(59,130,246,0.1) !important;
-}
-[data-theme="dark"] .report-table th { background: rgba(255,255,255,0.04) !important; color: #94a3b8 !important; }
-.report-table td { padding: 14px 16px !important; font-size: 13px !important; }
-.report-table tr:hover td { background: rgba(59,130,246,0.04) !important; }
-[data-theme="dark"] .report-table tr:hover td { background: rgba(59,130,246,0.07) !important; }
+/* --- TABLES --- */
+.report-table { border-radius: 14px !important; overflow: hidden !important; border: 1px solid rgba(226,232,240,0.6) !important; }
+.report-table th { background: #f8fafc !important; padding: 13px 16px !important; font-size: 10px !important; font-weight: 800 !important; letter-spacing: 1px !important; color: #64748b !important; border-bottom: 1px solid rgba(226,232,240,0.6) !important; }
+[data-theme="dark"] .report-table th { background: rgba(30,41,59,0.5) !important; }
+.report-table td { padding: 13px 16px !important; font-size: 13px !important; }
+.report-table tr:hover td { background: rgba(59,130,246,0.03) !important; }
 
 /* --- PAY TILE --- */
-.pay-tile {
-  border-radius: 12px !important;
-  transition: var(--transition) !important;
-  border: 1.5px solid rgba(0,0,0,0.1) !important;
-  font-weight: 800 !important;
-}
-.pay-tile:hover {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  color: white !important;
-  border-color: transparent !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px rgba(59,130,246,0.35) !important;
-}
+.pay-tile { border-radius: 12px !important; transition: all 0.2s ease !important; border: 1.5px solid rgba(226,232,240,0.8) !important; font-weight: 800 !important; }
+.pay-tile:hover { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: #fff !important; border-color: transparent !important; transform: translateY(-2px) !important; box-shadow: 0 6px 20px rgba(59,130,246,0.3) !important; }
 
-/* --- ITEM DETAILS --- */
-.item-details-highlight {
-  border-radius: 10px !important;
-  background: linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.04)) !important;
-  border: 1px solid rgba(239,68,68,0.2) !important;
-  font-size: 13px !important;
-}
+/* --- LOGIN --- */
+#login-overlay { background: linear-gradient(135deg, #0c1929 0%, #162544 40%, #0c1929 100%) !important; }
 
-/* --- LOGIN OVERLAY --- */
-#login-overlay {
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%) !important;
-}
-#login-overlay .modal-card,
-#login-overlay > div {
-  background: rgba(255,255,255,0.05) !important;
-  backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
-  border-radius: 24px !important;
-  padding: 40px !important;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.5) !important;
-  max-width: 420px !important;
-  width: 90% !important;
-}
-#login-pin {
-  background: rgba(255,255,255,0.08) !important;
-  border: 1px solid rgba(255,255,255,0.15) !important;
-  color: white !important;
-  font-size: 32px !important;
-  border-radius: 14px !important;
-  text-align: center !important;
-  letter-spacing: 15px !important;
-  padding: 20px !important;
-}
-#login-pin:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 4px rgba(59,130,246,0.25) !important; }
+/* --- TOAST --- */
+.toast-notify { font-size: 15px !important; font-weight: 700 !important; }
+.toast-notify-new { background: linear-gradient(90deg, #059669, #10b981) !important; }
+.toast-notify-call { background: linear-gradient(90deg, #b91c1c, #ef4444) !important; }
+.toast-notify-add { background: linear-gradient(90deg, #d97706, #f59e0b) !important; }
+.toast-notify-pay { background: linear-gradient(90deg, #7c3aed, #8b5cf6) !important; }
+.closing-banner { border-radius: 12px !important; background: linear-gradient(135deg, #b91c1c, #ef4444) !important; }
 
-/* --- TOAST NOTIFICATIONS --- */
-.toast-notify {
-  border-radius: 0 !important;
-  font-size: 16px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.3px !important;
-}
-.toast-notify-new {
-  background: linear-gradient(90deg, #059669, #10b981) !important;
-  box-shadow: 0 6px 30px rgba(16,185,129,0.5) !important;
-}
-.toast-notify-call {
-  background: linear-gradient(90deg, #b91c1c, #ef4444) !important;
-  box-shadow: 0 6px 30px rgba(239,68,68,0.5) !important;
-}
-.toast-notify-add {
-  background: linear-gradient(90deg, #d97706, #f59e0b) !important;
-  box-shadow: 0 6px 30px rgba(245,158,11,0.5) !important;
-}
-.toast-notify-pay {
-  background: linear-gradient(90deg, #7c3aed, #8b5cf6) !important;
-  box-shadow: 0 6px 30px rgba(139,92,246,0.5) !important;
-}
+/* --- SECTIONS ANIMATION --- */
+#order-sec, #takeaway-sec, #stock-sec, #report-sec, #points-sec, #settings-sec { animation: fadeSlideIn 0.25s ease-out; }
 
-/* --- CLOSING BANNER --- */
-.closing-banner {
-  border-radius: 14px !important;
-  background: linear-gradient(135deg, #b91c1c, #ef4444) !important;
-  box-shadow: 0 6px 25px rgba(239,68,68,0.3) !important;
-  border: none !important;
-}
-
-/* --- SCROLLBAR STYLING --- */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+/* --- SCROLLBAR --- */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.5); }
+::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.2); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.4); }
 
-/* --- SIDEBAR BADGE --- */
-.badge {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  color: white !important;
-  border-radius: 8px !important;
-  font-size: 10px !important;
-  font-weight: 800 !important;
-  padding: 3px 8px !important;
-  box-shadow: 0 2px 8px rgba(59,130,246,0.4) !important;
-}
-
-/* --- SECTION HEADINGS --- */
-#settings-sec h2, #report-sec h2, #points-sec h2 {
-  background: linear-gradient(135deg, var(--text-main) 0%, #3b82f6 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  font-size: 26px !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.5px !important;
-}
-
-/* --- MICRO ANIMATION --- */
-@keyframes slideInUp {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-#order-sec, #takeaway-sec, #stock-sec, #report-sec, #points-sec, #settings-sec {
-  animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* --- BUTTON SOUND / NAV BUTTONS --- */
-#btn-sound {
-  background: rgba(59,130,246,0.1) !important;
-  border: 1px solid rgba(59,130,246,0.25) !important;
-  color: #3b82f6 !important;
-  border-radius: 8px !important;
-  font-size: 10px !important;
-  padding: 5px 10px !important;
-  font-weight: 700 !important;
-}
-#btn-sound:hover { background: #3b82f6 !important; color: white !important; }
-
-#sync-status {
-  font-size: 11px !important;
-  background: rgba(16,185,129,0.1) !important;
-  color: #10b981 !important;
-  border-radius: 6px !important;
-  padding: 3px 10px !important;
-  border: 1px solid rgba(16,185,129,0.2) !important;
-  animation: none !important;
-}
-
-/* --- ITEM BADGE --- */
-.badge-new-item {
-  border-radius: 6px !important;
-  font-size: 10px !important;
-}
-
-/* --- ORDER CARD PAID STATUS --- */
-.pill-ordered-more, .pill-waiting-bill {
-  background: linear-gradient(135deg, #1e293b, #0f172a) !important;
-  color: white !important;
-  border: none !important;
-}
-
-/* --- DARK MODE OVERRIDES --- */
-[data-theme="dark"] .map-section { background: #161b27 !important; }
-[data-theme="dark"] .stat-card { background: #161b27 !important; }
-[data-theme="dark"] .tab-bar { background: rgba(59,130,246,0.06) !important; border-color: rgba(59,130,246,0.1) !important; }
-[data-theme="dark"] .report-table th { background: rgba(255,255,255,0.04) !important; }
-[data-theme="dark"] .order-card { background: #161b27 !important; }
-[data-theme="dark"] .btn-outline { color: rgba(255,255,255,0.85) !important; }
-[data-theme="dark"] .top-nav { border-bottom: 1px solid rgba(59,130,246,0.1) !important; }
-
-/* --- WITHU REVAMP UI OVERRIDES (inline specifics) --- */
-.withu-revamp-script .settings-sec .ai-card { border-top-width: 4px !important; }
+/* --- REPORT SECTIONS --- */
+#settings-sec h2, #report-sec h2, #points-sec h2 { font-size: 24px !important; font-weight: 900 !important; }
 </style>
+
+<script id="withu-v3-system">
+document.addEventListener('DOMContentLoaded', function() {
+    // === ICON REPLACEMENT ===
+    var iconMap = {
+        'sb-orders': 'fas fa-store',
+        'sb-takeaway': 'fas fa-motorcycle',
+        'sb-stock': 'fas fa-box-open',
+        'sb-report': 'fas fa-chart-line',
+        'sb-points': 'fas fa-star'
+    };
+    Object.keys(iconMap).forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            var svgs = el.querySelectorAll('svg');
+            svgs.forEach(function(s) { s.remove(); });
+            var ic = document.createElement('i');
+            ic.className = iconMap[id];
+            ic.style.cssText = 'margin-right:10px; font-size:15px; width:20px; text-align:center;';
+            el.prepend(ic);
+        }
+    });
+    
+    // Fix other sidebar buttons with SVG icons
+    document.querySelectorAll('.sidebar-item').forEach(function(btn) {
+        var svg = btn.querySelector('svg');
+        if (svg) {
+            svg.remove();
+            var iconClass = 'fas fa-circle';
+            var oc = btn.getAttribute('onclick') || '';
+            if (oc.indexOf('handleLogout') !== -1) iconClass = 'fas fa-sign-out-alt';
+            else if (oc.indexOf('openManualOrderModal') !== -1) iconClass = 'fas fa-pen-to-square';
+            else if (oc.indexOf('toggleAttendance') !== -1) iconClass = 'fas fa-user-clock';
+            else if (oc.indexOf('toggleTheme') !== -1) iconClass = 'fas fa-adjust';
+            else if (oc.indexOf('toggleLanguage') !== -1) iconClass = 'fas fa-globe';
+            var ic = document.createElement('i');
+            ic.className = iconClass;
+            ic.style.cssText = 'margin-right:10px; font-size:15px; width:20px; text-align:center;';
+            btn.prepend(ic);
+        }
+    });
+    
+    // === SETTINGS BUTTON IN SIDEBAR ===
+    if (!document.getElementById('sb-settings')) {
+        var logoutBtn = document.querySelector('button[onclick*="handleLogout"]');
+        if (logoutBtn) {
+            var divider = document.createElement('div');
+            divider.className = 'sidebar-divider';
+            var settingsBtn = document.createElement('button');
+            settingsBtn.className = 'sidebar-item';
+            settingsBtn.id = 'sb-settings';
+            settingsBtn.innerHTML = '<i class="fas fa-cog" style="margin-right:10px; font-size:15px; width:20px; text-align:center;"><\/i>Settings';
+            settingsBtn.onclick = function() { window.showSec('settings'); toggleSidebar(); };
+            logoutBtn.parentNode.insertBefore(divider, logoutBtn);
+            logoutBtn.parentNode.insertBefore(settingsBtn, logoutBtn);
+        }
+    }
+    
+    // === SETTINGS SECTION ===
+    if (!document.getElementById('settings-sec')) {
+        var orderSec = document.getElementById('order-sec');
+        if (orderSec) {
+            var div = document.createElement('div');
+            div.id = 'settings-sec';
+            div.style.cssText = 'display:none; padding:20px;';
+            div.innerHTML = '<h2 style="margin-bottom:20px;"><i class="fas fa-cog" style="color:#3b82f6; margin-right:8px;"><\/i>Store Settings<\/h2>' +
+                '<div class="ai-card" style="margin-bottom:16px; border-top:3px solid #3b82f6;">' +
+                '<h3 style="font-size:15px; margin-bottom:14px; font-weight:800;"><i class="fas fa-clock" style="color:#3b82f6; margin-right:6px;"><\/i>Business Hours<\/h3>' +
+                '<label style="display:flex; align-items:center; gap:10px; font-weight:800; font-size:16px; color:#10b981; margin-bottom:15px; cursor:pointer;"><input type="checkbox" id="store-open-status" onchange="toggleStoreStatus()" style="width:22px; height:22px; accent-color:#10b981;"> Open for Orders Today<\/label>' +
+                '<hr style="border:0; border-top:1px solid var(--border); margin:14px 0;">' +
+                '<label style="font-weight:700; display:block; margin-bottom:10px; font-size:13px;">Operating Days<\/label>' +
+                '<div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:15px;" id="bh-days">' +
+                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="1" checked> Mon<\/label>' +
+                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="2" checked> Tue<\/label>' +
+                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="3" checked> Wed<\/label>' +
+                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="4" checked> Thu<\/label>' +
+                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="5" checked> Fri<\/label>' +
+                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="6" checked> Sat<\/label>' +
+                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="0" checked> Sun<\/label>' +
+                '<\/div>' +
+                '<div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:15px;">' +
+                '<div><label style="font-weight:700; display:block; margin-bottom:5px; font-size:12px;">Open<\/label><input type="time" id="bh-start" value="09:00"><\/div>' +
+                '<div><label style="font-weight:700; display:block; margin-bottom:5px; font-size:12px;">Close<\/label><input type="time" id="bh-end" value="21:00"><\/div>' +
+                '<\/div>' +
+                '<button class="btn-black" onclick="saveBusinessHours()" style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fas fa-save" style="margin-right:6px;"><\/i>Save<\/button>' +
+                '<\/div>' +
+                '<div class="ai-card" style="margin-bottom:16px;">' +
+                '<h3 style="font-size:15px; margin-bottom:14px; font-weight:800;"><i class="fas fa-qrcode" style="color:#3b82f6; margin-right:6px;"><\/i>PromptPay QR<\/h3>' +
+                '<input type="text" id="store-promptpay" placeholder="Phone or National ID" style="margin-bottom:12px;">' +
+                '<button class="btn-black" onclick="savePromptPay()" style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fas fa-save" style="margin-right:6px;"><\/i>Save PromptPay<\/button>' +
+                '<\/div>' +
+                '<div class="ai-card">' +
+                '<h3 style="font-size:15px; margin-bottom:14px; font-weight:800;"><i class="fas fa-volume-up" style="color:#3b82f6; margin-right:6px;"><\/i>Sound Alerts<\/h3>' +
+                '<button id="btn-sound-setting" onclick="window.toggleSound()" class="btn-outline" style="width:100%; border-color:#3b82f6; color:#3b82f6; padding:14px; font-weight:800;"><i class="fas fa-volume-up" style="margin-right:6px;"><\/i>Toggle Sound<\/button>' +
+                '<\/div>';
+            orderSec.parentNode.insertBefore(div, orderSec.nextSibling);
+        }
+    }
+
+    // === POINTS SECTION ===
+    var pointsSec = document.getElementById('points-sec');
+    if (pointsSec && !pointsSec.querySelector('#pts-phone')) {
+        pointsSec.innerHTML = '<h2 style="margin-bottom:20px;"><i class="fas fa-star" style="color:#f59e0b; margin-right:8px;"><\/i>Loyalty Points<\/h2>' +
+            '<div class="ai-card" style="margin-bottom:16px; border-top:3px solid #f59e0b;">' +
+            '<h3 style="font-size:15px; margin-bottom:14px; font-weight:800;"><i class="fas fa-user-plus" style="color:#3b82f6; margin-right:6px;"><\/i>Add / Edit Member<\/h3>' +
+            '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">' +
+            '<div><label style="font-size:11px; font-weight:700;">Phone<\/label><input type="tel" id="pts-phone" placeholder="09XXXXXXXX"><\/div>' +
+            '<div><label style="font-size:11px; font-weight:700;">Name<\/label><input type="text" id="pts-name" placeholder="Customer Name"><\/div>' +
+            '<div><label style="font-size:11px; font-weight:700;">Points<\/label><input type="number" id="pts-val" value="0"><\/div>' +
+            '<\/div>' +
+            '<button class="btn-black" onclick="savePointData()" style="margin-top:14px; background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fas fa-save" style="margin-right:6px;"><\/i>Save<\/button>' +
+            '<\/div>' +
+            '<div class="ai-card" style="padding:0; overflow-x:auto;">' +
+            '<table class="report-table" style="min-width:500px; width:100%;"><thead><tr><th>Phone<\/th><th>Name<\/th><th>Points<\/th><th>Actions<\/th><\/tr><\/thead><tbody id="points-list"><\/tbody><\/table><\/div>';
+    }
+    
+    // === REPORT SECTION ===
+    var reportSec = document.getElementById('report-sec');
+    if (reportSec && !reportSec.querySelector('#rtab-dashboard')) {
+        reportSec.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">' +
+            '<h2 style="margin:0;"><i class="fas fa-chart-line" style="color:#3b82f6; margin-right:8px;"><\/i>Performance<\/h2>' +
+            '<div style="display:flex; gap:8px;">' +
+            '<button class="btn-outline" onclick="switchReportTab(\x27dashboard\x27)" id="rtab-dashboard" style="border-color:#3b82f6; color:#3b82f6; background:rgba(59,130,246,0.08); font-size:12px; padding:8px 14px;"><i class="fas fa-chart-pie" style="margin-right:4px;"><\/i>Dashboard<\/button>' +
+            '<button class="btn-outline" onclick="switchReportTab(\x27history\x27)" id="rtab-history" style="font-size:12px; padding:8px 14px;"><i class="fas fa-history" style="margin-right:4px;"><\/i>History<\/button>' +
+            '<\/div><\/div>' +
+            '<div id="report-dashboard">' +
+            '<div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">' +
+            '<button class="btn-black rpt-btn" onclick="renderReport(\x271d\x27)" style="flex:1; min-width:70px; background:linear-gradient(135deg,#3b82f6,#2563eb);">1 Day<\/button>' +
+            '<button class="btn-black rpt-btn" onclick="renderReport(\x277d\x27)" style="flex:1; min-width:70px;">7 Days<\/button>' +
+            '<button class="btn-black rpt-btn" onclick="renderReport(\x2730d\x27)" style="flex:1; min-width:70px;">30 Days<\/button>' +
+            '<button class="btn-black rpt-btn" onclick="renderReport(\x27all\x27)" style="flex:1; min-width:70px;">All<\/button>' +
+            '<\/div>' +
+            '<div class="stats-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:16px;">' +
+            '<div class="ai-card" style="border-left:3px solid #10b981; padding:18px;"><p style="font-size:10px; font-weight:800; color:#64748b; letter-spacing:1px; text-transform:uppercase; margin:0;">TOTAL SALES<\/p><p style="font-size:26px; font-weight:900; color:#10b981; margin:6px 0 0;">\u0e3f<span id="rep-total">0<\/span><\/p><\/div>' +
+            '<div class="ai-card" style="border-left:3px solid #3b82f6; padding:18px;"><p style="font-size:10px; font-weight:800; color:#64748b; letter-spacing:1px; text-transform:uppercase; margin:0;">ORDERS<\/p><p style="font-size:26px; font-weight:900; color:#3b82f6; margin:6px 0 0;" id="rep-count">0<\/p><\/div>' +
+            '<div class="ai-card" style="border-left:3px solid #f59e0b; padding:18px;"><p style="font-size:10px; font-weight:800; color:#64748b; letter-spacing:1px; text-transform:uppercase; margin:0;">TOP MENU<\/p><p style="font-size:18px; font-weight:900; color:#f59e0b; margin:6px 0 0;" id="rep-top-menu">-<\/p><\/div>' +
+            '<\/div>' +
+            '<div class="ai-card" style="margin-bottom:16px;"><h3 style="font-size:13px; font-weight:800; margin-bottom:14px;"><i class="fas fa-chart-area" style="color:#3b82f6; margin-right:6px;"><\/i>Sales Trend<\/h3><div style="height:260px;"><canvas id="salesChart"><\/canvas><\/div><\/div>' +
+            '<div class="ai-card"><h3 style="font-size:13px; font-weight:800; margin-bottom:14px;"><i class="fas fa-utensils" style="color:#f59e0b; margin-right:6px;"><\/i>Menu Breakdown (Today)<\/h3><div id="menu-breakdown" style="max-height:300px; overflow-y:auto;"><\/div><\/div>' +
+            '<\/div>' +
+            '<div id="report-history" style="display:none;">' +
+            '<div class="ai-card" style="padding:0;"><div style="overflow-x:auto;"><table class="report-table" style="min-width:700px; width:100%;"><thead><tr><th>Date<\/th><th>Order<\/th><th>Table<\/th><th>Total<\/th><th>Payment<\/th><\/tr><\/thead><tbody id="history-list"><\/tbody><\/table><\/div><\/div><\/div>';
+    }
+
+    setTimeout(function() {
+        if (typeof window.loadSettings === 'function') window.loadSettings();
+        if (typeof window.loadBusinessHours === 'function') window.loadBusinessHours();
+    }, 300);
+});
+
+// === SHOW SECTION OVERRIDE ===
+var _origShowSec = typeof window.showSec === 'function' ? window.showSec : null;
+window.showSec = function(n) {
+    ['order-sec','takeaway-sec','stock-sec','report-sec','points-sec','settings-sec'].forEach(function(s) {
+        var el = document.getElementById(s);
+        if (el) el.style.display = 'none';
+    });
+    var t = document.getElementById(n + '-sec');
+    if (t) {
+        t.style.display = (n==='report'||n==='settings'||n==='points') ? 'block' : 'grid';
+        t.style.animation = 'fadeSlideIn 0.25s ease-out';
+    }
+    if (n==='points' && typeof window.loadPoints === 'function') window.loadPoints();
+    if (n==='report' && typeof window.switchReportTab === 'function') setTimeout(function(){window.switchReportTab('dashboard');},50);
+    if (n==='settings' && typeof window.loadSettings === 'function') window.loadSettings();
+    document.querySelectorAll('.tab-btn').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='t-'+n); });
+    document.querySelectorAll('.sidebar-item').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='sb-'+n); });
+};
+
+// === AUTO-SYNC ===
+window.addEventListener('storage', function(e) {
+    if (e.key==='withu_orders'||e.key==='withu_points'||e.key==='withu_points_db') {
+        var ss = document.getElementById('sync-status');
+        if(ss) { ss.style.display='inline-flex'; setTimeout(function(){ss.style.display='none';},1500); }
+    }
+});
+
+// === SETTINGS LOGIC ===
+window.loadSettings = function() {
+    var cb = document.getElementById('store-open-status');
+    if(cb) cb.checked = localStorage.getItem('withu_store_open') !== 'false';
+    var pp = document.getElementById('store-promptpay');
+    if(pp) pp.value = localStorage.getItem('withu_promptpay') || '';
+};
+window.toggleStoreStatus = function() {
+    var isOpen = document.getElementById('store-open-status').checked;
+    localStorage.setItem('withu_store_open', isOpen);
+    if(typeof showToast==='function') showToast(isOpen ? 'Store OPEN' : 'Store CLOSED', 'new');
+};
+window.savePromptPay = function() {
+    localStorage.setItem('withu_promptpay', document.getElementById('store-promptpay').value.trim());
+    if(typeof showToast==='function') showToast('PromptPay saved', 'new');
+};
+window.loadBusinessHours = function() {
+    try {
+        var bh = JSON.parse(localStorage.getItem('withu_business_hours'));
+        if(bh) {
+            document.querySelectorAll('#bh-days input').forEach(function(cb) { cb.checked = bh.days.indexOf(parseInt(cb.value)) !== -1; });
+            if(bh.start) document.getElementById('bh-start').value = bh.start;
+            if(bh.end) document.getElementById('bh-end').value = bh.end;
+        }
+    } catch(e) {}
+};
+window.saveBusinessHours = function() {
+    var days = Array.from(document.querySelectorAll('#bh-days input:checked')).map(function(cb){return parseInt(cb.value);});
+    localStorage.setItem('withu_business_hours', JSON.stringify({ days: days, start: document.getElementById('bh-start').value, end: document.getElementById('bh-end').value }));
+    if(typeof showToast==='function') showToast('Business hours saved', 'new');
+};
+
+// === POINTS LOGIC ===
+window.loadPoints = function() {
+    var db = {};
+    try { db = JSON.parse(localStorage.getItem('withu_points_db') || '{}'); } catch(e) {}
+    var list = document.getElementById('points-list');
+    if(!list) return;
+    list.innerHTML = '';
+    Object.keys(db).forEach(function(phone) {
+        var data = db[phone];
+        if(typeof data==='number') { data = {points:data, name:''}; db[phone] = data; }
+        var tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid var(--border)';
+        tr.innerHTML = '<td style="font-weight:700; padding:13px;">' + phone + '</td>' +
+            '<td>' + (data.name || '<span style="color:var(--text-muted);">-</span>') + '</td>' +
+            '<td style="color:#3b82f6; font-weight:800; font-size:16px;">' + data.points + '</td>' +
+            '<td><button class="btn-outline" style="padding:6px 12px; border-color:#f59e0b; color:#f59e0b; font-size:11px;"><i class="fas fa-edit" style="margin-right:4px;"></i>Edit</button></td>';
+        tr.querySelector('button').onclick = function() { editPointData(phone, data.name||'', data.points); };
+        list.appendChild(tr);
+    });
+    localStorage.setItem('withu_points_db', JSON.stringify(db));
+};
+window.editPointData = function(phone, name, points) {
+    var p = document.getElementById('pts-phone'); if(p) p.value = phone;
+    var n = document.getElementById('pts-name'); if(n) n.value = name;
+    var v = document.getElementById('pts-val'); if(v) v.value = points;
+};
+window.savePointData = function() {
+    var phone = (document.getElementById('pts-phone') || {}).value;
+    if(!phone || !phone.trim()) { if(typeof showToast==='function') showToast('Enter phone number','call'); return; }
+    phone = phone.trim();
+    var db = {}; try { db = JSON.parse(localStorage.getItem('withu_points_db')||'{}'); } catch(e){}
+    db[phone] = { points: parseInt((document.getElementById('pts-val')||{}).value)||0, name: ((document.getElementById('pts-name')||{}).value||'').trim() };
+    localStorage.setItem('withu_points_db', JSON.stringify(db));
+    document.getElementById('pts-phone').value = '';
+    document.getElementById('pts-name').value = '';
+    document.getElementById('pts-val').value = '0';
+    window.loadPoints();
+    if(typeof showToast==='function') showToast('Member saved','new');
+};
+
+// === REPORT LOGIC ===
+var salesChartInstance = null;
+window.switchReportTab = function(tab) {
+    var d = document.getElementById('report-dashboard');
+    var h = document.getElementById('report-history');
+    if(d) { d.style.display = tab==='dashboard'?'block':'none'; }
+    if(h) { h.style.display = tab==='history'?'block':'none'; }
+    var db = document.getElementById('rtab-dashboard');
+    var hb = document.getElementById('rtab-history');
+    if(db) db.style.cssText = tab==='dashboard' ? 'border-color:#3b82f6; color:#3b82f6; background:rgba(59,130,246,0.08); font-size:12px; padding:8px 14px;' : 'font-size:12px; padding:8px 14px;';
+    if(hb) hb.style.cssText = tab==='history' ? 'border-color:#3b82f6; color:#3b82f6; background:rgba(59,130,246,0.08); font-size:12px; padding:8px 14px;' : 'font-size:12px; padding:8px 14px;';
+    if(tab==='dashboard') window.renderReport('1d'); else window.renderHistory();
+};
+window.renderReport = function(period) {
+    var btns = document.querySelectorAll('.rpt-btn');
+    var pMap = {'1d':0,'7d':1,'30d':2,'all':3};
+    btns.forEach(function(b,i) {
+        b.style.background = i===pMap[period] ? 'linear-gradient(135deg,#3b82f6,#2563eb)' : 'linear-gradient(135deg,#1e293b,#0f172a)';
+    });
+    var dataStr = localStorage.getItem('withu_completed_orders') || '[]';
+    var orders = []; try { orders = JSON.parse(dataStr); } catch(e) {}
+    var now = new Date();
+    var fOrders = orders.filter(function(o) {
+        if(!o.timestamp) return false;
+        var d = new Date(o.timestamp);
+        var diff = Math.ceil(Math.abs(now-d)/(1000*60*60*24));
+        if(period==='1d') return diff<=1 && d.getDate()===now.getDate();
+        if(period==='7d') return diff<=7;
+        if(period==='30d') return diff<=30;
+        return true;
+    });
+    var total=0, items={}, byDate={};
+    fOrders.forEach(function(o) {
+        var amt = o.total||o.finalTotal||0; total+=amt;
+        if(o.cart) o.cart.forEach(function(item) { items[item.name] = (items[item.name]||0) + (item.qty||1); });
+        var dk = new Date(o.timestamp).toLocaleDateString('th-TH');
+        byDate[dk] = (byDate[dk]||0) + amt;
+    });
+    var te = document.getElementById('rep-total'); if(te) te.innerText = total.toLocaleString();
+    var ce = document.getElementById('rep-count'); if(ce) ce.innerText = fOrders.length;
+    var topArr = Object.entries(items).sort(function(a,b){return b[1]-a[1];});
+    var tme = document.getElementById('rep-top-menu'); if(tme) tme.innerText = topArr.length ? topArr[0][0]+' ('+topArr[0][1]+')' : '-';
+    
+    // Menu breakdown
+    var mb = document.getElementById('menu-breakdown');
+    if(mb) {
+        if(topArr.length === 0) {
+            mb.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">No data</div>';
+        } else {
+            var maxQ = topArr[0][1];
+            var rows = topArr.map(function(entry) {
+                var pct = Math.round((entry[1]/maxQ)*100);
+                return '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;"><div style="font-weight:700; font-size:13px;">' + entry[0] + '</div><div style="margin-top:5px; height:4px; background:var(--border); border-radius:99px; overflow:hidden;"><div style="height:100%; background:linear-gradient(90deg,#3b82f6,#6366f1); border-radius:99px; width:' + pct + '%;"></div></div></td><td style="text-align:right; padding:10px; font-weight:900; font-size:16px; color:#3b82f6;">' + entry[1] + '</td></tr>';
+            }).join('');
+            mb.innerHTML = '<table style="width:100%; border-collapse:collapse;"><tr style="border-bottom:2px solid var(--border);"><th style="text-align:left; padding:10px; font-size:11px; font-weight:800; color:#64748b; letter-spacing:1px;">MENU ITEM</th><th style="text-align:right; padding:10px; font-size:11px; font-weight:800; color:#64748b; letter-spacing:1px;">QTY</th></tr>' + rows + '</table>';
+        }
+    }
+    
+    // Chart
+    var ctx = document.getElementById('salesChart');
+    if(ctx && window.Chart) {
+        if(salesChartInstance) salesChartInstance.destroy();
+        var labels = Object.keys(byDate); if(!labels.length) labels = ['-'];
+        var vals = Object.values(byDate); if(!vals.length) vals = [0];
+        salesChartInstance = new Chart(ctx, {
+            type:'line',
+            data: { labels: labels, datasets: [{ label:'Sales', data: vals, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.1)', borderWidth:2.5, fill:true, tension:0.4, pointBackgroundColor:'#3b82f6', pointRadius:4 }] },
+            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,0.05)'}}} }
+        });
+    }
+};
+window.renderHistory = function() {
+    var dataStr = localStorage.getItem('withu_completed_orders')||'[]';
+    var orders = []; try { orders = JSON.parse(dataStr); } catch(e){}
+    orders.sort(function(a,b) { return new Date(b.timestamp)-new Date(a.timestamp); });
+    var list = document.getElementById('history-list');
+    if(!list) return;
+    if(!orders.length) { list.innerHTML='<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">No history</td></tr>'; return; }
+    list.innerHTML = orders.map(function(o,i) {
+        var date = new Date(o.timestamp).toLocaleString('th-TH');
+        var pay = o.paymentMethod==='qr' ? '<span style="color:#3b82f6; font-weight:700;"><i class="fas fa-qrcode" style="margin-right:4px;"></i>QR</span>' : '<span style="color:#f59e0b; font-weight:700;"><i class="fas fa-money-bill" style="margin-right:4px;"></i>CASH</span>';
+        return '<tr style="border-bottom:1px solid var(--border);"><td style="font-size:12px; color:var(--text-muted); padding:13px;">' + date + '</td><td style="font-weight:800;">#' + (o.id||o.orderNo||(1000+i)) + '</td><td><span style="background:var(--slate); padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700;">' + (o.table||'Takeaway') + '</span></td><td style="color:#10b981; font-weight:800;">\u0e3f' + (o.total||o.finalTotal||0).toLocaleString() + '</td><td>' + pay + '</td></tr>';
+    }).join('');
+};
+</script>
 
 </head>
 <body>
@@ -1026,13 +901,13 @@ input:focus, select:focus {
         <div style="display: flex; align-items: center;">
             <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
             
-    <div style="display: flex; align-items: center; gap: 15px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
         <div class="logo">WITHU ADMIN</div>
-        <span id="sync-status" style="display:none; color:#10b981; font-weight:800; font-size:11px;"><i class="fas fa-sync-alt fa-spin" style="margin-right: 5px;"></i>SYNCING</span>
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); display: flex; align-items: center;">
-            <span style="background: rgba(59,130,246,0.1); padding: 4px 8px; border-radius: 6px; color: #3b82f6; margin-right: 5px;">CLOSING IN: <span id="close-timer" style="font-weight: 900;">00:00:00</span></span>
+        <span id="sync-status" style="display:none; font-weight:700; font-size:11px; color:#10b981; background:rgba(16,185,129,0.1); padding:4px 10px; border-radius:6px; border:1px solid rgba(16,185,129,0.2);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px; vertical-align:-1px; animation:spin 1s linear infinite;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>SYNCING</span>
+        <div style="font-size:11px; font-weight:700; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+            <span style="background:rgba(59,130,246,0.08); padding:5px 10px; border-radius:8px; color:#3b82f6; font-weight:800; border:1px solid rgba(59,130,246,0.15);">CLOSING IN: <span id="close-timer" style="font-weight:900; color:#2563eb;">00:00:00</span></span>
+            <span id="date-now" style="background:rgba(100,116,139,0.08); padding:5px 10px; border-radius:8px; color:#64748b; font-weight:700; border:1px solid rgba(100,116,139,0.1);"></span>
         </div>
-        <div id="date-now" style="font-size: 11px; font-weight: 700; color: var(--text-muted);"></div>
     </div>
 
         </div>
@@ -2468,607 +2343,6 @@ input:focus, select:focus {
 
 
 
-
-<!-- WITHU V2 Revamp Styles & Scripts -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-    :root {
-        --text-accent: #3b82f6; /* Blue accent */
-    }
-    .btn-black:hover { background: #3b82f6 !important; border-color: #3b82f6 !important; transition: 0.3s; }
-    .tab-btn.active { border-color: #3b82f6 !important; color: #3b82f6 !important; background: rgba(59,130,246,0.1) !important; font-weight: 800; border-bottom: 3px solid #3b82f6; }
-    .sidebar-item.active { border-right: 4px solid #3b82f6; background: rgba(59,130,246,0.05); color: #3b82f6; }
-    .ai-card { transition: transform 0.2s; }
-    .ai-card:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    /* Enhance Modal */
-    .modal-overlay { animation: fadeIn 0.2s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-</style>
-<script id="withu-revamp-script">
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- 1. UI/UX REVAMP (Icons) ---
-        const replaceIcon = (id, iconHTML, text) => {
-            const el = document.getElementById(id);
-            if(el) {
-                // Ensure the click handler uses toggleSidebar securely
-                const onclick = el.getAttribute('onclick') || '';
-                el.innerHTML = iconHTML + text;
-                // Highlight color logic is handled by CSS .active
-            }
-        };
-        replaceIcon('sb-orders', '<i class="fas fa-store" style="margin-right:12px; font-size:16px;"></i>', 'ออเดอร์หน้าร้าน');
-        replaceIcon('sb-takeaway', '<i class="fas fa-motorcycle" style="margin-right:12px; font-size:16px;"></i>', 'เดลิเวอรี่');
-        replaceIcon('sb-stock', '<i class="fas fa-box" style="margin-right:12px; font-size:16px;"></i>', 'คลังสินค้า');
-        replaceIcon('sb-report', '<i class="fas fa-chart-bar" style="margin-right:12px; font-size:16px;"></i>', 'ผลประกอบการ');
-        replaceIcon('sb-points', '<i class="fas fa-star" style="margin-right:12px; font-size:16px;"></i>', 'ระบบสมาชิก (แต้ม)');
-        
-        // Ensure "Store" and tabs look better
-        const tOrders = document.getElementById('t-orders'); if(tOrders) tOrders.innerHTML = '<i class="fas fa-store"></i> Store';
-        const tTakeaway = document.getElementById('t-takeaway'); if(tTakeaway) tTakeaway.innerHTML = '<i class="fas fa-motorcycle"></i> Delivery';
-        const tStock = document.getElementById('t-stock'); if(tStock) tStock.innerHTML = '<i class="fas fa-box"></i> Stock';
-        const tReport = document.getElementById('t-report'); if(tReport) tReport.innerHTML = '<i class="fas fa-chart-pie"></i> Performance';
-        
-        // --- 2. SETTINGS UI ---
-        
-        if (!document.getElementById('sb-settings')) {
-            const logoutBtn = document.querySelector('button[onclick*="handleLogout"]');
-            if (logoutBtn) {
-                const settingsBtn = document.createElement('button');
-                settingsBtn.className = 'sidebar-item';
-                settingsBtn.id = 'sb-settings';
-                settingsBtn.innerHTML = '<i class="fas fa-cog" style="margin-right:12px; font-size:16px;"></i>ตั้งค่าร้านค้า';
-                settingsBtn.onclick = () => { window.showSec('settings'); toggleSidebar(); };
-                
-                const div = document.createElement('div');
-                div.className = 'sidebar-divider';
-                
-                logoutBtn.parentNode.insertBefore(settingsBtn, logoutBtn);
-                logoutBtn.parentNode.insertBefore(div, logoutBtn);
-            } else {
-                const menu = document.querySelector('.sidebar-menu');
-                if (menu) {
-                    const settingsBtn = document.createElement('button');
-                    settingsBtn.className = 'sidebar-item';
-                    settingsBtn.id = 'sb-settings';
-                    settingsBtn.innerHTML = '<i class="fas fa-cog" style="margin-right:12px; font-size:16px;"></i>ตั้งค่าร้านค้า';
-                    settingsBtn.onclick = () => { window.showSec('settings'); toggleSidebar(); };
-                    menu.appendChild(settingsBtn);
-                }
-            }
-        }
-
-        
-        if (!document.getElementById('settings-sec')) {
-            const orderSec = document.getElementById('order-sec');
-            if (orderSec) {
-                const settingsHTML = `
-                    <div id="settings-sec" style="display:none; padding: 20px; animation: fadeIn 0.3s;">
-                        <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 20px; color: #1e293b;"><i class="fas fa-cog" style="color: #3b82f6;"></i> ตั้งค่าร้านค้า</h2>
-                        
-                        <div class="ai-card" style="margin-bottom: 20px; border-top: 4px solid #3b82f6;">
-                            <h3 style="font-size: 16px; margin-bottom: 15px;"><i class="fas fa-store"></i> เปิด-ปิดร้าน และเวลาทำการ</h3>
-                            <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 15px;">
-                                <label style="display:flex; align-items:center; gap: 10px; font-weight: 800; font-size:18px; color:#10b981;">
-                                    <input type="checkbox" id="store-open-status" onchange="toggleStoreStatus()" style="width: 24px; height: 24px;"> เปิดรับออเดอร์วันนี้
-                                </label>
-                            </div>
-                            <hr style="border: 0; border-top: 1px solid var(--border); margin: 15px 0;">
-                            <div style="margin-bottom: 15px;">
-                                <label style="font-weight: 700; display: block; margin-bottom: 10px;">วันที่เปิดขายเป็นประจำ</label>
-                                <div style="display: flex; flex-wrap: wrap; gap: 15px;" id="bh-days">
-                                    <label style="cursor:pointer;"><input type="checkbox" value="1" checked> จันทร์</label>
-                                    <label style="cursor:pointer;"><input type="checkbox" value="2" checked> อังคาร</label>
-                                    <label style="cursor:pointer;"><input type="checkbox" value="3" checked> พุธ</label>
-                                    <label style="cursor:pointer;"><input type="checkbox" value="4" checked> พฤหัสบดี</label>
-                                    <label style="cursor:pointer;"><input type="checkbox" value="5" checked> ศุกร์</label>
-                                    <label style="cursor:pointer;"><input type="checkbox" value="6" checked> เสาร์</label>
-                                    <label style="cursor:pointer;"><input type="checkbox" value="0" checked> อาทิตย์</label>
-                                </div>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                                <div><label style="font-weight: 700; display: block; margin-bottom: 5px;">เวลาเปิด</label><input type="time" id="bh-start" value="09:00" style="padding:10px; border-radius:6px; border:1px solid var(--border); width:100%;"></div>
-                                <div><label style="font-weight: 700; display: block; margin-bottom: 5px;">เวลาปิด</label><input type="time" id="bh-end" value="21:00" style="padding:10px; border-radius:6px; border:1px solid var(--border); width:100%;"></div>
-                            </div>
-                            <button class="btn-black" onclick="saveBusinessHours()" style="background: #3b82f6;"><i class="fas fa-save"></i> บันทึกเวลาทำการ</button>
-                            <p style="font-size: 12px; color: #ef4444; margin-top: 10px; font-weight:700;">* หากปิดร้าน หรือนอกเวลาทำการ ลูกค้าจะไม่สามารถกดสั่งอาหารในหน้าเว็บได้</p>
-                        </div>
-
-                        <div class="ai-card" style="margin-bottom: 20px;">
-                            <h3 style="font-size: 16px; margin-bottom: 15px;"><i class="fas fa-qrcode"></i> ตั้งค่า PromptPay (พร้อมเพย์) สำหรับหน้าลูกค้า</h3>
-                            <input type="text" id="store-promptpay" placeholder="เบอร์โทรศัพท์ (เช่น 0931805507) หรือ เลขบัตรประชาชน" value="" style="margin-bottom: 10px; padding:12px; border-radius:6px; border:1px solid var(--border); width:100%;">
-                            <button class="btn-black" onclick="savePromptPay()" style="background: #3b82f6;"><i class="fas fa-save"></i> บันทึก PromptPay</button>
-                        </div>
-
-                        <div class="ai-card">
-                            <h3 style="font-size: 16px; margin-bottom: 15px;"><i class="fas fa-volume-up"></i> การแจ้งเตือนด้วยเสียง (Sound Alerts)</h3>
-                            <button id="btn-sound-setting" onclick="window.toggleSound()" class="btn-outline" style="width: 100%; border-color: #3b82f6; color: #3b82f6; padding:15px; font-weight:800;"><i class="fas fa-volume-up"></i> เปิดเสียงแจ้งเตือน</button>
-                        </div>
-                    </div>
-                `;
-                orderSec.insertAdjacentHTML('afterend', settingsHTML);
-            }
-        }
-
-        // --- 3. POINTS UI ---
-        const pointsSec = document.getElementById('points-sec');
-        if (pointsSec) {
-            pointsSec.innerHTML = `
-                <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 20px; color: #1e293b;"><i class="fas fa-star" style="color: #f59e0b;"></i> ระบบสมาชิก (แต้ม)</h2>
-                <div class="ai-card" style="margin-bottom: 20px; border-top: 4px solid #f59e0b;">
-                    <h3 style="font-size: 16px; margin-bottom: 15px;"><i class="fas fa-user-plus"></i> เพิ่ม / แก้ไข ข้อมูลสมาชิกรายบุคคล</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
-                        <div><label style="font-size:12px; font-weight:700;">เบอร์โทรศัพท์</label><input type="tel" id="pts-phone" placeholder="09XXXXXXXX" style="padding: 10px; border-radius: 6px; border: 1px solid var(--border); width:100%;"></div>
-                        <div><label style="font-size:12px; font-weight:700;">ชื่อลูกค้า (เฉพาะแอดมินเห็น)</label><input type="text" id="pts-name" placeholder="ชื่อลูกค้า" style="padding: 10px; border-radius: 6px; border: 1px solid var(--border); width:100%;"></div>
-                        <div><label style="font-size:12px; font-weight:700;">คะแนน</label><input type="number" id="pts-val" placeholder="จำนวนแต้ม" value="0" style="padding: 10px; border-radius: 6px; border: 1px solid var(--border); width:100%;"></div>
-                    </div>
-                    <button class="btn-black" onclick="savePointData()" style="margin-top: 15px; background: #3b82f6;"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
-                </div>
-                <div class="ai-card" style="padding:0; overflow-x: auto;">
-                    <table class="report-table" id="points-table" style="min-width: 600px; width:100%;">
-                        <thead style="background:var(--slate);"><tr><th style="padding:15px;">เบอร์โทรศัพท์</th><th>ชื่อลูกค้า</th><th>แต้มสะสม</th><th>จัดการ</th></tr></thead>
-                        <tbody id="points-list"></tbody>
-                    </table>
-                </div>
-            `;
-        }
-
-        // --- 4. REPORT & HISTORY UI ---
-        const reportSec = document.getElementById('report-sec');
-        if (reportSec) {
-            reportSec.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="font-size: 24px; font-weight: 800; color: #1e293b;"><i class="fas fa-chart-bar" style="color: #3b82f6;"></i> รายงานผลประกอบการและประวัติ</h2>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-outline" onclick="switchReportTab('dashboard')" id="rtab-dashboard" style="border-color: #3b82f6; color: #3b82f6; background: rgba(59,130,246,0.1);"><i class="fas fa-chart-pie"></i> ภาพรวม (Dashboard)</button>
-                        <button class="btn-outline" onclick="switchReportTab('history')" id="rtab-history"><i class="fas fa-history"></i> ประวัติการขายย้อนหลัง</button>
-                    </div>
-                </div>
-                <div id="report-dashboard">
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
-                        <button class="btn-black" onclick="renderReport('1d')" style="flex: 1; min-width: 80px; background: #3b82f6;">1 วัน</button>
-                        <button class="btn-black" onclick="renderReport('7d')" style="flex: 1; min-width: 80px; background: var(--text-main);">7 วัน</button>
-                        <button class="btn-black" onclick="renderReport('30d')" style="flex: 1; min-width: 80px; background: var(--text-main);">1 เดือน</button>
-                        <button class="btn-black" onclick="renderReport('all')" style="flex: 1; min-width: 80px; background: var(--text-main);">ทั้งหมด</button>
-                    </div>
-                    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                        <div class="ai-card" style="border-left: 4px solid #10b981;"><p style="font-size: 13px; color: var(--text-muted); font-weight: 700;">ยอดขายรวม</p><p style="font-size: 28px; font-weight: 800; color: #10b981;">฿<span id="rep-total">0</span></p></div>
-                        <div class="ai-card" style="border-left: 4px solid #3b82f6;"><p style="font-size: 13px; color: var(--text-muted); font-weight: 700;">จำนวนออเดอร์</p><p style="font-size: 28px; font-weight: 800; color: #3b82f6;" id="rep-count">0</p></div>
-                        <div class="ai-card" style="border-left: 4px solid #f59e0b;"><p style="font-size: 13px; color: var(--text-muted); font-weight: 700;">เมนูขายดีที่สุด</p><p style="font-size: 20px; font-weight: 800; margin-top: 5px; color: #f59e0b;" id="rep-top-menu">-</p></div>
-                    </div>
-                    <div class="ai-card" style="width: 100%; overflow-x: auto;">
-                        <h3 style="font-size: 14px; margin-bottom: 15px;"><i class="fas fa-chart-line"></i> กราฟยอดขายแนวโน้ม</h3>
-                        <div style="min-width: 600px; height: 300px;"><canvas id="salesChart"></canvas></div>
-                    </div>
-                </div>
-                <div id="report-history" style="display: none;">
-                    <div class="ai-card" style="padding: 0; border:none;">
-                        <div style="overflow-x: auto;">
-                            <table class="report-table" style="min-width: 800px; width: 100%;">
-                                <thead style="background:var(--slate);"><tr><th style="padding:15px;">วันที่ - เวลา</th><th>รหัสออเดอร์</th><th>โต๊ะ/ช่องทาง</th><th>ยอดรวม</th><th>การชำระเงิน</th></tr></thead>
-                                <tbody id="history-list"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // --- 5. MANUAL ORDER MODAL REVAMP ---
-        const moModal = document.getElementById('manual-order-modal');
-        if (moModal) {
-            moModal.innerHTML = `
-                <div class="modal-card" style="max-width: 700px; width:95%; animation: fadeIn 0.2s;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #1e293b;"><i class="fas fa-cart-plus" style="color:#3b82f6;"></i> เพิ่มออเดอร์ (Manual) ให้ลูกค้า</h3>
-                        <button onclick="document.getElementById('manual-order-modal').style.display='none'" style="background: none; border: none; font-size: 28px; cursor: pointer; color: var(--text-muted);">&times;</button>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 20px;">
-                        <div>
-                            <label style="font-weight: 700; display: block; margin-bottom: 5px; font-size: 14px;">เลือกระบุโต๊ะ / ช่องทาง</label>
-                            <select id="mo-table" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); width: 100%; font-size: 14px; background:#fff;">
-                                <option value="Takeaway">Takeaway (กลับบ้าน)</option>
-                                <option value="T-1">โต๊ะ T-1</option>
-                                <option value="T-2">โต๊ะ T-2</option>
-                                <option value="T-3">โต๊ะ T-3</option>
-                                <option value="T-4">โต๊ะ T-4</option>
-                                <option value="T-5">โต๊ะ T-5</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="font-weight: 700; display: block; margin-bottom: 5px; font-size: 14px;">พิมพ์ค้นหาเมนู</label>
-                            <div style="position:relative;">
-                                <i class="fas fa-search" style="position:absolute; left:12px; top:15px; color:var(--text-muted);"></i>
-                                <input type="text" id="mo-search" placeholder="พิมพ์ชื่อเมนู..." oninput="window.filterMoItems()" style="padding: 12px 12px 12px 35px; border-radius: 8px; border: 1px solid var(--border); width: 100%; font-size: 14px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; background:var(--bg);" id="mo-menu-list">
-                        <!-- Menu items injected here -->
-                    </div>
-
-                    <div style="background: var(--slate); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3b82f6;">
-                        <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 800;">รายการที่เลือกไว้ (<span id="mo-cart-count" style="color:#3b82f6;">0</span> รายการ)</h4>
-                        <div id="mo-cart-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 10px; font-size: 13px;">
-                            <div style="color: var(--text-muted); text-align: center; padding:10px;">ยังไม่มีการเลือกเมนู</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 20px; color: #10b981; border-top:1px dashed var(--border); padding-top:10px;">
-                            <span>ยอดรวมทั้งหมด:</span>
-                            <span>฿<span id="mo-total">0</span></span>
-                        </div>
-                    </div>
-
-                    <button class="btn-black" onclick="window.submitManualOrder()" style="width: 100%; background: #3b82f6; height: 50px; font-size: 18px; box-shadow: 0 4px 10px rgba(59,130,246,0.3);"><i class="fas fa-check-circle"></i> ยืนยันการรับออเดอร์</button>
-                </div>
-            `;
-        }
-
-        // Initialization
-        setTimeout(() => {
-            if(typeof window.loadSettings === 'function') window.loadSettings();
-            if(typeof window.loadBusinessHours === 'function') window.loadBusinessHours();
-        }, 500);
-    });
-
-    // --- OVERRIDES & LOGIC INJECTIONS ---
-
-    // Safe showSec override
-    const origShowSec = typeof window.showSec === 'function' ? window.showSec : function(n) {};
-    window.showSec = function(n) {
-        // Fast transition
-        ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec', 'points-sec', 'settings-sec'].forEach(s => {
-            const el = document.getElementById(s);
-            if (el) el.style.display = 'none';
-        });
-        
-        const targetEl = document.getElementById(n + '-sec');
-        if (targetEl) {
-            targetEl.style.display = (n === 'report' || n === 'settings' || n === 'points') ? 'block' : 'grid';
-            // Animation for smoothness
-            targetEl.style.animation = 'fadeIn 0.3s ease-out';
-        }
-        
-        if (n === 'points') { if(typeof window.loadPoints === 'function') window.loadPoints(); }
-        if (n === 'report') { if(typeof window.switchReportTab === 'function') setTimeout(()=>window.switchReportTab('dashboard'), 50); }
-        
-        document.querySelectorAll('.tab-btn').forEach(b => {
-            if (b.id) b.classList.toggle('active', b.id === 't-' + n);
-        });
-        document.querySelectorAll('.sidebar-item').forEach(b => {
-            if (b.id) b.classList.toggle('active', b.id === 'sb-' + n);
-        });
-    };
-
-    // Auto-Sync Data (Real-time listener)
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'withu_orders' || e.key === 'withu_points' || e.key === 'withu_points_db') {
-            const ordersEl = document.getElementById('order-sec');
-            if (ordersEl && ordersEl.style.display !== 'none' && typeof window.loadOrders === 'function') window.loadOrders();
-            
-            const takeawayEl = document.getElementById('takeaway-sec');
-            if (takeawayEl && takeawayEl.style.display !== 'none' && typeof window.loadTakeaway === 'function') window.loadTakeaway();
-            
-            const pointsEl = document.getElementById('points-sec');
-            if (pointsEl && pointsEl.style.display !== 'none' && typeof window.loadPoints === 'function') window.loadPoints();
-            
-            // Visual Sync Indicator
-            const syncStatus = document.getElementById('sync-status');
-            if(syncStatus) {
-                syncStatus.style.display = 'inline';
-                setTimeout(()=>syncStatus.style.display = 'none', 1000);
-            }
-        }
-    });
-
-    // Settings Logic
-    window.loadSettings = function() {
-        const status = localStorage.getItem('withu_store_open') !== 'false';
-        const cb = document.getElementById('store-open-status');
-        if (cb) cb.checked = status;
-        
-        const pp = localStorage.getItem('withu_promptpay') || '';
-        const ppInp = document.getElementById('store-promptpay');
-        if (ppInp) ppInp.value = pp;
-        
-        window.updateSoundBtnUI();
-    }
-    window.toggleStoreStatus = function() {
-        const isOpen = document.getElementById('store-open-status').checked;
-        localStorage.setItem('withu_store_open', isOpen);
-        if (typeof window.showToast === 'function') window.showToast(isOpen ? 'เปิดร้านแล้ว (ออเดอร์จะเข้าได้)' : 'ปิดร้านแล้ว (ลูกค้าสั่งไม่ได้)', 'new');
-    }
-    window.savePromptPay = function() {
-        const pp = document.getElementById('store-promptpay').value.trim();
-        localStorage.setItem('withu_promptpay', pp);
-        if (typeof window.showToast === 'function') window.showToast('บันทึก PromptPay แล้ว', 'new');
-    }
-    window.loadBusinessHours = function() {
-        try {
-            const bhStr = localStorage.getItem('withu_business_hours');
-            if (bhStr) {
-                const bh = JSON.parse(bhStr);
-                document.querySelectorAll('#bh-days input').forEach(cb => {
-                    cb.checked = bh.days.includes(parseInt(cb.value));
-                });
-                if (bh.start) document.getElementById('bh-start').value = bh.start;
-                if (bh.end) document.getElementById('bh-end').value = bh.end;
-            }
-        } catch (e) {}
-    }
-    window.saveBusinessHours = function() {
-        const days = Array.from(document.querySelectorAll('#bh-days input:checked')).map(cb => parseInt(cb.value));
-        const start = document.getElementById('bh-start').value;
-        const end = document.getElementById('bh-end').value;
-        localStorage.setItem('withu_business_hours', JSON.stringify({ days, start, end }));
-        if (typeof window.showToast === 'function') window.showToast('บันทึกเวลาทำการแล้ว', 'new');
-    }
-
-    // Sound Toggle Logic Move
-    const origToggleSound = typeof window.toggleSound === 'function' ? window.toggleSound : function(){};
-    window.toggleSound = function() {
-        origToggleSound();
-        window.updateSoundBtnUI();
-    }
-    window.updateSoundBtnUI = function() {
-        const isSoundOn = typeof isSoundEnabled !== 'undefined' ? isSoundEnabled : true;
-        const btn = document.getElementById('btn-sound-setting');
-        if (btn) {
-            if (isSoundOn) {
-                btn.innerHTML = '<i class="fas fa-volume-up"></i> ปิดเสียงแจ้งเตือน (กำลังเปิดอยู่)';
-                btn.style.color = '#ef4444'; btn.style.borderColor = '#ef4444';
-            } else {
-                btn.innerHTML = '<i class="fas fa-volume-mute"></i> เปิดเสียงแจ้งเตือน (กำลังปิดอยู่)';
-                btn.style.color = '#3b82f6'; btn.style.borderColor = '#3b82f6';
-            }
-        }
-        const topBtn = document.getElementById('btn-sound');
-        if (topBtn) {
-            topBtn.innerHTML = isSoundOn ? '<i class="fas fa-volume-up"></i> SOUND ON' : '<i class="fas fa-volume-mute"></i> SOUND OFF';
-        }
-    }
-
-    // Points Logic
-    window.loadPoints = function() {
-        let rawData = localStorage.getItem('withu_points_db') || '{}';
-        let db = {};
-        try { db = JSON.parse(rawData); } catch(e) {}
-        
-        const list = document.getElementById('points-list');
-        if(!list) return;
-        list.innerHTML = '';
-        for (let [phone, data] of Object.entries(db)) {
-            // Upgrade old db structure if any
-            if (typeof data === 'number') { data = { points: data, name: '' }; db[phone] = data; }
-            list.innerHTML += `
-                <tr style="border-bottom:1px solid var(--border);">
-                    <td style="font-weight: 800; padding:15px;">${phone}</td>
-                    <td>${data.name || '<span style="color:var(--text-muted);">-</span>'}</td>
-                    <td style="color: #3b82f6; font-weight: 800; font-size:18px;">${data.points}</td>
-                    <td><button class="btn-outline" onclick="window.editPointData('${phone}', '${data.name || ''}', ${data.points})" style="padding: 8px 12px; border-color: #f59e0b; color: #f59e0b;"><i class="fas fa-edit"></i> แก้ไข</button></td>
-                </tr>
-            `;
-        }
-        localStorage.setItem('withu_points_db', JSON.stringify(db));
-    }
-    window.editPointData = function(phone, name, points) {
-        const el1 = document.getElementById('pts-phone'); if(el1) el1.value = phone;
-        const el2 = document.getElementById('pts-name'); if(el2) el2.value = name || '';
-        const el3 = document.getElementById('pts-val'); if(el3) el3.value = points;
-    }
-    window.savePointData = function() {
-        const phoneEl = document.getElementById('pts-phone');
-        const phone = phoneEl ? phoneEl.value.trim() : '';
-        const nameEl = document.getElementById('pts-name');
-        const name = nameEl ? nameEl.value.trim() : '';
-        const ptsEl = document.getElementById('pts-val');
-        const points = ptsEl ? parseInt(ptsEl.value) || 0 : 0;
-        
-        if (!phone) { if(typeof window.showToast === 'function') window.showToast('กรุณาระบุเบอร์โทรศัพท์', 'call'); return; }
-        
-        let db = {};
-        try { db = JSON.parse(localStorage.getItem('withu_points_db') || '{}'); } catch(e){}
-        db[phone] = { points, name };
-        localStorage.setItem('withu_points_db', JSON.stringify(db));
-        
-        if(phoneEl) phoneEl.value = '';
-        if(nameEl) nameEl.value = '';
-        if(ptsEl) ptsEl.value = '0';
-        
-        window.loadPoints();
-        if(typeof window.showToast === 'function') window.showToast('บันทึกข้อมูลสมาชิกแล้ว', 'new');
-    }
-
-    // Report Logic
-    let salesChartInstance = null;
-    window.switchReportTab = function(tab) {
-        const dEl = document.getElementById('report-dashboard');
-        const hEl = document.getElementById('report-history');
-        if (dEl) { dEl.style.display = tab === 'dashboard' ? 'block' : 'none'; dEl.style.animation = 'fadeIn 0.3s'; }
-        if (hEl) { hEl.style.display = tab === 'history' ? 'block' : 'none'; hEl.style.animation = 'fadeIn 0.3s'; }
-        
-        const dbBtn = document.getElementById('rtab-dashboard');
-        const hBtn = document.getElementById('rtab-history');
-        if (dbBtn) dbBtn.style.cssText = tab === 'dashboard' ? 'border-color: #3b82f6; color: #3b82f6; background: rgba(59,130,246,0.1);' : 'border-color: var(--border); color: var(--text-main); background: transparent;';
-        if (hBtn) hBtn.style.cssText = tab === 'history' ? 'border-color: #3b82f6; color: #3b82f6; background: rgba(59,130,246,0.1);' : 'border-color: var(--border); color: var(--text-main); background: transparent;';
-        
-        if (tab === 'dashboard') { window.renderReport('1d'); } else { window.renderHistory(); }
-    };
-    window.renderReport = function(period) {
-        const dEl = document.getElementById('report-dashboard');
-        if(dEl) {
-            const btns = dEl.querySelectorAll('.btn-black');
-            const pMap = {'1d': 0, '7d': 1, '30d': 2, 'all': 3};
-            btns.forEach((b, i) => {
-                b.style.background = i === pMap[period] ? '#3b82f6' : 'var(--text-main)';
-            });
-        }
-        const dataStr = localStorage.getItem('withu_completed_orders') || '[]';
-        let orders = [];
-        try { orders = JSON.parse(dataStr); } catch(e) {}
-        
-        const now = new Date();
-        const fOrders = orders.filter(o => {
-            if (!o.timestamp) return false;
-            const oDate = new Date(o.timestamp);
-            const diffTime = Math.abs(now - oDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            if (period === '1d') return diffDays <= 1 && oDate.getDate() === now.getDate();
-            if (period === '7d') return diffDays <= 7;
-            if (period === '30d') return diffDays <= 30;
-            return true; 
-        });
-        
-        let totalSales = 0;
-        const itemCounts = {};
-        const salesByDate = {};
-        fOrders.forEach(o => {
-            const amt = o.total || o.finalTotal || 0;
-            totalSales += amt;
-            if (o.cart) { o.cart.forEach(item => { itemCounts[item.name] = (itemCounts[item.name] || 0) + (item.qty || 1); }); }
-            const dateKey = new Date(o.timestamp).toLocaleDateString('th-TH');
-            salesByDate[dateKey] = (salesByDate[dateKey] || 0) + amt;
-        });
-        const totEl = document.getElementById('rep-total'); if(totEl) totEl.innerText = totalSales.toLocaleString();
-        const countEl = document.getElementById('rep-count'); if(countEl) countEl.innerText = fOrders.length;
-        const topItem = Object.entries(itemCounts).sort((a, b) => b[1] - a[1])[0];
-        const topEl = document.getElementById('rep-top-menu'); if(topEl) topEl.innerText = topItem ? `${topItem[0]} (${topItem[1]})` : '-';
-
-        const chartLabels = Object.keys(salesByDate);
-        const chartData = Object.values(salesByDate);
-        const ctx = document.getElementById('salesChart');
-        if (ctx && window.Chart) {
-            if (salesChartInstance) salesChartInstance.destroy();
-            salesChartInstance = new window.Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: chartLabels.length ? chartLabels : ['-'],
-                    datasets: [{
-                        label: 'ยอดขาย (บาท)',
-                        data: chartData.length ? chartData : [0],
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59,130,246,0.2)',
-                        borderWidth: 2, fill: true, tension: 0.4
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-    };
-    window.renderHistory = function() {
-        const dataStr = localStorage.getItem('withu_completed_orders') || '[]';
-        let orders = [];
-        try { orders = JSON.parse(dataStr); } catch(e) {}
-        orders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        
-        const list = document.getElementById('history-list');
-        if(!list) return;
-        list.innerHTML = '';
-        if(orders.length === 0) { list.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">ไม่มีข้อมูลประวัติการขาย</td></tr>'; return; }
-        orders.forEach((o, i) => {
-            const date = new Date(o.timestamp).toLocaleString('th-TH');
-            list.innerHTML += `
-                <tr style="border-bottom:1px solid var(--border);">
-                    <td style="font-size: 12px; color: var(--text-muted); padding:15px;">${date}</td>
-                    <td style="font-weight: 800; color:#1e293b;">#${o.id || o.orderNo || (1000+i)}</td>
-                    <td><span style="background:var(--slate); padding:5px 10px; border-radius:4px; font-size:12px; font-weight:700;">${o.table || 'Takeaway'}</span></td>
-                    <td style="color: #10b981; font-weight: 800;">฿${(o.total || o.finalTotal || 0).toLocaleString()}</td>
-                    <td>${o.paymentMethod === 'qr' ? '<span style="color:#3b82f6; font-weight:700;"><i class="fas fa-qrcode"></i> PROMPTPAY</span>' : '<span style="color:#f59e0b; font-weight:700;"><i class="fas fa-money-bill"></i> CASH</span>'}</td>
-                </tr>
-            `;
-        });
-    };
-
-    // Manual Order Logic
-    window.manualCart = [];
-    window.openManualOrderModal = function(targetTable = null) {
-        window.manualCart = [];
-        const modal = document.getElementById('manual-order-modal');
-        if (modal) {
-            modal.style.display = 'flex';
-            const sel = document.getElementById('mo-table');
-            if (targetTable && sel) {
-                let found = false;
-                for(let i=0; i<sel.options.length; i++) { if(sel.options[i].value === targetTable) { found = true; sel.selectedIndex = i; break; } }
-                if(!found) { const opt = document.createElement('option'); opt.value = targetTable; opt.text = targetTable; sel.add(opt); sel.value = targetTable; }
-            } else if (sel) { sel.value = 'Takeaway'; }
-            window.renderMoMenu();
-            window.renderMoCart();
-        }
-    };
-    window.renderMoMenu = function() {
-        const list = document.getElementById('mo-menu-list');
-        if(!list) return;
-        // Mockup of getting menus, ideally we should read window.CATEGORIES or similar if exists
-        let itemsHtml = '';
-        if (typeof window.MENU !== 'undefined') {
-            Object.values(window.MENU).forEach(cat => {
-                cat.forEach(item => {
-                    itemsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid var(--border);">
-                        <div><span style="font-weight:700;">${item.name}</span><br><span style="color:#10b981; font-size:12px;">฿${item.price}</span></div>
-                        <button onclick="window.addManualItem('${item.name}', ${item.price})" class="btn-outline" style="padding:5px 15px; border-color:#3b82f6; color:#3b82f6;"><i class="fas fa-plus"></i></button>
-                    </div>`;
-                });
-            });
-        }
-        if(!itemsHtml) itemsHtml = '<div style="padding: 15px; text-align: center; color: var(--text-muted);">ไม่พบข้อมูลเมนูในระบบ</div>';
-        list.innerHTML = itemsHtml;
-    };
-    window.addManualItem = function(name, price) {
-        const exist = window.manualCart.find(i => i.name === name);
-        if(exist) { exist.qty++; exist.total = exist.qty * price; }
-        else { window.manualCart.push({ name, price, qty: 1, total: price }); }
-        window.renderMoCart();
-    };
-    window.filterMoItems = function() {
-        const search = document.getElementById('mo-search').value.toLowerCase();
-        const list = document.getElementById('mo-menu-list');
-        if(!list) return;
-        const items = list.querySelectorAll('div > div > span:first-child');
-        items.forEach(span => {
-            const row = span.parentNode.parentNode;
-            if(span.innerText.toLowerCase().includes(search)) row.style.display = 'flex';
-            else row.style.display = 'none';
-        });
-    };
-    window.renderMoCart = function() {
-        const list = document.getElementById('mo-cart-list');
-        if(list) list.innerHTML = window.manualCart.length ? window.manualCart.map((item, i) => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--border);"><span><span style="background:#3b82f6; color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; margin-right:5px;">${item.qty}x</span> <span style="font-weight:700;">${item.name}</span></span><span style="font-weight:800;">฿${item.total} <button onclick="window.manualCart.splice(${i},1); window.renderMoCart();" style="color:#ef4444; border:none; background:none; cursor:pointer; margin-left:10px;"><i class="fas fa-trash"></i></button></span></div>`).join('') : '<div style="color: var(--text-muted); text-align: center; padding:10px;">ยังไม่มีการเลือกเมนู</div>';
-        const total = window.manualCart.reduce((s, i) => s + i.total, 0);
-        const totalEl = document.getElementById('mo-total'); if(totalEl) totalEl.innerText = total;
-        const countEl = document.getElementById('mo-cart-count'); if(countEl) countEl.innerText = window.manualCart.length;
-    };
-    window.submitManualOrder = function() {
-        if (!window.manualCart.length) {
-            if (typeof window.showToast === 'function') window.showToast('กรุณาเลือกเมนู', 'call');
-            return;
-        }
-        const tableEl = document.getElementById('mo-table');
-        const table = tableEl ? tableEl.value : 'Takeaway';
-        
-        // Push to localstorage
-        let active = JSON.parse(localStorage.getItem('withu_orders') || '[]');
-        const newOrder = {
-            id: Date.now().toString().slice(-6),
-            table: table,
-            cart: window.manualCart.map(c => ({ name: c.name, price: c.price, qty: c.qty, total: c.total })),
-            total: window.manualCart.reduce((s, i) => s + i.total, 0),
-            timestamp: new Date().toISOString(),
-            status: 'pending',
-            paymentMethod: 'cash'
-        };
-        active.unshift(newOrder);
-        localStorage.setItem('withu_orders', JSON.stringify(active));
-        
-        if (typeof window.showToast === 'function') window.showToast('เพิ่มออเดอร์ ' + table + ' สำเร็จ', 'new');
-        const modal = document.getElementById('manual-order-modal');
-        if(modal) modal.style.display = 'none';
-        
-        if (typeof window.loadOrders === 'function') window.loadOrders();
-        if (typeof window.loadTakeaway === 'function') window.loadTakeaway();
-    };
-
-</script>
 
 </body>
 </html>

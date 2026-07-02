@@ -211,7 +211,7 @@
 *:not(.fas):not(.far):not(.fab):not(.fa) { font-family: 'Plus Jakarta Sans', 'Inter', 'Prompt', system-ui, sans-serif !important; }
 
 body { background: #f8fafc !important; background-image: radial-gradient(at 20% 30%, rgba(59,130,246,0.03) 0%, transparent 50%), radial-gradient(at 80% 70%, rgba(99,102,241,0.03) 0%, transparent 50%) !important; }
-[data-theme="dark"] body { background: #0c0f1a !important; background-image: radial-gradient(at 20% 30%, rgba(59,130,246,0.05) 0%, transparent 50%), radial-gradient(at 80% 70%, rgba(99,102,241,0.04) 0%, transparent 50%) !important; }
+[data-theme="dark"] body { background: #000000 !important; }
 
 /* --- TOP NAV --- */
 .top-nav { background: rgba(255,255,255,0.95) !important; backdrop-filter: blur(20px) saturate(1.8) !important; -webkit-backdrop-filter: blur(20px) saturate(1.8) !important; border-bottom: 1px solid rgba(226,232,240,0.8) !important; padding: 10px 24px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.02) !important; top: 0 !important; }
@@ -294,8 +294,8 @@ button[onclick*="handleLogout"]:hover { color: #ef4444 !important; background: r
 .btn-void { border-radius: 8px !important; transition: all 0.15s ease !important; }
 
 /* --- AI CARD --- */
-.ai-card { border-radius: 16px !important; border: 1px solid rgba(226,232,240,0.6) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.02) !important; transition: all 0.2s ease !important; padding: 22px !important; }
-.ai-card:hover { transform: translateY(-1px) !important; box-shadow: 0 6px 20px rgba(59,130,246,0.06) !important; }
+.ai-card { border-radius: 16px !important; border: 1px solid rgba(226,232,240,0.6) !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1) !important; transition: all 0.2s ease !important; padding: 22px !important; }
+.ai-card:hover { transform: translateY(-2px) !important; box-shadow: 0 15px 30px -5px rgba(59,130,246,0.15), 0 10px 15px -5px rgba(59,130,246,0.1) !important; }
 [data-theme="dark"] .ai-card { background: #111827 !important; border-color: rgba(30,41,59,0.5) !important; }
 
 /* --- MODALS --- */
@@ -407,38 +407,38 @@ document.addEventListener('DOMContentLoaded', function() {
             var div = document.createElement('div');
             div.id = 'settings-sec';
             div.style.cssText = 'display:none; padding:20px;';
-            div.innerHTML = '<h2 style="margin-bottom:20px;"><i class="fas fa-cog" style="color:#3b82f6; margin-right:8px;"><\/i>Store Settings<\/h2>' +
-                '<div class="ai-card" style="margin-bottom:16px; border-top:3px solid #3b82f6;">' +
-                '<h3 style="font-size:15px; margin-bottom:14px; font-weight:800;"><i class="fas fa-clock" style="color:#3b82f6; margin-right:6px;"><\/i>Business Hours<\/h3>' +
-                '<label style="display:flex; align-items:center; gap:10px; font-weight:800; font-size:16px; color:#10b981; margin-bottom:15px; cursor:pointer;"><input type="checkbox" id="store-open-status" onchange="toggleStoreStatus()" style="width:22px; height:22px; accent-color:#10b981;"> Open for Orders Today<\/label>' +
-                '<hr style="border:0; border-top:1px solid var(--border); margin:14px 0;">' +
-                '<label style="font-weight:700; display:block; margin-bottom:10px; font-size:13px;">Operating Days<\/label>' +
-                '<div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:15px;" id="bh-days">' +
-                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="1" checked> Mon<\/label>' +
-                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="2" checked> Tue<\/label>' +
-                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="3" checked> Wed<\/label>' +
-                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="4" checked> Thu<\/label>' +
-                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="5" checked> Fri<\/label>' +
-                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="6" checked> Sat<\/label>' +
-                '<label style="cursor:pointer; font-size:13px;"><input type="checkbox" value="0" checked> Sun<\/label>' +
+            div.innerHTML = '<h2 style="margin-bottom:20px; font-weight:900; font-size:24px; letter-spacing:-0.5px;"><i class="fas fa-cog" style="color:#3b82f6; margin-right:10px;"><\/i>Store Settings<\/h2>' +
+                '<div class="ai-card" style="margin-bottom:20px; border-left:4px solid #10b981;">' +
+                '<h3 style="font-size:16px; margin-bottom:18px; font-weight:800;"><i class="fas fa-clock" style="color:#10b981; margin-right:8px;"><\/i>Business Hours & Store Status<\/h3>' +
+                
+                '<label style="display:flex; align-items:center; gap:12px; font-weight:800; font-size:16px; color:#10b981; margin-bottom:20px; cursor:pointer; background:rgba(16,185,129,0.1); padding:16px; border-radius:12px; border:1px solid rgba(16,185,129,0.2);">' +
+                '<input type="checkbox" id="store-open-status" onchange="toggleStoreStatus()" style="width:24px; height:24px; accent-color:#10b981; cursor:pointer;"> ร้านเปิดรับออเดอร์ตามปกติ (Open for Orders)<\/label>' +
+                
+                '<div style="font-size:13px; font-weight:700; margin-bottom:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Operating Days<\/div>' +
+                '<div id="bh-days" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">' +
+                '<label style="cursor:pointer; font-size:13px; background:var(--slate); padding:8px 16px; border-radius:8px; border:1px solid var(--border); display:flex; align-items:center; gap:6px;"><input type="checkbox" value="1" checked style="accent-color:#3b82f6;"> จ.<\/label>' +
+                '<label style="cursor:pointer; font-size:13px; background:var(--slate); padding:8px 16px; border-radius:8px; border:1px solid var(--border); display:flex; align-items:center; gap:6px;"><input type="checkbox" value="2" checked style="accent-color:#3b82f6;"> อ.<\/label>' +
+                '<label style="cursor:pointer; font-size:13px; background:var(--slate); padding:8px 16px; border-radius:8px; border:1px solid var(--border); display:flex; align-items:center; gap:6px;"><input type="checkbox" value="3" checked style="accent-color:#3b82f6;"> พ.<\/label>' +
+                '<label style="cursor:pointer; font-size:13px; background:var(--slate); padding:8px 16px; border-radius:8px; border:1px solid var(--border); display:flex; align-items:center; gap:6px;"><input type="checkbox" value="4" checked style="accent-color:#3b82f6;"> พฤ.<\/label>' +
+                '<label style="cursor:pointer; font-size:13px; background:var(--slate); padding:8px 16px; border-radius:8px; border:1px solid var(--border); display:flex; align-items:center; gap:6px;"><input type="checkbox" value="5" checked style="accent-color:#3b82f6;"> ศ.<\/label>' +
+                '<label style="cursor:pointer; font-size:13px; background:var(--slate); padding:8px 16px; border-radius:8px; border:1px solid var(--border); display:flex; align-items:center; gap:6px;"><input type="checkbox" value="6" checked style="accent-color:#3b82f6;"> ส.<\/label>' +
+                '<label style="cursor:pointer; font-size:13px; background:var(--slate); padding:8px 16px; border-radius:8px; border:1px solid var(--border); display:flex; align-items:center; gap:6px;"><input type="checkbox" value="0" checked style="accent-color:#3b82f6;"> อา.<\/label>' +
                 '<\/div>' +
-                '<div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:15px;">' +
-                '<div><label style="font-weight:700; display:block; margin-bottom:5px; font-size:12px;">Open<\/label><input type="time" id="bh-start" value="09:00"><\/div>' +
-                '<div><label style="font-weight:700; display:block; margin-bottom:5px; font-size:12px;">Close<\/label><input type="time" id="bh-end" value="21:00"><\/div>' +
+                
+                '<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">' +
+                '<div><label style="font-weight:700; display:block; margin-bottom:8px; font-size:12px; color:var(--text-muted);">เวลาเปิด (Open)<\/label><input type="time" id="bh-start" value="09:00" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--slate); font-size:15px; font-weight:600;"><\/div>' +
+                '<div><label style="font-weight:700; display:block; margin-bottom:8px; font-size:12px; color:var(--text-muted);">เวลาปิด (Close)<\/label><input type="time" id="bh-end" value="21:00" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--slate); font-size:15px; font-weight:600;"><\/div>' +
                 '<\/div>' +
-                '<button class="btn-black" onclick="saveBusinessHours()" style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fas fa-save" style="margin-right:6px;"><\/i>Save<\/button>' +
+                '<button class="btn-black" onclick="saveBusinessHours()" style="background:linear-gradient(135deg, #10b981, #059669); padding:14px; width:auto; min-width:200px;"><i class="fas fa-save" style="margin-right:8px;"><\/i>บันทึกเวลาทำการ<\/button>' +
                 '<\/div>' +
-                '<div class="ai-card" style="margin-bottom:16px;">' +
-                '<h3 style="font-size:15px; margin-bottom:14px; font-weight:800;"><i class="fas fa-qrcode" style="color:#3b82f6; margin-right:6px;"><\/i>PromptPay QR<\/h3>' +
-                '<input type="text" id="store-promptpay" placeholder="Phone or National ID" style="margin-bottom:12px;">' +
-                '<button class="btn-black" onclick="savePromptPay()" style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fas fa-save" style="margin-right:6px;"><\/i>Save PromptPay<\/button>' +
-                '<\/div>' +
-                '<div class="ai-card">' +
-                '<h3 style="font-size:15px; margin-bottom:14px; font-weight:800;"><i class="fas fa-volume-up" style="color:#3b82f6; margin-right:6px;"><\/i>Sound Alerts<\/h3>' +
-                '<button id="btn-sound-setting" onclick="window.toggleSound()" class="btn-outline" style="width:100%; border-color:#3b82f6; color:#3b82f6; padding:14px; font-weight:800;"><i class="fas fa-volume-up" style="margin-right:6px;"><\/i>Toggle Sound<\/button>' +
+                
+                '<div class="ai-card" style="border-left:4px solid #3b82f6;">' +
+                '<h3 style="font-size:16px; margin-bottom:14px; font-weight:800;"><i class="fas fa-volume-up" style="color:#3b82f6; margin-right:8px;"><\/i>Sound Alerts<\/h3>' +
+                '<button id="btn-sound-setting" onclick="window.toggleSound()" class="btn-outline" style="width:100%; border-color:#3b82f6; color:#3b82f6; padding:15px; font-weight:800; max-width:300px;"><i class="fas fa-volume-up" style="margin-right:8px;"><\/i>เปิด/ปิด เสียงแจ้งเตือน<\/button>' +
                 '<\/div>';
             orderSec.parentNode.insertBefore(div, orderSec.nextSibling);
         }
+    }
     }
 
     // === POINTS SECTION ===
@@ -523,8 +523,22 @@ window.addEventListener('storage', function(e) {
 window.loadSettings = function() {
     var cb = document.getElementById('store-open-status');
     if(cb) cb.checked = localStorage.getItem('withu_store_open') !== 'false';
-    var pp = document.getElementById('store-promptpay');
-    if(pp) pp.value = localStorage.getItem('withu_promptpay') || '';
+    window.loadBusinessHours();
+};
+
+window.loadBusinessHours = function() {
+    var bh = localStorage.getItem('withu_business_hours');
+    if (bh) {
+        try {
+            var data = JSON.parse(bh);
+            if (data.start) document.getElementById('bh-start').value = data.start;
+            if (data.end) document.getElementById('bh-end').value = data.end;
+            if (data.days && Array.isArray(data.days)) {
+                var cbs = document.querySelectorAll('#bh-days input[type="checkbox"]');
+                cbs.forEach(cb => { cb.checked = data.days.includes(parseInt(cb.value)); });
+            }
+        } catch(e) {}
+    }
 };
 window.toggleStoreStatus = function() {
     var isOpen = document.getElementById('store-open-status').checked;
@@ -915,7 +929,7 @@ window.renderHistory = function() {
 
     
         <div id="mistake-log" style="font-weight: 700; color: #ef4444; display:none; text-transform: uppercase; letter-spacing: 1px;">MISTAKE DETECTED</div>
-        <div id="date-now"></div>
+        
     </div>
 
     <nav class="top-nav">
@@ -923,7 +937,7 @@ window.renderHistory = function() {
             <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
             
     <div style="display: flex; align-items: center; gap: 12px;">
-        <div class="logo" style="display:flex; align-items:center; gap:10px;">WITHU ADMIN <span id="date-now" style="font-size:12px; color:#3b82f6; font-weight:800; background:rgba(59,130,246,0.1); padding:4px 8px; border-radius:6px; letter-spacing:0.5px;"></span></div>
+        <div class="logo" style="display:flex; align-items:center; gap:10px;">WITHU ADMIN </div>
         <span id="sync-status" style="display:none; font-weight:700; font-size:11px; color:#10b981; background:rgba(16,185,129,0.1); padding:4px 10px; border-radius:6px; border:1px solid rgba(16,185,129,0.2);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px; vertical-align:-1px; animation:spin 1s linear infinite;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>SYNCING</span>
         <div style="font-size:11px; font-weight:700; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
             <span style="background:rgba(59,130,246,0.08); padding:5px 10px; border-radius:8px; color:#3b82f6; font-weight:800; border:1px solid rgba(59,130,246,0.15);">CLOSING IN: <span id="close-timer" style="font-weight:900; color:#2563eb;">00:00:00</span></span>
@@ -931,13 +945,10 @@ window.renderHistory = function() {
     </div>
 
         </div>
-        <div class="action-btns" style="display: flex; gap: 8px;">
+        <div class="action-btns" style="display: flex; gap: 8px; align-items: center;">
+            <div id="date-now" style="margin-right: 15px; font-weight: 700; color: var(--text-muted); font-size: 14px;"></div>
             <button id="btn-sound" onclick="toggleSound()" class="tab-btn" style="border: 1px solid var(--border); color: #3b82f6;"><i class="fas fa-volume-up"></i></button>
-            <button class="tab-btn" onclick="toggleLanguage()" style="border: 1px solid #000;" id="btn-lang">EN / TH</button>
-            <button class="tab-btn" onclick="openManualOrderModal(null)" id="btn-add-nav">ADD ORDER</button>
-            <button class="tab-btn" onclick="toggleAttendance()" id="btn-staff-nav" style="background: #000; color: #fff;">STAFF</button>
-            <button class="tab-btn" onclick="window.print()" id="btn-export-nav" style="background: #000; color: #fff;">EXPORT</button>
-            <button class="tab-btn" onclick="toggleTheme()" style="background: var(--border);">MODE</button>
+            <button class="tab-btn" onclick="openManualOrderModal(null)" id="btn-add-nav" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none;">ADD ORDER</button>
         </div>
     </nav>
     <div class="container">
@@ -1027,18 +1038,38 @@ window.renderHistory = function() {
     
         <div id="points-sec" style="display:none; padding: 20px;">
             <div style="background:var(--surface); padding:25px; border-radius:12px; border:1px solid var(--border); box-shadow:var(--shadow);">
-                <h2 style="margin:0 0 20px 0; letter-spacing:-0.5px;">ระบบสมาชิก (Customer Points)</h2>
-                <div style="display:flex; gap:10px; margin-bottom: 25px; flex-wrap: wrap;">
-                    <input type="tel" id="point-phone-input" placeholder="เบอร์โทรศัพท์ (เช่น 0812345678)" style="flex:1; min-width:200px; padding:12px; font-size:16px;">
-                    <input type="number" id="point-val-input" placeholder="จำนวนแต้ม" style="width:120px; padding:12px; font-size:16px;">
-                    <button class="btn-black" onclick="savePoint()" style="padding: 12px 24px;">บันทึก / แก้ไข</button>
+                <h2 style="margin-bottom:20px; font-weight:900; font-size:24px; letter-spacing:-0.5px;"><i class="fas fa-star" style="color:#f59e0b; margin-right:10px;"></i>Customer Points</h2>
+            <div class="ai-card" style="margin-bottom:20px; border-left:4px solid #3b82f6;">
+                <h3 style="font-size:16px; margin-bottom:18px; font-weight:800;"><i class="fas fa-user-plus" style="color:#3b82f6; margin-right:8px;"></i>เพิ่ม/แก้ไข สมาชิก</h3>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:16px;">
+                    <div>
+                        <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">เบอร์โทรศัพท์ (Phone)</label>
+                        <input type="tel" id="pts-phone" placeholder="09XXXXXXXX" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); font-size:15px; background:var(--slate);">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">ชื่อสมาชิก (Name)</label>
+                        <input type="text" id="pts-name" placeholder="ชื่อลูกค้า" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); font-size:15px; background:var(--slate);">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">คะแนนสะสม (Points)</label>
+                        <input type="number" id="pts-val" value="0" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); font-size:15px; background:var(--slate);">
+                    </div>
                 </div>
-                <div style="overflow-x:auto;">
-                    <table class="report-table" style="width:100%; text-align:center;">
-                        <thead><tr><th>เบอร์โทรศัพท์</th><th>แต้มสะสม</th><th>จัดการ</th></tr></thead>
-                        <tbody id="points-list-body"></tbody>
-                    </table>
-                </div>
+                <button class="btn-black" onclick="savePointData()" style="width:auto; padding:12px 24px; background:linear-gradient(135deg, #3b82f6, #2563eb);"><i class="fas fa-save" style="margin-right:8px;"></i>บันทึกข้อมูลสมาชิก</button>
+            </div>
+            <div class="ai-card" style="padding:0; overflow-x:auto;">
+                <table class="report-table" style="min-width:600px; width:100%; border:none;">
+                    <thead style="background:var(--slate);">
+                        <tr>
+                            <th style="padding:15px 20px; font-size:12px;">เบอร์โทรศัพท์</th>
+                            <th style="padding:15px 20px; font-size:12px;">ชื่อสมาชิก</th>
+                            <th style="padding:15px 20px; font-size:12px;">คะแนนสะสม</th>
+                            <th style="padding:15px 20px; font-size:12px; text-align:center;">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="points-list"></tbody>
+                </table>
+            </div>
             </div>
         </div>
 
@@ -1352,8 +1383,13 @@ window.renderHistory = function() {
                 const safeAnalytics = data.analytics ? data.analytics : {revenue:0, report:[]};
                 renderAIInsights(safeAnalytics, data.orders || []);
                 
+                
                 const avg = data.orders && data.orders.length > 0 ? (data.orders.reduce((s,o) => s + getTimeDiff(o.time), 0) / data.orders.length).toFixed(1) : "0.0";
                 safeText('avg-speed', avg + " MINS");
+                
+                // Update Sidebar Live Report
+                safeText('sb-rep-avg', avg + " MINS");
+
                 
                 drawChart();
             } catch(e) { 
@@ -1708,7 +1744,7 @@ window.renderHistory = function() {
             safeStyle('p-methods', 'display', 'none');
             if(m === 'qr') { 
                 const img = document.getElementById('p-qr-img'); 
-                if(img) img.src = `https://promptpay.io/0931805507/${pTotal}.png`; 
+                if(img) img.src = `https://promptpay.io/0616087420/${pTotal}.png`; 
                 safeStyle('p-qr-area', 'display', 'block'); 
             } else { 
                 const input = document.getElementById('p-cash-input'); if(input) input.value = ""; 

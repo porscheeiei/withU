@@ -685,7 +685,7 @@
                     <input type="number" id="cash-given" class="cart-note" style="padding:12px; margin-top:0;" placeholder="จำนวนเงินที่จ่าย (บาท) เพื่อเตรียมเงินทอน">
                 </div>
                 <div id="qr-sec" style="display:none; text-align:center;">
-                    <img src="https://promptpay.io/${localStorage.getItem('withu_promptpay') || '0931805507'}/${total}.png" style="width:160px; height:160px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
+                    <img src="https://promptpay.io/${localStorage.getItem('withu_promptpay') || '0616087420'}/${total}.png" style="width:160px; height:160px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
                     <div style="font-size:14px; font-weight:700; margin-bottom:12px; color:var(--primary);">ยอดชำระ: ฿${total.toLocaleString()}</div>
                     <input type="file" id="slip-upload" accept="image/*" style="display:block; margin:0 auto; font-size:13px; margin-bottom:16px;">
                 </div>
@@ -917,7 +917,7 @@
         window.finalPay = function(method) {
             origFinalPay(method);
             if (method === 'qr') {
-                const pp = localStorage.getItem('withu_promptpay') || '0931805507';
+                const pp = localStorage.getItem('withu_promptpay') || '0616087420';
                 const img = document.getElementById('p-qr-img');
                 const totalEl = document.getElementById('p-total');
                 if (img && totalEl) {

@@ -2306,6 +2306,25 @@ window.renderHistory = function() {
         
         async function actionCall(action, params) { 
             try { 
+                // Fix: Save cleared orders to local history before they disappear from API
+                if (action === 'clearOrder' || action === 'clearTable') {
+                    if (window.fullData && window.fullData.orders) {
+                        const targetOrders = window.fullData.orders.filter(o => o.id === params.id || (params.table && o.table === params.table));
+                        if (targetOrders.length > 0) {
+                            let history = []; try { history = JSON.parse(localStorage.getItem('withu_completed_orders') || '[]'); } catch(e){}
+                            targetOrders.forEach(o => {
+                                o.timestamp = new Date().toISOString();
+                                history.push(o);
+                            });
+                            localStorage.setItem('withu_completed_orders', JSON.stringify(history));
+                            
+                            // Re-render history if we are currently looking at it
+                            if (typeof window.renderHistory === 'function') window.renderHistory();
+                        }
+                    }
+                    if (typeof showToast === 'function') showToast('เคลียร์ออเดอร์เรียบร้อย', 'success');
+                }
+                
                 const payload = {action, apiKey: API_KEY, ...params};
                 await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(payload)}); 
                 refresh(); 
@@ -2398,6 +2417,18 @@ window.renderHistory = function() {
 
 
 
+
+
+<style id="toast-styles">
+.toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast { background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; animation: toastSlideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.toast.toast-success { border-left: 4px solid #10b981; }
+.toast.toast-error { border-left: 4px solid #ef4444; }
+.toast.toast-info { border-left: 4px solid #3b82f6; }
+@keyframes toastSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes toastFadeOut { from { opacity: 1; } to { opacity: 0; } }
+</style>
+<div id="toast-container" class="toast-container"></div>
 
 </body>
 </html>

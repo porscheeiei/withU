@@ -447,7 +447,38 @@ document.addEventListener('DOMContentLoaded', function() {
 // ลูกค้าต้องเปลี่ยนลิงก์ตรงนี้ให้เป็นลิงก์ Firebase ของตัวเอง (อย่าลืมเติม .json ต่อท้าย)
 const FIREBASE_POINTS_URL = "https://withu-da97c-default-rtdb.asia-southeast1.firebasedatabase.app/points.json"; 
 
+
+// ==========================================
+// MIGRATE OLD POINTS FROM LOCALSTORAGE TO FIREBASE
+// ==========================================
+window.migrateOldPoints = async function() {
+    var old = localStorage.getItem('withu_points');
+    if (!old) return;
+    try {
+        var arr = JSON.parse(old);
+        if (arr && arr.length > 0) {
+            if(typeof showToast==='function') showToast('กำลังซิงค์ข้อมูลเก่าเข้า Firebase...', 'new');
+            let promises = arr.map(m => {
+                let updateUrl = FIREBASE_POINTS_URL.replace('.json', '/' + m.phone + '.json');
+                return fetch(updateUrl, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: m.name||'-', points: m.points||0 })
+                });
+            });
+            await Promise.all(promises);
+            localStorage.removeItem('withu_points'); // Prevent double sync
+            if(typeof showToast==='function') showToast('กู้ข้อมูลเก่ากลับมาครบแล้ว!', 'success');
+            window.loadPoints(); // Refresh UI
+        }
+    } catch(e) {
+        console.error("Migration error:", e);
+    }
+};
+
 window.loadPoints = async function() {
+    window.migrateOldPoints(); // Auto-sync old data on load
+
     var list = document.getElementById('points-list');
     if (!list) return;
     

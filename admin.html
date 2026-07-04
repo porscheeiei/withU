@@ -509,7 +509,7 @@ window.migrateOldPoints = async function() {
 window.loadPoints = async function() {
     window.migrateOldPoints(); // Auto-sync old data on load
 
-    var list = document.getElementById('points-list');
+    var list = document.getElementById('points-list-body') || document.getElementById('points-list');
     if (!list) return;
     
     if (false) {
@@ -552,8 +552,9 @@ window.loadPoints = async function() {
 };
 
 window.savePointData = async function() {
-    var phone = (document.getElementById('pts-phone') || {}).value;
-    if(!phone || !phone.trim()) { if(typeof showToast==='function') showToast('Enter phone number','call'); return; }
+    var pInput = document.getElementById('pts-phone') || document.getElementById('point-phone-input');
+    var phone = (pInput || {}).value;
+    if(!phone || !phone.trim()) { if(typeof showToast==='function') showToast('กรุณากรอกเบอร์โทร','error'); return; }
     phone = phone.trim();
     
     if (FIREBASE_POINTS_URL.includes('your-project-id')) {
@@ -561,16 +562,18 @@ window.savePointData = async function() {
         return;
     }
     
-    var points = parseInt((document.getElementById('pts-val')||{}).value)||0;
-    var name = ((document.getElementById('pts-name')||{}).value||'').trim();
+    var vInput = document.getElementById('pts-val') || document.getElementById('point-val-input');
+    var points = parseInt((vInput || {}).value)||0;
     
-    document.getElementById('pts-phone').value = '';
-    document.getElementById('pts-name').value = '';
-    document.getElementById('pts-val').value = '0';
+    var nInput = document.getElementById('pts-name');
+    var name = nInput ? nInput.value.trim() : '-';
+    
+    if(pInput) pInput.value = '';
+    if(nInput) nInput.value = '';
+    if(vInput) vInput.value = '';
     
     if(typeof showToast==='function') showToast('กำลังส่งข้อมูลไป Firebase...','new');
     
-    // Construct individual update URL (e.g. .../points/0812345678.json)
     const updateUrl = FIREBASE_POINTS_URL.replace('.json', '/' + phone + '.json');
     
     try {
@@ -580,12 +583,13 @@ window.savePointData = async function() {
             body: JSON.stringify({ name: name, points: points })
         });
         if(typeof showToast==='function') showToast('บันทึกแต้มลง Firebase สำเร็จ!','success');
-        window.loadPoints(); // Reload table
+        window.loadPoints(); 
     } catch(e) {
         console.error("Firebase Save Error:", e);
         if(typeof showToast==='function') showToast('บันทึกข้อมูลล้มเหลว', 'error');
     }
 };
+;
 
     // === POINTS SECTION ===
     var pointsSec = document.getElementById('points-sec');
@@ -1305,13 +1309,18 @@ window.renderHistory = function() {
             loadPoints();
             alert("บันทึกข้อมูลสำเร็จ!");
         }
-        function deletePoint(phone) {
-            if(!confirm('ยืนยันการลบข้อมูลแต้มของเบอร์ ' + phone + ' หรือไม่?')) return;
-            const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
-            delete db[phone];
-            safeStorageSet('withu_points_db', JSON.stringify(db));
-            loadPoints();
-        }
+        window.deletePoint = async function(phone) {
+    if(!confirm('ต้องการลบข้อมูลของเบอร์ ' + phone + ' ใช่หรือไม่?')) return;
+    if(typeof showToast==='function') showToast('กำลังลบข้อมูล...', 'new');
+    const delUrl = FIREBASE_POINTS_URL.replace('.json', '/' + phone + '.json');
+    try {
+        await fetch(delUrl, { method: 'DELETE' });
+        if(typeof showToast==='function') showToast('ลบสำเร็จ', 'success');
+        window.loadPoints();
+    } catch(e) {
+        if(typeof showToast==='function') showToast('ลบล้มเหลว', 'error');
+    }
+}
 
         const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
         const API_KEY = "WITHU_SECRET_2026"; 

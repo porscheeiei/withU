@@ -712,25 +712,6 @@ window.saveBusinessHours = function() {
 };
 
 // === POINTS LOGIC ===
-
-    try { db = JSON.parse(localStorage.getItem('withu_points_db') || '{}'); } catch(e) {}
-    var list = document.getElementById('points-list');
-    if(!list) return;
-    list.innerHTML = '';
-    Object.keys(db).forEach(function(phone) {
-        var data = db[phone];
-        if(typeof data==='number') { data = {points:data, name:''}; db[phone] = data; }
-        var tr = document.createElement('tr');
-        tr.style.borderBottom = '1px solid var(--border)';
-        tr.innerHTML = '<td style="font-weight:700; padding:13px;">' + phone + '</td>' +
-            '<td>' + (data.name || '<span style="color:var(--text-muted);">-</span>') + '</td>' +
-            '<td style="color:#3b82f6; font-weight:800; font-size:16px;">' + data.points + '</td>' +
-            '<td><button class="btn-outline" style="padding:6px 12px; border-color:#f59e0b; color:#f59e0b; font-size:11px;"><i class="fas fa-edit" style="margin-right:4px;"></i>Edit</button></td>';
-        tr.querySelector('button').onclick = function() { editPointData(phone, data.name||'', data.points); };
-        list.appendChild(tr);
-    });
-    localStorage.setItem('withu_points_db', JSON.stringify(db));
-};
 window.editPointData = function(phone, name, points) {
     var p = document.getElementById('pts-phone'); if(p) p.value = phone;
     var n = document.getElementById('pts-name'); if(n) n.value = name;

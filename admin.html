@@ -452,25 +452,55 @@ const FIREBASE_POINTS_URL = "https://withu-da97c-default-rtdb.asia-southeast1.fi
 // MIGRATE OLD POINTS FROM LOCALSTORAGE TO FIREBASE
 // ==========================================
 window.migrateOldPoints = async function() {
-    var old = localStorage.getItem('withu_points');
-    if (!old) return;
+    // Check both potential old keys
+    var old1 = localStorage.getItem('withu_points_db'); // format: { phone: points }
+    var old2 = localStorage.getItem('withu_points');    // format: [{phone, name, points}]
+    
+    if (!old1 && !old2) return;
+    
     try {
-        var arr = JSON.parse(old);
-        if (arr && arr.length > 0) {
-            if(typeof showToast==='function') showToast('กำลังซิงค์ข้อมูลเก่าเข้า Firebase...', 'new');
-            let promises = arr.map(m => {
-                let updateUrl = FIREBASE_POINTS_URL.replace('.json', '/' + m.phone + '.json');
-                return fetch(updateUrl, {
+        if(typeof showToast==='function') showToast('กำลังซิงค์ข้อมูลเก่าเข้า Firebase...', 'new');
+        let promises = [];
+        
+        // Migrate old1 (withu_points_db)
+        if (old1) {
+            let db = JSON.parse(old1);
+            for (let phone in db) {
+                let updateUrl = FIREBASE_POINTS_URL.replace('.json', '/' + phone + '.json');
+                promises.push(fetch(updateUrl, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: m.name||'-', points: m.points||0 })
-                });
-            });
-            await Promise.all(promises);
-            localStorage.removeItem('withu_points'); // Prevent double sync
-            if(typeof showToast==='function') showToast('กู้ข้อมูลเก่ากลับมาครบแล้ว!', 'success');
-            window.loadPoints(); // Refresh UI
+                    body: JSON.stringify({ name: '-', points: db[phone]||0 })
+                }));
+            }
         }
+        
+        // Migrate old2 (withu_points)
+        if (old2) {
+            let arr = JSON.parse(old2);
+            if (Array.isArray(arr)) {
+                for(let m of arr) {
+                    let updateUrl = FIREBASE_POINTS_URL.replace('.json', '/' + m.phone + '.json');
+                    promises.push(fetch(updateUrl, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: m.name||'-', points: m.points||0 })
+                    }));
+                }
+            }
+        }
+        
+        if (promises.length > 0) {
+            await Promise.all(promises);
+        }
+        
+        // Prevent double sync
+        localStorage.removeItem('withu_points_db');
+        localStorage.removeItem('withu_points');
+        
+        if(typeof showToast==='function') showToast('กู้ข้อมูลเก่ากลับมาครบแล้ว!', 'success');
+        
+        // Let loadPoints handle the UI refresh next
     } catch(e) {
         console.error("Migration error:", e);
     }

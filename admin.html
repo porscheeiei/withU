@@ -1469,14 +1469,19 @@ window.renderReport = function(period) {
 };
 window.renderHistory = function() {
     var orders = [];
-    // USE CLOUD HISTORY FROM GOOGLE SHEETS
     if (window.fullData && window.fullData.history) {
-        orders = window.fullData.history;
-    } else {
-        // Fallback to local if no cloud history yet
-        var dataStr = localStorage.getItem('withu_completed_orders')||'[]';
-        try { orders = JSON.parse(dataStr); } catch(e){}
+        orders = [...window.fullData.history];
     }
+    
+    var localOrders = [];
+    try { localOrders = JSON.parse(localStorage.getItem('withu_completed_orders')||'[]'); } catch(e){}
+    
+    var existingIds = new Set(orders.map(o => o.id || o.orderNo));
+    localOrders.forEach(o => {
+        if (!existingIds.has(o.id || o.orderNo)) {
+            orders.push(o);
+        }
+    });
     
     orders.sort(function(a,b) { return new Date(b.timestamp)-new Date(a.timestamp); });
     var list = document.getElementById('history-list');
@@ -3162,6 +3167,21 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 const phoneInput = document.getElementById('p-customer-phone');
                 const customerPhone = phoneInput ? phoneInput.value.trim() : "";
                 const earnedPoints = Math.floor(pTotal / 50);
+
+                if (window.fullData && window.fullData.orders) {
+                    const targetOrders = window.fullData.orders.filter(o => pRows.includes(o.rowNum) || (pTable && o.table === pTable));
+                    if (targetOrders.length > 0) {
+                        let history = []; try { history = JSON.parse(localStorage.getItem('withu_completed_orders') || '[]'); } catch(e){}
+                        targetOrders.forEach(o => {
+                            o.timestamp = new Date().toISOString();
+                            o.paymentMethod = method === 'เงินสด' ? 'cash' : 'qr';
+                            o.finalTotal = (parseFloat(o.price) || 0) * (parseInt(o.qty) || 1);
+                            history.push(o);
+                        });
+                        localStorage.setItem('withu_completed_orders', JSON.stringify(history));
+                        if (typeof window.renderHistory === 'function') window.renderHistory();
+                    }
+                }
 
                 await fetch(API_URL, {
                     method: 'POST', 

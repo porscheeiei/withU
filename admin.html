@@ -1347,11 +1347,7 @@ window.loadBusinessHours = function() {
         } catch(e) {}
     }
 };
-window.toggleStoreStatus = function() {
-    var isOpen = document.getElementById('store-open-status').checked;
-    localStorage.setItem('withu_store_open', isOpen);
-    if(typeof showToast==='function') showToast(isOpen ? 'Store OPEN' : 'Store CLOSED', 'new');
-};
+
 window.savePromptPay = function() {
     localStorage.setItem('withu_promptpay', document.getElementById('store-promptpay').value.trim());
     if(typeof showToast==='function') showToast('PromptPay saved', 'new');
@@ -3932,19 +3928,23 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
     </div>
   </div>
 
-  <!-- iOS Toggle -->
-  <div class="ios-toggle-row" id="prem-toggle-row">
-    <div class="ios-toggle-info">
-      <div class="ios-status-icon" id="prem-status-icon">✅</div>
-      <div>
-        <div class="ios-status-text" id="prem-status-text">Open for Orders</div>
-        <div class="ios-status-sub" id="prem-status-sub">Store is currently accepting orders</div>
-      </div>
+  <!-- Store Status Options -->
+  <div class="status-grid" id="prem-toggle-row" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:24px;">
+    <div class="status-opt-card" id="status-opt-open" onclick="setStoreStatus('open')" style="padding:16px; border-radius:16px; border:2px solid transparent; background:var(--gray-light); cursor:pointer; text-align:center; transition:all 0.3s;">
+       <div style="font-size:24px; margin-bottom:8px;">✅</div>
+       <div style="font-family:var(--font-head); font-weight:800; font-size:14px; color:var(--primary);">เปิดรับออเดอร์</div>
+       <div style="font-size:11px; color:var(--secondary); margin-top:2px;">Open for Orders</div>
     </div>
-    <label class="ios-switch">
-      <input type="checkbox" id="store-open-status" onchange="toggleStoreStatus(); updateStoreToggleUI();" checked>
-      <span class="ios-slider"></span>
-    </label>
+    <div class="status-opt-card" id="status-opt-advance" onclick="setStoreStatus('advance')" style="padding:16px; border-radius:16px; border:2px solid transparent; background:var(--gray-light); cursor:pointer; text-align:center; transition:all 0.3s;">
+       <div style="font-size:24px; margin-bottom:8px;">⏸️</div>
+       <div style="font-family:var(--font-head); font-weight:800; font-size:14px; color:var(--primary);">ปิดล่วงหน้า</div>
+       <div style="font-size:11px; color:var(--secondary); margin-top:2px;">Advance Close</div>
+    </div>
+    <div class="status-opt-card" id="status-opt-closed" onclick="setStoreStatus('closed')" style="padding:16px; border-radius:16px; border:2px solid transparent; background:var(--gray-light); cursor:pointer; text-align:center; transition:all 0.3s;">
+       <div style="font-size:24px; margin-bottom:8px;">🔴</div>
+       <div style="font-family:var(--font-head); font-weight:800; font-size:14px; color:var(--primary);">ปิดประจำวัน</div>
+       <div style="font-size:11px; color:var(--secondary); margin-top:2px;">Closed for Today</div>
+    </div>
   </div>
 
   <div class="prem-divider"></div>
@@ -4007,9 +4007,8 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
         var dayInputs = document.querySelectorAll('#bh-days input[type=checkbox]');
         dayInputs.forEach(function(inp) { inp.checked = bh.days.indexOf(parseInt(inp.value)) !== -1; });
       }
-      var storeStatus = localStorage.getItem('withu_store_open');
-      var chk = document.getElementById('store-open-status');
-      if (chk && storeStatus === 'false') { chk.checked = false; updateStoreToggleUI(); }
+      var storeStatus = localStorage.getItem('withu_store_status') || (localStorage.getItem('withu_store_open') === 'false' ? 'closed' : 'open');
+      setStoreStatus(storeStatus, true);
     } catch(e) {}
   }
 
@@ -4017,14 +4016,14 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
     // Preserve the existing tbody id="points-list"
     sec.innerHTML = `
 <div class="pts-header-title">
-  <span style="background:linear-gradient(135deg,#F59E0B,#D97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:10px;">⭐</span>
+  <span style="background:linear-gradient(135deg,#F59E0B,#D97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:10px;"></span>
   Loyalty Points
 </div>
 
 <!-- Form Card -->
 <div class="pts-form-card">
   <div class="prem-section-title">
-    <div class="prem-section-icon purple">👤</div>
+    <div class="prem-section-icon purple"></div>
     <div>
       <div class="prem-section-label">เพิ่ม / แก้ไข สมาชิก</div>
       <div class="prem-section-sub">Add or update member loyalty points</div>
@@ -4033,32 +4032,32 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
 
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
     <div class="pts-field">
-      <span class="pts-field-label">📱 Phone</span>
+      <span class="pts-field-label">Phone</span>
       <div class="pts-input-wrap">
-        <span class="inp-icon">📞</span>
+        <span class="inp-icon"></span>
         <input type="tel" id="pts-phone" placeholder="09XXXXXXXX">
       </div>
     </div>
     <div class="pts-field">
-      <span class="pts-field-label">👤 Name</span>
+      <span class="pts-field-label">Name</span>
       <div class="pts-input-wrap">
-        <span class="inp-icon">✏️</span>
+        <span class="inp-icon"></span>
         <input type="text" id="pts-name" placeholder="ชื่อลูกค้า">
       </div>
     </div>
     <div class="pts-field">
-      <span class="pts-field-label">⭐ Points</span>
+      <span class="pts-field-label">Points</span>
       <div class="pts-input-wrap pts-big">
-        <span class="inp-icon">🌟</span>
+        <span class="inp-icon"></span>
         <input type="number" id="pts-val" value="0" min="0">
       </div>
     </div>
   </div>
 
   <div class="pts-btn-row">
-    <button class="pts-btn-save" onclick="savePointData()">💾 บันทึกสมาชิก</button>
-    <button class="pts-btn-search" onclick="searchMember()">🔍 ค้นหาสมาชิก</button>
-    <button class="pts-btn-clear" onclick="document.getElementById('pts-phone').value='';document.getElementById('pts-name').value='';document.getElementById('pts-val').value=0;">✕ ล้างข้อมูล</button>
+    <button class="pts-btn-save" onclick="savePointData()">บันทึกสมาชิก</button>
+    <button class="pts-btn-search" onclick="searchMember()">ค้นหาสมาชิก</button>
+    <button class="pts-btn-clear" onclick="document.getElementById('pts-phone').value='';document.getElementById('pts-name').value='';document.getElementById('pts-val').value=0;">ล้างข้อมูล</button>
   </div>
 </div>
 
@@ -4093,24 +4092,37 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
     }).catch(function(){ if(typeof showToast==='function') showToast('ค้นหาล้มเหลว','error'); });
   };
 
-  // Update toggle UI
-  window.updateStoreToggleUI = function() {
-    var chk = document.getElementById('store-open-status');
-    var icon = document.getElementById('prem-status-icon');
-    var txt  = document.getElementById('prem-status-text');
-    var sub  = document.getElementById('prem-status-sub');
-    var row  = document.getElementById('prem-toggle-row');
-    if (!chk) return;
-    if (chk.checked) {
-      if(icon) icon.textContent = '✅';
-      if(txt)  txt.textContent  = 'Open for Orders';
-      if(sub)  sub.textContent  = 'Store is currently accepting orders';
-      if(row)  { row.style.background='linear-gradient(135deg,rgba(16,185,129,.07),rgba(5,150,105,.04))'; row.style.borderColor='rgba(16,185,129,.2)'; }
-    } else {
-      if(icon) icon.textContent = '🔴';
-      if(txt)  txt.textContent  = 'Store Closed';
-      if(sub)  sub.textContent  = 'Not accepting orders right now';
-      if(row)  { row.style.background='linear-gradient(135deg,rgba(239,68,68,.06),rgba(220,38,38,.03))'; row.style.borderColor='rgba(239,68,68,.2)'; }
+  // Global setStoreStatus function
+  window.setStoreStatus = function(status, noToast) {
+    // legacy support
+    localStorage.setItem('withu_store_open', status === 'open');
+    localStorage.setItem('withu_store_status', status);
+    
+    // Update UI
+    ['open', 'advance', 'closed'].forEach(function(s) {
+      var el = document.getElementById('status-opt-' + s);
+      if (el) {
+        if (s === status) {
+          if (s === 'open') {
+            el.style.borderColor = 'var(--success)';
+            el.style.background = 'rgba(16,185,129,0.08)';
+          } else if (s === 'advance') {
+            el.style.borderColor = '#F59E0B'; // amber/warning
+            el.style.background = 'rgba(245,158,11,0.08)';
+          } else {
+            el.style.borderColor = 'var(--danger)';
+            el.style.background = 'rgba(239,68,68,0.08)';
+          }
+        } else {
+          el.style.borderColor = 'transparent';
+          el.style.background = 'var(--gray-light)';
+        }
+      }
+    });
+
+    if (!noToast && typeof showToast === 'function') {
+      var msgs = { 'open': 'Store OPEN', 'advance': 'Store PAUSED', 'closed': 'Store CLOSED' };
+      showToast(msgs[status], 'new');
     }
   };
 
@@ -4127,7 +4139,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
           if (cells[2] && !cells[2].querySelector('.pts-badge')) {
             var raw = cells[2].textContent.trim();
             if (raw && raw !== '-') {
-              cells[2].innerHTML = '<span class="pts-badge">⭐ ' + raw + '</span>';
+              cells[2].innerHTML = '<span class="pts-badge">' + raw + '</span>';
             }
           }
         });

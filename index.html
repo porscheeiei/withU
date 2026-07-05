@@ -906,34 +906,64 @@
 </script>
 
 <script id="withu-frontend-patch">
-    function checkStoreOpen() {
-        const isForceOpen = localStorage.getItem('withu_store_open');
-        if (isForceOpen === 'false') return false;
-
-        try {
-            const bhStr = localStorage.getItem('withu_business_hours');
-            if (bhStr) {
-                const bh = JSON.parse(bhStr);
-                const now = new Date();
-                const day = now.getDay(); // 0-6
-                
-                if (!bh.days.includes(day)) return false;
-                
-                if (bh.start && bh.end) {
-                    const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-                    if (timeStr < bh.start || timeStr > bh.end) return false;
-                }
-            }
-        } catch(e) {}
+    function syncStoreStatus() {
+        const storeStatus = localStorage.getItem('withu_store_status') || (localStorage.getItem('withu_store_open') === 'false' ? 'closed' : 'open');
+        const overlay = document.getElementById('store-closed-overlay');
+        const icon = document.getElementById('store-closed-icon');
+        const title = document.getElementById('store-closed-title');
+        const sub = document.getElementById('store-closed-sub');
         
-        return true;
+        let isClosed = false;
+        if (storeStatus === 'closed') {
+            if (icon) icon.textContent = '🌙';
+            if (title) title.textContent = 'ปิดให้บริการสำหรับวันนี้แล้ว';
+            if (sub) sub.textContent = 'ขออภัยในความไม่สะดวก พรุ่งนี้เปิดให้บริการใหม่นะคะ';
+            isClosed = true;
+        } else if (storeStatus === 'advance') {
+            if (icon) icon.textContent = '⏸️';
+            if (title) title.textContent = 'ร้านปิดรับออเดอร์ชั่วคราว';
+            if (sub) sub.textContent = 'ขออภัยในความไม่สะดวก กรุณารอสักครู่...';
+            isClosed = true;
+        }
+
+        // Also respect business hours if storeStatus is not explicitly set to advance/closed
+        if (!isClosed) {
+            try {
+                const bhStr = localStorage.getItem('withu_business_hours');
+                if (bhStr) {
+                    const bh = JSON.parse(bhStr);
+                    const now = new Date();
+                    const day = now.getDay();
+                    if (!bh.days.includes(day)) {
+                        isClosed = true;
+                    } else if (bh.start && bh.end) {
+                        const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+                        if (timeStr < bh.start || timeStr > bh.end) {
+                            isClosed = true;
+                        }
+                    }
+                    if (isClosed) {
+                        if (icon) icon.textContent = '🕒';
+                        if (title) title.textContent = 'อยู่นอกเวลาทำการ';
+                        if (sub) sub.textContent = 'เปิดทำการอีกครั้งตามเวลาปกติค่ะ';
+                    }
+                }
+            } catch(e) {}
+        }
+
+        if (overlay) {
+            overlay.style.display = isClosed ? 'flex' : 'none';
+        }
+        
+        return !isClosed;
     }
 
     // Intercept checkout
-    const origCheckout = typeof checkout === 'function' ? checkout : null;
+    window.checkStoreOpen = syncStoreStatus;
+    const origCheckout = typeof window.sub === 'function' ? window.sub : (typeof window.checkout === 'function' ? window.checkout : null);
     if (origCheckout) {
-        window.checkout = function() {
-            if (!checkStoreOpen()) {
+        window.checkout = window.sub = function() {
+            if (!syncStoreStatus()) {
                 if (typeof showToast === 'function') showToast('ขออภัยค่ะ ขณะนี้ร้านปิดให้บริการ', 'call');
                 else alert('ขออภัยค่ะ ขณะนี้ร้านปิดให้บริการ');
                 return;
@@ -957,6 +987,49 @@
                 }
             }
         };
+    }
+
+    // Initialize Store Closure Overlay
+    function initStoreClosureUI() {
+        if (document.getElementById('store-closed-overlay')) return;
+        
+        const div = document.createElement('div');
+        div.id = 'store-closed-overlay';
+        div.className = 'store-closed-overlay';
+        div.innerHTML = `
+            <div class="store-closed-card">
+                <div id="store-closed-icon" class="store-closed-icon">⏸️</div>
+                <h2 id="store-closed-title" class="store-closed-title">ร้านปิดรับออเดอร์ชั่วคราว</h2>
+                <p id="store-closed-sub" class="store-closed-sub">ขออภัยในความไม่สะดวก กรุณารอสักครู่...</p>
+            </div>
+        `;
+        document.body.appendChild(div);
+        
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .store-closed-overlay { position: fixed; inset: 0; background: rgba(250,250,250,0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 9000; display: none; align-items: center; justify-content: center; animation: fadeIn 0.4s ease; padding: 20px; text-align: center; }
+            .store-closed-card { background: #FFFFFF; padding: 48px 32px; border-radius: 32px; width: 100%; max-width: 400px; box-shadow: 0 24px 48px rgba(0, 0, 0, 0.08); border: 1px solid rgba(0,0,0,0.05); animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+            .store-closed-icon { font-size: 64px; margin-bottom: 24px; animation: bounce 2s infinite; }
+            .store-closed-title { font-family: 'Plus Jakarta Sans', 'Prompt', sans-serif; font-weight: 900; font-size: 24px; color: #111111; margin: 0 0 12px 0; letter-spacing: -0.02em; }
+            .store-closed-sub { font-family: 'Inter', 'Prompt', sans-serif; font-size: 15px; color: #666666; margin: 0 0 24px 0; }
+            @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        `;
+        document.head.appendChild(style);
+        
+        syncStoreStatus();
+    }
+
+    // Listen for cross-tab changes
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'withu_store_status' || e.key === 'withu_store_open' || e.key === 'withu_business_hours') {
+            syncStoreStatus();
+        }
+    });
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initStoreClosureUI);
+    } else {
+        initStoreClosureUI();
     }
 </script>
 

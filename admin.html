@@ -1562,13 +1562,13 @@ window.renderHistoryCards = function() {
             // Build items list
             var itemsHtml = '';
             if (o.cart && Array.isArray(o.cart)) {
-                itemsHtml = o.cart.map(item => `<div style="font-size:13px; color:var(--text); margin-bottom:2px;">&bull; ${item.name} <span style="color:var(--text-muted); font-size:11px; margin-left:4px;">x${item.qty||1}</span></div>`).join('');
+                itemsHtml = o.cart.map(item => `<div style="font-size:13px; color:var(--text); margin-bottom:2px;">&bull; ${item.name||item.menu} <span style="color:var(--text-muted); font-size:11px; margin-left:4px;">x${item.qty||1}</span></div>`).join('');
             } else if (o.items && Array.isArray(o.items)) {
-                itemsHtml = o.items.map(item => `<div style="font-size:13px; color:var(--text); margin-bottom:2px;">&bull; ${item.name||item} <span style="color:var(--text-muted); font-size:11px; margin-left:4px;">x${item.qty||1}</span></div>`).join('');
+                itemsHtml = o.items.map(item => `<div style="font-size:13px; color:var(--text); margin-bottom:2px;">&bull; ${item.name||item.menu||item} <span style="color:var(--text-muted); font-size:11px; margin-left:4px;">x${item.qty||1}</span></div>`).join('');
             } else if (o.items && typeof o.items === 'string') {
                 itemsHtml = `<div style="font-size:13px; color:var(--text); white-space:pre-wrap;">${o.items}</div>`;
-            } else if (o.name) {
-                itemsHtml = `<div style="font-size:13px; color:var(--text); margin-bottom:2px;">&bull; ${o.name} <span style="color:var(--text-muted); font-size:11px; margin-left:4px;">x${o.qty||1}</span></div>`;
+            } else if (o.name || o.menu) {
+                itemsHtml = `<div style="font-size:13px; color:var(--text); margin-bottom:2px;">&bull; ${o.name||o.menu} <span style="color:var(--text-muted); font-size:11px; margin-left:4px;">x${o.qty||1}</span></div>`;
             }
             
             if (itemsHtml) {

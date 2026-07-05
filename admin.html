@@ -1494,6 +1494,9 @@ window.renderReport = function(period) {
     }
 };
 window.renderHistory = function() {
+    if (typeof window.renderHistoryCards === 'function') window.renderHistoryCards();
+};
+window.renderHistoryCards = function() {
     var orders = [];
     if (window.fullData && window.fullData.history) {
         orders = [...window.fullData.history];
@@ -1510,14 +1513,60 @@ window.renderHistory = function() {
     });
     
     orders.sort(function(a,b) { return new Date(b.timestamp)-new Date(a.timestamp); });
+    
+    // Group by Date
+    var grouped = {};
+    orders.forEach(o => {
+        var dateObj = new Date(o.timestamp);
+        var dateStr = dateObj.toLocaleDateString('th-TH', {day: '2-digit', month: 'short', year: 'numeric'});
+        if(!grouped[dateStr]) grouped[dateStr] = [];
+        grouped[dateStr].push(o);
+    });
+    
+    var htmlCards = '';
+    Object.keys(grouped).forEach(dateStr => {
+        htmlCards += '<div style="background:var(--gray-light); padding:10px 16px; margin-top:20px; border-radius:10px; font-weight:800; color:var(--primary); font-size:14px; border-left:4px solid var(--primary);"><i class="fas fa-calendar-day" style="margin-right:8px;"></i>' + dateStr + '</div>';
+        htmlCards += '<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:12px; margin-top:12px;">';
+        
+        grouped[dateStr].forEach((o, i) => {
+            var timeStr = new Date(o.timestamp).toLocaleTimeString('th-TH', {hour: '2-digit', minute: '2-digit'});
+            var pay = o.paymentMethod==='qr' ? '<span style="color:#3b82f6; font-weight:800; background:rgba(59,130,246,0.1); padding:4px 8px; border-radius:6px; font-size:11px;"><i class="fas fa-qrcode" style="margin-right:4px;"></i> QR</span>' : '<span style="color:#10b981; font-weight:800; background:rgba(16,185,129,0.1); padding:4px 8px; border-radius:6px; font-size:11px;"><i class="fas fa-money-bill" style="margin-right:4px;"></i> CASH</span>';
+            var price = '฿' + (o.total||o.finalTotal||0).toLocaleString();
+            
+            htmlCards += '<div class="ai-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border); box-shadow:0 2px 10px rgba(0,0,0,0.02); background: #ffffff;">';
+            htmlCards += '<div>';
+            htmlCards += '<div style="font-size:12px; color:var(--text-muted); margin-bottom:6px;"><i class="fas fa-clock" style="margin-right:4px;"></i> ' + timeStr + ' &nbsp;&bull;&nbsp; <span style="font-weight:700; color:var(--text);">' + (o.table||'Takeaway') + '</span></div>';
+            htmlCards += '<div style="font-weight:900; font-size:15px; color:var(--text); letter-spacing:-0.5px;">#' + (o.id||o.orderNo||(1000+i)) + '</div>';
+            htmlCards += '</div>';
+            
+            htmlCards += '<div style="text-align:right;">';
+            htmlCards += '<div style="color:var(--primary); font-weight:900; font-size:18px; margin-bottom:6px;">' + price + '</div>';
+            htmlCards += '<div>' + pay + '</div>';
+            htmlCards += '</div>';
+            
+            htmlCards += '</div>';
+        });
+        
+        htmlCards += '</div>';
+    });
+    
+    if(!orders.length) htmlCards = '<div style="text-align:center; padding:40px; color:var(--text-muted); background:var(--gray-light); border-radius:12px; margin-top:20px; font-weight:700;"><i class="fas fa-history" style="font-size:24px; margin-bottom:10px; display:block; opacity:0.5;"></i>ไม่มีประวัติการขาย</div>';
+    
+    var listCards = document.getElementById('history-list-cards');
+    if(listCards) listCards.innerHTML = htmlCards;
+
+    // Legacy table fallback
     var list = document.getElementById('history-list');
-    if(!list) return;
-    if(!orders.length) { list.innerHTML='<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">No history</td></tr>'; return; }
-    list.innerHTML = orders.map(function(o,i) {
-        var date = new Date(o.timestamp).toLocaleString('th-TH');
-        var pay = o.paymentMethod==='qr' ? '<span style="color:#3b82f6; font-weight:700;"><i class="fas fa-qrcode" style="margin-right:4px;"></i>QR</span>' : '<span style="color:#f59e0b; font-weight:700;"><i class="fas fa-money-bill" style="margin-right:4px;"></i>CASH</span>';
-        return '<tr style="border-bottom:1px solid var(--border);"><td style="font-size:12px; color:var(--text-muted); padding:13px;">' + date + '</td><td style="font-weight:800;">#' + (o.id||o.orderNo||(1000+i)) + '</td><td><span style="background:var(--slate); padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700;">' + (o.table||'Takeaway') + '</span></td><td style="color:#10b981; font-weight:800;">฿' + (o.total||o.finalTotal||0).toLocaleString() + '</td><td>' + pay + '</td></tr>';
-    }).join('');
+    if(list) {
+        if(!orders.length) { list.innerHTML='<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">No history</td></tr>'; }
+        else {
+            list.innerHTML = orders.map(function(o,i) {
+                var date = new Date(o.timestamp).toLocaleString('th-TH');
+                var pay = o.paymentMethod==='qr' ? '<span style="color:#3b82f6; font-weight:700;"><i class="fas fa-qrcode" style="margin-right:4px;"></i>QR</span>' : '<span style="color:#f59e0b; font-weight:700;"><i class="fas fa-money-bill" style="margin-right:4px;"></i>CASH</span>';
+                return '<tr style="border-bottom:1px solid var(--border);"><td style="font-size:12px; color:var(--text-muted); padding:13px;">' + date + '</td><td style="font-weight:800;">#' + (o.id||o.orderNo||(1000+i)) + '</td><td><span style="background:var(--slate); padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700;">' + (o.table||'Takeaway') + '</span></td><td style="color:#10b981; font-weight:800;">฿' + (o.total||o.finalTotal||0).toLocaleString() + '</td><td>' + pay + '</td></tr>';
+            }).join('');
+        }
+    }
 };
 </script>
 

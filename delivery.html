@@ -884,12 +884,12 @@
         
         let isClosed = false;
         if (storeStatus === 'closed') {
-            if (icon) icon.textContent = '🌙';
+            if (icon) icon.textContent = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;color:#6366f1;margin-right:6px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
             if (title) title.textContent = 'ปิดให้บริการสำหรับวันนี้แล้ว';
             if (sub) sub.textContent = 'ขออภัยในความไม่สะดวก พรุ่งนี้เปิดให้บริการใหม่นะคะ';
             isClosed = true;
         } else if (storeStatus === 'advance') {
-            if (icon) icon.textContent = '⏸️';
+            if (icon) icon.textContent = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
             if (title) title.textContent = 'ร้านปิดรับออเดอร์ชั่วคราว';
             if (sub) sub.textContent = 'ขออภัยในความไม่สะดวก กรุณารอสักครู่...';
             isClosed = true;
@@ -967,7 +967,7 @@
         div.className = 'store-closed-overlay';
         div.innerHTML = `
             <div class="store-closed-card">
-                <div id="store-closed-icon" class="store-closed-icon">⏸️</div>
+                <div id="store-closed-icon" class="store-closed-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></div>
                 <h2 id="store-closed-title" class="store-closed-title">ร้านปิดรับออเดอร์ชั่วคราว</h2>
                 <p id="store-closed-sub" class="store-closed-sub">ขออภัยในความไม่สะดวก กรุณารอสักครู่...</p>
             </div>

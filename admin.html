@@ -528,7 +528,7 @@ window.loadPoints = async function() {
             arr = Object.keys(data).map(phone => ({
                 phone: phone,
                 name: data[phone].name || '-',
-                points: data[phone].points || 0
+                points: (typeof data[phone].points === 'object' && data[phone].points !== null ? data[phone].points.points : data[phone].points) || 0
             }));
         }
         

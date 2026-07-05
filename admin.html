@@ -3692,6 +3692,8 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                             let history = []; try { history = JSON.parse(localStorage.getItem('withu_completed_orders') || '[]'); } catch(e){}
                             targetOrders.forEach(o => {
                                 o.timestamp = new Date().toISOString();
+                                o.paymentMethod = 'cash'; // Default fallback
+                                o.finalTotal = (parseFloat(o.price) || 0) * (parseInt(o.qty) || 1);
                                 history.push(o);
                             });
                             localStorage.setItem('withu_completed_orders', JSON.stringify(history));

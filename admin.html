@@ -1315,7 +1315,9 @@ window.showSec = function(n) {
     if (n==='settings' && typeof window.loadSettings === 'function') window.loadSettings();
     document.querySelectorAll('.tab-btn').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='t-'+n); });
     document.querySelectorAll('.sidebar-item').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='sb-'+n); });
-};\n\n// === AUTO-SYNC ===
+};
+
+// === AUTO-SYNC ===
 window.addEventListener('storage', function(e) {
     if (e.key==='withu_orders'||e.key==='withu_points'||e.key==='withu_points_db') {
         var ss = document.getElementById('sync-status');
@@ -2034,6 +2036,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
   font-size: 20px !important;
   margin-bottom: 14px !important;
   flex-shrink: 0 !important;
+  color: #ffffff !important;
 }
 .sc-icon-1 { background: linear-gradient(135deg,#6366F1,#8B5CF6) !important; }
 .sc-icon-2 { background: linear-gradient(135deg,#6366F1,#A78BFA) !important; }

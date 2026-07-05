@@ -1041,6 +1041,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+        // === HISTORY BUTTON IN SIDEBAR ===
+    if (!document.getElementById('sb-history')) {
+        var reportBtn = document.getElementById('sb-report');
+        if (reportBtn) {
+            var historyBtn = document.createElement('button');
+            historyBtn.className = 'sidebar-item';
+            historyBtn.id = 'sb-history';
+            historyBtn.innerHTML = '<i class="fas fa-history" style="margin-right:10px; font-size:15px; width:20px; text-align:center;"></i>ประวัติการขาย';
+            historyBtn.onclick = function() { window.showSec('history'); toggleSidebar(); };
+            reportBtn.parentNode.insertBefore(historyBtn, reportBtn.nextSibling);
+        }
+    }
+
     // === SETTINGS BUTTON IN SIDEBAR ===
     if (!document.getElementById('sb-settings')) {
         var logoutBtn = document.querySelector('button[onclick*="handleLogout"]');
@@ -1057,6 +1070,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+        // === HISTORY SECTION ===
+    if (!document.getElementById('history-sec')) {
+        var reportSecEl = document.getElementById('report-sec');
+        if (reportSecEl) {
+            var historyDiv = document.createElement('div');
+            historyDiv.id = 'history-sec';
+            historyDiv.style.display = 'none';
+            historyDiv.innerHTML = '<h2 style="margin-bottom:28px;font-size:26px;font-weight:800;letter-spacing:-.6px;"><i class="fas fa-history" style="color:var(--primary); margin-right:10px;"></i> ประวัติการขาย (History)</h2><div id="history-list-cards"></div>';
+            reportSecEl.parentNode.appendChild(historyDiv);
+        }
+    }
+
     // === SETTINGS SECTION ===
     if (!document.getElementById('settings-sec')) {
         var orderSec = document.getElementById('order-sec');
@@ -1307,12 +1332,13 @@ window.showSec = function(n) {
     
     var t = document.getElementById(n + '-sec');
     if (t) {
-        t.style.display = (n==='report'||n==='settings'||n==='points') ? 'block' : 'grid';
+        t.style.display = (n==='report'||n==='settings'||n==='points'||n==='history') ? 'block' : 'grid';
         t.style.animation = 'fadeSlideIn 0.25s ease-out';
     }
     if (n==='points' && typeof window.loadPoints === 'function') window.loadPoints();
     if (n==='report' && typeof window.switchReportTab === 'function') setTimeout(function(){window.switchReportTab('dashboard');},50);
     if (n==='settings' && typeof window.loadSettings === 'function') window.loadSettings();
+    if (n==='history' && typeof window.renderHistoryCards === 'function') window.renderHistoryCards();
     document.querySelectorAll('.tab-btn').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='t-'+n); });
     document.querySelectorAll('.sidebar-item').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='sb-'+n); });
 };
@@ -3559,19 +3585,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             }).join('')); 
         }
 
-        function showSec(n) { 
-            ['order-sec', 'takeaway-sec', 'stock-sec', 'report-sec', 'points-sec'].forEach(s => safeStyle(s, 'display', 'none')); 
-            
-            if (n === 'points') {
-                safeStyle('points-sec', 'display', 'block');
-                loadPoints();
-            } else {
-                safeStyle(n + '-sec', 'display', (n === 'report' ? 'block' : 'grid')); 
-            }
-            
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-' + n)); 
-            if (n === 'report') setTimeout(drawChart, 150);
-        }
+        // showSec removed to avoid shadowing global window.showSec
 
         function clearCallNotify() { 
             const t = document.getElementById('call-table-no').innerText; clearedCalls[t] = true; 

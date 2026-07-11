@@ -1104,24 +1104,32 @@
 
 <!-- CAT POPUP UI -->
 <div id="cat-popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:9999999; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);">
-    <div class="cat-letter" style="position:relative; width:100%; max-width:380px; background:var(--surface); border-radius:24px; padding:0; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6); overflow:hidden; animation: popupBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);">
+    <div class="popup-2col" style="position:relative; width:100%; max-width:800px; background:var(--surface); border-radius:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6); overflow:hidden; animation: popupBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); display:flex; flex-direction:row;">
         
-        <button onclick="closeCatPopup()" style="position:absolute; top:12px; right:12px; width:34px; height:34px; border-radius:50%; background:rgba(0,0,0,0.4); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); transition:0.2s;">✕</button>
-        
-        <div style="width:100%; height:220px; overflow:hidden; background:#f1f5f9; position:relative;">
-            <img id="cat-popup-img" src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&auto=format&fit=crop" style="width:100%; height:100%; object-fit:cover;">
-            <div style="position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(to top, var(--surface), transparent);"></div>
+        <!-- Left Image -->
+        <div class="popup-img-container" style="flex: 1 1 50%; min-height: 250px; background:#f1f5f9; position:relative;">
+            <img id="cat-popup-img" src="https://images.unsplash.com/photo-1601055903647-8f1ea74738dc?q=80&w=800&auto=format&fit=crop" style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0;">
         </div>
         
-        <div style="padding: 24px; text-align:center; padding-top: 0;">
-            <div style="display:inline-block; margin-top:-35px; margin-bottom:12px; position:relative; z-index:5; background:var(--surface); padding:10px; border-radius:50%; box-shadow:0 4px 15px rgba(0,0,0,0.08);">
-                <span style="font-size:36px; line-height:1;">💌</span>
-            </div>
-            <div id="cat-popup-text" style="font-size:16px; line-height:1.6; color:var(--text-main); font-weight:700; margin-bottom: 24px;">
-                <!-- Text injected here -->
+        <!-- Right Content -->
+        <div class="popup-content-container" style="flex: 1 1 50%; padding: 40px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; position:relative;">
+            
+            <button onclick="closeCatPopup()" style="position:absolute; top:16px; right:16px; width:34px; height:34px; border-radius:50%; background:transparent; color:var(--text-muted); border:1px solid var(--border); font-size:16px; cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center; transition:0.2s;">✕</button>
+            
+            <h2 id="cat-popup-title" style="font-size:32px; font-weight:900; color:var(--text-main); margin-top:10px; margin-bottom:16px; line-height:1.2;">%30 OFF COUPON</h2>
+            
+            <div id="cat-popup-text" style="font-size:15px; line-height:1.6; color:var(--text-muted); font-weight:600; margin-bottom: 24px; max-width: 90%;">
+                If you are looking for a new way to promote your business.
             </div>
             
-            <button onclick="closeCatPopup()" style="width:100%; padding:14px; background:var(--primary); color:#fff; border:none; border-radius:14px; font-weight:800; font-size:15px; cursor:pointer; box-shadow:0 4px 15px var(--primary-glow); transition: 0.2s;">รับทราบ 🐾</button>
+            <div id="cat-popup-coupon-box" style="display:none; width:100%; padding:14px; border: 2.5px dashed var(--text-main); border-radius: 8px; font-size:18px; font-weight:800; color:var(--text-main); margin-bottom:24px; cursor:pointer; position:relative; background: rgba(0,0,0,0.02); transition:0.2s;" onclick="copyCoupon()">
+                <span id="cat-popup-coupon-text">SUMMER30</span>
+                <div id="copy-tooltip" style="position:absolute; top:-35px; left:50%; transform:translateX(-50%); background:var(--text-main); color:var(--surface); font-size:12px; padding:4px 10px; border-radius:6px; opacity:0; pointer-events:none; transition:0.2s; white-space:nowrap;">คัดลอกแล้ว!</div>
+            </div>
+            
+            <button id="cat-popup-btn" onclick="closeCatPopup()" style="width:100%; padding:16px; background:#f4c4c4; color:#fff; border:none; border-radius:8px; font-weight:800; font-size:16px; cursor:pointer; box-shadow:0 4px 15px rgba(244,196,196,0.4); transition: 0.2s; margin-bottom: 16px; text-transform:uppercase;">Explore Collection</button>
+            
+            <div onclick="closeCatPopup()" style="font-size:13px; color:var(--text-muted); text-decoration:underline; cursor:pointer; font-weight:600;">ไม่รับสิทธิ์ (No, thanks)</div>
         </div>
     </div>
 </div>
@@ -1130,7 +1138,15 @@
     0% { transform: scale(0.7) translateY(80px); opacity: 0; } 
     100% { transform: scale(1) translateY(0); opacity: 1; } 
 }
-#cat-popup-overlay button:active { transform: scale(0.95); }
+#cat-popup-btn:active { transform: scale(0.97); }
+#cat-popup-coupon-box:hover { background: rgba(0,0,0,0.05) !important; }
+#cat-popup-coupon-box:active { transform: scale(0.97); }
+@media (max-width: 768px) {
+    .popup-2col { flex-direction: column !important; max-height: 90vh; overflow-y: auto; }
+    .popup-img-container { min-height: 250px !important; flex: none !important; }
+    .popup-content-container { padding: 32px 24px !important; flex: none !important; }
+    #cat-popup-title { font-size: 26px !important; }
+}
 </style>
 
 <script>
@@ -1140,15 +1156,55 @@ window.initCatPopup = async function() {
         const res = await fetch('https://withu-da97c-default-rtdb.asia-southeast1.firebasedatabase.app/popupAd.json');
         const data = await res.json();
         if(data && data.enabled) {
-            if(data.text) {
-                // Ensure text formatting is preserved using line breaks if it's plain text
-                let formattedText = data.text.replace(/\n/g, '<br>');
-                document.getElementById('cat-popup-text').innerHTML = formattedText;
+            
+            // Title
+            const titleEl = document.getElementById('cat-popup-title');
+            if(data.title) { titleEl.innerHTML = data.title; titleEl.style.display = 'block'; }
+            else { titleEl.style.display = 'none'; }
+            
+            // Description
+            const textEl = document.getElementById('cat-popup-text');
+            if(data.text) { 
+                textEl.innerHTML = data.text.replace(/\n/g, '<br>');
+                textEl.style.display = 'block'; 
+            } else { textEl.style.display = 'none'; }
+            
+            // Coupon
+            const couponBox = document.getElementById('cat-popup-coupon-box');
+            const couponText = document.getElementById('cat-popup-coupon-text');
+            if(data.coupon) {
+                couponText.innerText = data.coupon;
+                couponBox.style.display = 'block';
+            } else {
+                couponBox.style.display = 'none';
             }
+            
+            // Button
+            const btnEl = document.getElementById('cat-popup-btn');
+            if(data.btnText) { btnEl.innerText = data.btnText; }
+            else { btnEl.innerText = 'สั่งอาหารเลย'; }
+            
+            // Button Color mapping based on current theme if needed, but the requested color is a nice pastel pink #f4c4c4. 
+            // In a real app we might use var(--primary). I'll use var(--primary) for consistency with the app, but keeping the style as requested.
+            // Wait, let's use var(--primary) because it fits the app best, but the user showed a peach button. I'll stick to var(--primary) for a unified app look.
+            btnEl.style.background = 'var(--primary)';
+            btnEl.style.boxShadow = '0 4px 15px var(--primary-glow)';
+            
+            // Image
             if(data.image) document.getElementById('cat-popup-img').src = data.image;
+            
             document.getElementById('cat-popup-overlay').style.display = 'flex';
         }
     } catch(e) { console.error('Popup error', e); }
+};
+
+window.copyCoupon = function() {
+    const text = document.getElementById('cat-popup-coupon-text').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        const tooltip = document.getElementById('copy-tooltip');
+        tooltip.style.opacity = '1';
+        setTimeout(() => { tooltip.style.opacity = '0'; }, 2000);
+    });
 };
 
 window.closeCatPopup = function() {

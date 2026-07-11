@@ -1418,7 +1418,7 @@ window.showSec = function(n) {
     
     var t = document.getElementById(n + '-sec');
     if (t) {
-        t.style.display = (n==='report'||n==='settings'||n==='points'||n==='history'||n==='menu'||n==='popup') ? 'block' : 'grid';
+        t.style.display = (n==='report'||n==='settings'||n==='points'||n==='history'||n==='menu'||n==='popup'||n==='banner') ? 'block' : 'grid';
         t.style.animation = 'fadeSlideIn 0.25s ease-out';
     }
     if (n==='points' && typeof window.loadPoints === 'function') window.loadPoints();
@@ -1427,6 +1427,7 @@ window.showSec = function(n) {
     if (n==='history' && typeof window.renderHistoryCards === 'function') window.renderHistoryCards();
     if (n==='menu' && typeof window.initMenuManager === 'function') setTimeout(function(){window.initMenuManager();},80);
     if (n==='popup' && typeof window.loadPopupAd === 'function') window.loadPopupAd();
+    if (n==='banner' && typeof window.loadBanners === 'function') window.loadBanners();
     document.querySelectorAll('.tab-btn').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='t-'+n); });
     document.querySelectorAll('.sidebar-item').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='sb-'+n); });
 };
@@ -5203,6 +5204,30 @@ window.initMenuManager = async function() {
         </div>
         
         <button onclick="savePopupAd()" class="btn-black" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 12px; letter-spacing: 0.5px;">💾 บันทึกข้อมูลโฆษณา</button>
+    </div>
+</div>
+
+<div id="banner-sec" style="display:none;" class="container">
+    <div class="stat-card" style="max-width: 800px; margin: 0 auto; padding: 32px; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); background: var(--surface);">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+            <div style="font-size: 28px;">🖼️</div>
+            <h2 style="margin: 0; font-weight: 800; color: var(--primary); font-size: 24px;">จัดการแบนเนอร์ (Banners)</h2>
+        </div>
+        
+        <div style="background: rgba(59,130,246,0.05); padding: 20px; border-radius: 16px; border: 1px solid rgba(59,130,246,0.1); margin-bottom: 24px;">
+            <label style="font-weight: 800; margin-bottom: 8px; display: block; font-size: 15px;">เพิ่มแบนเนอร์ใหม่</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="new-banner-url" style="flex: 1; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border); font-family: inherit; font-size: 15px; outline: none;" placeholder="วางลิงก์รูปภาพที่นี่ (Image URL)">
+                <button onclick="addBanner()" class="btn-black" style="padding: 0 24px; font-size: 15px; border-radius: 12px; white-space: nowrap; height: 50px;">➕ เพิ่มรูป</button>
+            </div>
+        </div>
+        
+        <h3 style="font-weight: 700; margin-bottom: 16px; font-size: 18px;">แบนเนอร์ปัจจุบัน</h3>
+        <div id="banner-preview-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <!-- Render banners here -->
+        </div>
+        
+        <button onclick="saveBanners()" class="btn-black" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 12px; letter-spacing: 0.5px;">💾 บันทึกระบบแบนเนอร์</button>
     </div>
 </div>
 </body>

@@ -505,12 +505,23 @@
             if (e.key === 'withu_menu_updated') { localStorage.removeItem('withu_cached_menu'); loadMenu(); }
         });
     }
-    function renderBanners(bannersArray) {
+    async function renderBanners(fallbackBannersArray) {
         const track = document.getElementById("banner-track");
         const dotsContainer = document.getElementById("banner-dots");
         if (!track || !dotsContainer) return;
+        
+        let targetBanners = fallbackBannersArray;
+        try {
+            const res = await fetch('https://withu-da97c-default-rtdb.asia-southeast1.firebasedatabase.app/banners.json');
+            const data = await res.json();
+            if (data && Array.isArray(data) && data.length > 0) {
+                targetBanners = data;
+            }
+        } catch(e) { console.warn('Firebase banners failed', e); }
+
         let defaultBanners = [ "https://img1.pic.in.th/images/eiei-3.md.png", "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1920&auto=format&fit=crop" ];
-        let targetBanners = (bannersArray && bannersArray.length > 0) ? bannersArray : defaultBanners;
+        if (!targetBanners || targetBanners.length === 0) targetBanners = defaultBanners;
+        
         track.innerHTML = targetBanners.map(url => `<div class="banner-slide"><img src="${url}" loading="lazy" alt="Banner"></div>`).join('');
         dotsContainer.innerHTML = targetBanners.map((_, i) => `<div class="banner-dot ${i===0?'active':''}" onclick="moveToBanner(${i})"></div>`).join('');
         currentBannerIndex = 0; updateBannerPosition();

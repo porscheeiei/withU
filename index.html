@@ -565,16 +565,20 @@
             // Default category-based options
             let isD = (cat === "เครื่องดื่ม" || cat === "สมูทตี้");
             let isFoodWithTopping = (cat === "เมนูเส้น" || cat === "เมนูข้าว"); 
-            let isYumOrSnack = (cat === "เมนูยำ" || cat === "ยำ");
+            let isYum = (cat === "เมนูยำ" || cat === "ยำ");
+            
             let showFrappe = (cat === "เครื่องดื่ม");
+            let hasSpicy = isFoodWithTopping || isYum;
+            let hasSpecial = isFoodWithTopping || isYum || (cat === "ของทานเล่น"); // Snacks usually have "+พิเศษ"
+            
             // Per-item option overrides from Firebase (r[8])
             const _iopts = r[8] && typeof r[8] === 'object' ? r[8] : null;
             if (_iopts) {
                 if (_iopts.sweetness !== undefined) isD = _iopts.sweetness;
                 if (_iopts.frappe !== undefined) showFrappe = _iopts.frappe;
-                if (_iopts.spiciness !== undefined) { isFoodWithTopping = _iopts.spiciness; if(!_iopts.special) isYumOrSnack = _iopts.spiciness; }
-                if (_iopts.special !== undefined) isYumOrSnack = _iopts.special;
-                if (_iopts.topping !== undefined && !_iopts.topping) { isFoodWithTopping = false; }
+                if (_iopts.spiciness !== undefined) hasSpicy = _iopts.spiciness;
+                if (_iopts.special !== undefined) hasSpecial = _iopts.special;
+                if (_iopts.topping !== undefined && !_iopts.topping) isFoodWithTopping = false;
             }
             
             let showTopping = false;
@@ -588,7 +592,7 @@
             
             if(!itemQty[idx]) itemQty[idx] = 1; 
             if(isD && !currentS[idx]) currentS[idx] = "100%"; 
-            if((isFoodWithTopping || isYumOrSnack) && !currentSpicy[idx]) currentSpicy[idx] = "เผ็ดปานกลาง"; 
+            if(hasSpicy && !currentSpicy[idx]) currentSpicy[idx] = "เผ็ดปานกลาง"; 
             if(!itemOpt[idx]) itemOpt[idx] = { toppings: [], smoothie: false, special: false }; 
             
             let badgeText = r[7] ? r[7].toString().trim() : "";
@@ -624,14 +628,16 @@
                 </div>` : ''}
                 ` : ''}
                 
-                ${isAvail && (isFoodWithTopping || isYumOrSnack) ? `
+                ${isAvail && hasSpicy ? `
                 <div class="option-section">
                     <div class="opt-label">${translate('spiciness')}</div>
                     <div class="segmented-control">
                         ${['ไม่เผ็ด','เผ็ดน้อย','เผ็ดปานกลาง','เผ็ดมาก'].map(l=>`<div class="seg-btn ${currentSpicy[idx]===l?'active':''}" onclick="setSpicy(${idx},'${l}')" style="font-size:12px; padding:10px 2px; white-space:nowrap;">${tMenu(l)}</div>`).join('')}
                     </div>
                 </div>
+                ` : ''}
                 
+                ${isAvail && hasSpecial ? `
                 <div class="special-btn ${itemOpt[idx].special?'active':''}" onclick="tSpecial(${idx})">
                     <span>${translate('extra')}</span><span class="price-add">+฿${r[0] === 'เฟรนฟราย' ? 20 : 10}</span>
                 </div>
@@ -669,7 +675,7 @@
                         
                         <button class="lux-btn" onclick="updateQty(${idx},1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                     </div>` : ''}
-                    <button class="add-cart-btn" onclick="addC('${r[0]}',${r[1]},${idx},${isD},${isFoodWithTopping || isYumOrSnack})">
+                    <button class="add-cart-btn" onclick="addC('${r[0]}',${r[1]},${idx},${isD},${hasSpicy})">
                         ${isAvail ? translate('add_to_cart') : translate('sold_out')}
                     </button>
                 </div>

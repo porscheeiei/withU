@@ -1293,27 +1293,90 @@ window.savePointData = async function() {
     // === REPORT SECTION ===
     var reportSec = document.getElementById('report-sec');
     if (reportSec && !reportSec.querySelector('#rtab-dashboard')) {
-        reportSec.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">' +
-            '<h2 style="margin:0;"><i class="fas fa-chart-line" style="color:#3b82f6; margin-right:8px;"><\/i>Performance<\/h2>' +
+        reportSec.innerHTML = 
+            /* ── Header ── */
+            '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">' +
+            '<div>' +
+            '<h2 style="margin:0; font-size:22px; font-weight:900; letter-spacing:-0.5px;"><span style="background:linear-gradient(135deg,#6366f1,#a855f7,#ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">📊 Performance</span></h2>' +
+            '<p style="margin:4px 0 0; font-size:12px; color:#64748b;">ภาพรวมยอดขายและสถิติร้าน</p>' +
+            '</div>' +
             '<div style="display:flex; gap:8px;">' +
-            '<button class="btn-outline" onclick="switchReportTab(\x27dashboard\x27)" id="rtab-dashboard" style="border-color:#3b82f6; color:#3b82f6; background:rgba(59,130,246,0.08); font-size:12px; padding:8px 14px;"><i class="fas fa-chart-pie" style="margin-right:4px;"><\/i>Dashboard<\/button>' +
-            '<button class="btn-outline" onclick="switchReportTab(\x27history\x27)" id="rtab-history" style="font-size:12px; padding:8px 14px;"><i class="fas fa-history" style="margin-right:4px;"><\/i>History<\/button>' +
-            '<\/div><\/div>' +
+            '<button onclick="switchReportTab(\'dashboard\')" id="rtab-dashboard" style="background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3);"><i class="fas fa-chart-pie" style="margin-right:4px;"></i>Dashboard</button>' +
+            '<button onclick="switchReportTab(\'history\')" id="rtab-history" style="background:rgba(100,116,139,0.1); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer;"><i class="fas fa-history" style="margin-right:4px;"></i>History</button>' +
+            '</div></div>' +
+
+            /* ── Dashboard Panel ── */
             '<div id="report-dashboard">' +
-            '<div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">' +
-            '<button class="btn-black rpt-btn" onclick="renderReport(\x271d\x27)" style="flex:1; min-width:70px; background:linear-gradient(135deg,#3b82f6,#2563eb);">1 Day<\/button>' +
-            '<button class="btn-black rpt-btn" onclick="renderReport(\x277d\x27)" style="flex:1; min-width:70px;">7 Days<\/button>' +
-            '<button class="btn-black rpt-btn" onclick="renderReport(\x2730d\x27)" style="flex:1; min-width:70px;">30 Days<\/button>' +
-            '<button class="btn-black rpt-btn" onclick="renderReport(\x27all\x27)" style="flex:1; min-width:70px;">All<\/button>' +
-            '<\/div>' +
-            '<div class="stats-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:16px;">' +
-            '<div class="ai-card" style="border-left:3px solid #10b981; padding:18px;"><p style="font-size:10px; font-weight:800; color:#64748b; letter-spacing:1px; text-transform:uppercase; margin:0;">TOTAL SALES<\/p><p style="font-size:26px; font-weight:900; color:#10b981; margin:6px 0 0;">\u0e3f<span id="rep-total">0<\/span><\/p><\/div>' +
-            '<div class="ai-card" style="border-left:3px solid #3b82f6; padding:18px;"><p style="font-size:10px; font-weight:800; color:#64748b; letter-spacing:1px; text-transform:uppercase; margin:0;">ORDERS<\/p><p style="font-size:26px; font-weight:900; color:#3b82f6; margin:6px 0 0;" id="rep-count">0<\/p><\/div>' +
-            '<div class="ai-card" style="border-left:3px solid #f59e0b; padding:18px;"><p style="font-size:10px; font-weight:800; color:#64748b; letter-spacing:1px; text-transform:uppercase; margin:0;">TOP MENU<\/p><p style="font-size:18px; font-weight:900; color:#f59e0b; margin:6px 0 0;" id="rep-top-menu">-<\/p><\/div>' +
-            '<\/div>' +
-            '<div class="ai-card" style="margin-bottom:16px;"><h3 style="font-size:13px; font-weight:800; margin-bottom:14px;"><i class="fas fa-chart-area" style="color:#3b82f6; margin-right:6px;"><\/i>Sales Trend<\/h3><div style="height:260px;"><canvas id="salesChart"><\/canvas><\/div><\/div>' +
-            '<div class="ai-card"><h3 style="font-size:13px; font-weight:800; margin-bottom:14px;"><i class="fas fa-utensils" style="color:#f59e0b; margin-right:6px;"><\/i>Menu Breakdown (Today)<\/h3><div id="menu-breakdown" style="max-height:300px; overflow-y:auto;"><\/div><\/div>' +
-            '<\/div>' +
+
+            /* Period Buttons */
+            '<div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">' +
+            '<button class="rpt-btn" onclick="renderReport(\'1d\')" style="flex:1; min-width:70px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:10px; padding:10px; font-weight:700; font-size:12px; cursor:pointer; box-shadow:0 4px 12px rgba(99,102,241,0.35); transition:0.2s;">⚡ 1 Day</button>' +
+            '<button class="rpt-btn" onclick="renderReport(\'7d\')" style="flex:1; min-width:70px; background:rgba(100,116,139,0.08); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:10px; font-weight:700; font-size:12px; cursor:pointer; transition:0.2s;">7 Days</button>' +
+            '<button class="rpt-btn" onclick="renderReport(\'30d\')" style="flex:1; min-width:70px; background:rgba(100,116,139,0.08); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:10px; font-weight:700; font-size:12px; cursor:pointer; transition:0.2s;">30 Days</button>' +
+            '<button class="rpt-btn" onclick="renderReport(\'all\')" style="flex:1; min-width:70px; background:rgba(100,116,139,0.08); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:10px; font-weight:700; font-size:12px; cursor:pointer; transition:0.2s;">All Time</button>' +
+            '</div>' +
+
+            /* KPI Cards */
+            '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:20px;">' +
+            '<div style="background:linear-gradient(135deg,#10b981,#059669); border-radius:18px; padding:20px; color:#fff; position:relative; overflow:hidden;"><div style="position:absolute; top:-10px; right:-10px; width:70px; height:70px; background:rgba(255,255,255,0.1); border-radius:50%;"></div><p style="font-size:10px; font-weight:800; letter-spacing:1.5px; margin:0; opacity:0.8;">TOTAL SALES</p><p style="font-size:28px; font-weight:900; margin:6px 0 0; letter-spacing:-1px;">฿<span id="rep-total">0</span></p></div>' +
+            '<div style="background:linear-gradient(135deg,#3b82f6,#2563eb); border-radius:18px; padding:20px; color:#fff; position:relative; overflow:hidden;"><div style="position:absolute; top:-10px; right:-10px; width:70px; height:70px; background:rgba(255,255,255,0.1); border-radius:50%;"></div><p style="font-size:10px; font-weight:800; letter-spacing:1.5px; margin:0; opacity:0.8;">ORDERS</p><p style="font-size:28px; font-weight:900; margin:6px 0 0;" id="rep-count">0</p></div>' +
+            '<div style="background:linear-gradient(135deg,#f59e0b,#d97706); border-radius:18px; padding:20px; color:#fff; position:relative; overflow:hidden;"><div style="position:absolute; top:-10px; right:-10px; width:70px; height:70px; background:rgba(255,255,255,0.1); border-radius:50%;"></div><p style="font-size:10px; font-weight:800; letter-spacing:1.5px; margin:0; opacity:0.8;">TOP MENU</p><p style="font-size:16px; font-weight:900; margin:6px 0 0; line-height:1.3;" id="rep-top-menu">-</p></div>' +
+            '</div>' +
+
+            /* Category Sales Chart Row */
+            '<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">' +
+
+            /* Sales Trend Chart */
+            '<div style="background:#fff; border-radius:18px; padding:22px; border:1px solid rgba(226,232,240,0.6); box-shadow:0 4px 20px rgba(0,0,0,0.04);">' +
+            '<div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">' +
+            '<div style="width:32px; height:32px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;">📈</div>' +
+            '<div><p style="margin:0; font-size:13px; font-weight:800;">Sales Trend</p><p style="margin:0; font-size:11px; color:#64748b;">ยอดขายตามช่วงเวลา</p></div>' +
+            '</div>' +
+            '<div style="height:220px;"><canvas id="salesChart"></canvas></div>' +
+            '</div>' +
+
+            /* Category Chart */
+            '<div style="background:#fff; border-radius:18px; padding:22px; border:1px solid rgba(226,232,240,0.6); box-shadow:0 4px 20px rgba(0,0,0,0.04);">' +
+            '<div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">' +
+            '<div style="width:32px; height:32px; background:linear-gradient(135deg,#f59e0b,#ec4899); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;">🏷️</div>' +
+            '<div><p style="margin:0; font-size:13px; font-weight:800;">ยอดขายแยกประเภท</p><p style="margin:0; font-size:11px; color:#64748b;">เครื่องดื่ม / ขนมปัง / อาหาร</p></div>' +
+            '</div>' +
+            '<div style="height:220px;"><canvas id="categoryChart"></canvas></div>' +
+            '</div>' +
+
+            '</div>' +
+
+            /* Category Summary Badges */
+            '<div id="category-badges" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px;">' +
+            '<div style="background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(99,102,241,0.08)); border:1px solid rgba(59,130,246,0.2); border-radius:14px; padding:16px; text-align:center;">' +
+            '<div style="font-size:24px;">🧋</div>' +
+            '<p style="font-size:11px; font-weight:800; color:#3b82f6; letter-spacing:1px; margin:6px 0 2px; text-transform:uppercase;">เครื่องดื่ม</p>' +
+            '<p style="font-size:20px; font-weight:900; color:#1e40af; margin:0;"><span id="cat-drink">0</span><span style="font-size:11px; margin-left:4px; color:#64748b;">ชิ้น</span></p>' +
+            '</div>' +
+            '<div style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(239,68,68,0.08)); border:1px solid rgba(245,158,11,0.2); border-radius:14px; padding:16px; text-align:center;">' +
+            '<div style="font-size:24px;">🍞</div>' +
+            '<p style="font-size:11px; font-weight:800; color:#f59e0b; letter-spacing:1px; margin:6px 0 2px; text-transform:uppercase;">ขนมปัง</p>' +
+            '<p style="font-size:20px; font-weight:900; color:#92400e; margin:0;"><span id="cat-bread">0</span><span style="font-size:11px; margin-left:4px; color:#64748b;">ชิ้น</span></p>' +
+            '</div>' +
+            '<div style="background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.08)); border:1px solid rgba(16,185,129,0.2); border-radius:14px; padding:16px; text-align:center;">' +
+            '<div style="font-size:24px;">🍜</div>' +
+            '<p style="font-size:11px; font-weight:800; color:#10b981; letter-spacing:1px; margin:6px 0 2px; text-transform:uppercase;">อาหาร</p>' +
+            '<p style="font-size:20px; font-weight:900; color:#065f46; margin:0;"><span id="cat-food">0</span><span style="font-size:11px; margin-left:4px; color:#64748b;">ชิ้น</span></p>' +
+            '</div>' +
+            '</div>' +
+
+            /* Menu Breakdown */
+            '<div style="background:#fff; border-radius:18px; padding:22px; border:1px solid rgba(226,232,240,0.6); box-shadow:0 4px 20px rgba(0,0,0,0.04);">' +
+            '<div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">' +
+            '<div style="width:32px; height:32px; background:linear-gradient(135deg,#ec4899,#a855f7); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;">🏆</div>' +
+            '<div><p style="margin:0; font-size:13px; font-weight:800;">Menu Breakdown</p><p style="margin:0; font-size:11px; color:#64748b;">สินค้าขายดี</p></div>' +
+            '</div>' +
+            '<div id="menu-breakdown" style="max-height:320px; overflow-y:auto;"></div>' +
+            '</div>' +
+
+            '</div>' + /* end report-dashboard */
+
+            /* ── History Panel ── */
             '<div id="report-history" style="display:none;">' +
             '<div class="ai-card" style="padding:0;"><div style="overflow-x:auto;"><table class="report-table" style="min-width:700px; width:100%;"><thead><tr><th>Date<\/th><th>Order<\/th><th>Table<\/th><th>Total<\/th><th>Payment<\/th><\/tr><\/thead><tbody id="history-list"><\/tbody><\/table><\/div><\/div><\/div>';
     }
@@ -1403,6 +1466,13 @@ window.editPointData = function(phone, name, points) {
 
 // === REPORT LOGIC ===
 var salesChartInstance = null;
+var categoryChartInstance = null;
+
+// Category classification lists
+var DRINK_CATS = ['เครื่องดื่ม','สมูทตี้'];
+var BREAD_NAMES = ['ขนมปังหน้าเนยนม','ขนมปังหน้าเนยนมคาราเมล','ขนมปังหน้าสังขยา','ขนมปังหน้าช็อกโกแลต','ขนมปังหน้าสตอเบอร์รี่','ขนมปังช็อค + เนยนม','ขนมปังช็อค + สตอเบอร์รี่','ขนมปังช็อค + สังขยา','ขนมปังเนยนม + สังขยา','ขนมปังเนยนม + สตอเบอร์รี่'];
+var FOOD_CATS = ['เมนูเส้น','เมนูข้าว','เมนูยำ','ยำ','ของทานเล่น','อาหาร'];
+
 window.switchReportTab = function(tab) {
     var d = document.getElementById('report-dashboard');
     var h = document.getElementById('report-history');
@@ -1410,37 +1480,48 @@ window.switchReportTab = function(tab) {
     if(h) { h.style.display = tab==='history'?'block':'none'; }
     var db = document.getElementById('rtab-dashboard');
     var hb = document.getElementById('rtab-history');
-    if(db) db.style.cssText = tab==='dashboard' ? 'border-color:#3b82f6; color:#3b82f6; background:rgba(59,130,246,0.08); font-size:12px; padding:8px 14px;' : 'font-size:12px; padding:8px 14px;';
-    if(hb) hb.style.cssText = tab==='history' ? 'border-color:#3b82f6; color:#3b82f6; background:rgba(59,130,246,0.08); font-size:12px; padding:8px 14px;' : 'font-size:12px; padding:8px 14px;';
+    if(db) db.style.cssText = tab==='dashboard'
+        ? 'background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3);'
+        : 'background:rgba(100,116,139,0.1); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer;';
+    if(hb) hb.style.cssText = tab==='history'
+        ? 'background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3);'
+        : 'background:rgba(100,116,139,0.1); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer;';
     if(tab==='dashboard') window.renderReport('1d'); else window.renderHistory();
 };
+
 window.renderReport = function(period) {
+    // Style period buttons
     var btns = document.querySelectorAll('.rpt-btn');
     var pMap = {'1d':0,'7d':1,'30d':2,'all':3};
     btns.forEach(function(b,i) {
-        b.style.background = i===pMap[period] ? 'linear-gradient(135deg,#3b82f6,#2563eb)' : 'linear-gradient(135deg,#1e293b,#0f172a)';
+        b.style.background = i===pMap[period]
+            ? 'linear-gradient(135deg,#6366f1,#8b5cf6)'
+            : 'rgba(100,116,139,0.08)';
+        b.style.color = i===pMap[period] ? '#fff' : '#64748b';
+        b.style.border = i===pMap[period] ? 'none' : '1.5px solid rgba(100,116,139,0.2)';
+        b.style.boxShadow = i===pMap[period] ? '0 4px 12px rgba(99,102,241,0.35)' : 'none';
     });
-    
-    var total=0, items={}, byDate={};
+
+    var total=0, items={}, byDate={}, catDrink=0, catBread=0, catFood=0;
     var ordersCount = 0;
     var now = new Date();
-    
-    // Check if we are viewing 1d and have fullData from API
+
+    // Check fullData from API (1d)
     if (period === '1d' && window.fullData && window.fullData.analytics && window.fullData.analytics.report && window.fullData.analytics.report.length > 0) {
         var rpt = window.fullData.analytics.report;
         total = window.fullData.analytics.revenue || 0;
         rpt.forEach(function(i) {
-            items[i.name || i[0]] = (items[i.name || i[0]] || 0) + (i.qty || 1);
+            var name = i.name || i[0];
+            var qty = i.qty || 1;
+            items[name] = (items[name] || 0) + qty;
             if (!total && i.revenue) total += i.revenue;
         });
-        ordersCount = rpt.reduce(function(s, i) { return s + (i.qty || 1); }, 0); // Estimate
+        ordersCount = rpt.reduce(function(s, i) { return s + (i.qty || 1); }, 0);
         var dk = now.toLocaleDateString('th-TH');
         byDate[dk] = total;
     } else {
-        // Fallback to localStorage data
         var dataStr = localStorage.getItem('withu_completed_orders') || '[]';
         var orders = []; try { orders = JSON.parse(dataStr); } catch(e) {}
-        
         var fOrders = orders.filter(function(o) {
             if(!o.timestamp) return false;
             var d = new Date(o.timestamp);
@@ -1450,7 +1531,6 @@ window.renderReport = function(period) {
             if(period==='30d') return diff<=30;
             return true;
         });
-        
         ordersCount = fOrders.length;
         fOrders.forEach(function(o) {
             var amt = o.total||o.finalTotal||0; total+=amt;
@@ -1460,36 +1540,177 @@ window.renderReport = function(period) {
         });
     }
 
+    // Category totals from items
+    Object.entries(items).forEach(function(e) {
+        var name = e[0]; var qty = e[1];
+        if (BREAD_NAMES.indexOf(name) !== -1) { catBread += qty; }
+        else if (
+            name.indexOf('น้ำ')!==-1 || name.indexOf('ชา')!==-1 || name.indexOf('กาแฟ')!==-1 ||
+            name.indexOf('นม')!==-1 || name.indexOf('มัทฉะ')!==-1 || name.indexOf('โกโก้')!==-1 ||
+            name.indexOf('สมูทตี้')!==-1 || name.indexOf('โซดา')!==-1 || name.indexOf('เอสเพรช')!==-1 ||
+            name.indexOf('ลาเต้')!==-1 || name.indexOf('คาปูชิ')!==-1 || name.indexOf('มอคค่า')!==-1 ||
+            name.indexOf('อเมริกาโน่')!==-1 || name.indexOf('คาราเมล')!==-1 && name.indexOf('ขนม')===-1 ||
+            name.indexOf('โค้ก')!==-1 || name.indexOf('เพียวมัท')!==-1 || name.indexOf('ชาไทย')!==-1 ||
+            name.indexOf('ลิ้นจี่')!==-1 || name.indexOf('สตรอว์')!==-1 && name.indexOf('ขนม')===-1
+        ) { catDrink += qty; }
+        else { catFood += qty; }
+    });
+
+    // Update KPI
     var te = document.getElementById('rep-total'); if(te) te.innerText = total.toLocaleString();
     var ce = document.getElementById('rep-count'); if(ce) ce.innerText = ordersCount;
     var topArr = Object.entries(items).sort(function(a,b){return b[1]-a[1];});
     var tme = document.getElementById('rep-top-menu'); if(tme) tme.innerText = topArr.length ? topArr[0][0]+' ('+topArr[0][1]+')' : '-';
-    
+
+    // Update category badges
+    var cd = document.getElementById('cat-drink'); if(cd) cd.innerText = catDrink;
+    var cb = document.getElementById('cat-bread'); if(cb) cb.innerText = catBread;
+    var cf = document.getElementById('cat-food'); if(cf) cf.innerText = catFood;
+
     // Menu breakdown
     var mb = document.getElementById('menu-breakdown');
     if(mb) {
         if(topArr.length === 0) {
-            mb.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">No data</div>';
+            mb.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8;"><div style="font-size:32px; margin-bottom:8px;">📭</div><div style="font-weight:700;">ไม่มีข้อมูล</div></div>';
         } else {
             var maxQ = topArr[0][1];
-            var rows = topArr.map(function(entry) {
+            var gradients = [
+                'linear-gradient(90deg,#6366f1,#8b5cf6)',
+                'linear-gradient(90deg,#3b82f6,#06b6d4)',
+                'linear-gradient(90deg,#10b981,#34d399)',
+                'linear-gradient(90deg,#f59e0b,#fbbf24)',
+                'linear-gradient(90deg,#ec4899,#f43f5e)',
+            ];
+            var rows = topArr.slice(0,20).map(function(entry, idx) {
                 var pct = Math.round((entry[1]/maxQ)*100);
-                return '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;"><div style="font-weight:700; font-size:13px;">' + entry[0] + '</div><div style="margin-top:5px; height:4px; background:var(--border); border-radius:99px; overflow:hidden;"><div style="height:100%; background:linear-gradient(90deg,#3b82f6,#6366f1); border-radius:99px; width:' + pct + '%;"></div></div></td><td style="text-align:right; padding:10px; font-weight:900; font-size:16px; color:#3b82f6;">' + entry[1] + '</td></tr>';
+                var grad = gradients[idx % gradients.length];
+                var medal = idx===0?'🥇':idx===1?'🥈':idx===2?'🥉':'';
+                return '<div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(226,232,240,0.5);">'+
+                '<span style="font-size:14px; width:24px; text-align:center;">'+(medal||'<span style="font-size:11px; color:#94a3b8; font-weight:700;">'+(idx+1)+'</span>')+'</span>'+
+                '<div style="flex:1; min-width:0;">'+
+                '<div style="font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">'+entry[0]+'</div>'+
+                '<div style="margin-top:5px; height:5px; background:rgba(226,232,240,0.8); border-radius:99px; overflow:hidden;">'+
+                '<div style="height:100%; background:'+grad+'; border-radius:99px; width:'+pct+'%; transition:width 0.5s ease;"></div>'+
+                '</div></div>'+
+                '<span style="font-weight:900; font-size:15px; background:linear-gradient(135deg,#6366f1,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; min-width:28px; text-align:right;">'+entry[1]+'</span>'+
+                '</div>';
             }).join('');
-            mb.innerHTML = '<table style="width:100%; border-collapse:collapse;"><tr style="border-bottom:2px solid var(--border);"><th style="text-align:left; padding:10px; font-size:11px; font-weight:800; color:#64748b; letter-spacing:1px;">MENU ITEM</th><th style="text-align:right; padding:10px; font-size:11px; font-weight:800; color:#64748b; letter-spacing:1px;">QTY</th></tr>' + rows + '</table>';
+            mb.innerHTML = '<div style="padding:0 4px;">'+rows+'</div>';
         }
     }
-    
-    // Chart
+
+    // ── Sales Trend Chart ──
     var ctx = document.getElementById('salesChart');
     if(ctx && window.Chart) {
         if(salesChartInstance) salesChartInstance.destroy();
         var labels = Object.keys(byDate); if(!labels.length) labels = ['-'];
         var vals = Object.values(byDate); if(!vals.length) vals = [0];
         salesChartInstance = new Chart(ctx, {
-            type:'line',
-            data: { labels: labels, datasets: [{ label:'Sales', data: vals, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.1)', borderWidth:2.5, fill:true, tension:0.4, pointBackgroundColor:'#3b82f6', pointRadius:4 }] },
-            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,0.05)'}}} }
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'ยอดขาย (฿)',
+                    data: vals,
+                    borderColor: '#6366f1',
+                    backgroundColor: function(context) {
+                        var chart = context.chart;
+                        var ctx2 = chart.ctx, chartArea = chart.chartArea;
+                        if (!chartArea) return 'rgba(99,102,241,0.1)';
+                        var gradient = ctx2.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                        gradient.addColorStop(0, 'rgba(99,102,241,0.35)');
+                        gradient.addColorStop(1, 'rgba(139,92,246,0.02)');
+                        return gradient;
+                    },
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.45,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15,23,42,0.9)',
+                        titleColor: '#a5b4fc',
+                        bodyColor: '#f1f5f9',
+                        borderColor: 'rgba(99,102,241,0.3)',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: { label: function(c) { return ' ฿' + c.parsed.y.toLocaleString(); } }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#94a3b8' } },
+                    y: { grid: { color: 'rgba(226,232,240,0.6)', drawBorder: false }, ticks: { font: { size: 10 }, color: '#94a3b8', callback: function(v) { return '฿'+v.toLocaleString(); } } }
+                }
+            }
+        });
+    }
+
+    // ── Category Bar Chart ──
+    var ctx2 = document.getElementById('categoryChart');
+    if(ctx2 && window.Chart) {
+        if(categoryChartInstance) categoryChartInstance.destroy();
+        categoryChartInstance = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['🧋 เครื่องดื่ม', '🍞 ขนมปัง', '🍜 อาหาร'],
+                datasets: [{
+                    label: 'จำนวนที่ขาย (ชิ้น)',
+                    data: [catDrink, catBread, catFood],
+                    backgroundColor: [
+                        function(context) {
+                            var c = context.chart, a = c.chartArea;
+                            if (!a) return 'rgba(59,130,246,0.8)';
+                            var g = c.ctx.createLinearGradient(0, a.top, 0, a.bottom);
+                            g.addColorStop(0,'#6366f1'); g.addColorStop(1,'#3b82f6'); return g;
+                        },
+                        function(context) {
+                            var c = context.chart, a = c.chartArea;
+                            if (!a) return 'rgba(245,158,11,0.8)';
+                            var g = c.ctx.createLinearGradient(0, a.top, 0, a.bottom);
+                            g.addColorStop(0,'#f59e0b'); g.addColorStop(1,'#ef4444'); return g;
+                        },
+                        function(context) {
+                            var c = context.chart, a = c.chartArea;
+                            if (!a) return 'rgba(16,185,129,0.8)';
+                            var g = c.ctx.createLinearGradient(0, a.top, 0, a.bottom);
+                            g.addColorStop(0,'#10b981'); g.addColorStop(1,'#06b6d4'); return g;
+                        }
+                    ],
+                    borderRadius: 12,
+                    borderSkipped: false,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15,23,42,0.9)',
+                        titleColor: '#a5b4fc',
+                        bodyColor: '#f1f5f9',
+                        borderColor: 'rgba(99,102,241,0.3)',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: { label: function(c) { return ' ' + c.parsed.y + ' ชิ้น'; } }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 11, weight: '700' }, color: '#475569' } },
+                    y: { grid: { color: 'rgba(226,232,240,0.6)', drawBorder: false }, ticks: { font: { size: 10 }, color: '#94a3b8', stepSize: 1 }, beginAtZero: true }
+                }
+            }
         });
     }
 };

@@ -451,17 +451,6 @@
         });
     }
 
-        fetch(API_URL + "?action=getMenu").then(r=>r.json()).then(d=>{
-            if(d.menu) { 
-                localStorage.setItem('withu_cached_menu', JSON.stringify(d)); 
-                fullMenu = d.menu; 
-                toppingsData = d.toppings || []; 
-                toppingsData2 = d.toppings2 || []; 
-                renderMenu(currentF); 
-                renderBanners(d.banners); 
-            }
-        });
-    }
 
     function renderBanners(bannersArray) {
         const track = document.getElementById("banner-track");
@@ -755,7 +744,7 @@
                 </div>
               </div>`;
               
-        let total = cart.reduce((s,i)=>s+i.total,0);
+        total = cart.reduce((s,i)=>s+i.total,0);
         let earnPoints = Math.floor(total / 50);
 
         h += `

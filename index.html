@@ -1090,5 +1090,69 @@
     }
 </script>
 
+
+<!-- CAT POPUP UI -->
+<div id="cat-popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:9999999; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);">
+    <div class="cat-letter" style="position:relative; width:100%; max-width:380px; background:var(--surface); border-radius:24px; padding:0; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6); overflow:hidden; animation: popupBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);">
+        
+        <button onclick="closeCatPopup()" style="position:absolute; top:12px; right:12px; width:34px; height:34px; border-radius:50%; background:rgba(0,0,0,0.4); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); transition:0.2s;">✕</button>
+        
+        <div style="width:100%; height:220px; overflow:hidden; background:#f1f5f9; position:relative;">
+            <img id="cat-popup-img" src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&auto=format&fit=crop" style="width:100%; height:100%; object-fit:cover;">
+            <div style="position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(to top, var(--surface), transparent);"></div>
+        </div>
+        
+        <div style="padding: 24px; text-align:center; padding-top: 0;">
+            <div style="display:inline-block; margin-top:-35px; margin-bottom:12px; position:relative; z-index:5; background:var(--surface); padding:10px; border-radius:50%; box-shadow:0 4px 15px rgba(0,0,0,0.08);">
+                <span style="font-size:36px; line-height:1;">💌</span>
+            </div>
+            <div id="cat-popup-text" style="font-size:16px; line-height:1.6; color:var(--text-main); font-weight:700; margin-bottom: 24px;">
+                <!-- Text injected here -->
+            </div>
+            
+            <button onclick="closeCatPopup()" style="width:100%; padding:14px; background:var(--primary); color:#fff; border:none; border-radius:14px; font-weight:800; font-size:15px; cursor:pointer; box-shadow:0 4px 15px var(--primary-glow); transition: 0.2s;">รับทราบ 🐾</button>
+        </div>
+    </div>
+</div>
+<style>
+@keyframes popupBounce { 
+    0% { transform: scale(0.7) translateY(80px); opacity: 0; } 
+    100% { transform: scale(1) translateY(0); opacity: 1; } 
+}
+#cat-popup-overlay button:active { transform: scale(0.95); }
+</style>
+
+<script>
+window.initCatPopup = async function() {
+    if(sessionStorage.getItem('withu_popup_shown')) return;
+    try {
+        const res = await fetch('https://withu-da97c-default-rtdb.asia-southeast1.firebasedatabase.app/popupAd.json');
+        const data = await res.json();
+        if(data && data.enabled) {
+            if(data.text) {
+                // Ensure text formatting is preserved using line breaks if it's plain text
+                let formattedText = data.text.replace(/\n/g, '<br>');
+                document.getElementById('cat-popup-text').innerHTML = formattedText;
+            }
+            if(data.image) document.getElementById('cat-popup-img').src = data.image;
+            document.getElementById('cat-popup-overlay').style.display = 'flex';
+        }
+    } catch(e) { console.error('Popup error', e); }
+};
+
+window.closeCatPopup = function() {
+    const el = document.getElementById('cat-popup-overlay');
+    el.style.opacity = '0';
+    el.style.transition = '0.3s';
+    setTimeout(() => { el.style.display = 'none'; }, 300);
+    sessionStorage.setItem('withu_popup_shown', 'true');
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(window.initCatPopup, 1200);
+});
+</script>
+<!-- END CAT POPUP UI -->
+
 </body>
 </html>

@@ -1041,6 +1041,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // === MENU MANAGER BUTTON IN SIDEBAR ===
+    if (!document.getElementById('sb-menu')) {
+        var stockBtnEl = document.getElementById('sb-stock');
+        if (stockBtnEl) {
+            var menuMgrBtn = document.createElement('button');
+            menuMgrBtn.className = 'sidebar-item';
+            menuMgrBtn.id = 'sb-menu';
+            menuMgrBtn.innerHTML = '<i class="fas fa-utensils" style="margin-right:10px; font-size:15px; width:20px; text-align:center;"></i>จัดการเมนู';
+            menuMgrBtn.onclick = function() { window.showSec('menu'); toggleSidebar(); };
+            stockBtnEl.parentNode.insertBefore(menuMgrBtn, stockBtnEl.nextSibling);
+        }
+    }
+
         // === HISTORY BUTTON IN SIDEBAR ===
     if (!document.getElementById('sb-history')) {
         var reportBtn = document.getElementById('sb-report');
@@ -1120,6 +1133,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 '<\/div>';
             orderSec.parentNode.insertBefore(div, orderSec.nextSibling);
         }
+    }
+
+    // === MENU MANAGER SECTION ===
+    if (!document.getElementById('menu-sec')) {
+        var menuSecDiv = document.createElement('div');
+        menuSecDiv.id = 'menu-sec';
+        menuSecDiv.style.cssText = 'display:none; padding:24px;';
+        menuSecDiv.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;"><i class="fas fa-spinner fa-spin" style="font-size:24px;"></i><p style="margin-top:10px;font-weight:600;">กำลังโหลด Menu Manager...</p></div>';
+        var orderSecRef = document.getElementById('order-sec');
+        if (orderSecRef) orderSecRef.parentNode.appendChild(menuSecDiv);
     }
 
     
@@ -1395,13 +1418,14 @@ window.showSec = function(n) {
     
     var t = document.getElementById(n + '-sec');
     if (t) {
-        t.style.display = (n==='report'||n==='settings'||n==='points'||n==='history') ? 'block' : 'grid';
+        t.style.display = (n==='report'||n==='settings'||n==='points'||n==='history'||n==='menu') ? 'block' : 'grid';
         t.style.animation = 'fadeSlideIn 0.25s ease-out';
     }
     if (n==='points' && typeof window.loadPoints === 'function') window.loadPoints();
     if (n==='report' && typeof window.switchReportTab === 'function') setTimeout(function(){window.switchReportTab('dashboard');},50);
     if (n==='settings' && typeof window.loadSettings === 'function') window.loadSettings();
     if (n==='history' && typeof window.renderHistoryCards === 'function') window.renderHistoryCards();
+    if (n==='menu' && typeof window.initMenuManager === 'function') setTimeout(function(){window.initMenuManager();},80);
     document.querySelectorAll('.tab-btn').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='t-'+n); });
     document.querySelectorAll('.sidebar-item').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='sb-'+n); });
 };
@@ -4634,6 +4658,516 @@ window.showToast = function(msg, type) {
     c.appendChild(t);
     setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity 0.3s ease'; setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},300); }, 3000);
 };
+</script>
+<script id="withu-menu-manager">
+/* ============================================================
+   WITHU MENU MANAGER v1.0
+   CRUD for menu items, stored in Firebase /customMenu
+   Image upload with client-side compression to base64
+============================================================ */
+(function() {
+
+var FIREBASE_MENU_URL = '';
+function getMenuUrl() {
+    if (!FIREBASE_MENU_URL) {
+        var base = typeof FIREBASE_POINTS_URL !== 'undefined'
+            ? FIREBASE_POINTS_URL.replace('/points.json', '')
+            : 'https://withu-da97c-default-rtdb.asia-southeast1.firebasedatabase.app';
+        FIREBASE_MENU_URL = base + '/customMenu.json';
+    }
+    return FIREBASE_MENU_URL;
+}
+function getMenuItemUrl(key) {
+    return getMenuUrl().replace('.json', '/' + encodeURIComponent(key) + '.json');
+}
+
+var menuManagerInited = false;
+var allMenuItems = [];
+var customMenuItems = {};
+var currentMenuFilter = 'ทั้งหมด';
+var editingKey = null;
+
+/* ─── Image compress ─── */
+window.compressMenuImage = function(file, cb) {
+    var maxW = 500, q = 0.72;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+            var ratio = Math.min(maxW / img.width, maxW / img.height, 1);
+            var c = document.createElement('canvas');
+            c.width = Math.round(img.width * ratio);
+            c.height = Math.round(img.height * ratio);
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            cb(c.toDataURL('image/jpeg', q));
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
+/* ─── Firebase CRUD ─── */
+async function loadCustomMenu() {
+    try {
+        var res = await fetch(getMenuUrl());
+        var d = await res.json();
+        return d || {};
+    } catch(e) { return {}; }
+}
+async function saveCustomMenuItem(key, data) {
+    var res = await fetch(getMenuItemUrl(key), {
+        method: 'PUT', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+    });
+    return res.ok;
+}
+async function deleteCustomMenuItemFB(key) {
+    await fetch(getMenuItemUrl(key), { method: 'DELETE' });
+}
+
+/* ─── Build UI ─── */
+function buildMenuSection(sec) {
+    sec.innerHTML = `
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+  <div>
+    <h2 style="margin:0;font-size:22px;font-weight:900;letter-spacing:-0.5px;">
+      <span style="background:linear-gradient(135deg,#10b981,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">🍽️ จัดการเมนู</span>
+    </h2>
+    <p style="margin:4px 0 0;font-size:12px;color:#64748b;">เพิ่ม แก้ไข ลบเมนู กำหนดตัวเลือก และซิงค์หน้าลูกค้า</p>
+  </div>
+  <button onclick="openMenuModal(null)" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:12px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(16,185,129,0.35);display:flex;align-items:center;gap:8px;">
+    <i class="fas fa-plus"></i> เพิ่มเมนูใหม่
+  </button>
+</div>
+<div id="mm-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px;"></div>
+<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+  <div id="mm-filter-tabs" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:200px;"></div>
+  <div style="position:relative;min-width:200px;">
+    <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:13px;pointer-events:none;"></i>
+    <input type="text" id="mm-search" placeholder="ค้นหาเมนู..." oninput="window.renderMenuCards()" style="padding:10px 14px 10px 36px;border:1.5px solid rgba(226,232,240,0.8);border-radius:10px;font-size:13px;width:100%;box-sizing:border-box;outline:none;">
+  </div>
+</div>
+<div id="mm-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;"></div>
+
+<!-- Modal -->
+<div id="mm-modal-overlay" onclick="if(event.target===this)window.closeMenuModal()" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(8px);z-index:9000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:24px;max-width:560px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#0f172a,#1e293b);padding:20px 26px;border-radius:24px 24px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1;">
+      <div>
+        <h3 id="mm-modal-title" style="margin:0;color:#f1f5f9;font-size:17px;font-weight:800;">เพิ่มเมนูใหม่</h3>
+        <p style="margin:4px 0 0;font-size:11px;color:#94a3b8;">กำหนดรายละเอียดและตัวเลือก</p>
+      </div>
+      <button onclick="window.closeMenuModal()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#94a3b8;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;line-height:1;">&times;</button>
+    </div>
+    <div style="padding:24px 26px;">
+      <!-- Image -->
+      <div style="text-align:center;margin-bottom:20px;">
+        <div id="mm-img-preview" onclick="document.getElementById('mm-img-file').click()" style="width:120px;height:120px;border-radius:16px;background:#f8fafc;border:2px dashed #cbd5e1;margin:0 auto 10px;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color 0.2s;">
+          <div style="text-align:center;color:#94a3b8;pointer-events:none;"><i class="fas fa-image" style="font-size:28px;display:block;margin-bottom:6px;"></i><span style="font-size:11px;font-weight:600;">คลิกเพิ่มรูป</span></div>
+        </div>
+        <input type="file" id="mm-img-file" accept="image/*" style="display:none;" onchange="window.handleMenuImageUpload(event)">
+        <p style="font-size:11px;color:#94a3b8;margin:0;">JPG/PNG/WebP • บีบอัดอัตโนมัติ • ไม่เกิน 8MB</p>
+      </div>
+      <!-- Fields grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+        <div style="grid-column:1/-1;">
+          <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">ชื่อเมนู *</label>
+          <input type="text" id="mm-name" placeholder="ชื่อเมนู" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">ราคา (฿) *</label>
+          <input type="number" id="mm-price" placeholder="0" min="0" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Badge (ป้าย)</label>
+          <input type="text" id="mm-badge" placeholder="เช่น New, Hot, Recommend" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">หมวดหมู่ *</label>
+          <select id="mm-category" onchange="window.mmOnCategoryChange()" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;">
+            <option value="">— เลือกหมวดหมู่ —</option>
+            <option value="เครื่องดื่ม">🧋 เครื่องดื่ม</option>
+            <option value="สมูทตี้">🥤 สมูทตี้</option>
+            <option value="ขนมปัง">🍞 ขนมปัง</option>
+            <option value="เมนูเส้น">🍜 เมนูเส้น</option>
+            <option value="เมนูข้าว">🍚 เมนูข้าว</option>
+            <option value="เมนูยำ">🥗 เมนูยำ</option>
+            <option value="ของทานเล่น">🍿 ของทานเล่น</option>
+            <option value="อื่นๆ">📦 อื่นๆ</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">หมวดย่อย</label>
+          <input type="text" id="mm-subcategory" placeholder="เช่น กาแฟ, ชา" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">สถานะ</label>
+          <select id="mm-status" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;">
+            <option value="ปกติ">✅ ปกติ (มีขาย)</option>
+            <option value="หมด">🚫 หมด (Sold Out)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">แสดงในหน้า</label>
+          <select id="mm-showin" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;">
+            <option value="both">🔁 Dine-in + Delivery</option>
+            <option value="dine">🪑 Dine-in เท่านั้น</option>
+            <option value="delivery">🛵 Delivery เท่านั้น</option>
+          </select>
+        </div>
+      </div>
+      <!-- Options -->
+      <div style="background:#f8fafc;border-radius:14px;padding:16px;margin-bottom:16px;border:1px solid #e2e8f0;">
+        <p style="font-size:11px;font-weight:800;color:#64748b;letter-spacing:1px;text-transform:uppercase;margin:0 0 12px;">ตัวเลือกสำหรับเมนูนี้</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="mm-opts-grid">
+          <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;">
+            <input type="checkbox" id="opt-sweetness" style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;">
+            <div><div style="font-size:12px;font-weight:700;">🍯 ระดับความหวาน</div><div style="font-size:10px;color:#94a3b8;">เลือก 25-100%</div></div>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;">
+            <input type="checkbox" id="opt-frappe" style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;">
+            <div><div style="font-size:12px;font-weight:700;">🧊 เพิ่มปั่น (Frappe)</div><div style="font-size:10px;color:#94a3b8;">ปั่น +฿10</div></div>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;">
+            <input type="checkbox" id="opt-spiciness" style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;">
+            <div><div style="font-size:12px;font-weight:700;">🌶️ ระดับความเผ็ด</div><div style="font-size:10px;color:#94a3b8;">ไม่เผ็ด-เผ็ดมาก</div></div>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;">
+            <input type="checkbox" id="opt-special" style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;">
+            <div><div style="font-size:12px;font-weight:700;">⭐ พิเศษ (Upsize)</div><div style="font-size:10px;color:#94a3b8;">พิเศษ +฿20</div></div>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;grid-column:1/-1;">
+            <input type="checkbox" id="opt-topping" style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;">
+            <div><div style="font-size:12px;font-weight:700;">🧁 ท็อปปิ้ง (Add-ons)</div><div style="font-size:10px;color:#94a3b8;">เลือกท็อปปิ้งเพิ่ม</div></div>
+          </label>
+        </div>
+      </div>
+      <!-- URL fallback -->
+      <div style="margin-bottom:20px;">
+        <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">หรือใส่ URL รูปภาพแทน</label>
+        <input type="url" id="mm-img-url" placeholder="https://..." oninput="window.mmPreviewUrl(this.value)" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;">
+      </div>
+      <input type="hidden" id="mm-img-data">
+      <!-- Buttons -->
+      <div style="display:flex;gap:10px;">
+        <button onclick="window.saveMenuItemFromModal()" style="flex:1;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,0.35);">
+          <i class="fas fa-save" style="margin-right:6px;"></i>บันทึกเมนู
+        </button>
+        <button onclick="window.closeMenuModal()" style="padding:13px 18px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;color:#64748b;">ยกเลิก</button>
+        <button id="mm-delete-btn" onclick="window.deleteMenuItemFromModal()" style="display:none;padding:13px 16px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;color:#ef4444;">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+/* ─── Helpers ─── */
+function getDefaultOpt(key, cat) {
+    var isDrink = (cat==='เครื่องดื่ม'||cat==='สมูทตี้');
+    var isFood  = (cat==='เมนูเส้น'||cat==='เมนูข้าว');
+    var isYum   = (cat==='เมนูยำ'||cat==='ของทานเล่น');
+    if (key==='sweetness') return isDrink;
+    if (key==='frappe')    return cat==='เครื่องดื่ม';
+    if (key==='spiciness') return isFood||isYum;
+    if (key==='special')   return isFood||isYum;
+    if (key==='topping')   return isDrink||isFood;
+    return false;
+}
+
+/* ─── Image handlers ─── */
+window.handleMenuImageUpload = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 8*1024*1024) { showToast('ไฟล์ใหญ่เกิน 8MB','error'); return; }
+    showToast('กำลังบีบอัดรูปภาพ...','info');
+    window.compressMenuImage(file, function(b64) {
+        document.getElementById('mm-img-data').value = b64;
+        document.getElementById('mm-img-url').value = '';
+        var p = document.getElementById('mm-img-preview');
+        p.style.border = '2px solid #10b981';
+        p.innerHTML = '<img src="'+b64+'" style="width:100%;height:100%;object-fit:cover;">';
+        showToast('อัปโหลดรูปสำเร็จ ✅','success');
+    });
+};
+
+window.mmPreviewUrl = function(url) {
+    if (!url) return;
+    var p = document.getElementById('mm-img-preview');
+    p.style.border = '2px solid #3b82f6';
+    p.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentNode.innerHTML=\'<div style=padding:10px;color:#ef4444;font-size:11px;text-align:center>URL ไม่ถูกต้อง</div>\'">';
+    document.getElementById('mm-img-data').value = '';
+};
+
+window.mmOnCategoryChange = function() {
+    var cat = document.getElementById('mm-category').value;
+    ['sweetness','frappe','spiciness','special','topping'].forEach(function(k) {
+        var cb = document.getElementById('opt-'+k);
+        if (cb) cb.checked = getDefaultOpt(k, cat);
+    });
+};
+
+/* ─── Modal ─── */
+window.openMenuModal = function(item) {
+    editingKey = item ? (item._key||item.key||item.name) : null;
+    var isEdit = !!editingKey && !!item;
+    document.getElementById('mm-modal-title').textContent = isEdit ? '✏️ แก้ไขเมนู' : '➕ เพิ่มเมนูใหม่';
+    document.getElementById('mm-delete-btn').style.display = isEdit ? 'flex' : 'none';
+    document.getElementById('mm-name').value        = item ? item.name : '';
+    document.getElementById('mm-price').value       = item ? item.price : '';
+    document.getElementById('mm-badge').value       = item ? (item.badge||'') : '';
+    document.getElementById('mm-category').value    = item ? (item.category||'') : '';
+    document.getElementById('mm-subcategory').value = item ? (item.subcategory||'') : '';
+    document.getElementById('mm-status').value      = item ? (item.status||'ปกติ') : 'ปกติ';
+    document.getElementById('mm-showin').value      = item ? (item.showIn||'both') : 'both';
+    document.getElementById('mm-img-data').value    = '';
+    document.getElementById('mm-img-url').value     = item ? (item.image||'') : '';
+    document.getElementById('mm-img-file').value    = '';
+    var p = document.getElementById('mm-img-preview');
+    var src = item && item.image ? item.image : '';
+    if (src) {
+        p.style.border = '2px solid #3b82f6';
+        p.innerHTML = '<img src="'+src+'" style="width:100%;height:100%;object-fit:cover;">';
+    } else {
+        p.style.border = '2px dashed #cbd5e1';
+        p.innerHTML = '<div style="text-align:center;color:#94a3b8;"><i class="fas fa-image" style="font-size:28px;display:block;margin-bottom:6px;"></i><span style="font-size:11px;font-weight:600;">คลิกเพิ่มรูป</span></div>';
+    }
+    var opts = (item&&item.options) ? item.options : {};
+    ['sweetness','frappe','spiciness','special','topping'].forEach(function(k) {
+        var cb = document.getElementById('opt-'+k);
+        if (cb) cb.checked = opts[k]!==undefined ? opts[k] : getDefaultOpt(k, item?item.category:'');
+    });
+    var ov = document.getElementById('mm-modal-overlay');
+    ov.style.display = 'flex';
+    setTimeout(function() { var n = document.getElementById('mm-name'); if(n) n.focus(); }, 120);
+};
+
+window.closeMenuModal = function() {
+    document.getElementById('mm-modal-overlay').style.display = 'none';
+    editingKey = null;
+};
+
+/* ─── Save ─── */
+window.saveMenuItemFromModal = async function() {
+    var name  = (document.getElementById('mm-name').value||'').trim();
+    var price = parseFloat(document.getElementById('mm-price').value) || 0;
+    var cat   = document.getElementById('mm-category').value;
+    if (!name) { showToast('กรุณากรอกชื่อเมนู','error'); return; }
+    if (!cat)  { showToast('กรุณาเลือกหมวดหมู่','error'); return; }
+
+    var imgData = document.getElementById('mm-img-data').value;
+    var imgUrl  = (document.getElementById('mm-img-url').value||'').trim();
+    var image   = imgData || imgUrl || '';
+
+    // Use name as key for GAS items (override), or generate for new custom items
+    var isNewCustom = !editingKey || !customMenuItems[editingKey];
+    var key = editingKey || ('custom_' + Date.now());
+
+    var data = {
+        key: key, name: name, price: price, category: cat,
+        subcategory: (document.getElementById('mm-subcategory').value||'').trim(),
+        badge: (document.getElementById('mm-badge').value||'').trim(),
+        status: document.getElementById('mm-status').value,
+        showIn: document.getElementById('mm-showin').value,
+        image: image,
+        options: {
+            sweetness: document.getElementById('opt-sweetness').checked,
+            frappe:    document.getElementById('opt-frappe').checked,
+            spiciness: document.getElementById('opt-spiciness').checked,
+            special:   document.getElementById('opt-special').checked,
+            topping:   document.getElementById('opt-topping').checked
+        },
+        isCustom: isNewCustom,
+        updatedAt: new Date().toISOString()
+    };
+
+    var btn = document.querySelector('#mm-modal-overlay button[onclick*="saveMenu"]');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i>กำลังบันทึก...'; }
+    try {
+        var ok = await saveCustomMenuItem(key, data);
+        if (ok) {
+            customMenuItems[key] = data;
+            // Notify customer pages
+            localStorage.setItem('withu_menu_updated', Date.now().toString());
+            localStorage.removeItem('withu_cached_menu');
+            showToast('บันทึกเมนูสำเร็จ ✅','success');
+            window.closeMenuModal();
+            await reloadMenuManagerData();
+            window.renderMenuCards();
+            window.renderMenuStats();
+        } else {
+            showToast('บันทึกล้มเหลว กรุณาลองใหม่','error');
+        }
+    } catch(e) { showToast('เกิดข้อผิดพลาด: '+e.message,'error'); }
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save" style="margin-right:6px;"></i>บันทึกเมนู'; }
+};
+
+/* ─── Delete ─── */
+window.deleteMenuItemFromModal = async function() {
+    if (!editingKey) return;
+    var ok = await window.__withuConfirm('ต้องการลบเมนูนี้ออกจากระบบ?\n\n(เมนูจาก Google Sheet จะยังคงอยู่ แต่จะลบ override/custom ออก)');
+    if (!ok) return;
+    try {
+        await deleteCustomMenuItemFB(editingKey);
+        delete customMenuItems[editingKey];
+        localStorage.removeItem('withu_cached_menu');
+        localStorage.setItem('withu_menu_updated', Date.now().toString());
+        showToast('ลบเมนูสำเร็จ','success');
+        window.closeMenuModal();
+        await reloadMenuManagerData();
+        window.renderMenuCards();
+        window.renderMenuStats();
+    } catch(e) { showToast('ลบล้มเหลว','error'); }
+};
+
+/* ─── Quick toggle status ─── */
+window.toggleMenuStatus = async function(key, currentStatus) {
+    var newStatus = currentStatus==='หมด' ? 'ปกติ' : 'หมด';
+    if (!customMenuItems[key]) {
+        var gasItem = allMenuItems.find(function(m){return (m._key||m.name)===key;});
+        if (!gasItem) return;
+        customMenuItems[key] = {
+            key: key, name: gasItem.name, price: gasItem.price,
+            category: gasItem.category||'', subcategory: gasItem.subcategory||'',
+            badge: gasItem.badge||'', image: gasItem.image||'',
+            status: newStatus, showIn: 'both',
+            options: { sweetness:false, frappe:false, spiciness:false, special:false, topping:false },
+            isCustom: false, updatedAt: new Date().toISOString()
+        };
+    } else {
+        customMenuItems[key].status = newStatus;
+        customMenuItems[key].updatedAt = new Date().toISOString();
+    }
+    await saveCustomMenuItem(key, customMenuItems[key]);
+    localStorage.removeItem('withu_cached_menu');
+    localStorage.setItem('withu_menu_updated', Date.now().toString());
+    showToast(newStatus==='หมด' ? '⛔ ตั้งเป็นหมดแล้ว' : '✅ เปิดขายแล้ว','new');
+    await reloadMenuManagerData();
+    window.renderMenuCards();
+    window.renderMenuStats();
+};
+
+/* ─── Data loading ─── */
+async function reloadMenuManagerData() {
+    customMenuItems = await loadCustomMenu();
+    var gasList = [];
+    if (window.fullData && window.fullData.menu) {
+        gasList = window.fullData.menu.map(function(r) {
+            return { _key:r[0], key:r[0], name:r[0], price:r[1],
+                category:r[2]||'', subcategory:r[3]||'',
+                image:r[4]||'', status:r[5]||'ปกติ', badge:r[7]||'', isCustom:false };
+        });
+    }
+    // Apply Firebase overrides to GAS items
+    allMenuItems = gasList.map(function(item) {
+        var ov = Object.values(customMenuItems).find(function(c){return c.name===item.name;});
+        if (ov) return Object.assign({}, item, ov, {_key:item.name, isCustom:false, _override:true});
+        return item;
+    });
+    // Add purely new custom items not in GAS list
+    Object.values(customMenuItems).forEach(function(c) {
+        if (c.isCustom && !allMenuItems.find(function(m){return m.name===c.name;})) {
+            allMenuItems.push(Object.assign({}, c, {_key:c.key||c.name}));
+        }
+    });
+}
+
+/* ─── Render stats ─── */
+window.renderMenuStats = function() {
+    var el = document.getElementById('mm-stats');
+    if (!el) return;
+    var total   = allMenuItems.length;
+    var custom  = allMenuItems.filter(function(m){return m.isCustom||m._override;}).length;
+    var soldOut = allMenuItems.filter(function(m){return m.status==='หมด';}).length;
+    var cats    = new Set(allMenuItems.map(function(m){return m.category;})).size;
+    var stats = [
+        {icon:'🍽️',label:'เมนูทั้งหมด',val:total,g:'linear-gradient(135deg,#6366f1,#8b5cf6)'},
+        {icon:'✏️',label:'แก้ไขแล้ว',val:custom,g:'linear-gradient(135deg,#3b82f6,#06b6d4)'},
+        {icon:'🚫',label:'หมดแล้ว',val:soldOut,g:'linear-gradient(135deg,#ef4444,#f97316)'},
+        {icon:'📂',label:'หมวดหมู่',val:cats,g:'linear-gradient(135deg,#10b981,#059669)'},
+    ];
+    el.innerHTML = stats.map(function(s) {
+        return '<div style="background:'+s.g+';border-radius:16px;padding:14px 16px;color:#fff;display:flex;align-items:center;gap:10px;"><span style="font-size:22px;">'+s.icon+'</span><div><p style="font-size:10px;font-weight:800;letter-spacing:1px;margin:0;opacity:0.8;text-transform:uppercase;">'+s.label+'</p><p style="font-size:22px;font-weight:900;margin:2px 0 0;letter-spacing:-0.5px;">'+s.val+'</p></div></div>';
+    }).join('');
+};
+
+/* ─── Render filter tabs ─── */
+var FILTER_CATS = ['ทั้งหมด','เครื่องดื่ม','สมูทตี้','ขนมปัง','เมนูเส้น','เมนูข้าว','ของทานเล่น','เมนูยำ','Custom'];
+function renderFilterTabs() {
+    var el = document.getElementById('mm-filter-tabs');
+    if (!el) return;
+    el.innerHTML = FILTER_CATS.map(function(cat) {
+        var active = cat===currentMenuFilter;
+        return '<button onclick="window.setMenuFilter(\''+cat+'\')" style="padding:6px 12px;border-radius:8px;border:1.5px solid '+(active?'#6366f1':'rgba(226,232,240,0.8)')+';background:'+(active?'linear-gradient(135deg,#6366f1,#8b5cf6)':'#fff')+';color:'+(active?'#fff':'#64748b')+';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;">'+cat+'</button>';
+    }).join('');
+}
+window.setMenuFilter = function(cat) { currentMenuFilter = cat; renderFilterTabs(); window.renderMenuCards(); };
+
+/* ─── Render cards ─── */
+window.renderMenuCards = function() {
+    var el = document.getElementById('mm-grid');
+    if (!el) return;
+    var q = ((document.getElementById('mm-search')||{}).value||'').toLowerCase();
+    var filtered = allMenuItems.filter(function(m) {
+        if (currentMenuFilter!=='ทั้งหมด' && currentMenuFilter!=='Custom' && m.category!==currentMenuFilter) return false;
+        if (currentMenuFilter==='Custom' && !m.isCustom && !m._override) return false;
+        if (q && !m.name.toLowerCase().includes(q) && !(m.category||'').toLowerCase().includes(q)) return false;
+        return true;
+    });
+    if (!filtered.length) {
+        el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:#94a3b8;"><div style="font-size:48px;margin-bottom:12px;">🔍</div><p style="font-weight:700;font-size:15px;margin:0;">ไม่พบเมนูที่ค้นหา</p></div>';
+        return;
+    }
+    el.innerHTML = filtered.map(function(m) {
+        var key = m._key||m.name;
+        var soldOut = m.status==='หมด';
+        var imgSrc = m.image || 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=400&auto=format&fit=crop';
+        var badge = '';
+        if (m.isCustom) badge += '<span style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;letter-spacing:0.5px;">NEW</span> ';
+        if (m._override) badge += '<span style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;">แก้ไขแล้ว</span> ';
+        if (m.badge) badge += '<span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;">'+m.badge+'</span>';
+        var itemJson = JSON.stringify({
+            _key: m._key||m.name, key: m.key||m.name, name: m.name, price: m.price,
+            category: m.category||'', subcategory: m.subcategory||'',
+            badge: m.badge||'', image: m.image||'', status: m.status||'ปกติ',
+            showIn: m.showIn||'both', isCustom: !!m.isCustom, _override: !!m._override,
+            options: m.options||{}
+        }).replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+        return '<div style="background:#fff;border-radius:18px;border:1px solid rgba(226,232,240,0.7);box-shadow:0 2px 12px rgba(0,0,0,0.05);overflow:hidden;transition:all 0.2s;opacity:'+(soldOut?0.65:1)+'" onmouseover="this.style.transform=\'translateY(-3px)\';this.style.boxShadow=\'0 8px 24px rgba(99,102,241,0.14)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 2px 12px rgba(0,0,0,0.05)\'">'
+            + '<div style="position:relative;height:130px;overflow:hidden;background:#f8fafc;">'
+            + '<img src="'+imgSrc+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.src=\'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=400&auto=format&fit=crop\'">'
+            + (soldOut?'<div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;"><span style="background:#ef4444;color:#fff;font-size:12px;font-weight:800;padding:5px 14px;border-radius:20px;letter-spacing:1px;">SOLD OUT</span></div>':'')
+            + '<div style="position:absolute;top:8px;left:8px;display:flex;gap:4px;flex-wrap:wrap;">'+badge+'</div>'
+            + '</div>'
+            + '<div style="padding:12px 14px;">'
+            + '<div style="font-weight:800;font-size:13px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+m.name+'">'+m.name+'</div>'
+            + '<div style="font-size:10px;color:#94a3b8;margin-bottom:10px;">'+m.category+(m.subcategory?' › '+m.subcategory:'')+'</div>'
+            + '<div style="display:flex;justify-content:space-between;align-items:center;">'
+            + '<span style="font-size:17px;font-weight:900;background:linear-gradient(135deg,#10b981,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">฿'+m.price+'</span>'
+            + '<div style="display:flex;gap:6px;">'
+            + '<button onclick="window.toggleMenuStatus(\''+key.replace(/'/g,"\\'")+'\',' + (soldOut ? '\'หมด\'':'\'ปกติ\'') + ')" title="'+(soldOut?'เปิดขาย':'ปิดขาย')+'" style="width:30px;height:30px;border-radius:8px;border:1.5px solid '+(soldOut?'#10b981':'#ef4444')+';background:'+(soldOut?'rgba(16,185,129,0.08)':'rgba(239,68,68,0.08)')+';cursor:pointer;color:'+(soldOut?'#10b981':'#ef4444')+';font-size:12px;display:flex;align-items:center;justify-content:center;">'+(soldOut?'✓':'✕')+'</button>'
+            + '<button onclick="window.openMenuModal(JSON.parse(decodeURIComponent(\''+encodeURIComponent(JSON.stringify({_key:m._key||m.name,key:m.key||m.name,name:m.name,price:m.price,category:m.category||'',subcategory:m.subcategory||'',badge:m.badge||'',image:m.image||'',status:m.status||'ปกติ',showIn:m.showIn||'both',isCustom:!!m.isCustom,_override:!!m._override,options:m.options||{}}))+'\'  )))" style="width:30px;height:30px;border-radius:8px;border:1.5px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.06);cursor:pointer;color:#6366f1;font-size:12px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-edit"></i></button>'
+            + '</div></div></div></div>';
+    }).join('');
+};
+
+/* ─── Init ─── */
+window.initMenuManager = async function() {
+    var sec = document.getElementById('menu-sec');
+    if (!sec) return;
+    if (!menuManagerInited) {
+        buildMenuSection(sec);
+        menuManagerInited = true;
+    }
+    showToast('กำลังโหลดข้อมูลเมนู...','info');
+    await reloadMenuManagerData();
+    renderFilterTabs();
+    window.renderMenuStats();
+    window.renderMenuCards();
+};
+
+})();
 </script>
 </body>
 </html>

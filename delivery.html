@@ -388,6 +388,42 @@
 
     function startApp() { document.getElementById("display-table").innerText = currentTable; document.getElementById("menu-view").style.display = "block"; document.getElementById("app-header").style.display = "flex"; loadMenu(); }
 
+
+    const FIREBASE_BASE = 'https://withu-da97c-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+    async function mergeCustomMenu(gasMenu, pageType) {
+        try {
+            const res = await fetch(FIREBASE_BASE + '/customMenu.json');
+            const customData = await res.json();
+            if (!customData) return gasMenu;
+            let merged = gasMenu.map(r => {
+                const ov = Object.values(customData).find(c => c.name === r[0]);
+                if (ov) {
+                    if (pageType === 'dine' && ov.showIn === 'delivery') return null;
+                    if (pageType === 'delivery' && ov.showIn === 'dine') return null;
+                    let u = [...r];
+                    if (ov.price !== undefined) u[1] = ov.price;
+                    if (ov.status) u[5] = ov.status;
+                    if (ov.image) u[4] = ov.image;
+                    if (ov.badge !== undefined) u[7] = ov.badge;
+                    if (ov.options) u[8] = ov.options;
+                    return u;
+                }
+                return r;
+            }).filter(r => r !== null);
+            Object.values(customData).forEach(c => {
+                if (c.isCustom) {
+                    if (pageType === 'dine' && c.showIn === 'delivery') return;
+                    if (pageType === 'delivery' && c.showIn === 'dine') return;
+                    if (!merged.find(r => r[0] === c.name)) {
+                        merged.push([c.name, c.price, c.category, c.subcategory||'', c.image||'', c.status||'\u0e1b\u0e01\u0e15\u0e34', '', c.badge||'', c.options||{}]);
+                    }
+                }
+            });
+            return merged;
+        } catch(e) { console.warn('mergeCustomMenu error:', e); return gasMenu; }
+    }
+
     async function loadMenu() { 
         const cachedMenu = localStorage.getItem('withu_cached_menu');
         if(cachedMenu) { 
@@ -395,9 +431,26 @@
             fullMenu = d.menu; 
             toppingsData = d.toppings || []; 
             toppingsData2 = d.toppings2 || []; 
-            renderMenu("ทั้งหมด"); 
+            fullMenu = await mergeCustomMenu(fullMenu, 'delivery');
+            renderMenu("\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14"); 
             if(d.banners) renderBanners(d.banners); 
         }
+        fetch(API_URL + "?action=getMenu").then(r=>r.json()).then(async d=>{
+            if(d.menu) { 
+                localStorage.setItem('withu_cached_menu', JSON.stringify(d)); 
+                fullMenu = d.menu; 
+                toppingsData = d.toppings || []; 
+                toppingsData2 = d.toppings2 || []; 
+                fullMenu = await mergeCustomMenu(fullMenu, 'delivery');
+                renderMenu(currentF); 
+                renderBanners(d.banners); 
+            }
+        });
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'withu_menu_updated') { localStorage.removeItem('withu_cached_menu'); loadMenu(); }
+        });
+    }
+
         fetch(API_URL + "?action=getMenu").then(r=>r.json()).then(d=>{
             if(d.menu) { 
                 localStorage.setItem('withu_cached_menu', JSON.stringify(d)); 
@@ -467,9 +520,20 @@
             
             let isAvail = (r[5] !== "หมด");
             let cat = r[2] || "";
+            // Default category-based options
             let isD = (cat === "เครื่องดื่ม" || cat === "สมูทตี้");
             let isFoodWithTopping = (cat === "เมนูเส้น" || cat === "เมนูข้าว"); 
             let isYumOrSnack = (cat === "เมนูยำ" || cat === "ยำ" || cat === "ของทานเล่น");
+            let showFrappe = (cat === "เครื่องดื่ม");
+            // Per-item option overrides from Firebase (r[8])
+            const _iopts = r[8] && typeof r[8] === 'object' ? r[8] : null;
+            if (_iopts) {
+                if (_iopts.sweetness !== undefined) isD = _iopts.sweetness;
+                if (_iopts.frappe !== undefined) showFrappe = _iopts.frappe;
+                if (_iopts.spiciness !== undefined) { isFoodWithTopping = _iopts.spiciness; if(!_iopts.special) isYumOrSnack = _iopts.spiciness; }
+                if (_iopts.special !== undefined) isYumOrSnack = _iopts.special;
+                if (_iopts.topping !== undefined && !_iopts.topping) { isFoodWithTopping = false; }
+            }
             
             let showTopping = false;
             let toppingLabel = "";
@@ -512,7 +576,7 @@
                     </div>
                 </div>
                 
-                ${cat === "เครื่องดื่ม" ? `
+                ${showFrappe ? `
                 <div class="smoothie-btn ${itemOpt[idx].smoothie?'active':''}" onclick="tS(${idx})">
                     <span>${translate('frappe')}</span><span class="price-add">+฿10</span>
                 </div>` : ''}

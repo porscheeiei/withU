@@ -679,7 +679,7 @@
         
         if(isFood) {
             det.push(currentSpicy[idx]);
-            if(itemOpt[idx].special) { extras += 10; det.push("พิเศษ"); }
+            if(itemOpt[idx].special) { extras += (n === "เฟรนฟราย" ? 20 : 10); det.push("พิเศษ"); }
         }
 
         let currentToppingsList = isD ? toppingsData : (isFoodWithTopping ? toppingsData2 : []);

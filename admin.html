@@ -1428,6 +1428,7 @@ window.showSec = function(n) {
     if (n==='menu' && typeof window.initMenuManager === 'function') setTimeout(function(){window.initMenuManager();},80);
     if (n==='popup' && typeof window.loadPopupAd === 'function') window.loadPopupAd();
     if (n==='banner' && typeof window.loadBanners === 'function') window.loadBanners();
+    if ((n==='orders' || n==='takeaway') && typeof window.forceRefresh === 'function') window.forceRefresh();
     document.querySelectorAll('.tab-btn').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='t-'+n); });
     document.querySelectorAll('.sidebar-item').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='sb-'+n); });
 };
@@ -3149,6 +3150,14 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 safeStyle('sync-status', 'display', 'none');
             }
         }
+
+        window.forceRefresh = function() { 
+            if (window.fullData && window.fullData.orders) {
+                renderOrders(window.fullData.orders);
+            }
+            lastFingerprint = ""; 
+            refresh(); 
+        };
 
         //  แสดงออเดอร์ และระบบแจ้งเตือนออเดอร์ใหม่ฉลาดขึ้น 
         function renderOrders(orders) {

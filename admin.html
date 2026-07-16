@@ -2701,52 +2701,23 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 cssClass = "toast-notify toast-notify-pay";
             }
 
-            // เสียงพูด TTS ภาษาไทย
-            if (speechMsg && window.withuVoiceEnabled !== false && 'speechSynthesis' in window) {
-                function doSpeak() {
-                    window.speechSynthesis.cancel();
-                    const utterance = new SpeechSynthesisUtterance(speechMsg);
-                    utterance.lang = 'th-TH';
-                    utterance.rate = 0.9;
-                    utterance.pitch = 1.1;
-                    
-                    // บังคับเลือกเสียงภาษาไทย
-                    let voices = window.speechSynthesis.getVoices();
-                    if (voices.length === 0 && window.withuAvailableVoices) {
-                        voices = window.withuAvailableVoices;
-                    }
-                    
-                    const thaiVoice = voices.find(v => {
-                        const l = v.lang.toLowerCase();
-                        const n = v.name.toLowerCase();
-                        return l.includes('th-th') || l === 'th' || n.includes('thai') || n.includes('ไทย') || n.includes('pattara');
-                    });
-                    
-                    if (thaiVoice) {
-                        utterance.voice = thaiVoice;
-                    }
-                    
-                    window.speechSynthesis.speak(utterance);
-                }
-
-                if (window.speechSynthesis.getVoices().length === 0) {
-                    let fired = false;
-                    const onvc = function() {
-                        if (!fired) {
-                            fired = true;
-                            doSpeak();
+            // เสียงพูด TTS ภาษาไทย (ใช้ Google Translate TTS เพื่อรับประกันเสียงภาษาไทย 100%)
+            if (speechMsg && window.withuVoiceEnabled !== false) {
+                try {
+                    const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=th&q=${encodeURIComponent(speechMsg)}`;
+                    const audio = new Audio(url);
+                    audio.play().catch(e => {
+                        console.warn("Google TTS failed, falling back to browser TTS", e);
+                        // ถ้า Google TTS เล่นไม่ได้ ค่อยกลับไปใช้ของเบราว์เซอร์
+                        if ('speechSynthesis' in window) {
+                            window.speechSynthesis.cancel();
+                            const utterance = new SpeechSynthesisUtterance(speechMsg);
+                            utterance.lang = 'th-TH';
+                            window.speechSynthesis.speak(utterance);
                         }
-                        window.speechSynthesis.removeEventListener('voiceschanged', onvc);
-                    };
-                    window.speechSynthesis.addEventListener('voiceschanged', onvc);
-                    setTimeout(() => { 
-                        if(!fired) { 
-                            fired = true; 
-                            doSpeak(); 
-                        } 
-                    }, 1000);
-                } else {
-                    doSpeak();
+                    });
+                } catch(err) {
+                    console.error("TTS Error:", err);
                 }
             }
 

@@ -1135,6 +1135,77 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // === QRCODE BUTTON IN SIDEBAR ===
+    if (!document.getElementById('sb-qrcode')) {
+        var historyBtnNode = document.getElementById('sb-history');
+        if (historyBtnNode) {
+            var qrcodeBtn = document.createElement('button');
+            qrcodeBtn.className = 'sidebar-item';
+            qrcodeBtn.id = 'sb-qrcode';
+            qrcodeBtn.innerHTML = '<i class="fas fa-qrcode" style="margin-right:10px; font-size:15px; width:20px; text-align:center;"><\/i>QR Code โต๊ะ';
+            qrcodeBtn.onclick = function() { window.showSec('qrcode'); toggleSidebar(); };
+            historyBtnNode.parentNode.insertBefore(qrcodeBtn, historyBtnNode.nextSibling);
+        }
+    }
+
+    // === QRCODE SECTION ===
+    if (!document.getElementById('qrcode-sec')) {
+        var orderSecRef = document.getElementById('order-sec');
+        if (orderSecRef) {
+            var qrcodeDiv = document.createElement('div');
+            qrcodeDiv.id = 'qrcode-sec';
+            qrcodeDiv.style.cssText = 'display:none; padding:24px; max-width:1000px; margin:0 auto;';
+            qrcodeDiv.innerHTML = '<h2 style="margin-bottom:28px;font-size:26px;font-weight:800;letter-spacing:-.6px;"><i class="fas fa-qrcode" style="color:#6366f1; margin-right:10px;"><\/i> ระบบสร้าง QR Code โต๊ะอัตโนมัติ<\/h2>' +
+            '<div class="ai-card" style="margin-bottom:20px;">' +
+            '<label style="font-weight:700; display:block; margin-bottom:8px; font-size:14px;">จำนวนโต๊ะที่มีในร้าน<\/label>' +
+            '<div style="display:flex; gap:10px;">' +
+            '<input type="number" id="qr-table-count" value="15" min="1" max="100" style="width:150px; font-size:16px; font-weight:700; text-align:center;">' +
+            '<button onclick="generateTableQRCodes()" class="btn-black" style="background:linear-gradient(135deg, #6366f1, #8b5cf6); padding:12px 24px; width:auto;"><i class="fas fa-magic" style="margin-right:8px;"><\/i> สร้าง QR Code<\/button>' +
+            '<button onclick="printTableQRCodes()" class="btn-outline" style="padding:12px 24px; font-size:14px;"><i class="fas fa-print" style="margin-right:8px;"><\/i> พิมพ์<\/button>' +
+            '<\/div>' +
+            '<\/div>' +
+            '<div id="qr-preview-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:20px; margin-top:20px;"><\/div>';
+            orderSecRef.parentNode.appendChild(qrcodeDiv);
+        }
+    }
+
+window.generateTableQRCodes = function() {
+    var count = parseInt(document.getElementById('qr-table-count').value) || 15;
+    var grid = document.getElementById('qr-preview-grid');
+    grid.innerHTML = '';
+    var baseUrl = 'https://porscheeiei.github.io/withU/?table=';
+    
+    for(var i=1; i<=count; i++) {
+        var url = encodeURIComponent(baseUrl + i);
+        var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + url;
+        
+        var card = document.createElement('div');
+        card.style.cssText = 'background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; box-shadow:var(--shadow); break-inside: avoid;';
+        card.innerHTML = '<div style="font-weight:900; font-size:20px; margin-bottom:10px; color:#000;">โต๊ะ ' + i + '<\/div>' +
+        '<img src="' + qrUrl + '" style="width:100%; height:auto; border-radius:8px;">';
+        grid.appendChild(card);
+    }
+};
+
+window.printTableQRCodes = function() {
+    var grid = document.getElementById('qr-preview-grid');
+    if(!grid.innerHTML.trim()) {
+        if(typeof showToast==='function') showToast('กรุณาสร้าง QR Code ก่อนพิมพ์', 'error');
+        return;
+    }
+    
+    var printWin = window.open('', '_blank');
+    printWin.document.write('<html><head><title>พิมพ์ QR Code โต๊ะ<\/title><style>');
+    printWin.document.write('body { font-family: "Prompt", "Inter", sans-serif; text-align: center; background: #f9fafb; margin: 0; padding: 20px; }');
+    printWin.document.write('.qr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }');
+    printWin.document.write('@media print { body { background: #fff; padding: 0; } .no-print { display: none; } .qr-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }');
+    printWin.document.write('<\/style><\/head><body>');
+    printWin.document.write('<div class="no-print" style="margin-bottom:20px;"><button onclick="window.print()" style="padding:12px 24px; font-size:16px; font-weight:bold; cursor:pointer; background:#000; color:#fff; border:none; border-radius:8px;">พิมพ์ QR Code (Print)<\/button><\/div>');
+    printWin.document.write('<div class="qr-grid">' + grid.innerHTML + '<\/div>');
+    printWin.document.write('<\/body><\/html>');
+    printWin.document.close();
+};
+
     // === MENU MANAGER SECTION ===
     if (!document.getElementById('menu-sec')) {
         var menuSecDiv = document.createElement('div');

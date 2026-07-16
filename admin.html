@@ -2703,13 +2703,21 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
 
             // เสียงพูด TTS ภาษาไทย (ใช้ Google Translate TTS แบบ 100%)
             if (speechMsg && window.withuVoiceEnabled !== false) {
-                try {
-                    const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=th&q=${encodeURIComponent(speechMsg)}`;
-                    const audio = new Audio(url);
-                    audio.play().catch(e => console.warn("Google TTS failed", e));
-                } catch(err) {
-                    console.error("TTS Error:", err);
+                const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=th&q=${encodeURIComponent(speechMsg)}`;
+                
+                let ttsAudio = document.getElementById('tts-audio');
+                if (!ttsAudio) {
+                    ttsAudio = document.createElement('audio');
+                    ttsAudio.id = 'tts-audio';
+                    document.body.appendChild(ttsAudio);
                 }
+                
+                ttsAudio.src = url;
+                ttsAudio.play().catch(e => {
+                    console.warn("TTS Audio Error:", e);
+                    // ปริ้น Error ขึ้นจอให้เห็นเลยว่าติดอะไร
+                    if (notifyEl) notifyEl.innerText += ` [Audio Error: ${e.name}]`;
+                });
             }
 
             notifyEl.innerText = msg;

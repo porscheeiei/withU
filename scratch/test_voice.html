@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Debugger</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #111; color: white; }
+        button { padding: 15px; margin: 10px; font-size: 16px; cursor: pointer; border-radius: 8px; border: none; }
+        .btn-1 { background: #3b82f6; color: white; }
+        .btn-2 { background: #10b981; color: white; }
+        .btn-3 { background: #f59e0b; color: white; }
+        .btn-4 { background: #ef4444; color: white; }
+        #log { margin-top: 20px; padding: 10px; background: #222; border-radius: 8px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h2>WITHU Voice Debugger</h2>
+    <p>รบกวนกดปุ่มด้านล่างทีละปุ่ม เพื่อดูว่าปุ่มไหนสามารถพูดภาษาไทยได้ครับ</p>
+    
+    <button class="btn-1" onclick="testBrowserDefault()">1. ทดสอบเบราว์เซอร์ (ค่าเริ่มต้น)</button><br>
+    <button class="btn-2" onclick="testBrowserForce()">2. ทดสอบเบราว์เซอร์ (บังคับเสียง)</button><br>
+    <button class="btn-3" onclick="testGoogleGTX()">3. ทดสอบ Google (GTX API)</button><br>
+    <button class="btn-4" onclick="testGoogleTW()">4. ทดสอบ Google (TW API)</button><br>
+
+    <div id="log">Logs:<br></div>
+
+    <script>
+        function log(msg) {
+            document.getElementById('log').innerHTML += msg + '<br>';
+            console.log(msg);
+        }
+        
+        const testText = "โต๊ะ 12 สั่ง ตำไทย 1 ที่ ค่ะ";
+
+        function testBrowserDefault() {
+            log("--- Test 1: Browser Default (lang='th-TH') ---");
+            if (!window.speechSynthesis) return log("No speechSynthesis");
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(testText);
+            u.lang = 'th-TH';
+            window.speechSynthesis.speak(u);
+            log("Speaking...");
+        }
+
+        function testBrowserForce() {
+            log("--- Test 2: Browser Force Voice ---");
+            if (!window.speechSynthesis) return log("No speechSynthesis");
+            window.speechSynthesis.cancel();
+            const voices = window.speechSynthesis.getVoices();
+            log("Available voices: " + voices.length);
+            const thaiVoice = voices.find(v => v.lang.toLowerCase().includes('th') || v.name.toLowerCase().includes('thai') || v.name.includes('ไทย'));
+            
+            const u = new SpeechSynthesisUtterance(testText);
+            u.lang = 'th-TH';
+            if (thaiVoice) {
+                log("Found Thai Voice: " + thaiVoice.name);
+                u.voice = thaiVoice;
+            } else {
+                log("❌ Thai voice NOT FOUND in system.");
+            }
+            window.speechSynthesis.speak(u);
+            log("Speaking...");
+        }
+
+        function testGoogleGTX() {
+            log("--- Test 3: Google GTX API ---");
+            try {
+                const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=th&q=${encodeURIComponent(testText)}`;
+                const audio = new Audio(url);
+                audio.onplay = () => log("Audio playing...");
+                audio.onerror = (e) => log("❌ Audio Error: " + (e.target.error ? e.target.error.code : 'Unknown'));
+                audio.play().catch(e => log("❌ Play catch error: " + e.message));
+            } catch(e) {
+                log("❌ Try-catch error: " + e.message);
+            }
+        }
+
+        function testGoogleTW() {
+            log("--- Test 4: Google TW API ---");
+            try {
+                const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=th&q=${encodeURIComponent(testText)}`;
+                const audio = new Audio(url);
+                audio.onplay = () => log("Audio playing...");
+                audio.onerror = (e) => log("❌ Audio Error: " + (e.target.error ? e.target.error.code : 'Unknown'));
+                audio.play().catch(e => log("❌ Play catch error: " + e.message));
+            } catch(e) {
+                log("❌ Try-catch error: " + e.message);
+            }
+        }
+        
+        // preload
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+        }
+    </script>
+</body>
+</html>

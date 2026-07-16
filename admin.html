@@ -2704,7 +2704,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             // เสียงพูด TTS ภาษาไทย (ใช้ Google Translate TTS เพื่อรับประกันเสียงภาษาไทย 100%)
             if (speechMsg && window.withuVoiceEnabled !== false) {
                 try {
-                    const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=th&q=${encodeURIComponent(speechMsg)}`;
+                    const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=th&q=${encodeURIComponent(speechMsg)}`;
                     const audio = new Audio(url);
                     audio.play().catch(e => {
                         console.warn("Google TTS failed, falling back to browser TTS", e);

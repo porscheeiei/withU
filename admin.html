@@ -2699,6 +2699,14 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 utterance.lang = 'th-TH';
                 utterance.rate = 0.9;
                 utterance.pitch = 1.1;
+                
+                // บังคับเลือกเสียงภาษาไทยที่มีอยู่ในเครื่อง
+                const voices = window.speechSynthesis.getVoices();
+                const thaiVoice = voices.find(v => v.lang === 'th-TH' || v.lang === 'th_TH' || v.lang.includes('th'));
+                if (thaiVoice) {
+                    utterance.voice = thaiVoice;
+                }
+
                 window.speechSynthesis.speak(utterance);
             }
 

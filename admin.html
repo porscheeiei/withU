@@ -2814,6 +2814,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
         <div class="action-btns" style="display: flex; gap: 8px; align-items: center;">
             <div id="date-now" style="margin-right: 15px; font-weight: 700; color: var(--text-muted); font-size: 14px;"></div>
             <button id="btn-sound" onclick="toggleSound()" class="tab-btn" style="border: 1px solid var(--border); color: #3b82f6;"><i class="fas fa-volume-up"></i></button>
+            <button onclick="triggerNotify('new', '99', [{menu:'ส้มตำ', qty:1, status:'รับออเดอร์'}, {menu:'ไก่ย่าง', qty:1, status:'รับออเดอร์'}])" class="tab-btn" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; font-weight: bold; border-radius: 8px;">🔊 ลองเสียง AI</button>
             <button class="tab-btn" onclick="openManualOrderModal(null)" id="btn-add-nav" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none;">ADD ORDER</button>
         </div>
     </nav>

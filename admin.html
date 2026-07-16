@@ -2527,6 +2527,8 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
 .sc-compare .sc-label { color: #94A3B8 !important; font-weight: 500 !important; }
 </style>
 
+<!-- ResponsiveVoice TTS API for guaranteed Thai voice fallback -->
+<script src="https://code.responsivevoice.org/responsivevoice.js"></script>
 </head>
 <body>
     <script>
@@ -2702,21 +2704,12 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             }
 
             // เสียงพูด TTS ภาษาไทย (ใช้ Google Translate TTS แบบ 100%)
+            // เสียงพูด TTS ภาษาไทย (ใช้ ResponsiveVoice API เพื่อรับประกันเสียงภาษาไทย 100%)
             if (speechMsg && window.withuVoiceEnabled !== false) {
-                try {
-                    const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=th&q=${encodeURIComponent(speechMsg)}`;
-                    const audio = new Audio(url);
-                    audio.onplay = () => console.log("Playing Google TTS");
-                    audio.onerror = (e) => {
-                        console.error("Audio Error Code:", e.target.error ? e.target.error.code : 'Unknown');
-                        if (notifyEl) notifyEl.innerText += " [Audio Load Error]";
-                    };
-                    audio.play().catch(e => {
-                        console.warn("TTS Play Error:", e);
-                        if (notifyEl) notifyEl.innerText += ` [Play Error: ${e.message}]`;
-                    });
-                } catch(err) {
-                    console.error("TTS Fatal Error:", err);
+                if (window.responsiveVoice) {
+                    window.responsiveVoice.speak(speechMsg, "Thai Female", {rate: 0.9, pitch: 1.1});
+                } else {
+                    console.warn("ResponsiveVoice not loaded yet.");
                 }
             }
 

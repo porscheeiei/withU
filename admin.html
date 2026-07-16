@@ -2701,21 +2701,12 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 cssClass = "toast-notify toast-notify-pay";
             }
 
-            // เสียงพูด TTS ภาษาไทย (ใช้ Google Translate TTS เพื่อรับประกันเสียงภาษาไทย 100%)
+            // เสียงพูด TTS ภาษาไทย (ใช้ Google Translate TTS แบบ 100%)
             if (speechMsg && window.withuVoiceEnabled !== false) {
                 try {
                     const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=th&q=${encodeURIComponent(speechMsg)}`;
                     const audio = new Audio(url);
-                    audio.play().catch(e => {
-                        console.warn("Google TTS failed, falling back to browser TTS", e);
-                        // ถ้า Google TTS เล่นไม่ได้ ค่อยกลับไปใช้ของเบราว์เซอร์
-                        if ('speechSynthesis' in window) {
-                            window.speechSynthesis.cancel();
-                            const utterance = new SpeechSynthesisUtterance(speechMsg);
-                            utterance.lang = 'th-TH';
-                            window.speechSynthesis.speak(utterance);
-                        }
-                    });
+                    audio.play().catch(e => console.warn("Google TTS failed", e));
                 } catch(err) {
                     console.error("TTS Error:", err);
                 }
@@ -2725,7 +2716,10 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             notifyEl.className = cssClass;
             notifyEl.style.display = 'block';
 
-            startLoopingSound(type); // สั่งเสียง Loop ทำงานทันที
+            // หน่วงเวลาเสียงกระดิ่งเล็กน้อย เพื่อไม่ให้แย่งกันดังกับเสียงคนพูด
+            setTimeout(() => {
+                startLoopingSound(type); 
+            }, 500);
         }
 
         //  ฟังก์ชันกดคลิกที่แถบแจ้งเตือน เพื่อล้างข้อความและหยุดเสียง 

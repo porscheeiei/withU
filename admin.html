@@ -2659,9 +2659,17 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
 
             let itemsSummary = "";
             if (items && items.length > 0) {
-                let newItems = items.filter(i => i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
+                // กรองเอาเฉพาะอันที่เพิ่งสั่ง (ถ้า status ว่าง ถือว่าเป็น รับออเดอร์)
+                let newItems = items.filter(i => {
+                    let s = (i.status || "รับออเดอร์").toUpperCase();
+                    return s === "รับออเดอร์" || s === "ACTIVE" || s === "PENDING" || s === "NEW";
+                });
+                
+                // ถ้ากรองแล้วไม่เจอเลย (อาจจะเผลอเปลี่ยนสถานะไปแล้ว) ให้เอาอันล่าสุดมาอ่าน
+                if (newItems.length === 0) newItems = items;
+
                 let topItems = newItems.slice(0, 3);
-                let itemTexts = topItems.map(i => `${i.menu} ${i.qty} ที่`);
+                let itemTexts = topItems.map(i => `${i.menu || 'ไม่ระบุ'} ${i.qty || 1} ที่`);
                 itemsSummary = itemTexts.join(" และ ");
                 if (newItems.length > 3) itemsSummary += " และอื่นๆ";
             }

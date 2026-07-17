@@ -3306,12 +3306,14 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 }
             }
 
+            let activeDeliveryTables = [];
             const genCards = (isStore) => {
                 let html = "";
                 Object.keys(groups).filter(t => {
                     const isDeliv = ["LINE", "GRAB", "LINEMAN", "TAKEAWAY"].includes(String(t).toUpperCase().trim());
                     return isStore ? !isDeliv : isDeliv;
                 }).forEach(tableId => {
+                    if (String(tableId).startsWith('ORD-')) activeDeliveryTables.push(tableId);
                     const wait = getTimeDiff(groups[tableId].time);
                     const status = lastActionMap[tableId] || groups[tableId].items[0].status || "รับออเดอร์";
                     
@@ -3406,34 +3408,14 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                         </div>
                         <div class="card-body">
                             ${(function(){
-                                let deliveryItem = groups[tableId].items.find(i => i.delivery || (i.details && i.details.includes('[DELIVERY_DATA]')));
+                                let deliveryItem = groups[tableId].items.find(i => i.details && i.details.includes('[DELIVERY_DATA]'));
                                 if (deliveryItem) {
-                                    let rawDelivery = deliveryItem.delivery || "";
-                                    let rawSlip = deliveryItem.slipImage || "";
-                                    
-                                    // Parse packed data if backend hasn't been updated
-                                    if (deliveryItem.details && deliveryItem.details.includes('[DELIVERY_DATA]')) {
-                                        let raw = deliveryItem.details;
-                                        rawDelivery = raw.split('[DELIVERY_DATA]')[1].split('[SLIP_DATA]')[0];
-                                        rawSlip = raw.includes('[SLIP_DATA]') ? raw.split('[SLIP_DATA]')[1] : "";
-                                        
-                                        // Clean the details string so it doesn't show garbage on the UI
-                                        deliveryItem.details = raw.split('[DELIVERY_DATA]')[0].trim();
-                                    }
-
-                                    if (rawDelivery) {
-                                        let dText = rawDelivery.replace(/\|/g, '<br>');
-                                        let slipBtn = rawSlip ? `<button onclick="openSlipModal('${rawSlip}')" style="margin-top:8px; background:var(--primary); color:white; border:none; padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer;">ดูสลิปโอนเงิน</button>` : "";
-                                        return `
-                                        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:12px; font-size:13px; color:#475569; line-height:1.5;">
-                                            <strong style="color:var(--primary); display:block; margin-bottom:4px;">🚚 ข้อมูลการจัดส่ง / ชำระเงิน</strong>
-                                            ${dText}
-                                            <br>${slipBtn}
-                                        </div>`;
-                                    }
+                                    // ซ่อนข้อมูลลับจากออเดอร์เก่าๆ ที่ยังค้างอยู่
+                                    deliveryItem.details = deliveryItem.details.split('[DELIVERY_DATA]')[0].trim();
                                 }
                                 return "";
                             })()}
+                            <div id="delivery-block-${tableId}"></div>
                             <div style="flex-grow:1;">
                                 ${groups[tableId].items.map(i => {
                                     if(i.qty > 10) globalMistakeDetected = true;
@@ -3518,6 +3500,11 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             
             if(store) store.innerHTML = genCards(true);
             if(takeaway) takeaway.innerHTML = genCards(false);
+            
+            // สั่งดึงข้อมูลจัดส่งจาก Firebase ของออเดอร์เดลิเวอรี่ทั้งหมดบนหน้าจอ
+            activeDeliveryTables.forEach(t => {
+                if (typeof loadFirebaseDelivery === 'function') loadFirebaseDelivery(t, groups[t]);
+            });
             
             safeStyle('mistake-log', 'display', globalMistakeDetected ? 'block' : 'none');
 
@@ -5611,10 +5598,10 @@ document.head.appendChild(style);
 </div><!-- /app-main -->
 
 <!-- Slip Modal -->
-<div id="slip-modal" class="modal" style="z-index: 100000;">
-    <div class="modal-content" style="max-width: 400px; padding: 20px; text-align: center;">
-        <h2 style="font-size: 20px; margin-bottom: 15px;">สลิปโอนเงิน</h2>
-        <img id="slip-image-view" src="" style="max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+<div id="slip-modal" class="modal-overlay" style="display:none; z-index: 100000; position:fixed; inset:0; background:rgba(15,23,42,0.7); backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:16px;">
+    <div class="modal-card" style="background:#fff; border-radius:24px; max-width:400px; width:100%; padding:20px; text-align:center; box-shadow:0 32px 80px rgba(0,0,0,0.3);">
+        <h2 style="font-size: 20px; margin-bottom: 15px; font-weight:800;">สลิปโอนเงิน</h2>
+        <img id="slip-image-view" src="" style="max-width: 100%; max-height:60vh; object-fit:contain; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
         <button class="btn-black" onclick="closeSlipModal()" style="width: 100%;">ปิดหน้าต่าง</button>
     </div>
 </div>
@@ -5626,6 +5613,62 @@ document.head.appendChild(style);
     function closeSlipModal() {
         document.getElementById('slip-modal').style.display = 'none';
         document.getElementById('slip-image-view').src = "";
+    }
+
+    // ==========================================
+    // Async Firebase Fetch for Delivery Orders
+    // ==========================================
+    window.deliveryDataCache = window.deliveryDataCache || {};
+
+    async function loadFirebaseDelivery(tableId, groupData) {
+        let el = document.getElementById(`delivery-block-${tableId}`);
+        if (!el) return;
+        
+        // 1. Fallback for legacy orders packed in details
+        let legacyItem = groupData.items.find(i => i.details && i.details.includes('[DELIVERY_DATA]'));
+        if (legacyItem) {
+            let raw = legacyItem.details;
+            let dInfo = raw.split('[DELIVERY_DATA]')[1].split('[SLIP_DATA]')[0];
+            let dSlip = raw.includes('[SLIP_DATA]') ? raw.split('[SLIP_DATA]')[1] : "";
+            window.deliveryDataCache[tableId] = { info: dInfo, slip: dSlip };
+        }
+        
+        // 2. Render from cache immediately if exists
+        if (window.deliveryDataCache[tableId]) {
+            if (!window.deliveryDataCache[tableId].empty) renderDeliveryBlock(tableId, window.deliveryDataCache[tableId]);
+            return;
+        }
+
+        if(el.innerHTML === "") el.innerHTML = `<span style="font-size:11px; color:#94a3b8; display:block; margin-bottom:8px;">กำลังโหลดข้อมูลจัดส่ง... <i class="fas fa-spinner fa-spin"></i></span>`;
+        
+        // 3. Fetch from Firebase
+        try {
+            let res = await fetch(`https://withu-da97c-default-rtdb.asia-southeast1.firebasedatabase.app/slips/${tableId}.json`);
+            let data = await res.json();
+            if (data && data.info) {
+                window.deliveryDataCache[tableId] = data;
+                renderDeliveryBlock(tableId, data);
+            } else {
+                window.deliveryDataCache[tableId] = { empty: true };
+                if (el) el.innerHTML = "";
+            }
+        } catch(e) {
+            console.warn("Firebase delivery load failed", e);
+            if (el) el.innerHTML = "";
+        }
+    }
+
+    function renderDeliveryBlock(tableId, data) {
+        let el = document.getElementById(`delivery-block-${tableId}`);
+        if (!el || data.empty) return;
+        let dText = data.info.replace(/\|/g, '<br>');
+        let slipBtn = data.slip ? `<button onclick="openSlipModal('${data.slip}')" style="margin-top:8px; background:var(--primary); color:white; border:none; padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer;">ดูสลิปโอนเงิน</button>` : "";
+        el.innerHTML = `
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:12px; font-size:13px; color:#475569; line-height:1.5;">
+            <strong style="color:var(--primary); display:block; margin-bottom:4px;">🚚 ข้อมูลการจัดส่ง / ชำระเงิน</strong>
+            ${dText}
+            <br>${slipBtn}
+        </div>`;
     }
 </script>
 

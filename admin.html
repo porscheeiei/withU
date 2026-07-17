@@ -3405,6 +3405,35 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                             </div>
                         </div>
                         <div class="card-body">
+                            ${(function(){
+                                let deliveryItem = groups[tableId].items.find(i => i.delivery || (i.details && i.details.includes('[DELIVERY_DATA]')));
+                                if (deliveryItem) {
+                                    let rawDelivery = deliveryItem.delivery || "";
+                                    let rawSlip = deliveryItem.slipImage || "";
+                                    
+                                    // Parse packed data if backend hasn't been updated
+                                    if (deliveryItem.details && deliveryItem.details.includes('[DELIVERY_DATA]')) {
+                                        let raw = deliveryItem.details;
+                                        rawDelivery = raw.split('[DELIVERY_DATA]')[1].split('[SLIP_DATA]')[0];
+                                        rawSlip = raw.includes('[SLIP_DATA]') ? raw.split('[SLIP_DATA]')[1] : "";
+                                        
+                                        // Clean the details string so it doesn't show garbage on the UI
+                                        deliveryItem.details = raw.split('[DELIVERY_DATA]')[0].trim();
+                                    }
+
+                                    if (rawDelivery) {
+                                        let dText = rawDelivery.replace(/\|/g, '<br>');
+                                        let slipBtn = rawSlip ? `<button onclick="openSlipModal('${rawSlip}')" style="margin-top:8px; background:var(--primary); color:white; border:none; padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer;">ดูสลิปโอนเงิน</button>` : "";
+                                        return `
+                                        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:12px; font-size:13px; color:#475569; line-height:1.5;">
+                                            <strong style="color:var(--primary); display:block; margin-bottom:4px;">🚚 ข้อมูลการจัดส่ง / ชำระเงิน</strong>
+                                            ${dText}
+                                            <br>${slipBtn}
+                                        </div>`;
+                                    }
+                                }
+                                return "";
+                            })()}
                             <div style="flex-grow:1;">
                                 ${groups[tableId].items.map(i => {
                                     if(i.qty > 10) globalMistakeDetected = true;
@@ -5580,5 +5609,25 @@ style.textContent = `
 document.head.appendChild(style);
 </script>
 </div><!-- /app-main -->
+
+<!-- Slip Modal -->
+<div id="slip-modal" class="modal" style="z-index: 100000;">
+    <div class="modal-content" style="max-width: 400px; padding: 20px; text-align: center;">
+        <h2 style="font-size: 20px; margin-bottom: 15px;">สลิปโอนเงิน</h2>
+        <img id="slip-image-view" src="" style="max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+        <button class="btn-black" onclick="closeSlipModal()" style="width: 100%;">ปิดหน้าต่าง</button>
+    </div>
+</div>
+<script>
+    function openSlipModal(imgData) {
+        document.getElementById('slip-image-view').src = imgData;
+        document.getElementById('slip-modal').style.display = 'flex';
+    }
+    function closeSlipModal() {
+        document.getElementById('slip-modal').style.display = 'none';
+        document.getElementById('slip-image-view').src = "";
+    }
+</script>
+
 </body>
 </html>

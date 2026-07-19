@@ -995,6 +995,14 @@ input:focus, select:focus { outline: none !important; border-color: #3b82f6 !imp
 
 /* --- REPORT SECTIONS --- */
 #settings-sec h2, #report-sec h2, #points-sec h2 { font-size: 24px !important; font-weight: 900 !important; }
+
+/* --- MOBILE LAYOUT FIX --- */
+@media (max-width: 768px) {
+    .top-nav { padding: 12px 14px !important; }
+    .top-nav > div:first-child { flex-wrap: wrap; justify-content: flex-start; max-width: 100%; }
+    .top-nav > div:first-child > div { flex-wrap: wrap; gap: 8px !important; }
+    .hamburger-btn { margin-right: 8px !important; }
+}
 </style>
 
 <script id="withu-v3-system">

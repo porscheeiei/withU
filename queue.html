@@ -3,177 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WITHU | Queue Display</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>WITHU | Premium Queue Display</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-light: #f8fafc; /* Very light slate */
-            --bg-white: #ffffff;
-            --ready-header: #0ea5e9; /* Sky blue 500 */
-            --ready-card: #ffffff;
-            --ready-text: #0f172a;
-            --ready-icon: #0ea5e9;
+        :root { 
+            --bg: #FAFAFA;
+            --surface: #FFFFFF;
+            --primary: #111111;
+            --secondary: #666666;
+            --border: #ECECEC;
+            --gold: #C9A86A;
+            --success: #16A34A;
+            --gray-light: #F9F9F9;
             
-            --prep-header: #64748b; /* Slate 500 */
-            --prep-card: #f1f5f9; /* Slate 100 */
-            --prep-text: #334155;
-            --prep-icon: #94a3b8;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+            --radius-xl: 28px;
+            --radius-pill: 100px;
             
-            --border-light: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.03);
+            --shadow-float: 0 24px 48px rgba(0, 0, 0, 0.08);
+            
+            --font-head: 'Plus Jakarta Sans', 'Prompt', sans-serif;
+            --font-body: 'Inter', 'Prompt', sans-serif;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Prompt', 'Inter', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--primary); font-family: var(--font-body); height: 100vh; overflow: hidden; display: flex; letter-spacing: -0.01em; }
 
-        body {
-            background-color: var(--bg-light);
-            color: #0f172a;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-        }
-
-        /* --- Left Side: Queue --- */
-        .queue-side {
-            width: 60%;
+        /* --- Left Side: Kanban Board --- */
+        .kanban-board {
+            width: 70%;
             height: 100%;
             display: flex;
-            flex-direction: column;
-            background-color: var(--bg-white);
-            border-right: 1px solid var(--border-light);
+            padding: 24px;
+            gap: 24px;
+            background: var(--bg);
         }
 
-        .section-header {
-            padding: 15px 30px;
-            font-size: 24px;
-            font-weight: 700;
+        .kanban-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .column-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: #ffffff;
+            background: var(--surface);
+            z-index: 10;
         }
 
-        .count-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 4px 16px;
-            border-radius: 20px;
-            font-size: 20px;
+        .column-title {
+            font-family: var(--font-head);
+            font-size: 24px;
             font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .queue-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 20px 30px;
+        .badge-count {
+            background: var(--gray-light);
+            color: var(--secondary);
+            padding: 6px 16px;
+            border-radius: var(--radius-pill);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .column-content {
+            padding: 24px;
             overflow-y: auto;
             flex-grow: 1;
-            align-content: flex-start;
-        }
-
-        .queue-grid::-webkit-scrollbar { display: none; }
-
-        /* Ready Section */
-        .ready-wrapper {
-            flex: 0 0 50%;
             display: flex;
             flex-direction: column;
-            border-bottom: 1px solid var(--border-light);
-            background: #f0f9ff; /* Very light blue */
-        }
-
-        .ready-wrapper .section-header {
-            background: var(--ready-header);
-        }
-
-        .card-ready {
-            background: var(--ready-card);
-            border-radius: 12px;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid rgba(14, 165, 233, 0.2);
-            animation: slideIn 0.4s ease-out;
-        }
-
-        .card-icon {
-            font-size: 24px;
-            background: #f1f5f9;
-            width: 48px; height: 48px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
+            gap: 20px;
+            background: var(--gray-light);
         }
         
-        .card-ready .card-icon {
-            background: #e0f2fe;
-            color: var(--ready-icon);
+        .column-content::-webkit-scrollbar { display: none; }
+
+        /* --- Bill Card Design --- */
+        .bill-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border);
+            animation: slideUp 0.4s ease-out;
+            transition: all 0.3s;
         }
 
-        .card-number {
-            font-size: 38px;
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: -1px;
-            color: var(--ready-text);
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Prep Section */
-        .prep-wrapper {
-            flex: 0 0 50%;
+        .bill-header {
             display: flex;
-            flex-direction: column;
-            background: var(--bg-white);
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed var(--border);
         }
 
-        .prep-wrapper .section-header {
-            background: var(--prep-header);
-        }
-
-        .card-prep {
-            background: var(--prep-card);
-            border-radius: 12px;
-            padding: 15px 20px;
+        .table-pill {
+            background: var(--primary);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: var(--radius-pill);
+            font-family: var(--font-head);
+            font-size: 18px;
+            font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 15px;
-            border: 1px solid var(--border-light);
+            gap: 8px;
         }
 
-        .card-prep .card-number {
-            font-size: 32px;
-            color: var(--prep-text);
+        .table-pill.ready {
+            background: var(--success);
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
         }
 
-        /* --- Right Side: Banners --- */
+        .item-count {
+            font-size: 14px;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .bill-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bill-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .item-qty {
+            background: var(--gray-light);
+            padding: 4px 10px;
+            border-radius: 8px;
+            color: var(--primary);
+            font-weight: 800;
+            min-width: 38px;
+            text-align: center;
+        }
+
+        .item-details {
+            flex-grow: 1;
+        }
+
+        .item-name {
+            color: var(--primary);
+        }
+
+        .item-note {
+            display: block;
+            font-size: 13px;
+            color: var(--secondary);
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        .item-status-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #fef3c7;
+            color: #b45309;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+
+        .item-status-tag.done {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* --- Right Side: Media --- */
         .media-side {
-            width: 40%;
+            width: 30%;
             height: 100%;
-            background: #fff;
-            position: relative;
-            padding: 20px;
+            padding: 24px 24px 24px 0;
             display: flex;
             flex-direction: column;
         }
 
-        /* Banner Carousel */
         .banner-container { 
             width: 100%; 
             flex-grow: 1;
             position: relative; 
-            border-radius: 24px; 
+            border-radius: var(--radius-xl); 
             overflow: hidden; 
-            box-shadow: var(--shadow-lg); 
-            background: #f1f5f9; 
+            box-shadow: var(--shadow-float); 
+            background: var(--surface); 
         }
         
         .banner-wrapper { 
@@ -209,83 +243,73 @@
             width: 8px; 
             height: 8px; 
             border-radius: 50%; 
-            background: rgba(255,255,255,0.5); 
-            transition: 0.3s ease; 
+            background: rgba(255,255,255,0.4); 
+            transition: var(--transition); 
         }
         
         .banner-dot.active { 
             background: #ffffff; 
             width: 24px; 
             border-radius: 4px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* Brand Footer on Media Side */
         .brand-footer {
-            margin-top: 20px;
+            margin-top: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            padding: 15px;
-            background: var(--bg-light);
-            border-radius: 16px;
+            gap: 12px;
+            padding: 16px;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-soft);
         }
 
-        .brand-footer img {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+        .brand-footer img { width: 36px; height: 36px; border-radius: 10px; }
+        .brand-footer h2 { font-family: var(--font-head); font-size: 18px; font-weight: 800; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .brand-footer h2 {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--prep-text);
-            letter-spacing: 1px;
-        }
-
-        /* Animations */
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .blink {
-            animation: blinkAnim 1.5s infinite;
-        }
-
+        .blink { animation: blinkAnim 1.5s infinite; }
         @keyframes blinkAnim {
-            0%, 100% { background: var(--ready-card); box-shadow: var(--shadow-md); }
-            50% { background: #bae6fd; box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); transform: scale(1.02); }
+            0%, 100% { transform: scale(1); box-shadow: var(--shadow-soft); border-color: var(--border); }
+            50% { transform: scale(1.02); box-shadow: 0 12px 30px rgba(22, 163, 74, 0.2); border-color: var(--success); }
         }
 
     </style>
 </head>
 <body>
 
-    <!-- Left Queue -->
-    <div class="queue-side">
+    <!-- Left Kanban -->
+    <div class="kanban-board">
         
-        <!-- Ready -->
-        <div class="ready-wrapper">
-            <div class="section-header">
-                <div>เชิญรับเครื่องดื่ม</div>
-                <div class="count-badge" id="ready-count">0</div>
+        <!-- Preparing Column -->
+        <div class="kanban-column">
+            <div class="column-header">
+                <div class="column-title">
+                    <span style="font-size:28px;">🍳</span> กำลังจัดเตรียม
+                </div>
+                <div class="badge-count" id="prep-count">0</div>
             </div>
-            <div class="queue-grid" id="ready-list">
-                <!-- Data goes here -->
+            <div class="column-content" id="prep-list">
+                <!-- Bills go here -->
             </div>
         </div>
 
-        <!-- Preparing -->
-        <div class="prep-wrapper">
-            <div class="section-header">
-                <div>กำลังจัดเตรียม</div>
-                <div class="count-badge" id="prep-count">0</div>
+        <!-- Ready Column -->
+        <div class="kanban-column">
+            <div class="column-header">
+                <div class="column-title">
+                    <span style="font-size:28px;">🛍️</span> พร้อมรับ
+                </div>
+                <div class="badge-count" id="ready-count" style="background:var(--success); color:#fff;">0</div>
             </div>
-            <div class="queue-grid" id="prep-list">
-                <!-- Data goes here -->
+            <div class="column-content" id="ready-list" style="background:#f0fdf4;">
+                <!-- Bills go here -->
             </div>
         </div>
 
@@ -294,9 +318,7 @@
     <!-- Right Media -->
     <div class="media-side">
         <div class="banner-container">
-            <div class="banner-wrapper" id="banner-track">
-                <!-- Banners injected here -->
-            </div>
+            <div class="banner-wrapper" id="banner-track"></div>
             <div class="banner-dots" id="banner-dots"></div>
         </div>
         
@@ -325,7 +347,6 @@
                 "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1920&auto=format&fit=crop",
                 "https://img1.pic.in.th/images/eiei-3.md.png"
             ];
-            
             let targetBanners = (data && data.length > 0) ? data : defaultBanners;
 
             const track = document.getElementById("banner-track");
@@ -338,16 +359,13 @@
             if (targetBanners.length > 1) { 
                 bannerSliderInterval = setInterval(autoSlideBanners, 5000); 
             }
-        } catch(e) {
-            console.warn("Failed to load banners", e);
-        }
+        } catch(e) { console.warn("Failed to load banners", e); }
     }
 
     function autoSlideBanners() { 
         const slides = document.querySelectorAll(".banner-slide"); 
         if (slides.length === 0) return; 
         currentBannerIndex = (currentBannerIndex + 1) % slides.length; 
-        
         const track = document.getElementById("banner-track"); 
         const dots = document.querySelectorAll(".banner-dot");
         if (track) track.style.transform = `translateX(-${currentBannerIndex * 100}%)`;
@@ -361,7 +379,6 @@
     function playDingDong() {
         if (!audioCtx) audioCtx = new AudioContext();
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        
         playTone(659.25, 0, 0.4); // E5
         playTone(523.25, 0.4, 0.8); // C5
     }
@@ -387,18 +404,18 @@
             if (!audioCtx) audioCtx = new AudioContext();
             audioCtx.resume();
             
-            // Toast notification
             let toast = document.createElement('div');
             toast.innerText = "🔊 ระบบเสียงพร้อมทำงาน";
             toast.style.position = 'fixed';
             toast.style.bottom = '30px';
             toast.style.right = '30px';
-            toast.style.background = '#0ea5e9';
+            toast.style.background = 'var(--primary)';
             toast.style.color = '#fff';
             toast.style.padding = '12px 24px';
-            toast.style.borderRadius = '12px';
-            toast.style.fontWeight = '600';
-            toast.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+            toast.style.borderRadius = 'var(--radius-pill)';
+            toast.style.fontFamily = 'var(--font-head)';
+            toast.style.fontWeight = '700';
+            toast.style.boxShadow = 'var(--shadow-float)';
             toast.style.zIndex = '9999';
             document.body.appendChild(toast);
             setTimeout(()=>toast.style.opacity='0', 2500);
@@ -411,58 +428,98 @@
         try {
             const res = await fetch(API_URL + "?action=getAdminData&ts=" + Date.now());
             const data = await res.json();
-            
             if (!data.orders) return;
 
             let tables = {};
             data.orders.forEach(o => {
                 let t = o.table.toString();
-                if (!tables[t]) tables[t] = { table: t, statuses: [] };
-                tables[t].statuses.push(o.status);
+                if (!tables[t]) tables[t] = { table: t, statuses: [], items: [] };
+                
+                // Ignore globally completed or cancelled at item level if we wanted to filter, 
+                // but let's just push active/cooking/serving.
+                if (o.status !== 'ยกเลิก') {
+                    tables[t].statuses.push(o.status);
+                    tables[t].items.push({
+                        qty: o.qty,
+                        menu: o.menu,
+                        details: o.details,
+                        status: o.status
+                    });
+                }
             });
 
-            let readyList = [];
-            let prepList = [];
+            let readyBills = [];
+            let prepBills = [];
 
             Object.values(tables).forEach(t => {
-                if (t.statuses.every(s => s === 'completed' || s === 'สำเร็จ' || s === 'ยกเลิก')) return;
+                // If table has no items left, skip
+                if (t.items.length === 0) return;
                 
-                let activeItems = t.statuses.filter(s => s !== 'ยกเลิก');
-                let isReady = activeItems.length > 0 && activeItems.every(s => s === 'รอเสิร์ฟ' || s === 'completed' || s === 'สำเร็จ');
+                // If every item is completed, skip showing on Kanban entirely? 
+                // Wait, if it's "สำเร็จ" we might still want to show it as "Ready" briefly until admin clears it? 
+                // Actually, "รอเสิร์ฟ" (Serving) is Ready. "สำเร็จ" (Completed) means they took it.
+                if (t.statuses.every(s => s === 'completed' || s === 'สำเร็จ')) return;
                 
-                if (isReady) readyList.push(t.table);
-                else prepList.push(t.table);
+                let isReady = t.statuses.every(s => s === 'รอเสิร์ฟ' || s === 'completed' || s === 'สำเร็จ');
+                
+                if (isReady) readyBills.push(t);
+                else prepBills.push(t);
             });
 
-            readyList.sort((a,b)=>a-b);
-            prepList.sort((a,b)=>a-b);
+            // Sort by table
+            readyBills.sort((a,b)=>a.table.localeCompare(b.table));
+            prepBills.sort((a,b)=>a.table.localeCompare(b.table));
 
-            // Play sound if new ready items
-            let newReady = readyList.filter(x => !previousReady.includes(x));
+            let currentReadyTables = readyBills.map(b => b.table);
+            let newReady = currentReadyTables.filter(x => !previousReady.includes(x));
             if (newReady.length > 0 && !isMuted) {
                 playDingDong();
             }
-            previousReady = readyList;
+            previousReady = currentReadyTables;
 
-            // Render Ready
-            document.getElementById('ready-count').innerText = readyList.length;
-            const readyContainer = document.getElementById('ready-list');
-            readyContainer.innerHTML = readyList.map(q => `
-                <div class="card-ready ${newReady.includes(q) ? 'blink' : ''}">
-                    <div class="card-icon">☕</div>
-                    <div class="card-number">${q}</div>
-                </div>
-            `).join('');
+            // Render Function
+            const renderBillCard = (bill, isReadyZone) => {
+                const totalItems = bill.items.reduce((s,i)=>s+parseInt(i.qty),0);
+                const isNew = newReady.includes(bill.table) && isReadyZone;
+                
+                let itemsHtml = bill.items.map(i => {
+                    let stTag = '';
+                    if (!isReadyZone) {
+                        if (i.status === 'รอเสิร์ฟ') stTag = '<span class="item-status-tag done">เสร็จแล้ว</span>';
+                        else if (i.status === 'กำลังทำ') stTag = '<span class="item-status-tag">กำลังทำ</span>';
+                    }
+                    let detailsHtml = (i.details && i.details !== '-') ? `<span class="item-note">${i.details}</span>` : '';
+                    
+                    return `
+                    <div class="bill-item">
+                        <div class="item-qty">${i.qty}</div>
+                        <div class="item-details">
+                            <div class="item-name">${i.menu} ${stTag}</div>
+                            ${detailsHtml}
+                        </div>
+                    </div>`;
+                }).join('');
 
-            // Render Prep
-            document.getElementById('prep-count').innerText = prepList.length;
-            const prepContainer = document.getElementById('prep-list');
-            prepContainer.innerHTML = prepList.map(q => `
-                <div class="card-prep">
-                    <div class="card-icon" style="background:#e2e8f0; font-size:20px;">☕</div>
-                    <div class="card-number">${q}</div>
-                </div>
-            `).join('');
+                return `
+                <div class="bill-card ${isNew ? 'blink' : ''}">
+                    <div class="bill-header">
+                        <div class="table-pill ${isReadyZone ? 'ready' : ''}">
+                            โต๊ะ ${bill.table}
+                        </div>
+                        <div class="item-count">${totalItems} รายการ</div>
+                    </div>
+                    <div class="bill-items">
+                        ${itemsHtml}
+                    </div>
+                </div>`;
+            };
+
+            // Inject
+            document.getElementById('ready-count').innerText = readyBills.length;
+            document.getElementById('ready-list').innerHTML = readyBills.map(b => renderBillCard(b, true)).join('');
+
+            document.getElementById('prep-count').innerText = prepBills.length;
+            document.getElementById('prep-list').innerHTML = prepBills.map(b => renderBillCard(b, false)).join('');
 
         } catch(e) {
             console.error("Queue fetch error:", e);

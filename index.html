@@ -501,9 +501,12 @@
                 renderBanners(d.banners); 
             }
         });
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'withu_menu_updated') { localStorage.removeItem('withu_cached_menu'); loadMenu(); }
-        });
+        if (!window._withuMenuListenerAdded) {
+            window._withuMenuListenerAdded = true;
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'withu_menu_updated') { localStorage.removeItem('withu_cached_menu'); loadMenu(); }
+            });
+        }
     }
     async function renderBanners(fallbackBannersArray) {
         const track = document.getElementById("banner-track");
@@ -850,12 +853,22 @@
         localStorage.setItem('withu_order_active', 'true');
         document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:60px 0;"><div style="position:relative; display:inline-block; margin-bottom: 30px;"><svg class="walking-cat" style="width: 80px; height: 80px; z-index:2; position:relative; margin-bottom:-10px;" viewBox="0 0 100 100"><path d="M 20 50 Q 20 20 50 20 Q 80 20 80 50 L 80 80 Q 80 90 70 90 L 30 90 Q 20 90 20 80 Z" fill="var(--primary)" /><path d="M 20 40 L 20 10 L 45 25" fill="var(--primary)" /><path d="M 80 40 L 80 10 L 55 25" fill="var(--primary)" /><circle cx="35" cy="50" r="6" fill="#fff" /><circle cx="65" cy="50" r="6" fill="#fff" /><circle cx="35" cy="50" r="2" fill="#000" /><circle cx="65" cy="50" r="2" fill="#000" /><circle cx="22" cy="55" r="5" fill="rgba(255,105,180,0.6)" /><circle cx="78" cy="55" r="5" fill="rgba(255,105,180,0.6)" /><path d="M 45 58 Q 50 63 55 58" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg><div class="cat-shadow" style="width: 50px; height: 10px; background: #000; border-radius: 50%; margin: 0 auto; position: absolute; bottom: -15px; left: 50%; margin-left: -25px;"></div></div><style>@keyframes hopCat { 0% { transform: translateY(0) scale(1.1, 0.9); } 30% { transform: translateY(-20px) scale(0.95, 1.05); } 50% { transform: translateY(-25px) scale(1, 1); } 70% { transform: translateY(-20px) scale(0.95, 1.05); } 100% { transform: translateY(0) scale(1.1, 0.9); } } @keyframes shadowHop { 0% { transform: scaleX(1.1); opacity: 0.2; } 50% { transform: scaleX(0.4); opacity: 0.05; } 100% { transform: scaleX(1.1); opacity: 0.2; } } .walking-cat { animation: hopCat 0.5s infinite alternate ease-in-out; transform-origin: bottom center; display: inline-block; } .cat-shadow { animation: shadowHop 0.5s infinite alternate ease-in-out; }</style><h2 style="font-family:var(--font-head); font-weight:800; font-size: 22px;">รอสักครู่งับ</h2></div>`;
         
+        const controller = new AbortController();
+        const fetchTimeout = setTimeout(() => controller.abort(), 10000);
+        
         try {
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload), signal: controller.signal });
+            clearTimeout(fetchTimeout);
             document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:60px 0;"><div style="position:relative; display:inline-block; margin-bottom: 30px;"><svg class="walking-cat" style="width: 80px; height: 80px; z-index:2; position:relative; margin-bottom:-10px;" viewBox="0 0 100 100"><path d="M 20 50 Q 20 20 50 20 Q 80 20 80 50 L 80 80 Q 80 90 70 90 L 30 90 Q 20 90 20 80 Z" fill="var(--primary)" /><path d="M 20 40 L 20 10 L 45 25" fill="var(--primary)" /><path d="M 80 40 L 80 10 L 55 25" fill="var(--primary)" /><circle cx="35" cy="50" r="6" fill="#fff" /><circle cx="65" cy="50" r="6" fill="#fff" /><circle cx="35" cy="50" r="2" fill="#000" /><circle cx="65" cy="50" r="2" fill="#000" /><circle cx="22" cy="55" r="5" fill="rgba(255,105,180,0.6)" /><circle cx="78" cy="55" r="5" fill="rgba(255,105,180,0.6)" /><path d="M 45 58 Q 50 63 55 58" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg><div class="cat-shadow" style="width: 50px; height: 10px; background: #000; border-radius: 50%; margin: 0 auto; position: absolute; bottom: -15px; left: 50%; margin-left: -25px;"></div></div><style>@keyframes hopCat { 0% { transform: translateY(0) scale(1.1, 0.9); } 30% { transform: translateY(-20px) scale(0.95, 1.05); } 50% { transform: translateY(-25px) scale(1, 1); } 70% { transform: translateY(-20px) scale(0.95, 1.05); } 100% { transform: translateY(0) scale(1.1, 0.9); } } @keyframes shadowHop { 0% { transform: scaleX(1.1); opacity: 0.2; } 50% { transform: scaleX(0.4); opacity: 0.05; } 100% { transform: scaleX(1.1); opacity: 0.2; } } .walking-cat { animation: hopCat 0.5s infinite alternate ease-in-out; transform-origin: bottom center; display: inline-block; } .cat-shadow { animation: shadowHop 0.5s infinite alternate ease-in-out; }</style><h2 style="font-family:var(--font-head); font-weight:800; font-size: 24px; color:var(--primary);">ส่งเสร็จแล้วงับ</h2><p style="color:var(--secondary); font-size:15px; margin-top:8px;">${translate('del_wait')}</p></div>`;
             cart = []; updateUI(); setTimeout(() => { showStatus(); }, 2000);
         } catch (e) {
-            console.error(e); alert("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง"); openReceipt();
+            clearTimeout(fetchTimeout);
+            console.error(e);
+            if (e.name === 'AbortError') {
+                document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:40px 20px;"><div style="font-size:64px; margin-bottom:16px;">⚡</div><h2 style="font-family:var(--font-head); font-weight:800; font-size:22px; color:var(--danger);">อินเทอร์เน็ตช้าเกินไป</h2><p style="color:var(--secondary); font-size:14px; margin:12px 0 24px;กรุณาตรวจสอบสัญญาณ Wi-Fi และลองสั่งอีกครั้ง</p><button onclick="openReceipt()" style="background:var(--primary); color:#fff; border:none; border-radius:16px; padding:16px 32px; font-family:var(--font-head); font-weight:700; font-size:15px; cursor:pointer; width:100%;">ลองส่งอีกครั้ง</button></div>`;
+            } else {
+                document.getElementById('modal-body').innerHTML = `<div style="text-align:center; padding:40px 20px;"><div style="font-size:64px; margin-bottom:16px;">⚠️</div><h2 style="font-family:var(--font-head); font-weight:800; font-size:22px;">เกิดข้อผิดพลาด</h2><p style="color:var(--secondary); font-size:14px; margin:12px 0 24px;">กรุณาลองสั่งอีกครั้งนะค่ะ</p><button onclick="openReceipt()" style="background:var(--primary); color:#fff; border:none; border-radius:16px; padding:16px 32px; font-family:var(--font-head); font-weight:700; font-size:15px; cursor:pointer; width:100%;">ลองอีกครั้ง</button></div>`;
+            }
         }
     }
 

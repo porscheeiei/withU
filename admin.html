@@ -3445,67 +3445,81 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                         <div class="card-body">
                             <div id="delivery-block-${tableId}"></div>
                             <div style="flex-grow:1;">
-                                ${groups[tableId].items.map(i => {
-                                    if(i.qty > 10) globalMistakeDetected = true;
-                                    const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
-                                    
-                                    let isItemNew = (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
-                                    let isSubsequentItem = (i.time !== firstBatchTime); 
-                                    let newItemBadge = "";
-                                    
-                                    if (isItemNew) {
-                                        if (hasExistingItems || isSubsequentItem) {
-                                            newItemBadge = `<span class="badge-new-item">สั่งมาเพิ่ม 🔔</span>`;
-                                        } else {
-                                            newItemBadge = `<span class="badge-new-item" style="background:#3b82f6;">ออเดอร์ใหม่ ✨</span>`;
+                                ${(() => {
+                                    const renderItemRow = (i) => {
+                                        if(i.qty > 10) globalMistakeDetected = true;
+                                        const hasDetails = i.details && i.details !== '-' && i.details.trim() !== '';
+                                        
+                                        let isItemNew = (i.status === "รับออเดอร์" || i.status === "active" || i.status === "PENDING" || i.status === "NEW");
+                                        let isSubsequentItem = (i.time !== firstBatchTime); 
+                                        let newItemBadge = "";
+                                        
+                                        if (isItemNew) {
+                                            if (hasExistingItems || isSubsequentItem) {
+                                                newItemBadge = `<span class="badge-new-item">สั่งมาเพิ่ม 🔔</span>`;
+                                            } else {
+                                                newItemBadge = `<span class="badge-new-item" style="background:#3b82f6;">ออเดอร์ใหม่ ✨</span>`;
+                                            }
                                         }
-                                    }
-                                    
-                                    //  ตัวกรองคำซ้ำสำหรับหมายเหตุ 
-                                    let cleanDetails = "";
-                                    if (hasDetails) {
-                                        let detailsArray = i.details.split(',').map(s => s.trim()).filter(s => s !== '');
-                                        cleanDetails = [...new Set(detailsArray)].join(', ');
-                                    }
+                                        
+                                        //  ตัวกรองคำซ้ำสำหรับหมายเหตุ 
+                                        let cleanDetails = "";
+                                        if (hasDetails) {
+                                            let detailsArray = i.details.split(',').map(s => s.trim()).filter(s => s !== '');
+                                            cleanDetails = [...new Set(detailsArray)].join(', ');
+                                        }
 
-                                    //  สร้างสถานะรายเมนู 
-                                    let itemStatus = i.status || "รับออเดอร์";
-                                    let itemStatusText = "รอดำเนินการ";
-                                    let itemStatusColor = "#737373";
+                                        //  สร้างสถานะรายเมนู 
+                                        let itemStatus = i.status || "รับออเดอร์";
+                                        let itemStatusText = "รอดำเนินการ";
+                                        let itemStatusColor = "#737373";
 
-                                    if (isItemNew) {
-                                        itemStatusText = "รอทำ";
-                                        itemStatusColor = "#f59e0b"; // สีส้ม
-                                    } else if (itemStatus === "กำลังทำ" || itemStatus === "COOK" || itemStatus === "COOKING") {
-                                        itemStatusText = "กำลังทำ";
-                                        itemStatusColor = "#3b82f6"; // สีฟ้า
-                                    } else if (itemStatus === "รอเสิร์ฟ" || itemStatus === "SERVE" || itemStatus === "SERVING") {
-                                        itemStatusText = "เสิร์ฟแล้ว";
-                                        itemStatusColor = "#10b981"; // สีเขียว
-                                    }
+                                        if (isItemNew) {
+                                            itemStatusText = "รอทำ";
+                                            itemStatusColor = "#f59e0b"; // สีส้ม
+                                        } else if (itemStatus === "กำลังทำ" || itemStatus === "COOK" || itemStatus === "COOKING") {
+                                            itemStatusText = "กำลังทำ";
+                                            itemStatusColor = "#3b82f6"; // สีฟ้า
+                                        } else if (itemStatus === "รอเสิร์ฟ" || itemStatus === "SERVE" || itemStatus === "SERVING") {
+                                            itemStatusText = "เสิร์ฟแล้ว";
+                                            itemStatusColor = "#10b981"; // สีเขียว
+                                        }
 
-                                    let itemStatusBadge = `<span style="font-size:11px; font-weight:800; color:${itemStatusColor}; border:1px solid ${itemStatusColor}; background:rgba(255,255,255,0.8); padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle;">${itemStatusText}</span>`;
+                                        let itemStatusBadge = `<span style="font-size:11px; font-weight:800; color:${itemStatusColor}; border:1px solid ${itemStatusColor}; background:rgba(255,255,255,0.8); padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle;">${itemStatusText}</span>`;
 
-                                    return `
-                                    <div class="item-row" style="align-items:flex-start; flex-direction:column; gap:8px;">
-                                        <div class="item-info" style="width:100%;">
-                                            <div style="display:flex; justify-content:space-between; width:100%;">
-                                                <div>
-                                                    <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge} ${itemStatusBadge}
+                                        return `
+                                        <div class="item-row" style="align-items:flex-start; flex-direction:column; gap:8px;">
+                                            <div class="item-info" style="width:100%;">
+                                                <div style="display:flex; justify-content:space-between; width:100%;">
+                                                    <div>
+                                                        <b style="font-size: 18px;">${i.qty}x ${i.menu}</b> ${newItemBadge} ${itemStatusBadge}
+                                                    </div>
+                                                    <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
                                                 </div>
-                                                <b style="font-size:16px; color:var(--text-main);">฿${i.total}</b>
+                                                
+                                                ${hasDetails ? `<div class="item-details-highlight">${cleanDetails}</div>` : ''}
+                                                
+                                                <div style="margin-top:12px; display:flex; gap:6px; align-items:center;">
+                                                    <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#3b82f6; border-color:#bfdbfe;" onclick="handleSingleItemStatus(${i.rowNum}, 'กำลังทำ')">🍳 เตรียมทำ</button>
+                                                    <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#10b981; border-color:#a7f3d0;" onclick="handleSingleItemStatus(${i.rowNum}, 'รอเสิร์ฟ')">🛎️ เสิร์ฟ</button>
+                                                    <button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:0; margin-left:10px;">${l.void}</button>
+                                                </div>
                                             </div>
-                                            
-                                            ${hasDetails ? `<div class="item-details-highlight">${cleanDetails}</div>` : ''}
-                                            
-                                            <div style="margin-top:12px; display:flex; gap:6px; align-items:center;">
-                                                <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#3b82f6; border-color:#bfdbfe;" onclick="handleSingleItemStatus(${i.rowNum}, 'กำลังทำ')">🍳 เตรียมทำ</button>
-                                                <button class="btn-outline" style="padding:4px 8px; font-size:11px; color:#10b981; border-color:#a7f3d0;" onclick="handleSingleItemStatus(${i.rowNum}, 'รอเสิร์ฟ')">🛎️ เสิร์ฟ</button>
-                                                <button class="btn-void" onclick="handleVoidItem(${i.rowNum})" style="margin-top:0; margin-left:10px;">${l.void}</button>
-                                            </div>
-                                        </div>
-                                    </div>`;
-                                }).join('')}
+                                        </div>`;
+                                    };
+
+                                    const foods = groups[tableId].items.filter(i => getCategoryFromName(i.menu) !== 'เครื่องดื่ม');
+                                    const drinks = groups[tableId].items.filter(i => getCategoryFromName(i.menu) === 'เครื่องดื่ม');
+                                    
+                                    let html = foods.map(renderItemRow).join('');
+                                    if (foods.length > 0 && drinks.length > 0) {
+                                        html += `<hr style="border:none; border-top:1px dashed var(--border); margin:15px 0;">`;
+                                        html += `<div style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;"><i class="fas fa-glass-martini-alt" style="margin-right:6px;"></i> เครื่องดื่ม (Drinks)</div>`;
+                                    }
+                                    html += drinks.map(renderItemRow).join('');
+                                    
+                                    return html;
+                                })()}
                             </div>
                             <hr style="border:none; border-top:1px dashed var(--border); margin:15px 0;">
                             <div style="display:flex; justify-content:space-between; align-items:center;">

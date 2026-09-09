@@ -396,7 +396,8 @@
         "บุกบราวน์ชูการ์               ": "Brown Sugar Jelly", "บุกบราวน์ชูการ์": "Brown Sugar Jelly", "ครีมชีส": "Cream Cheese", "ช็อคขูด": "Grated Chocolate", "เฉ๊าก๋วย": "Grass Jelly", "ไซรัปสตอ": "Strawberry Syrup", "ไซรัปคาราเมล": "Caramel Syrup", "ไข่ดาว              ": "Fried Egg", "ไข่ดาว": "Fried Egg", "ไข่เจียว": "Omelet", "ไก่กรอบ": "Crispy Chicken",
         "ไม่เผ็ด": "Not Spicy", "เผ็ดน้อย": "Mild", "เผ็ดปานกลาง": "Medium", "เผ็ดมาก": "Very Spicy",
         "หวาน": "Sweet", "ปั่น": "Frappe", "พิเศษ": "Extra", "เผ็ด": "Spicy",
-        "ปกติ": "Normal", "หมด": "Sold Out"
+        "ปกติ": "Normal", "หมด": "Sold Out",
+        "รับออเดอร์": "Order Received", "กำลังทำ": "Cooking", "รอเสิร์ฟ": "Serving", "สำเร็จ": "Completed", "ยกเลิก": "Cancelled"
     };
 
     function tMenu(text) {
@@ -569,7 +570,11 @@
 
     function updateDisplay() {
         const m = document.getElementById('main-content');
-        const filtered = fullMenu.filter(r => (currentF === "ทั้งหมด" || r[2] === currentF) && (currentSubF === "ทั้งหมด" || r[3] === currentSubF) && r[0].toLowerCase().includes(currentSearch));
+        const filtered = fullMenu.filter(r => 
+            (currentF === "ทั้งหมด" || r[2] === currentF) && 
+            (currentSubF === "ทั้งหมด" || r[3] === currentSubF) && 
+            (r[0].toLowerCase().includes(currentSearch) || tMenu(r[0]).toLowerCase().includes(currentSearch))
+        );
         
         m.innerHTML = filtered.map((r) => {
             const idx = fullMenu.findIndex(item => item[0] === r[0]);
@@ -737,7 +742,7 @@
     }
 
     function addC(n, p, idx, isD, isFood) {
-        let basePrice = parseFloat(p), extras = 0, det = [], qty = itemQty[idx];
+        let basePrice = parseFloat(String(p).replace(/,/g, '')), extras = 0, det = [], qty = itemQty[idx];
         
         let mObj = fullMenu[idx];
         let cat = mObj[2] || "";

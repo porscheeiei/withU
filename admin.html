@@ -1480,6 +1480,9 @@ window.showSec = function(n) {
         t.style.display = (n==='report'||n==='settings'||n==='points'||n==='history'||n==='menu'||n==='popup'||n==='banner') ? 'block' : 'grid';
         t.style.animation = 'fadeSlideIn 0.25s ease-out';
     }
+    document.querySelectorAll('.tab-btn').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='t-'+n); });
+    document.querySelectorAll('.sidebar-item').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='sb-'+n); });
+
     if (n==='points' && typeof window.loadPoints === 'function') window.loadPoints();
     if (n==='report' && typeof window.switchReportTab === 'function') setTimeout(function(){window.switchReportTab('dashboard');},50);
     if (n==='settings' && typeof window.loadSettings === 'function') window.loadSettings();
@@ -1487,9 +1490,12 @@ window.showSec = function(n) {
     if (n==='menu' && typeof window.initMenuManager === 'function') setTimeout(function(){window.initMenuManager();},80);
     if (n==='popup' && typeof window.loadPopupAd === 'function') window.loadPopupAd();
     if (n==='banner' && typeof window.loadBanners === 'function') window.loadBanners();
-    if ((n==='orders' || n==='takeaway') && typeof window.forceRefresh === 'function') window.forceRefresh();
-    document.querySelectorAll('.tab-btn').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='t-'+n); });
-    document.querySelectorAll('.sidebar-item').forEach(function(b) { if(b.id) b.classList.toggle('active', b.id==='sb-'+n); });
+    
+    if ((n==='orders' || n==='takeaway') && typeof window.forceRefresh === 'function') {
+        setTimeout(function() {
+            try { window.forceRefresh(); } catch(e) { console.error("Force Refresh Error:", e); }
+        }, 50);
+    }
 };
 
 // === AUTO-SYNC ===

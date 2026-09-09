@@ -2964,7 +2964,8 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 <div id="p-change-display" style="font-size: 18px; font-weight: 700; margin: 15px 0; display:none;"></div>
                 <button id="p-cash-submit" class="btn-black" onclick="finalPay('เงินสด')">CLOSE BILL</button>
             </div>
-            <button onclick="closePayModal()" style="margin-top:20px; width:100%; border:none; background:none; color:var(--text-muted); cursor:pointer; font-size:12px; text-decoration:underline;" id="btn-cancel-pay">CANCEL</button>
+            <button class="btn-black" onclick="printReceipt()" style="margin-top:20px; background-color:#2563eb; width:100%;">🖨️ PRINT RECEIPT (BLUETOOTH)</button>
+            <button onclick="closePayModal()" style="margin-top:10px; width:100%; border:none; background:none; color:var(--text-muted); cursor:pointer; font-size:12px; text-decoration:underline;" id="btn-cancel-pay">CANCEL</button>
         </div>
     </div>
     <div id="manual-order-modal" class="modal-overlay">
@@ -3624,10 +3625,12 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             if(hasActiveOrder) openPayModal(tableId);
         }
 
+        let currentPrintOrders = [];
         function openPayModal(tableId) {
             if(!fullData || !fullData.orders) return;
             const orders = fullData.orders.filter(o => o.table.toString() === tableId.toString());
             if(!orders.length) return;
+            currentPrintOrders = orders;
             pTable = tableId; pRows = orders.map(o => o.rowNum);
             pTotal = orders.reduce((s,o) => s + (parseFloat(String(o.total).replace(/,/g,'')) || 0), 0);
             

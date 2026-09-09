@@ -263,39 +263,41 @@
    CSS-only override. No logic touched.
 ==================================================== */
 
-/* ---------- 1. Design Tokens ---------- */
+/* ====================================================
+   WITHU ADMIN — DESIGN TOKENS (Gold-Black Theme, matching customer page)
+==================================================== */
 :root {
-    --primary: #6366f1;
-    --primary-dark: #4f46e5;
-    --primary-glow: rgba(99,102,241,0.25);
+    --primary: #C9A86A;
+    --primary-dark: #B08D52;
+    --primary-glow: rgba(201,168,106,0.25);
     --success: #10b981;
     --danger: #ef4444;
     --warning: #f59e0b;
-    --bg: #f3f4f8;
+    --bg: #FAFAFA;
     --surface: #ffffff;
     --surface2: #f9fafb;
-    --text-main: #111827;
-    --text-muted: #6b7280;
-    --border: #e5e7eb;
-    --slate: #f3f4f6;
+    --text-main: #111111;
+    --text-muted: #666666;
+    --border: #ECECEC;
+    --slate: #F9F9F9;
     --radius: 16px;
-    --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 20px rgba(0,0,0,0.10);
-    --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
+    --shadow: 0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
     --sidebar-w: 270px;
     --nav-h: 62px;
     --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+    --gold: #C9A86A;
+    --gold-light: #FDFBF7;
 }
 [data-theme="dark"] {
-    --bg: #0d0f14;
-    --surface: #161a24;
-    --surface2: #1e2330;
-    --text-main: #f1f5f9;
-    --text-muted: #64748b;
-    --border: #2a2f3e;
-    --slate: #1e2330;
-    --shadow: 0 2px 8px rgba(0,0,0,0.4);
-    --shadow-md: 0 4px 24px rgba(0,0,0,0.5);
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --text-main: #f5f5f5;
+    --text-muted: #888888;
+    --border: #222222;
+    --slate: #1a1a1a;
 }
 
 /* ---------- 2. Base ---------- */
@@ -306,7 +308,7 @@ body {
 
 /* ---------- 3. Topbar (op-bar) ---------- */
 .op-bar {
-    background: linear-gradient(90deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%) !important;
+    background: #111111 !important;
     padding: 10px 24px !important;
     font-size: 10px !important;
     letter-spacing: 1.5px !important;
@@ -315,24 +317,25 @@ body {
 
 /* ---------- 4. Navbar (top-nav) ---------- */
 .top-nav {
-    background: var(--surface) !important;
+    background: rgba(255,255,255,0.9) !important;
+    backdrop-filter: blur(20px) !important;
     border-bottom: 1px solid var(--border) !important;
     padding: 0 24px !important;
     height: var(--nav-h) !important;
     display: flex !important;
     align-items: center !important;
-    box-shadow: 0 1px 0 var(--border), 0 2px 16px rgba(0,0,0,0.04) !important;
+    box-shadow: 0 1px 0 var(--border), 0 2px 16px rgba(0,0,0,0.02) !important;
     position: sticky !important; top: 0 !important; z-index: 1000 !important;
 }
 
 .logo {
     font-weight: 900 !important;
-    font-size: 15px !important;
-    letter-spacing: 1.5px !important;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
+    font-size: 16px !important;
+    letter-spacing: -0.5px !important;
+    color: #111111 !important;
+    -webkit-text-fill-color: #111111 !important;
+    background: none !important;
+    background-clip: unset !important;
 }
 
 .hamburger-btn {
@@ -350,68 +353,52 @@ body {
 /* ---------- 5. SIDEBAR ---------- */
 .sidebar {
     width: var(--sidebar-w) !important;
-    background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 40%, #16213e 100%) !important;
-    padding: 0 !important;
-    box-shadow: 4px 0 32px rgba(0,0,0,0.35) !important;
-    border-right: 1px solid rgba(255,255,255,0.06) !important;
+    background: #111111 !important;
+    box-shadow: 4px 0 30px rgba(0,0,0,0.3) !important;
+    border-right: 1px solid rgba(255,255,255,0.04) !important;
 }
 .sidebar-header {
     padding: 24px 20px 20px !important;
-    border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
     display: flex !important; align-items: center !important; justify-content: space-between !important;
 }
 .sidebar-logo {
     font-size: 14px !important; font-weight: 900 !important;
     letter-spacing: 3px !important; text-transform: uppercase !important;
-    background: linear-gradient(135deg,#a5b4fc,#818cf8) !important;
-    -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
+    color: var(--gold) !important;
+    -webkit-text-fill-color: var(--gold) !important;
+    background: none !important;
 }
 .sidebar-close {
     width: 30px !important; height: 30px !important;
     border-radius: 8px !important;
     background: rgba(255,255,255,0.06) !important;
-    color: #94a3b8 !important;
+    color: #888888 !important;
     border: none !important; cursor: pointer !important;
     display: flex !important; align-items: center !important; justify-content: center !important;
     transition: var(--transition) !important;
 }
 .sidebar-close:hover { background: rgba(255,255,255,0.12) !important; color: #fff !important; }
 
-.sidebar-menu {
-    padding: 16px 12px !important;
-    display: flex !important; flex-direction: column !important; gap: 2px !important;
-}
 .sidebar-item {
     display: flex !important; align-items: center !important;
     padding: 12px 14px !important;
     border-radius: 12px !important;
     font-size: 13px !important; font-weight: 600 !important;
-    color: #94a3b8 !important;
+    color: #888888 !important;
     background: transparent !important;
     border: none !important; cursor: pointer !important;
     text-align: left !important; width: 100% !important;
     transition: var(--transition) !important;
     letter-spacing: 0.1px !important;
-    position: relative !important; overflow: hidden !important;
 }
-.sidebar-item::before {
-    content: '' !important;
-    position: absolute !important; left: 0 !important; top: 0 !important;
-    height: 100% !important; width: 0 !important;
-    background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.08)) !important;
-    transition: width 0.22s ease !important;
-    border-radius: 12px !important;
+.sidebar-item:hover { color: #f5f5f5 !important; background: rgba(255,255,255,0.05) !important; }
+.sidebar-item.active {
+    background: rgba(201,168,106,0.12) !important;
+    color: var(--gold) !important;
+    border: 1px solid rgba(201,168,106,0.2) !important;
 }
-.sidebar-item:hover { color: #e2e8f0 !important; }
-.sidebar-item:hover::before { width: 100% !important; }
-.sidebar-item:hover svg { stroke: #a5b4fc !important; }
-
-.sidebar-item.active, .sidebar-item[style*="color: rgb(239"] {
-    background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.12)) !important;
-    color: #a5b4fc !important;
-    border: 1px solid rgba(99,102,241,0.2) !important;
-}
+.sidebar-item.active i { color: var(--gold) !important; }
 
 .sidebar-divider {
     height: 1px !important;
@@ -518,10 +505,11 @@ body {
 }
 .tab-btn:hover { color: var(--text-main) !important; background: var(--slate) !important; }
 .tab-btn.active {
-    background: linear-gradient(135deg,#6366f1,#8b5cf6) !important;
-    color: #fff !important;
-    box-shadow: 0 4px 14px rgba(99,102,241,0.35) !important;
+    background: #111111 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15) !important;
 }
+[data-theme="dark"] .tab-btn.active { background: #ffffff !important; color: #111111 !important; }
 
 /* ---------- 9. Order Cards ---------- */
 .order-grid { gap: 18px !important; }
@@ -570,23 +558,22 @@ body {
 
 /* ---------- 10. Buttons ---------- */
 .btn-black {
-    background: linear-gradient(135deg,#1a1a2e,#16213e) !important;
-    color: #e2e8f0 !important;
-    border: 1px solid #2d3748 !important;
-    border-radius: 12px !important;
+    background: #111111 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 14px !important;
     padding: 13px 22px !important;
     font-weight: 700 !important; font-size: 13px !important;
     letter-spacing: 0.3px !important;
     cursor: pointer !important;
     transition: var(--transition) !important;
     display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
 }
 .btn-black:hover {
-    background: linear-gradient(135deg,#6366f1,#8b5cf6) !important;
-    border-color: #6366f1 !important;
+    background: #333333 !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 6px 20px rgba(99,102,241,0.35) !important;
-    color: #fff !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2) !important;
 }
 .btn-black:active { transform: scale(0.97) !important; }
 
@@ -619,19 +606,20 @@ body {
 
 /* ADD ORDER button in nav */
 #btn-add-nav {
-    background: linear-gradient(135deg,#6366f1,#8b5cf6) !important;
+    background: #111111 !important;
     color: #fff !important; border: none !important;
     border-radius: 10px !important;
     padding: 9px 18px !important;
     font-size: 12px !important; font-weight: 700 !important;
     letter-spacing: 0.5px !important;
-    box-shadow: 0 4px 14px rgba(99,102,241,0.35) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
     transition: var(--transition) !important;
 }
 #btn-add-nav:hover {
     transform: translateY(-1px) !important;
-    box-shadow: 0 6px 20px rgba(99,102,241,0.45) !important;
-    background: linear-gradient(135deg,#4f46e5,#7c3aed) !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
+    background: var(--gold) !important;
+    color: #111111 !important;
 }
 
 /* ---------- 11. Inputs ---------- */
@@ -646,7 +634,7 @@ input, select {
     outline: none !important;
 }
 input:focus, select:focus {
-    border-color: var(--primary) !important;
+    border-color: var(--gold) !important;
     box-shadow: 0 0 0 3px var(--primary-glow) !important;
 }
 
@@ -673,10 +661,10 @@ input:focus, select:focus {
     transition: var(--transition) !important; cursor: pointer !important;
 }
 .pay-tile:hover {
-    background: linear-gradient(135deg,#1a1a2e,#16213e) !important;
-    color: #fff !important; border-color: #4f46e5 !important;
+    background: #111111 !important;
+    color: #fff !important; border-color: #111111 !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 20px rgba(99,102,241,0.3) !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
 }
 
 /* Manual Order Modal */

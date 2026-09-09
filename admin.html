@@ -3202,7 +3202,16 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             
             try {
                 if(!API_URL || API_URL.includes("วางลิงก์")) return;
-                const response = await fetch(API_URL + "?action=getAdminData", { redirect: 'follow' });
+                
+                // แก้ไข: เพิ่ม Timeout 8 วินาที ป้องกัน fetch ค้างบล็อก loop
+                const controller = new AbortController();
+                const fetchTimeout = setTimeout(() => controller.abort(), 8000);
+                let response;
+                try {
+                    response = await fetch(API_URL + "?action=getAdminData", { redirect: 'follow', signal: controller.signal });
+                } finally {
+                    clearTimeout(fetchTimeout);
+                }
                 const text = await response.text();
                 let data;
                 
@@ -3310,8 +3319,9 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             if (window.fullData && window.fullData.orders) {
                 renderOrders(window.fullData.orders);
             }
-            lastFingerprint = ""; 
-            refresh(); 
+            // แก้ไข: ไม่เรียก refresh() ตรงๆ (ซ้อน loop) แต่ reset fingerprint
+            // แล้วปล่อยให้ loop ที่กำลังรออยู่ดึงข้อมูลใหม่เองโดยเร็ว
+            lastFingerprint = "";
         };
 
         //  แสดงออเดอร์ และระบบแจ้งเตือนออเดอร์ใหม่ฉลาดขึ้น 
@@ -3956,14 +3966,28 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             itemsToUpdate.forEach(m => m[5] = status);
             filterStock();
 
-            // ทยอยยิง API ไปปรับสถานะ
-            for (let m of itemsToUpdate) {
-                try {
-                    await fetch(API_URL, {
-                        method:'POST', mode:'no-cors', 
-                        body:JSON.stringify({action:'updateStock', type:'menu', name:m[0], status:status, apiKey: API_KEY})
-                    });
-                } catch(e) {}
+            // แก้ไข: รวมการอัปเดตทั้งหมดเป็น 1 API call แทนที่จะยิงทีละรายการ
+            try {
+                await fetch(API_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    body: JSON.stringify({
+                        action: 'bulkUpdateStock',
+                        type: 'menu',
+                        items: itemsToUpdate.map(m => m[0]),
+                        status: status,
+                        apiKey: API_KEY
+                    })
+                });
+            } catch(e) {
+                // ถ้า API ไม่รองรับ bulkUpdateStock ให้ fallback ยิงทีละอัน
+                for (let m of itemsToUpdate) {
+                    try {
+                        await fetch(API_URL, {
+                            method:'POST', mode:'no-cors', 
+                            body:JSON.stringify({action:'updateStock', type:'menu', name:m[0], status:status, apiKey: API_KEY})
+                        });
+                    } catch(err) {}
+                }
             }
             
             lastFingerprint = "";

@@ -3774,6 +3774,89 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             setTimeout(() => { refresh(); }, 1000);
         }
         
+        async function printReceipt() {
+            if (!navigator.bluetooth) {
+                alert("Web Bluetooth API is not supported in this browser. Please use Chrome on Android/PC.");
+                return;
+            }
+            
+            try {
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2', '49535343-fe7d-4ae5-8fa9-9fafd205e455']
+                });
+                
+                const server = await device.gatt.connect();
+                let service, characteristic;
+                
+                const services = await server.getPrimaryServices();
+                for (let s of services) {
+                    const chars = await s.getCharacteristics();
+                    for (let c of chars) {
+                        if (c.properties.write || c.properties.writeWithoutResponse) {
+                            service = s;
+                            characteristic = c;
+                            break;
+                        }
+                    }
+                    if (characteristic) break;
+                }
+                
+                if (!characteristic) {
+                    alert("Could not find a writable characteristic on this device.");
+                    return;
+                }
+
+                let encoder = new TextEncoder();
+                const INIT = [0x1B, 0x40];
+                const ALIGN_CENTER = [0x1B, 0x61, 0x01];
+                const ALIGN_LEFT = [0x1B, 0x61, 0x00];
+                const BOLD_ON = [0x1B, 0x45, 0x01];
+                const BOLD_OFF = [0x1B, 0x45, 0x00];
+                const CUT = [0x1D, 0x56, 0x41, 0x10];
+                
+                let buffer = [];
+                buffer.push(...INIT);
+                buffer.push(...ALIGN_CENTER);
+                buffer.push(...BOLD_ON);
+                buffer.push(...encoder.encode("WITHU CAFE\n"));
+                buffer.push(...BOLD_OFF);
+                buffer.push(...encoder.encode("--------------------------------\n"));
+                
+                buffer.push(...ALIGN_LEFT);
+                buffer.push(...encoder.encode(`Table/Queue: ${pTable}\n`));
+                buffer.push(...encoder.encode(`Date: ${new Date().toLocaleString()}\n`));
+                buffer.push(...encoder.encode("--------------------------------\n"));
+                
+                currentPrintOrders.forEach(o => {
+                    let line = `${o.qty}x ${o.menu}\n`;
+                    if(o.details && o.details !== '-') line += `   (${o.details})\n`;
+                    line += `   Price: ${o.total}\n`;
+                    buffer.push(...encoder.encode(line));
+                });
+                
+                buffer.push(...encoder.encode("--------------------------------\n"));
+                buffer.push(...ALIGN_CENTER);
+                buffer.push(...BOLD_ON);
+                buffer.push(...encoder.encode(`TOTAL: ${pTotal} THB\n`));
+                buffer.push(...BOLD_OFF);
+                buffer.push(...encoder.encode("Thank you!\n\n\n\n"));
+                buffer.push(...CUT);
+                
+                const data = new Uint8Array(buffer);
+                const chunkSize = 512;
+                for (let i = 0; i < data.length; i += chunkSize) {
+                    await characteristic.writeValue(data.slice(i, i + chunkSize));
+                }
+                
+                triggerNotify("success", "สั่งปริ้นใบเสร็จสำเร็จ!");
+
+            } catch (error) {
+                console.error(error);
+                alert("Bluetooth Error: " + error.message);
+            }
+        }
+
         function closePayModal() { 
             safeStorageRemove('cds_paying_table');
             actionCall('setPaymentStatus', {table: pTable, status: 'idle'}); 

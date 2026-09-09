@@ -3265,15 +3265,28 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 }
 
                 renderOrders(data.orders || []);
-                filterStock(); // Load matching items from stock
+                
+                // แก้ไข: filterStock เรียกเฉพาะเมื่อผู้ใช้อยู่บนหน้า Stock เท่านั้น
+                const stockSec = document.getElementById('stock-sec');
+                if (stockSec && stockSec.style.display !== 'none') {
+                    filterStock();
+                }
+                
                 renderPerformance(rpt);
                 renderAttendanceLog(data.attendance || []);
                 
                 const safeAnalytics = data.analytics ? data.analytics : {revenue:0, report:[]};
                 renderAIInsights(safeAnalytics, data.orders || []);
                 
-                if (typeof window.loadPoints === 'function') window.loadPoints();
-                if (typeof window.renderHistory === 'function') window.renderHistory();
+                // แก้ไข: loadPoints/renderHistory เรียกเฉพาะเมื่ออยู่หน้านั้นจริงๆ เท่านั้น
+                const pointsSec = document.getElementById('points-sec');
+                if (pointsSec && pointsSec.style.display !== 'none' && typeof window.loadPoints === 'function') {
+                    window.loadPoints();
+                }
+                const historySec = document.getElementById('history-sec');
+                if (historySec && historySec.style.display !== 'none' && typeof window.renderHistory === 'function') {
+                    window.renderHistory();
+                }
                 
                 
                 const avg = data.orders && data.orders.length > 0 ? (data.orders.reduce((s,o) => s + getTimeDiff(o.time), 0) / data.orders.length).toFixed(1) : "0.0";
@@ -3322,9 +3335,10 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 groups[o.table].rows.push(o.rowNum);
             });
 
+            // แก้ไข: อ่านค่าจาก storage แค่ครั้งเดียวก่อน loop ไม่ใช่ทุก iteration
+            const payingTableId = safeStorageGet('cds_paying_table', null);
             for(let i=1; i<=15; i++) {
-                let payingTable = safeStorageGet('cds_paying_table', null);
-                if(payingTable == i) {
+                if(payingTableId == i) {
                     let tile = document.getElementById(`map-t-${i}`);
                     if(tile) { tile.className = "map-table alert-trigger"; }
                 }
@@ -3344,7 +3358,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                     let hasNewItem = groups[tableId].items.some(i => i.status === "รับออเดอร์" || i.status === "PENDING" || i.status === "NEW" || i.status === "active");
                     let hasCookingItem = groups[tableId].items.some(i => i.status === "กำลังทำ" || i.status === "COOKING" || i.status === "COOK");
                     let hasServingItem = groups[tableId].items.some(i => i.status === "รอเสิร์ฟ" || i.status === "SERVING" || i.status === "SERVE");
-                    let isPayingMode = (safeStorageGet('cds_paying_table', '') == tableId || status === "paying");
+                    let isPayingMode = (payingTableId == tableId || status === "paying");
                     
                     let firstBatchTime = groups[tableId].items[0].time;
                     let hasExistingItems = groups[tableId].items.some(i => i.status !== "รับออเดอร์" && i.status !== "active" && i.status !== "PENDING" && i.status !== "NEW");
@@ -3431,14 +3445,6 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                             </div>
                         </div>
                         <div class="card-body">
-                            ${(function(){
-                                let deliveryItem = groups[tableId].items.find(i => i.details && i.details.includes('[DELIVERY_DATA]'));
-                                if (deliveryItem) {
-                                    // ซ่อนข้อมูลลับจากออเดอร์เก่าๆ ที่ยังค้างอยู่
-                                    deliveryItem.details = deliveryItem.details.split('[DELIVERY_DATA]')[0].trim();
-                                }
-                                return "";
-                            })()}
                             <div id="delivery-block-${tableId}"></div>
                             <div style="flex-grow:1;">
                                 ${groups[tableId].items.map(i => {
@@ -3750,7 +3756,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             safeStorageSet('cds_cash_received', '0');
             lastFingerprint = ""; 
             
-            setTimeout(() => { refresh(); }, 2500);
+            setTimeout(() => { refresh(); }, 1000);
         }
         
         function closePayModal() { 
@@ -3982,7 +3988,12 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                     data = (fullData.analytics.chartDaily || []).map(i => i.total || 0);
                 }
                 
-                if(salesChartInst) salesChartInst.destroy();
+                if(salesChartInst) {
+                    // แก้ไข: ตรวจสอบข้อมูลก่อน ถ้าไม่เปลี่ยนก็ไม่ต้อง destroy+create ใหม่
+                    const newChartKey = JSON.stringify({mode: currentChartMode, labels: labels.slice(0,3), data: data.slice(0,3)});
+                    if (salesChartInst._withuKey === newChartKey) return;
+                    salesChartInst.destroy();
+                }
                 if (!labels || labels.length === 0 || !data || data.length === 0) {
                     console.warn("No chart data available");
                     return;
@@ -3992,6 +4003,8 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                     data: { labels: labels, datasets: [{ data: data, backgroundColor: isDark ? '#ffffff' : '#000000', borderRadius: 4 }] },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
                 });
+                // เก็บ key ไว้เพื่อเปรียบเทียบรอบต่อไป
+                salesChartInst._withuKey = JSON.stringify({mode: currentChartMode, labels: labels.slice(0,3), data: data.slice(0,3)});
             } catch (e) { console.error("Chart Rendering Aborted:", e); }
         }
 
@@ -4251,7 +4264,9 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 
                 const payload = {action, apiKey: API_KEY, ...params};
                 await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(payload)}); 
-                refresh(); 
+                
+                // แก้ไข: ไม่เรียก refresh() โดยตรง (ซ้อน loop) แต่ reset fingerprint แล้วให้ loop ทำงานปกติ
+                lastFingerprint = "";
             } catch(e) { 
                 console.error(e); 
             } 
@@ -4302,6 +4317,9 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             if (refreshInterval) clearInterval(refreshInterval);
             if (clockInterval) clearInterval(clockInterval);
             if (reloadInterval) clearInterval(reloadInterval);
+            // แก้ไข: clearTimeout ของ refreshTimeout ซึ่งเป็นตัวแปรที่ใช้จริงตอนนี้
+            if (refreshTimeout) clearTimeout(refreshTimeout);
+            isRefreshing = false;
         }
 
         function initApp() {

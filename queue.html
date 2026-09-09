@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WITHU | Queue Display</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --ready-bg: #059669; /* Emerald 600 */
+            --ready-text: #ffffff;
+            --prep-bg: #1e293b; /* Slate 800 */
+            --prep-text: #f8fafc;
+            --accent: #f59e0b; /* Amber 500 */
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- Left Side: Media --- */
+        .media-side {
+            width: 60%;
+            height: 100%;
+            background: #000;
+            position: relative;
+        }
+
+        .media-side video, .media-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .brand-overlay {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .brand-overlay img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .brand-overlay h1 {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        /* --- Right Side: Queue --- */
+        .queue-side {
+            width: 40%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid var(--border);
+        }
+
+        /* Top: Ready */
+        .ready-section {
+            flex: 0 0 45%;
+            background: var(--ready-bg);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            border-bottom: 4px solid #047857;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .ready-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            align-content: flex-start;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        
+        /* Hide scrollbar */
+        .ready-grid::-webkit-scrollbar, .prep-grid::-webkit-scrollbar { display: none; }
+
+        .queue-number-ready {
+            background: #ffffff;
+            color: var(--ready-bg);
+            font-size: 64px;
+            font-weight: 900;
+            padding: 10px 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.1;
+        }
+        
+        .queue-prefix {
+            font-size: 18px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: -5px;
+        }
+
+        /* Bottom: Preparing */
+        .prep-section {
+            flex: 0 0 55%;
+            background: var(--prep-bg);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prep-section .section-title {
+            color: var(--accent);
+        }
+
+        .prep-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-content: flex-start;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .queue-number-prep {
+            background: rgba(255,255,255,0.05);
+            color: var(--prep-text);
+            border: 2px solid rgba(255,255,255,0.1);
+            font-size: 42px;
+            font-weight: 800;
+            padding: 10px 30px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.1;
+        }
+
+        /* Animations */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .blink {
+            animation: blinkAnim 1s infinite;
+        }
+
+        @keyframes blinkAnim {
+            0%, 100% { opacity: 1; background: #ffffff; color: var(--ready-bg); }
+            50% { opacity: 0.8; background: #fef08a; color: #b45309; box-shadow: 0 0 30px #fef08a; }
+        }
+
+        /* Floating particles for ready section */
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp 3s infinite linear;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(0); opacity: 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Left Media -->
+    <div class="media-side">
+        <!-- You can change this to an image or different video -->
+        <video autoplay muted loop playsinline>
+            <source src="WITHU.mp4" type="video/mp4">
+            <!-- Fallback image if video fails -->
+            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1920&auto=format&fit=crop" style="display:none;" onerror="this.style.display='block'; this.previousElementSibling.style.display='none';">
+        </video>
+        
+        <div class="brand-overlay">
+            <img src="https://img1.pic.in.th/images/-------2.png" alt="Logo">
+            <h1>WITHU CAFE</h1>
+        </div>
+    </div>
+
+    <!-- Right Queue -->
+    <div class="queue-side">
+        
+        <!-- Ready to Collect -->
+        <div class="ready-section" id="ready-bg">
+            <div class="section-title">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                เชิญรับเครื่องดื่ม
+            </div>
+            <div class="ready-grid" id="ready-list">
+                <!-- Data will go here -->
+            </div>
+        </div>
+
+        <!-- Preparing -->
+        <div class="prep-section">
+            <div class="section-title">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                กำลังจัดเตรียม
+            </div>
+            <div class="prep-grid" id="prep-list">
+                <!-- Data will go here -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Audio for bell notification -->
+    <!-- Using a generic bell sound base64 for reliable playback without external dependencies -->
+    <audio id="bell-sound" preload="auto">
+        <source src="data:audio/mp3;base64,//OExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" type="audio/mpeg">
+        <!-- We will replace this with a real fetch or ask user to provide a sound. Since I can't embed a 50kb mp3 here cleanly, we will use Web Audio API to synthesize a pleasant ding-dong -->
+    </audio>
+
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
+    
+    let previousReady = [];
+    let isMuted = true; // Auto-play policies require user interaction first
+
+    // Create particles in ready section
+    function createParticles() {
+        const bg = document.getElementById('ready-bg');
+        for(let i=0; i<5; i++) {
+            let p = document.createElement('div');
+            p.className = 'particle';
+            p.style.width = Math.random() * 20 + 10 + 'px';
+            p.style.height = p.style.width;
+            p.style.left = Math.random() * 100 + '%';
+            p.style.bottom = '-20px';
+            p.style.animationDuration = Math.random() * 2 + 2 + 's';
+            p.style.animationDelay = Math.random() * 2 + 's';
+            bg.appendChild(p);
+        }
+    }
+    createParticles();
+
+    // Synthesize a Ding-Dong sound using Web Audio API
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+    
+    function playDingDong() {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        // Ding
+        playTone(659.25, 0, 0.4); // E5
+        // Dong
+        playTone(523.25, 0.4, 0.8); // C5
+    }
+
+    function playTone(freq, startTimeOffset, duration) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        const now = audioCtx.currentTime;
+        gain.gain.setValueAtTime(0, now + startTimeOffset);
+        gain.gain.linearRampToValueAtTime(0.5, now + startTimeOffset + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + startTimeOffset + duration);
+        
+        osc.start(now + startTimeOffset);
+        osc.stop(now + startTimeOffset + duration);
+    }
+
+    // Enable audio on first click anywhere
+    document.body.addEventListener('click', () => {
+        if(isMuted) {
+            isMuted = false;
+            if (!audioCtx) audioCtx = new AudioContext();
+            audioCtx.resume();
+            // Create a small toast to confirm sound is enabled
+            let toast = document.createElement('div');
+            toast.innerText = "🔊 เปิดเสียงแจ้งเตือนแล้ว";
+            toast.style.position = 'fixed';
+            toast.style.top = '20px';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.background = 'rgba(0,0,0,0.8)';
+            toast.style.color = '#fff';
+            toast.style.padding = '10px 20px';
+            toast.style.borderRadius = '20px';
+            toast.style.zIndex = '9999';
+            document.body.appendChild(toast);
+            setTimeout(()=>toast.remove(), 2000);
+        }
+    }, {once:true});
+
+    async function fetchQueue() {
+        try {
+            // Get all orders from admin endpoint
+            const res = await fetch(API_URL + "?action=getAdminData&ts=" + Date.now());
+            const data = await res.json();
+            
+            if (!data.orders) return;
+
+            // Group by table
+            let tables = {};
+            data.orders.forEach(o => {
+                let t = o.table.toString();
+                if (!tables[t]) tables[t] = { table: t, statuses: [] };
+                tables[t].statuses.push(o.status);
+            });
+
+            let readyList = [];
+            let prepList = [];
+
+            // Determine table status
+            Object.values(tables).forEach(t => {
+                // Ignore completed/cancelled completely
+                if (t.statuses.every(s => s === 'completed' || s === 'สำเร็จ' || s === 'ยกเลิก')) return;
+
+                // If ALL non-cancelled items are "รอเสิร์ฟ" (Serving), the whole order is READY
+                let activeItems = t.statuses.filter(s => s !== 'ยกเลิก');
+                let isReady = activeItems.length > 0 && activeItems.every(s => s === 'รอเสิร์ฟ' || s === 'completed' || s === 'สำเร็จ');
+                
+                if (isReady) {
+                    readyList.push(t.table);
+                } else {
+                    prepList.push(t.table);
+                }
+            });
+
+            // Sort lists
+            readyList.sort((a,b)=>a-b);
+            prepList.sort((a,b)=>a-b);
+
+            // Check if there are NEW ready orders
+            let newReady = readyList.filter(x => !previousReady.includes(x));
+            if (newReady.length > 0 && !isMuted) {
+                playDingDong();
+            }
+            previousReady = readyList;
+
+            // Render Ready List
+            const readyContainer = document.getElementById('ready-list');
+            readyContainer.innerHTML = readyList.map(q => `
+                <div class="queue-number-ready ${newReady.includes(q) ? 'blink' : ''}">
+                    <span class="queue-prefix">โต๊ะ/คิว</span>
+                    ${q}
+                </div>
+            `).join('');
+
+            // Render Prep List
+            const prepContainer = document.getElementById('prep-list');
+            prepContainer.innerHTML = prepList.map(q => `
+                <div class="queue-number-prep">
+                    <span class="queue-prefix" style="color:var(--accent);">โต๊ะ/คิว</span>
+                    ${q}
+                </div>
+            `).join('');
+
+        } catch(e) {
+            console.error("Queue fetch error:", e);
+        }
+    }
+
+    // Initial fetch and set interval
+    fetchQueue();
+    setInterval(fetchQueue, 3000);
+
+</script>
+</body>
+</html>

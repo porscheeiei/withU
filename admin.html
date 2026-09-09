@@ -3184,7 +3184,14 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             safeText('date-now', now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}).toUpperCase());
         }
 
+        let isRefreshing = false;
+        let refreshTimeout = null;
+
         async function refresh() {
+            if (isRefreshing) return;
+            isRefreshing = true;
+            clearTimeout(refreshTimeout);
+            
             safeStyle('sync-status', 'display', 'inline-block');
             
             try {
@@ -3275,6 +3282,8 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 console.error("Sync Failure:", e); 
             } finally {
                 safeStyle('sync-status', 'display', 'none');
+                isRefreshing = false;
+                refreshTimeout = setTimeout(refresh, 5000);
             }
         }
 
@@ -4297,10 +4306,8 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             updateClock();
             clockInterval = setInterval(updateClock, 1000); 
             refresh(); 
-            refreshInterval = setInterval(refresh, 5000); 
-            reloadInterval = setInterval(function() {
-                window.location.reload();
-            }, 900000);
+            // เปลี่ยนจาก setInterval เป็น setTimeout ที่ทำงานวนลูปด้านใน refresh() แล้ว
+            // ปิดการใช้งาน reloadInterval ที่บังคับรีโหลดทั้งหน้าทุกๆ 15 นาที
         }
 
         document.addEventListener('DOMContentLoaded', () => {

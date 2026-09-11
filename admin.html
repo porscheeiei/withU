@@ -1822,7 +1822,7 @@ window.renderReport = function(period) {
     var pMap = {'1d':0,'7d':1,'30d':2,'all':3};
     btns.forEach(function(b,i) {
         b.style.background = i===pMap[period]
-            ? ''#111111''
+            ? '#111111'
             : 'rgba(100,116,139,0.08)';
         b.style.color = i===pMap[period] ? '#fff' : '#64748b';
         b.style.border = i===pMap[period] ? 'none' : '1.5px solid rgba(100,116,139,0.2)';
@@ -6081,7 +6081,7 @@ window.renderMenuStats = function() {
     var soldOut = allMenuItems.filter(function(m){return m.status==='หมด';}).length;
     var cats    = new Set(allMenuItems.map(function(m){return m.category;})).size;
     var stats = [
-        {icon:'<i class="fas fa-utensils"></i>',label:'เมนูทั้งหมด',val:total,g:''#111111''},
+        {icon:'<i class="fas fa-utensils"></i>',label:'เมนูทั้งหมด',val:total,g:'#111111'},
         {icon:'✏️',label:'แก้ไขแล้ว',val:custom,g:'linear-gradient(135deg,#3b82f6,#06b6d4)'},
         {icon:'🚫',label:'หมดแล้ว',val:soldOut,g:'linear-gradient(135deg,#ef4444,#f97316)'},
         {icon:'📂',label:'หมวดหมู่',val:cats,g:'linear-gradient(135deg,#10b981,#059669)'},
@@ -6098,7 +6098,7 @@ function renderFilterTabs() {
     if (!el) return;
     el.innerHTML = FILTER_CATS.map(function(cat) {
         var active = cat===currentMenuFilter;
-        return '<button onclick="window.setMenuFilter(\''+cat+'\')" style="padding:6px 12px;border-radius:8px;border:1.5px solid '+(active?'#6366f1':'rgba(226,232,240,0.8)')+';background:'+(active?''#111111'':'#fff')+';color:'+(active?'#fff':'#64748b')+';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;">'+cat+'</button>';
+        return '<button onclick="window.setMenuFilter(\''+cat+'\')" style="padding:6px 12px;border-radius:8px;border:1.5px solid '+(active?'#6366f1':'rgba(226,232,240,0.8)')+';background:'+(active?'#111111':'#fff')+';color:'+(active?'#fff':'#64748b')+';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;">'+cat+'</button>';
     }).join('');
 }
 window.setMenuFilter = function(cat) { currentMenuFilter = cat; renderFilterTabs(); window.renderMenuCards(); };

@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WITHU ADMIN | CONTROL CENTER</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <!-- Chart.js v4.4.1 loaded once below (withu-premium-v3 block) -->
     <style>
         :root {
             --bg: #fcfcfd; --surface: #ffffff; --text-main: #000000; --text-muted: #737373;
@@ -93,7 +92,7 @@
         .container { max-width: 1450px; margin: 25px auto; padding: 0 20px; }
         .map-section { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-bottom: 25px; box-shadow: var(--shadow); }
         .map-title { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.05em; color: var(--text-muted); }
-        .map-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 10px; }
+        .map-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; }
         .map-table { padding: 12px 5px; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 800; background: var(--surface); transition: all 0.2s ease; cursor: pointer; }
         
         .map-table.map-new, 
@@ -106,12 +105,12 @@
         @keyframes mapPulse { from { opacity: 1; } to { opacity: 0.3; } }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: var(--surface); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
-        .stat-card small { color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+        .stat-card small { color: var(--text-muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
         .stat-card h3 { margin: 0; font-size: 24px; font-weight: 700; }
         .tab-bar { display: flex; gap: 4px; margin-bottom: 25px; background: var(--border); padding: 4px; border-radius: 8px; width: fit-content; }
         .tab-btn { padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: var(--text-muted); font-weight: 600; font-size: 12px; transition: 0.2s; text-transform: uppercase; white-space: nowrap; }
         .tab-btn.active { background: var(--surface); color: var(--text-main); }
-        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 20px; }
         .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); position: relative; }
         .order-card.sla-trigger { border: 2px solid #000000; background: var(--slate); }
         .card-head { padding: 18px; background: rgba(0,0,0,0.01); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
@@ -140,17 +139,20 @@
         }
         [data-theme="dark"] .item-details-highlight { background: #450a0a; color: #fca5a5; border-color: #991b1b; }
 
-        /*  ป้ายกำกับ สั่งมาใหม่  */
+        /* Badge styles */
         .badge-new-item {
-            background: #ef4444; color: #ffffff; padding: 4px 8px; border-radius: 6px;
+            padding: 4px 8px; border-radius: 6px;
             font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle;
-            animation: alertCallBlink 1s infinite alternate;
         }
+        /* ออเดอร์ใหม่ = สีน้ำเงิน (ข้อมูล) */
+        .badge-new-item.badge-fresh-order { background: #3b82f6; color: #ffffff; }
+        /* สั่งมาเพิ่ม = สีส้ม (รอดำเนินการ) — ไม่ใช้แดง (แดง=error/ลบ) */
+        .badge-new-item.badge-added-order { background: #f59e0b; color: #ffffff; animation: alertAddBlink 1.2s ease 3 forwards; }
         
-        .btn-void { background: #fef2f2; border: 1px solid #fca5a5; color: #ef4444; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; }
+        .btn-void { background: #fef2f2; border: 1px solid #fca5a5; color: #ef4444; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; } min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center;
         .btn-void:hover { background: #ef4444; color: #ffffff; border-color: #ef4444; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: var(--text-main); }
+        .btn-outline { background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: var(--text-main); } min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center;
         .btn-outline:hover { background: #000000; color: #ffffff; border-color: #000000; }
         .btn-black { background: #000000; color: #ffffff; border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 12px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
         .report-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
@@ -166,23 +168,54 @@
         .pay-tile:hover { background: #000000; color: #ffffff; }
         input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; background: var(--surface); color: var(--text-main); }
         
-        /*  Styles สำหรับ Toast Notification หลากสี  */
-        .toast-notify { 
-            position: fixed; top: 0; left: 0; width: 100%; color: #ffffff; 
-            padding: 20px 30px; display: none; font-size: 20px; font-weight: 800; text-align: center; 
-            z-index: 99999; cursor: pointer;
-            letter-spacing: 0.5px;
+        /*  Styles สำหรับ Toast สัญญาณ — [UI] ย้ายไปมุมขวาบน ไม่บัง header  */
+        .toast-notify {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            left: auto;
+            width: auto;
+            max-width: 420px;
+            min-width: 260px;
+            color: #ffffff;
+            padding: 16px 20px 16px 20px;
+            display: none;
+            font-size: 15px;
+            font-weight: 800;
+            text-align: left;
+            z-index: 99999;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            line-height: 1.4;
         }
-        .toast-notify-call { background: #ef4444; box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5); animation: alertCallBlink 0.5s infinite alternate; }
-        .toast-notify-new { background: #10b981; box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); animation: alertNewBlink 0.5s infinite alternate; }
-        .toast-notify-add { background: #f59e0b; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.5); animation: alertAddBlink 0.5s infinite alternate; }
-        /*  สีใหม่ สำหรับแจ้งเตือนขอเช็คบิล  */
-        .toast-notify-pay { background: #8b5cf6; box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5); animation: alertPayBlink 0.5s infinite alternate; }
+        .toast-notify-call { background: #ef4444; box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5); }
+        .toast-notify-new { background: #10b981; box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); }
+        .toast-notify-add { background: #f59e0b; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.5); }
+        .toast-notify-pay { background: #8b5cf6; box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5); }
 
-        @keyframes alertCallBlink { from { background: #ef4444; } to { background: #7f1d1d; } }
-        @keyframes alertNewBlink { from { background: #10b981; } to { background: #064e3b; } }
-        @keyframes alertAddBlink { from { background: #f59e0b; } to { background: #78350f; } }
-        @keyframes alertPayBlink { from { background: #8b5cf6; } to { background: #4c1d95; } }
+        @keyframes alertCallBlink { 
+            0%,100% { background: #ef4444; } 
+            50% { background: #7f1d1d; } 
+        }
+        @keyframes alertNewBlink { 
+            0%,100% { background: #10b981; } 
+            50% { background: #064e3b; } 
+        }
+        @keyframes alertAddBlink { 
+            0%,100% { background: #f59e0b; } 
+            50% { background: #78350f; } 
+        }
+        @keyframes alertPayBlink { 
+            0%,100% { background: #8b5cf6; } 
+            50% { background: #4c1d95; } 
+        }
+        /* [PERF] จำกัด blink เป็น 3 รอบแล้วหยุด — ลด CPU/GPU repaint */
+        .toast-notify-call { animation: alertCallBlink 1.2s ease 3 forwards !important; }
+        .toast-notify-new  { animation: alertNewBlink  1.2s ease 3 forwards !important; }
+        .toast-notify-add  { animation: alertAddBlink  1.2s ease 3 forwards !important; }
+        .toast-notify-pay  { animation: alertPayBlink  1.2s ease 3 forwards !important; }
 
         .closing-banner {
             width: 100%; background: #ef4444; color: #ffffff; text-align: center; padding: 14px; font-weight: 800; font-size: 14px; display: none; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); animation: alertCallBlink 0.5s infinite alternate;
@@ -212,7 +245,7 @@
             position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1999; display: none; opacity: 0; transition: opacity 0.3s ease;
         }
         .sidebar {
-            position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: var(--surface); z-index: 2000;
+            position: fixed; top: 0; left: 0; bottom: 0; width: min(280px, 85vw); background: var(--surface); z-index: 2000;
             transform: translateX(-100%); transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);
             display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid var(--border);
         }
@@ -552,7 +585,7 @@ body {
     letter-spacing: 0.3px !important;
     transition: var(--transition) !important;
 }
-.track-step.active.step-new { background: linear-gradient(135deg,#6366f1,#8b5cf6) !important; color: #fff !important; }
+.track-step.active.step-new { background: #111111 !important; color: #fff !important; }
 .track-step.active.step-cooking { background: linear-gradient(135deg,#f59e0b,#d97706) !important; color: #fff !important; }
 .track-step.active.step-serving { background: linear-gradient(135deg,#10b981,#059669) !important; color: #fff !important; }
 
@@ -731,7 +764,7 @@ input:focus, select:focus {
     position: relative !important; overflow: hidden !important;
 }
 #points-sec .ai-card::before {
-    content: '⭐' !important;
+    content: '<i class="fas fa-star"></i>' !important;
     position: absolute !important;
     font-size: 100px !important; opacity: 0.04 !important;
     right: -10px !important; top: -20px !important;
@@ -754,7 +787,7 @@ input:focus, select:focus {
 
 /* Save button in points */
 #points-sec .btn-black[onclick*="savePoint"] {
-    background: linear-gradient(135deg,#6366f1,#8b5cf6) !important;
+    background: #111111 !important;
     border-color: transparent !important;
     box-shadow: 0 4px 14px rgba(99,102,241,0.4) !important;
     border-radius: 12px !important;
@@ -835,7 +868,100 @@ input:focus, select:focus {
 }
 /* END WITHU PREMIUM CSS */
 
-    </style>
+    
+  /* Mobile-first and Print Styles */
+  :root {
+      --fluid-text: clamp(16px, 4vw, 22px);
+      --fluid-text-lg: clamp(20px, 5vw, 30px);
+  }
+  .stat-card h3 {
+      font-size: var(--fluid-text-lg) !important;
+  }
+  
+  /* Toast Queue */
+  #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10000;
+  }
+  .toast-item {
+      background: #111111;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+      background: #e2e8f0;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+      border-radius: 4px;
+      color: transparent !important;
+  }
+  @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+  }
+
+  /* Table Card View on Mobile */
+  @media (max-width: 480px) {
+      .report-table thead { display: none; }
+      .report-table, .report-table tbody, .report-table tr, .report-table td {
+          display: block;
+          width: 100%;
+      }
+      .report-table tr {
+          margin-bottom: 15px;
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 10px;
+      }
+      .report-table td {
+          text-align: right;
+          padding-left: 50%;
+          position: relative;
+          border: none;
+          border-bottom: 1px solid #f1f5f9;
+      }
+      .report-table td::before {
+          content: attr(data-label);
+          position: absolute;
+          left: 10px;
+          width: 45%;
+          padding-right: 10px;
+          white-space: nowrap;
+          text-align: left;
+          font-weight: bold;
+      }
+      .report-table td:last-child { border-bottom: 0; }
+      
+      #manual-order-modal .modal-content, #points-sec .grid-layout {
+          grid-template-columns: 1fr !important;
+      }
+  }
+
+  /* Print Stylesheet */
+  @media print {
+      body * { visibility: hidden; }
+      #report-sec, #report-sec * { visibility: visible; }
+      #report-sec { position: absolute; left: 0; top: 0; width: 100%; }
+      .sidebar, .top-nav, .btn-void, .btn-outline { display: none !important; }
+  }
+
+</style>
 
     
     
@@ -846,7 +972,10 @@ input:focus, select:focus {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- [PERF] Chart.js โหลดครั้งเดียว (ลบ duplicate จาก head แล้ว) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- [PERF] qrcode.js: สร้าง QR Code ฝั่ง client ไม่ต้อง loop API -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style id="withu-premium-v3">
 /* === PREMIUM V3 DESIGN SYSTEM (GOLD-BLACK) === */
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -930,10 +1059,10 @@ body { background: #f8fafc !important; background-image: radial-gradient(at 20% 
 /* --- BUTTONS --- */
 .btn-black { background: #111111 !important; border-radius: 10px !important; font-weight: 700 !important; font-size: 12px !important; transition: all 0.2s ease !important; border: none !important; box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important; color: #ffffff !important; }
 .btn-black:hover { background: #333333 !important; transform: translateY(-1px) !important; box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; }
-.btn-outline { border-radius: 10px !important; font-weight: 700 !important; border: 1.5px solid rgba(226,232,240,0.8) !important; transition: all 0.2s ease !important; }
+.btn-outline { border-radius: 10px !important; font-weight: 700 !important; border: 1.5px solid rgba(226,232,240,0.8) !important; transition: all 0.2s ease !important; } min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center;
 .btn-outline:hover { background: #111111 !important; color: #fff !important; border-color: transparent !important; }
-[data-theme="dark"] .btn-outline { border-color: rgba(51,51,51,0.5) !important; }
-.btn-void { border-radius: 8px !important; transition: all 0.15s ease !important; }
+[data-theme="dark"] .btn-outline { border-color: rgba(51,51,51,0.5) !important; } min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center;
+.btn-void { border-radius: 8px !important; transition: all 0.15s ease !important; } min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center;
 
 /* --- AI CARD --- */
 .ai-card { border-radius: 16px !important; border: 1px solid rgba(226,232,240,0.6) !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1) !important; transition: all 0.2s ease !important; padding: 22px !important; }
@@ -991,6 +1120,99 @@ input:focus, select:focus { outline: none !important; border-color: #C9A86A !imp
     .top-nav > div:first-child > div { flex-wrap: wrap; gap: 8px !important; }
     .hamburger-btn { margin-right: 8px !important; }
 }
+
+  /* Mobile-first and Print Styles */
+  :root {
+      --fluid-text: clamp(16px, 4vw, 22px);
+      --fluid-text-lg: clamp(20px, 5vw, 30px);
+  }
+  .stat-card h3 {
+      font-size: var(--fluid-text-lg) !important;
+  }
+  
+  /* Toast Queue */
+  #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10000;
+  }
+  .toast-item {
+      background: #111111;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+      background: #e2e8f0;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+      border-radius: 4px;
+      color: transparent !important;
+  }
+  @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+  }
+
+  /* Table Card View on Mobile */
+  @media (max-width: 480px) {
+      .report-table thead { display: none; }
+      .report-table, .report-table tbody, .report-table tr, .report-table td {
+          display: block;
+          width: 100%;
+      }
+      .report-table tr {
+          margin-bottom: 15px;
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 10px;
+      }
+      .report-table td {
+          text-align: right;
+          padding-left: 50%;
+          position: relative;
+          border: none;
+          border-bottom: 1px solid #f1f5f9;
+      }
+      .report-table td::before {
+          content: attr(data-label);
+          position: absolute;
+          left: 10px;
+          width: 45%;
+          padding-right: 10px;
+          white-space: nowrap;
+          text-align: left;
+          font-weight: bold;
+      }
+      .report-table td:last-child { border-bottom: 0; }
+      
+      #manual-order-modal .modal-content, #points-sec .grid-layout {
+          grid-template-columns: 1fr !important;
+      }
+  }
+
+  /* Print Stylesheet */
+  @media print {
+      body * { visibility: hidden; }
+      #report-sec, #report-sec * { visibility: visible; }
+      #report-sec { position: absolute; left: 0; top: 0; width: 100%; }
+      .sidebar, .top-nav, .btn-void, .btn-outline { display: none !important; }
+  }
+
 </style>
 
 <script id="withu-v3-system">
@@ -1083,7 +1305,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 '<h3 style="font-size:16px; margin-bottom:18px; font-weight:800;"><i class="fas fa-clock" style="color:#10b981; margin-right:8px;"><\/i>Business Hours & Store Status<\/h3>' +
                 
                 '<label style="display:flex; align-items:center; gap:12px; font-weight:800; font-size:16px; color:#10b981; margin-bottom:20px; cursor:pointer; background:rgba(16,185,129,0.1); padding:16px; border-radius:12px; border:1px solid rgba(16,185,129,0.2);">' +
-                '<input type="checkbox" id="store-open-status" onchange="toggleStoreStatus()" style="width:24px; height:24px; accent-color:#10b981; cursor:pointer;"> ร้านเปิดรับออเดอร์ตามปกติ (Open for Orders)<\/label>' +
+                '<input type="checkbox" id="store-open-status" onchange="setStoreStatus()" style="width:24px; height:24px; accent-color:#10b981; cursor:pointer;"> ร้านเปิดรับออเดอร์ตามปกติ (Open for Orders)<\/label>' +
                 
                 '<div style="font-size:13px; font-weight:700; margin-bottom:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Operating Days<\/div>' +
                 '<div id="bh-days" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">' +
@@ -1131,7 +1353,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var qrcodeDiv = document.createElement('div');
             qrcodeDiv.id = 'qrcode-sec';
             qrcodeDiv.style.cssText = 'display:none; padding:24px; max-width:1000px; margin:0 auto;';
-            qrcodeDiv.innerHTML = '<h2 style="margin-bottom:28px;font-size:26px;font-weight:800;letter-spacing:-.6px;"><i class="fas fa-qrcode" style="color:#6366f1; margin-right:10px;"><\/i> ระบบสร้าง QR Code โต๊ะอัตโนมัติ<\/h2>' +
+            qrcodeDiv.innerHTML = '<h2 style="margin-bottom:28px;font-size:26px;font-weight:800;letter-spacing:-.6px;"><i class="fas fa-qrcode" style="color:#111111; margin-right:10px;"><\/i> ระบบสร้าง QR Code โต๊ะอัตโนมัติ<\/h2>' +
             '<div class="ai-card" style="margin-bottom:20px;">' +
             '<label style="font-weight:700; display:block; margin-bottom:8px; font-size:14px;">จำนวนโต๊ะที่มีในร้าน<\/label>' +
             '<div style="display:flex; gap:10px;">' +
@@ -1152,14 +1374,39 @@ window.generateTableQRCodes = function() {
     var baseUrl = 'https://porscheeiei.github.io/withU/?table=';
     
     for(var i=1; i<=count; i++) {
-        var url = encodeURIComponent(baseUrl + i);
-        var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + url;
+        var url = baseUrl + i;
         
         var card = document.createElement('div');
         card.style.cssText = 'background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; box-shadow:var(--shadow); break-inside: avoid;';
-        card.innerHTML = '<div style="font-weight:900; font-size:20px; margin-bottom:10px; color:#000;">โต๊ะ ' + i + '<\/div>' +
-        '<img src="' + qrUrl + '" style="width:100%; height:auto; border-radius:8px;">';
+        
+        var title = document.createElement('div');
+        title.style.cssText = 'font-weight:900; font-size:20px; margin-bottom:10px; color:#000;';
+        title.textContent = 'โต๊ะ ' + i;
+        card.appendChild(title);
+        
+        var qrContainer = document.createElement('div');
+        qrContainer.id = 'qr-box-' + i;
+        qrContainer.style.cssText = 'display:flex; justify-content:center; align-items:center;';
+        card.appendChild(qrContainer);
         grid.appendChild(card);
+        
+        // [PERF] สร้าง QR ฝั่ง client — ไม่ยิง API เลย
+        if (window.QRCode) {
+            new QRCode(qrContainer, {
+                text: url,
+                width: 200,
+                height: 200,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        } else {
+            // Fallback: ถ้า qrcode.js ยังไม่โหลด
+            var img = document.createElement('img');
+            img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(url);
+            img.style.cssText = 'width:200px; height:200px; border-radius:8px;';
+            qrContainer.appendChild(img);
+        }
     }
 };
 
@@ -1367,11 +1614,11 @@ window.savePointData = async function() {
             /* ── Header ── */
             '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">' +
             '<div>' +
-            '<h2 style="margin:0; font-size:22px; font-weight:900; letter-spacing:-0.5px;"><span style="background:linear-gradient(135deg,#6366f1,#a855f7,#ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">📊 Performance</span></h2>' +
+            '<h2 style="margin:0; font-size:22px; font-weight:900; letter-spacing:-0.5px;"><span style="background:none; color:#111111;"><i class="fas fa-chart-bar"></i> Performance</span></h2>' +
             '<p style="margin:4px 0 0; font-size:12px; color:#64748b;">ภาพรวมยอดขายและสถิติร้าน</p>' +
             '</div>' +
             '<div style="display:flex; gap:8px;">' +
-            '<button onclick="switchReportTab(\'dashboard\')" id="rtab-dashboard" style="background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3);"><i class="fas fa-chart-pie" style="margin-right:4px;"></i>Dashboard</button>' +
+            '<button onclick="switchReportTab(\'dashboard\')" id="rtab-dashboard" style="background:#111111; color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3);"><i class="fas fa-chart-pie" style="margin-right:4px;"></i>Dashboard</button>' +
             '<button onclick="switchReportTab(\'history\')" id="rtab-history" style="background:rgba(100,116,139,0.1); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer;"><i class="fas fa-history" style="margin-right:4px;"></i>History</button>' +
             '</div></div>' +
 
@@ -1380,7 +1627,7 @@ window.savePointData = async function() {
 
             /* Period Buttons */
             '<div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">' +
-            '<button class="rpt-btn" onclick="renderReport(\'1d\')" style="flex:1; min-width:70px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:10px; padding:10px; font-weight:700; font-size:12px; cursor:pointer; box-shadow:0 4px 12px rgba(99,102,241,0.35); transition:0.2s;">⚡ 1 Day</button>' +
+            '<button class="rpt-btn" onclick="renderReport(\'1d\')" style="flex:1; min-width:70px; background:#111111; color:#fff; border:none; border-radius:10px; padding:10px; font-weight:700; font-size:12px; cursor:pointer; box-shadow:0 4px 12px rgba(99,102,241,0.35); transition:0.2s;"><i class="fas fa-bolt"></i> 1 Day</button>' +
             '<button class="rpt-btn" onclick="renderReport(\'7d\')" style="flex:1; min-width:70px; background:rgba(100,116,139,0.08); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:10px; font-weight:700; font-size:12px; cursor:pointer; transition:0.2s;">7 Days</button>' +
             '<button class="rpt-btn" onclick="renderReport(\'30d\')" style="flex:1; min-width:70px; background:rgba(100,116,139,0.08); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:10px; font-weight:700; font-size:12px; cursor:pointer; transition:0.2s;">30 Days</button>' +
             '<button class="rpt-btn" onclick="renderReport(\'all\')" style="flex:1; min-width:70px; background:rgba(100,116,139,0.08); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:10px; font-weight:700; font-size:12px; cursor:pointer; transition:0.2s;">All Time</button>' +
@@ -1399,7 +1646,7 @@ window.savePointData = async function() {
             /* Sales Trend Chart */
             '<div style="background:#fff; border-radius:18px; padding:22px; border:1px solid rgba(226,232,240,0.6); box-shadow:0 4px 20px rgba(0,0,0,0.04);">' +
             '<div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">' +
-            '<div style="width:32px; height:32px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;">📈</div>' +
+            '<div style="width:32px; height:32px; background:#111111; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;"><i class="fas fa-chart-line"></i></div>' +
             '<div><p style="margin:0; font-size:13px; font-weight:800;">Sales Trend</p><p style="margin:0; font-size:11px; color:#64748b;">ยอดขายตามช่วงเวลา</p></div>' +
             '</div>' +
             '<div style="height:220px;"><canvas id="salesChart"></canvas></div>' +
@@ -1419,17 +1666,17 @@ window.savePointData = async function() {
             /* Category Summary Badges */
             '<div id="category-badges" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px;">' +
             '<div style="background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(99,102,241,0.08)); border:1px solid rgba(59,130,246,0.2); border-radius:14px; padding:16px; text-align:center;">' +
-            '<div style="font-size:24px;">🧋</div>' +
+            '<div style="font-size:24px;"><i class="fas fa-glass-water"></i></div>' +
             '<p style="font-size:11px; font-weight:800; color:#3b82f6; letter-spacing:1px; margin:6px 0 2px; text-transform:uppercase;">เครื่องดื่ม</p>' +
             '<p style="font-size:20px; font-weight:900; color:#1e40af; margin:0;"><span id="cat-drink">0</span><span style="font-size:11px; margin-left:4px; color:#64748b;">ชิ้น</span></p>' +
             '</div>' +
             '<div style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(239,68,68,0.08)); border:1px solid rgba(245,158,11,0.2); border-radius:14px; padding:16px; text-align:center;">' +
-            '<div style="font-size:24px;">🍞</div>' +
+            '<div style="font-size:24px;"><i class="fas fa-bread-slice"></i></div>' +
             '<p style="font-size:11px; font-weight:800; color:#f59e0b; letter-spacing:1px; margin:6px 0 2px; text-transform:uppercase;">ขนมปัง</p>' +
             '<p style="font-size:20px; font-weight:900; color:#92400e; margin:0;"><span id="cat-bread">0</span><span style="font-size:11px; margin-left:4px; color:#64748b;">ชิ้น</span></p>' +
             '</div>' +
             '<div style="background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.08)); border:1px solid rgba(16,185,129,0.2); border-radius:14px; padding:16px; text-align:center;">' +
-            '<div style="font-size:24px;">🍜</div>' +
+            '<div style="font-size:24px;"><i class="fas fa-bowl-food"></i></div>' +
             '<p style="font-size:11px; font-weight:800; color:#10b981; letter-spacing:1px; margin:6px 0 2px; text-transform:uppercase;">อาหาร</p>' +
             '<p style="font-size:20px; font-weight:900; color:#065f46; margin:0;"><span id="cat-food">0</span><span style="font-size:11px; margin-left:4px; color:#64748b;">ชิ้น</span></p>' +
             '</div>' +
@@ -1561,10 +1808,10 @@ window.switchReportTab = function(tab) {
     var db = document.getElementById('rtab-dashboard');
     var hb = document.getElementById('rtab-history');
     if(db) db.style.cssText = tab==='dashboard'
-        ? 'background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3);'
+        ? 'background:#111111; color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3);'
         : 'background:rgba(100,116,139,0.1); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer;';
     if(hb) hb.style.cssText = tab==='history'
-        ? 'background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3);'
+        ? 'background:#111111; color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3);'
         : 'background:rgba(100,116,139,0.1); color:#64748b; border:1.5px solid rgba(100,116,139,0.2); border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer;';
     if(tab==='dashboard') window.renderReport('1d'); else window.renderHistory();
 };
@@ -1575,7 +1822,7 @@ window.renderReport = function(period) {
     var pMap = {'1d':0,'7d':1,'30d':2,'all':3};
     btns.forEach(function(b,i) {
         b.style.background = i===pMap[period]
-            ? 'linear-gradient(135deg,#6366f1,#8b5cf6)'
+            ? ''#111111''
             : 'rgba(100,116,139,0.08)';
         b.style.color = i===pMap[period] ? '#fff' : '#64748b';
         b.style.border = i===pMap[period] ? 'none' : '1.5px solid rgba(100,116,139,0.2)';
@@ -1672,7 +1919,7 @@ window.renderReport = function(period) {
                 '<div style="margin-top:5px; height:5px; background:rgba(226,232,240,0.8); border-radius:99px; overflow:hidden;">'+
                 '<div style="height:100%; background:'+grad+'; border-radius:99px; width:'+pct+'%; transition:width 0.5s ease;"></div>'+
                 '</div></div>'+
-                '<span style="font-weight:900; font-size:15px; background:linear-gradient(135deg,#6366f1,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; min-width:28px; text-align:right;">'+entry[1]+'</span>'+
+                '<span style="font-weight:900; font-size:15px; background:#111111; color:#111111; min-width:28px; text-align:right;">'+entry[1]+'</span>'+
                 '</div>';
             }).join('');
             mb.innerHTML = '<div style="padding:0 4px;">'+rows+'</div>';
@@ -1742,7 +1989,7 @@ window.renderReport = function(period) {
         categoryChartInstance = new Chart(ctx2, {
             type: 'bar',
             data: {
-                labels: ['🧋 เครื่องดื่ม', '🍞 ขนมปัง', '🍜 อาหาร'],
+                labels: ['<i class="fas fa-glass-water"></i> เครื่องดื่ม', '<i class="fas fa-bread-slice"></i> ขนมปัง', '<i class="fas fa-bowl-food"></i> อาหาร'],
                 datasets: [{
                     label: 'จำนวนที่ขาย (ชิ้น)',
                     data: [catDrink, catBread, catFood],
@@ -2082,6 +2329,99 @@ button[onclick="saveBusinessHours()"]:hover {
 .toast.toast-info { border-left: 4px solid var(--primary) !important; }
 
 /* END settings extra */
+
+  /* Mobile-first and Print Styles */
+  :root {
+      --fluid-text: clamp(16px, 4vw, 22px);
+      --fluid-text-lg: clamp(20px, 5vw, 30px);
+  }
+  .stat-card h3 {
+      font-size: var(--fluid-text-lg) !important;
+  }
+  
+  /* Toast Queue */
+  #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10000;
+  }
+  .toast-item {
+      background: #111111;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+      background: #e2e8f0;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+      border-radius: 4px;
+      color: transparent !important;
+  }
+  @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+  }
+
+  /* Table Card View on Mobile */
+  @media (max-width: 480px) {
+      .report-table thead { display: none; }
+      .report-table, .report-table tbody, .report-table tr, .report-table td {
+          display: block;
+          width: 100%;
+      }
+      .report-table tr {
+          margin-bottom: 15px;
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 10px;
+      }
+      .report-table td {
+          text-align: right;
+          padding-left: 50%;
+          position: relative;
+          border: none;
+          border-bottom: 1px solid #f1f5f9;
+      }
+      .report-table td::before {
+          content: attr(data-label);
+          position: absolute;
+          left: 10px;
+          width: 45%;
+          padding-right: 10px;
+          white-space: nowrap;
+          text-align: left;
+          font-weight: bold;
+      }
+      .report-table td:last-child { border-bottom: 0; }
+      
+      #manual-order-modal .modal-content, #points-sec .grid-layout {
+          grid-template-columns: 1fr !important;
+      }
+  }
+
+  /* Print Stylesheet */
+  @media print {
+      body * { visibility: hidden; }
+      #report-sec, #report-sec * { visibility: visible; }
+      #report-sec { position: absolute; left: 0; top: 0; width: 100%; }
+      .sidebar, .top-nav, .btn-void, .btn-outline { display: none !important; }
+  }
+
 </style>
 
 <style id="withu-premium-redesign">
@@ -2090,8 +2430,8 @@ button[onclick="saveBusinessHours()"]:hover {
 
 /* ── Tokens ─────────────────────────────────── */
 :root {
-  --pp: #6366F1; --pp2: #8B5CF6; --pp-glow: rgba(99,102,241,.18);
-  --pg: linear-gradient(135deg,#6366F1,#8B5CF6);
+  --pp: #111111; --pp2: #000000; --pp-glow: rgba(17,17,17,.18);
+  --pg: #111111;
   --gg: linear-gradient(135deg,#10B981,#059669);
   --sp: #F8FAFC; --sc: #ffffff;
   --sb: #E5E7EB; --st: #0F172A; --sm: #64748B;
@@ -2282,12 +2622,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
   position: relative !important; overflow: hidden !important;
   transition: var(--tr) !important;
 }
-.pts-form-card::after {
-  content: '⭐' !important; position: absolute !important;
-  font-size: 120px !important; opacity: .04 !important;
-  right: -16px !important; top: -24px !important;
-  pointer-events: none !important;
-}
+
 .pts-form-card:hover { box-shadow: var(--sh-h) !important; }
 
 /* Floating label inputs */
@@ -2406,6 +2741,99 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
 /* Animations */
 @keyframes prem-fadeup { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
 .pts-form-card, .pts-table-card, .prem-card { animation: prem-fadeup .3s ease both !important; }
+
+  /* Mobile-first and Print Styles */
+  :root {
+      --fluid-text: clamp(16px, 4vw, 22px);
+      --fluid-text-lg: clamp(20px, 5vw, 30px);
+  }
+  .stat-card h3 {
+      font-size: var(--fluid-text-lg) !important;
+  }
+  
+  /* Toast Queue */
+  #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10000;
+  }
+  .toast-item {
+      background: #111111;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+      background: #e2e8f0;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+      border-radius: 4px;
+      color: transparent !important;
+  }
+  @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+  }
+
+  /* Table Card View on Mobile */
+  @media (max-width: 480px) {
+      .report-table thead { display: none; }
+      .report-table, .report-table tbody, .report-table tr, .report-table td {
+          display: block;
+          width: 100%;
+      }
+      .report-table tr {
+          margin-bottom: 15px;
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 10px;
+      }
+      .report-table td {
+          text-align: right;
+          padding-left: 50%;
+          position: relative;
+          border: none;
+          border-bottom: 1px solid #f1f5f9;
+      }
+      .report-table td::before {
+          content: attr(data-label);
+          position: absolute;
+          left: 10px;
+          width: 45%;
+          padding-right: 10px;
+          white-space: nowrap;
+          text-align: left;
+          font-weight: bold;
+      }
+      .report-table td:last-child { border-bottom: 0; }
+      
+      #manual-order-modal .modal-content, #points-sec .grid-layout {
+          grid-template-columns: 1fr !important;
+      }
+  }
+
+  /* Print Stylesheet */
+  @media print {
+      body * { visibility: hidden; }
+      #report-sec, #report-sec * { visibility: visible; }
+      #report-sec { position: absolute; left: 0; top: 0; width: 100%; }
+      .sidebar, .top-nav, .btn-void, .btn-outline { display: none !important; }
+  }
+
 </style>
 
 
@@ -2451,10 +2879,10 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
   opacity: .09 !important;
   pointer-events: none !important;
 }
-.stat-card:nth-child(1)::after { background: radial-gradient(circle,#6366F1,#8B5CF6) !important; }
-.stat-card:nth-child(2)::after { background: radial-gradient(circle,#6366F1,#A78BFA) !important; }
-.stat-card:nth-child(3)::after { background: radial-gradient(circle,#3B82F6,#60A5FA) !important; }
-.stat-card:nth-child(4)::after { background: radial-gradient(circle,#10B981,#34D399) !important; }
+
+
+
+
 
 /* Icon box */
 .sc-icon {
@@ -2507,6 +2935,99 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
 .sc-delta.down { background: rgba(239,68,68,.1) !important; color: #DC2626 !important; }
 .sc-delta.flat { background: rgba(100,116,139,.1) !important; color: #64748B !important; }
 .sc-compare .sc-label { color: #94A3B8 !important; font-weight: 500 !important; }
+
+  /* Mobile-first and Print Styles */
+  :root {
+      --fluid-text: clamp(16px, 4vw, 22px);
+      --fluid-text-lg: clamp(20px, 5vw, 30px);
+  }
+  .stat-card h3 {
+      font-size: var(--fluid-text-lg) !important;
+  }
+  
+  /* Toast Queue */
+  #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10000;
+  }
+  .toast-item {
+      background: #111111;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+      background: #e2e8f0;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+      border-radius: 4px;
+      color: transparent !important;
+  }
+  @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+  }
+
+  /* Table Card View on Mobile */
+  @media (max-width: 480px) {
+      .report-table thead { display: none; }
+      .report-table, .report-table tbody, .report-table tr, .report-table td {
+          display: block;
+          width: 100%;
+      }
+      .report-table tr {
+          margin-bottom: 15px;
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 10px;
+      }
+      .report-table td {
+          text-align: right;
+          padding-left: 50%;
+          position: relative;
+          border: none;
+          border-bottom: 1px solid #f1f5f9;
+      }
+      .report-table td::before {
+          content: attr(data-label);
+          position: absolute;
+          left: 10px;
+          width: 45%;
+          padding-right: 10px;
+          white-space: nowrap;
+          text-align: left;
+          font-weight: bold;
+      }
+      .report-table td:last-child { border-bottom: 0; }
+      
+      #manual-order-modal .modal-content, #points-sec .grid-layout {
+          grid-template-columns: 1fr !important;
+      }
+  }
+
+  /* Print Stylesheet */
+  @media print {
+      body * { visibility: hidden; }
+      #report-sec, #report-sec * { visibility: visible; }
+      #report-sec { position: absolute; left: 0; top: 0; width: 100%; }
+      .sidebar, .top-nav, .btn-void, .btn-outline { display: none !important; }
+  }
+
 </style>
 
 <!-- ResponsiveVoice TTS API for guaranteed Thai voice fallback -->
@@ -2676,11 +3197,11 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 speechMsg = `ออเดอร์ใหม่ โต๊ะ ${tableStr} สั่ง ${itemsSummary || 'อาหาร'} ค่ะ`;
                 cssClass = "toast-notify toast-notify-new";
             } else if (type === 'add') {
-                msg = `สั่งมาเพิ่ม 🔔 โต๊ะหมายเลข ${tableStr} สั่งเมนูมาเพิ่ม! (คลิกที่นี่เพื่อปิดแจ้งเตือน)`;
+                msg = `สั่งมาเพิ่ม <i class="fas fa-bell"></i> โต๊ะหมายเลข ${tableStr} สั่งเมนูมาเพิ่ม! (คลิกที่นี่เพื่อปิดแจ้งเตือน)`;
                 speechMsg = `โต๊ะ ${tableStr} สั่ง ${itemsSummary || 'อาหาร'} เพิ่มค่ะ`;
                 cssClass = "toast-notify toast-notify-add";
             } else if (type === 'pay') {
-                msg = `💰 โต๊ะหมายเลข ${tableStr} ขอเช็คบิล! (คลิกที่นี่เพื่อปิดแจ้งเตือน)`;
+                msg = `<i class="fas fa-coins"></i> โต๊ะหมายเลข ${tableStr} ขอเช็คบิล! (คลิกที่นี่เพื่อปิดแจ้งเตือน)`;
                 speechMsg = `โต๊ะหมายเลข ${tableStr} ขอเช็คบิลค่ะ`;
                 cssClass = "toast-notify toast-notify-pay";
             }
@@ -2752,10 +3273,10 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             <button class="sidebar-item" onclick="showSec('report'); toggleSidebar();" id="sb-report"><i class="fas fa-chart-line" style="width:24px;"></i> Sales Analytics</button>
             <button class="sidebar-item" onclick="showSec('stock'); toggleSidebar();" id="sb-stock"><i class="fas fa-box" style="width:24px;"></i> Inventory</button>
             <button class="sidebar-item" onclick="openManualOrderModal(null); toggleSidebar();" id="sb-purchase"><i class="fas fa-shopping-cart" style="width:24px;"></i> Purchase</button>
-            <button class="sidebar-item" onclick="toggleAttendance(); toggleSidebar();" id="sb-waste"><i class="fas fa-trash-alt" style="width:24px;"></i> Waste Management</button>
-            <button class="sidebar-item" onclick="alert('Investment Module Coming Soon');" id="sb-investment"><i class="fas fa-arrow-trend-up" style="width:24px;"></i> Investment</button>
+            <button class="sidebar-item" onclick="toggleAttendance(); toggleSidebar();" id="sb-waste"><i class="fas fa-user-clock" style="width:24px;"></i> ตอกบัตรพนักงาน</button>
+            
             <button class="sidebar-item" onclick="showSec('takeaway'); toggleSidebar();" id="sb-takeaway"><i class="fas fa-file-invoice" style="width:24px;"></i> Reports</button>
-            <button class="sidebar-item" onclick="alert('AI Assistant Module Coming Soon');" id="sb-ai"><i class="fas fa-robot" style="width:24px;"></i> AI Assistant</button>
+            
             <button class="sidebar-item" onclick="toggleTheme(); toggleSidebar();" id="sb-settings"><i class="fas fa-cog" style="width:24px;"></i> Settings</button>
         </div>
         <div style="padding: 15px;">
@@ -2975,7 +3496,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <select id="manual-channel" style="font-weight:700;"></select>
             </div>
-            <input type="text" id="manual-search" placeholder=" ค้นหาเมนู..." oninput="renderManualMenu()" style="margin-bottom: 10px; font-size: 13px; padding: 8px;">
+            <input type="text" id="manual-search" placeholder=" ค้นหาเมนู..." oninput="_debouncedManualMenu()" style="margin-bottom: 10px; font-size: 13px; padding: 8px;">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                 <select id="manual-sweetness" style="font-size:12px; padding:8px;">
                     <option value="">ความหวาน/เผ็ด ปกติ</option>
@@ -3029,27 +3550,14 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
         </div>
     </div>
     <script>
-        function loadPoints() {
-            const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
+        '));
             let html = '';
             for(let phone in db) {
                 html += `<tr><td>${phone}</td><td style="font-size:18px; font-weight:800; color:var(--primary);">${db[phone]}</td><td><button class="btn-outline" style="border-color:var(--danger); color:var(--danger); padding:6px 12px;" onclick="deletePoint('${phone}')">ลบข้อมูล</button></td></tr>`;
             }
             safeHtml('points-list-body', html || '<tr><td colspan="3" style="text-align:center; padding:30px; color:var(--text-muted);">ยังไม่มีข้อมูลสมาชิก</td></tr>');
         }
-        function savePoint() {
-            const phone = document.getElementById('point-phone-input').value.trim();
-            const pts = parseInt(document.getElementById('point-val-input').value);
-            if(!phone || isNaN(pts)) return alert("กรุณาใส่เบอร์โทรศัพท์และจำนวนแต้มให้ถูกต้อง");
-            const db = JSON.parse(safeStorageGet('withu_points_db', '{}'));
-            db[phone] = pts;
-            safeStorageSet('withu_points_db', JSON.stringify(db));
-            document.getElementById('point-phone-input').value = '';
-            document.getElementById('point-val-input').value = '';
-            loadPoints();
-            alert("บันทึกข้อมูลสำเร็จ!");
-        }
-        window.deletePoint = async function(phone) {
+                window.deletePoint = async function(phone) {
     if(!confirm('ต้องการลบข้อมูลของเบอร์ ' + phone + ' ใช่หรือไม่?')) return;
     if(typeof showToast==='function') showToast('กำลังลบข้อมูล...', 'new');
     const delUrl = FIREBASE_POINTS_URL.replace('.json', '/' + phone + '.json');
@@ -3063,7 +3571,29 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
 }
 
         const API_URL = "https://script.google.com/macros/s/AKfycbzo3GGk0RBYAX_q4kYmYcONV2a639J-4TXoggQHGtRjtTaK7DdPz5KcrMwXK6wtSinPnA/exec";
-        const API_KEY = "WITHU_SECRET_2026"; 
+        // [SECURITY] API_KEY ถูกลบออกจาก client แล้ว — ใช้ session token แทน
+        // ดู apps_script_patch.txt สำหรับ server-side implementation
+
+        // ─── Session Token Helpers ───────────────────────────────────────
+        function getSessionToken() {
+            return sessionStorage.getItem('withu_session_token') || '';
+        }
+        function setSessionToken(token) {
+            sessionStorage.setItem('withu_session_token', token);
+        }
+        function clearSessionToken() {
+            sessionStorage.removeItem('withu_session_token');
+        }
+        function isSessionValid() {
+            const token = getSessionToken();
+            if (!token) return false;
+            // token format: "<uuid>:<expiry_ms>"
+            const parts = token.split(':');
+            if (parts.length < 2) return false;
+            const expiry = parseInt(parts[parts.length - 1]);
+            return Date.now() < expiry;
+        }
+        // ─────────────────────────────────────────────────────────────────
         
         let fullData = null, manualCart = [], salesChartInst = null;
         let pTable = "", pTotal = 0, pRows = [];
@@ -3082,35 +3612,21 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
         function safeStorageRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
 
         let currentLang = safeStorageGet('withu_lang', 'th');
-        const langPack = {
-            th: {
-                btn_add: "เพิ่มออเดอร์", btn_staff: "พนักงาน", btn_export: "ส่งออก PDF",
-                profit: "กำไรสุทธิวันนี้", revenue: "ยอดขายวันนี้", speed: "ความเร็วบริการเฉลี่ย", orders: "ออเดอร์วันนี้",
-                tab_orders: "ออเดอร์หน้าร้าน", tab_takeaway: "เดลิเวอรี", tab_stock: "คลังสินค้า", tab_report: "ผลประกอบการ",
-                no_orders: "ไม่มีออเดอร์ค้างในระบบ", mins_ago: "นาทีที่แล้ว", cook: "เตรียม", serve: "เสิร์ฟ",
-                collect: "เรียกเก็บเงิน", total_due: "ยอดรวมที่ต้องชำระ", cancel: "ยกเลิก", confirm: "ยืนยัน",
-                th_name: "ชื่อเมนู", th_cost: "ต้นทุน", th_status: "สถานะ", th_ctrl: "จัดการ", void: "ลบรายการ",
-                status_normal: "ปกติ", status_out: "หมด", toggle: "สลับสถานะ", live_map: "แผนผังร้านแบบ Real-time",
-                heat_title: "อันดับเมนูขายดี (Heat Menu)", ai_title: "AI วิเคราะห์ธุรกิจ", manual_title: "สร้างออเดอร์นอกระบบ",
-                perf_title: "รายงานสรุปยอดขาย", btn_peak: "รายชั่วโมง", btn_day: "รายวัน", staff_title: "ตอกบัตรพนักงาน",
-                ai_loading: "กำลังโหลดระบบ AI...", ai_ready: "ระบบ AI พร้อมใช้งาน", scan_btn: "สแกนใบหน้าตอกบัตร", reg_btn: "ลงทะเบียนใบหน้า",
-                mistake: "ตรวจพบข้อมูลผิดปกติ", btn_move_table: "ย้ายโต๊ะ", btn_add_item: "เพิ่มเมนู"
-            },
-            en: {
-                btn_add: "ADD ORDER", btn_staff: "STAFF", btn_export: "EXPORT PDF",
-                profit: "Gross Profit", revenue: "Revenue", speed: "Avg Service", orders: "Orders Today",
-                tab_orders: "Store", tab_takeaway: "Delivery", tab_stock: "Stock", tab_report: "Performance",
-                no_orders: "NO PENDING ORDERS", mins_ago: "MINS AGO", cook: "COOK", serve: "SERVE",
-                collect: "COLLECT PAYMENT", total_due: "Total Due", cancel: "CANCEL", confirm: "CONFIRM",
-                th_name: "Item Name", th_cost: "Cost", th_status: "Status", th_ctrl: "Control", void: "VOID",
-                status_normal: "NORMAL", status_out: "OUT OF STOCK", toggle: "TOGGLE", live_map: "Live Restaurant Map",
-                heat_title: "Heat Menu (Best Sellers)", ai_title: "AI Business Advisor", manual_title: "CREATE MANUAL ORDER",
-                perf_title: "DAILY PERFORMANCE REPORT", btn_peak: "HOURLY", btn_day: "DAILY", staff_title: "STAFF CLOCK",
-                ai_loading: "AI MODELS LOADING...", ai_ready: "AI SYSTEM READY", scan_btn: "SCAN FACE TO CLOCK", reg_btn: "REGISTER FACE",
-                mistake: "MISTAKE DETECTED", btn_move_table: "MOVE TABLE", btn_add_item: "ADD ITEM"
-            }
-        };
 
+        // [PERF] Debounce utility — ลด render calls จาก input search
+        function debounce(fn, delay) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+        // Debounced wrappers — สร้างหลัง declare renderManualMenu แล้ว
+        // (เรียกหลัง DOMContentLoaded ดังนั้น renderManualMenu มีแน่นอนแล้ว)
+        window._debouncedManualMenu = debounce(function() {
+            if (typeof renderManualMenu === 'function') renderManualMenu();
+        }, 250);
+        
         function toggleTheme() {
             const currentTheme = document.body.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -3119,16 +3635,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             if (salesChartInst) drawChart(); 
         }
 
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'th' : 'en';
-            safeStorageSet('withu_lang', currentLang);
-            applyLanguagePack();
-            if(fullData) { 
-                renderOrders(fullData.orders || []); 
-                filterStock(); // Update to use filter function
-                renderPerformance((fullData.analytics && fullData.analytics.report) ? fullData.analytics.report : []); 
-            }
-        }
+                }
 
         function applyLanguagePack() {
             if (!langPack[currentLang]) currentLang = 'th';
@@ -3457,9 +3964,11 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                                         
                                         if (isItemNew) {
                                             if (hasExistingItems || isSubsequentItem) {
-                                                newItemBadge = `<span class="badge-new-item">สั่งมาเพิ่ม 🔔</span>`;
+                                                // [UI] สั่งมาเพิ่ม = สีส้ม/orange (ไม่ใช้แดง เพราะแดง = error/ลบ)
+                                                newItemBadge = `<span class="badge-new-item badge-added-order">สั่งมาเพิ่ม <i class="fas fa-bell"></i></span>`;
                                             } else {
-                                                newItemBadge = `<span class="badge-new-item" style="background:#3b82f6;">ออเดอร์ใหม่ ✨</span>`;
+                                                // [UI] ออเดอร์ใหม่ = สีน้ำเงิน (ข้อมูล/ใหม่)
+                                                newItemBadge = `<span class="badge-new-item badge-fresh-order">ออเดอร์ใหม่ ✨</span>`;
                                             }
                                         }
                                         
@@ -3540,9 +4049,49 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                 });
                 return html || `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted); font-size:14px; font-weight:500;">${l.no_orders}</div>`;
             };
-            
-            if(store) store.innerHTML = genCards(true);
-            if(takeaway) takeaway.innerHTML = genCards(false);
+
+            // [PERF] DOM Diffing — ไม่ rebuild innerHTML ทั้งหมดทุก 5 วิ
+            // เปรียบเทียบ card fingerprint ต่อ tableId แล้วอัปเดตเฉพาะที่เปลี่ยน
+            function applyDiff(container, isStore) {
+                if (!container) return;
+                const newHtml = genCards(isStore);
+
+                // สร้าง fingerprint ของ HTML ใหม่ทั้งหมด
+                const newKey = newHtml.length + '_' + (newHtml.slice(0, 80));
+                const oldKey = container.dataset.renderKey || '';
+
+                // ถ้า fingerprint เดิม → ไม่ต้อง render เลย
+                if (newKey === oldKey) return;
+                container.dataset.renderKey = newKey;
+
+                // Parse cards ใหม่เป็น temp fragment
+                const temp = document.createElement('div');
+                temp.innerHTML = newHtml;
+                const newCards = Array.from(temp.children);
+
+                // ถ้าไม่มี card (empty state) หรือจำนวน card เปลี่ยน → ทำ full replace
+                const oldCards = Array.from(container.children);
+                if (newCards.length !== oldCards.length) {
+                    container.innerHTML = newHtml;
+                    return;
+                }
+
+                // ถ้าจำนวนเท่ากัน → เปรียบเทียบแต่ละ card
+                newCards.forEach((newCard, idx) => {
+                    const oldCard = oldCards[idx];
+                    if (!oldCard) {
+                        container.appendChild(newCard);
+                        return;
+                    }
+                    // เปรียบเทียบ outerHTML ก่อน — ถ้าเหมือนกันข้ามไป
+                    if (oldCard.outerHTML !== newCard.outerHTML) {
+                        container.replaceChild(newCard, oldCard);
+                    }
+                });
+            }
+
+            applyDiff(store, true);
+            applyDiff(takeaway, false);
             
             // สั่งดึงข้อมูลจัดส่งจาก Firebase ของออเดอร์เดลิเวอรี่ทั้งหมดบนหน้าจอ
             activeDeliveryTables.forEach(t => {
@@ -3569,7 +4118,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             }
             fetch(API_URL, {
                 method:'POST', mode:'no-cors',
-                body: JSON.stringify({ action:'updateStatus', rowNums: [rowNum], status: status, apiKey: API_KEY })
+                body: JSON.stringify({ action:'updateStatus', rowNums: [rowNum], status: status, token: getSessionToken() })
             });
         }
 
@@ -3585,7 +4134,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             try {
                 await fetch(API_URL, {
                     method:'POST', mode:'no-cors',
-                    body: JSON.stringify({ action:'updateStatus', rowNums: rows, status: 'void', apiKey: API_KEY })
+                    body: JSON.stringify({ action:'updateStatus', rowNums: rows, status: 'void', token: getSessionToken() })
                 });
             } catch(e) { console.error("Void Table Error:", e); }
             
@@ -3607,7 +4156,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                     mode: 'no-cors',
                     body: JSON.stringify({ 
                         action: 'moveTable', 
-                        apiKey: API_KEY, 
+                        token: getSessionToken(), 
                         oldTable: oldTable, 
                         newTable: newTable.trim() 
                     })
@@ -3750,8 +4299,9 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                         paymentMethod: method, 
                         change: actualChange,
                         customerPhone: customerPhone,
-                        earnedPoints: earnedPoints,
-                        apiKey: API_KEY
+                        // [SECURITY] earnedPoints คำนวณฝั่ง server จาก rowNums จริง ไม่เชื่อค่านี้
+                        earnedPointsHint: earnedPoints,
+                        token: getSessionToken()
                     })
                 });
 
@@ -3882,7 +4432,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                     action:'updateStatus', 
                     rowNums: rows, 
                     status: status, 
-                    apiKey: API_KEY
+                    token: getSessionToken()
                 })
             });
         }
@@ -3890,7 +4440,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
         async function handleVoidItem(rowNum) {
             if(!confirm("ยืนยันลบเมนูนี้ออกจากบิล?")) return;
             try {
-                await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'voidItem', rowNum: rowNum, orderId: rowNum, apiKey: API_KEY})});
+                await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action:'voidItem', rowNum: rowNum, orderId: rowNum, token: getSessionToken()})});
             } catch(e) {
                 console.error("Void Item Error:", e);
             }
@@ -4129,6 +4679,22 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
 
         async function loadFaceApiModels() {
             if (isAiModelsLoaded) return;
+            // [PERF] Lazy-load face-api.js เฉพาะตอนใช้งานจริง — ไม่โหลดตอนเปิดหน้า
+            if (!window.faceapi) {
+                safeText('ai-status', 'กำลังโหลด AI library...');
+                try {
+                    await new Promise((resolve, reject) => {
+                        const s = document.createElement('script');
+                        s.src = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js';
+                        s.onload = resolve;
+                        s.onerror = () => reject(new Error('face-api.js load failed'));
+                        document.head.appendChild(s);
+                    });
+                } catch(e) {
+                    safeText('ai-status', 'AI LOAD ERROR — ตรวจสอบ internet');
+                    return;
+                }
+            }
             const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
             try {
                 await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
@@ -4338,7 +4904,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             const originalText = btnConfirm.innerText;
             btnConfirm.innerText = "SENDING...";
             try {
-                await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action: 'submitOrder', table: channelVal, cart: manualCart, apiKey: API_KEY})});
+                await fetch(API_URL, {method:'POST', mode:'no-cors', body: JSON.stringify({action: 'submitOrder', table: channelVal, cart: manualCart, token: getSessionToken()})});
             } catch(e) {
                 console.error("Submit Order Error:", e);
             }
@@ -4374,7 +4940,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
                     if (typeof showToast === 'function') showToast('เคลียร์ออเดอร์เรียบร้อย', 'success');
                 }
                 
-                const payload = {action, apiKey: API_KEY, ...params};
+                const payload = {action, token: getSessionToken(), ...params};
                 await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(payload)}); 
                 
                 // แก้ไข: ไม่เรียก refresh() โดยตรง (ซ้อน loop) แต่ reset fingerprint แล้วให้ loop ทำงานปกติ
@@ -4400,26 +4966,67 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             }
         }
         
-        const ADMIN_PIN = "123456";
+        // [SECURITY] ADMIN_PIN ถูกลบออกแล้ว — ตรวจสอบผ่าน server เท่านั้น
         let refreshInterval = null;
         let clockInterval = null;
         let reloadInterval = null;
 
-        function checkLogin() {
+        async function checkLogin() {
             const pin = document.getElementById('login-pin').value;
-            if(pin === ADMIN_PIN || pin === API_KEY) {
-                safeStorageSet('withu_admin_logged_in', 'true');
-                document.getElementById('login-overlay').style.display = 'none';
-                initApp();
-            } else {
+            if (!pin || pin.length < 4) {
                 safeStyle('login-error', 'display', 'block');
                 setTimeout(() => safeStyle('login-error', 'display', 'none'), 3000);
+                return;
+            }
+
+            const btnLogin = document.querySelector('#login-overlay button[onclick*="checkLogin"]');
+            if (btnLogin) { btnLogin.disabled = true; btnLogin.textContent = 'กำลังตรวจสอบ...'; }
+
+            try {
+                // [SECURITY] ส่ง PIN ไปยัง server เพื่อตรวจสอบ — ไม่เก็บ PIN ไว้ฝั่ง client
+                const resp = await fetch(API_URL + '?action=verifyPin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ pin: pin }),
+                    redirect: 'follow'
+                });
+                const text = await resp.text();
+                let result;
+                try { result = JSON.parse(text); } catch(e) { result = {}; }
+
+                if (result.ok && result.token) {
+                    // เก็บ token + expiry ใน sessionStorage (ปิด tab = หมดอายุ)
+                    const expiryMs = Date.now() + (8 * 60 * 60 * 1000); // 8 ชั่วโมง
+                    setSessionToken(result.token + ':' + expiryMs);
+                    safeStorageSet('withu_admin_logged_in', 'true');
+                    document.getElementById('login-overlay').style.display = 'none';
+                    initApp();
+                } else {
+                    safeStyle('login-error', 'display', 'block');
+                    setTimeout(() => safeStyle('login-error', 'display', 'none'), 3000);
+                    // Fallback สำหรับกรณี Apps Script ยังไม่มี verifyPin endpoint
+                    // (ลบบล็อก if-else ด้านล่างนี้ออกหลังจาก deploy Apps Script แล้ว)
+                    if (text && (text.includes('verifyPin') === false && text.includes('Invalid action') === false)) {
+                        // server ยังไม่รองรับ verifyPin — ให้แสดงข้อความแนะนำ
+                        console.warn('[WITHU SECURITY] Apps Script ยังไม่มี verifyPin endpoint — ดู apps_script_patch.txt');
+                    }
+                }
+            } catch(e) {
+                console.error('[WITHU] Login verification failed:', e);
+                // Graceful fallback: ถ้า network error แสดง error ให้ user รู้
+                const errEl = document.getElementById('login-error');
+                if (errEl) errEl.textContent = 'เชื่อมต่อ server ล้มเหลว — ตรวจสอบ network';
+                safeStyle('login-error', 'display', 'block');
+                setTimeout(() => { safeStyle('login-error', 'display', 'none'); if(errEl) errEl.textContent = 'PIN ไม่ถูกต้อง'; }, 3000);
+            } finally {
+                if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'เข้าสู่ระบบ'; }
             }
         }
 
         function handleLogout() {
             if(!confirm("ต้องการออกจากระบบใช่หรือไม่?")) return;
             safeStorageRemove('withu_admin_logged_in');
+            clearSessionToken(); // [SECURITY] ลบ session token
             document.getElementById('login-pin').value = '';
             document.getElementById('login-overlay').style.display = 'flex';
             
@@ -4429,7 +5036,6 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
             if (refreshInterval) clearInterval(refreshInterval);
             if (clockInterval) clearInterval(clockInterval);
             if (reloadInterval) clearInterval(reloadInterval);
-            // แก้ไข: clearTimeout ของ refreshTimeout ซึ่งเป็นตัวแปรที่ใช้จริงตอนนี้
             if (refreshTimeout) clearTimeout(refreshTimeout);
             isRefreshing = false;
         }
@@ -4447,10 +5053,13 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            if(safeStorageGet('withu_admin_logged_in') === 'true') {
+            if(safeStorageGet('withu_admin_logged_in') === 'true' && isSessionValid()) {
                 document.getElementById('login-overlay').style.display = 'none';
                 initApp();
             } else {
+                // [SECURITY] session หมดอายุหรือไม่มี token — force login ใหม่
+                safeStorageRemove('withu_admin_logged_in');
+                clearSessionToken();
                 document.getElementById('login-overlay').style.display = 'flex';
             }
             
@@ -4479,6 +5088,99 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
 .toast.toast-info { border-left: 4px solid #3b82f6; }
 @keyframes toastSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes toastFadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+  /* Mobile-first and Print Styles */
+  :root {
+      --fluid-text: clamp(16px, 4vw, 22px);
+      --fluid-text-lg: clamp(20px, 5vw, 30px);
+  }
+  .stat-card h3 {
+      font-size: var(--fluid-text-lg) !important;
+  }
+  
+  /* Toast Queue */
+  #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10000;
+  }
+  .toast-item {
+      background: #111111;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+      background: #e2e8f0;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+      border-radius: 4px;
+      color: transparent !important;
+  }
+  @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+  }
+
+  /* Table Card View on Mobile */
+  @media (max-width: 480px) {
+      .report-table thead { display: none; }
+      .report-table, .report-table tbody, .report-table tr, .report-table td {
+          display: block;
+          width: 100%;
+      }
+      .report-table tr {
+          margin-bottom: 15px;
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 10px;
+      }
+      .report-table td {
+          text-align: right;
+          padding-left: 50%;
+          position: relative;
+          border: none;
+          border-bottom: 1px solid #f1f5f9;
+      }
+      .report-table td::before {
+          content: attr(data-label);
+          position: absolute;
+          left: 10px;
+          width: 45%;
+          padding-right: 10px;
+          white-space: nowrap;
+          text-align: left;
+          font-weight: bold;
+      }
+      .report-table td:last-child { border-bottom: 0; }
+      
+      #manual-order-modal .modal-content, #points-sec .grid-layout {
+          grid-template-columns: 1fr !important;
+      }
+  }
+
+  /* Print Stylesheet */
+  @media print {
+      body * { visibility: hidden; }
+      #report-sec, #report-sec * { visibility: visible; }
+      #report-sec { position: absolute; left: 0; top: 0; width: 100%; }
+      .sidebar, .top-nav, .btn-void, .btn-outline { display: none !important; }
+  }
+
 </style>
 <div id="toast-container" class="toast-container"></div>
 
@@ -4588,7 +5290,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
     // Preserve existing inputs by wrapping them instead of replacing
     sec.innerHTML = `
 <h2 style="margin-bottom:28px;font-size:26px;font-weight:800;letter-spacing:-.6px;">
-  <i class="fas fa-cog" style="background:linear-gradient(135deg,#6366F1,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:10px;"></i>
+  <i class="fas fa-cog" style="background:#111111;color:#111111;margin-right:10px;"></i>
   Store Settings
 </h2>
 
@@ -4645,7 +5347,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
     <div class="time-field">
       <label>เวลาปิด (Close)</label>
       <div class="time-field-wrap">
-        <span class="t-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;color:#6366f1;margin-right:6px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></span>
+        <span class="t-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;color:#111111;margin-right:6px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></span>
         <input type="time" id="bh-end" value="21:00">
       </div>
     </div>
@@ -4660,7 +5362,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
 <!-- Sound Card -->
 <div class="prem-card">
   <div class="prem-section-title">
-    <div class="prem-section-icon blue">🔔</div>
+    <div class="prem-section-icon blue"><i class="fas fa-bell"></i></div>
     <div>
       <div class="prem-section-label">Sound Alerts</div>
       <div class="prem-section-sub">Enable or disable notification sounds</div>
@@ -4690,7 +5392,7 @@ input:checked + .ios-slider::before { transform: translateX(22px) !important; }
     // Preserve the existing tbody id="points-list"
     sec.innerHTML = `
 <div class="pts-header-title">
-  <span style="background:linear-gradient(135deg,#F59E0B,#D97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:10px;"></span>
+  <span style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#111111;margin-right:10px;"></span>
   Loyalty Points
 </div>
 
@@ -5028,7 +5730,7 @@ function buildMenuSection(sec) {
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
   <div>
     <h2 style="margin:0;font-size:22px;font-weight:900;letter-spacing:-0.5px;">
-      <span style="background:linear-gradient(135deg,#10b981,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">🍽️ จัดการเมนู</span>
+      <span style="background:linear-gradient(135deg,#10b981,#3b82f6,#8b5cf6);color:#111111;background-clip:text;"><i class="fas fa-utensils"></i> จัดการเมนู</span>
     </h2>
     <p style="margin:4px 0 0;font-size:12px;color:#64748b;">เพิ่ม แก้ไข ลบเมนู กำหนดตัวเลือก และซิงค์หน้าลูกค้า</p>
   </div>
@@ -5083,10 +5785,10 @@ function buildMenuSection(sec) {
           <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">หมวดหมู่ *</label>
           <select id="mm-category" onchange="window.mmOnCategoryChange()" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;">
             <option value="">— เลือกหมวดหมู่ —</option>
-            <option value="เครื่องดื่ม">🧋 เครื่องดื่ม</option>
+            <option value="เครื่องดื่ม"><i class="fas fa-glass-water"></i> เครื่องดื่ม</option>
             <option value="สมูทตี้">🥤 สมูทตี้</option>
-            <option value="ขนมปัง">🍞 ขนมปัง</option>
-            <option value="เมนูเส้น">🍜 เมนูเส้น</option>
+            <option value="ขนมปัง"><i class="fas fa-bread-slice"></i> ขนมปัง</option>
+            <option value="เมนูเส้น"><i class="fas fa-bowl-food"></i> เมนูเส้น</option>
             <option value="เมนูข้าว">🍚 เมนูข้าว</option>
             <option value="เมนูยำ">🥗 เมนูยำ</option>
             <option value="ของทานเล่น">🍿 ของทานเล่น</option>
@@ -5118,23 +5820,23 @@ function buildMenuSection(sec) {
         <p style="font-size:11px;font-weight:800;color:#64748b;letter-spacing:1px;text-transform:uppercase;margin:0 0 12px;">ตัวเลือกสำหรับเมนูนี้</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="mm-opts-grid">
           <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;">
-            <input type="checkbox" id="opt-sweetness" style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;">
+            <input type="checkbox" id="opt-sweetness" style="width:16px;height:16px;accent-color:#111111;cursor:pointer;">
             <div><div style="font-size:12px;font-weight:700;">🍯 ระดับความหวาน</div><div style="font-size:10px;color:#94a3b8;">เลือก 25-100%</div></div>
           </label>
           <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;">
-            <input type="checkbox" id="opt-frappe" style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;">
-            <div><div style="font-size:12px;font-weight:700;">🧊 เพิ่มปั่น (Frappe)</div><div style="font-size:10px;color:#94a3b8;">ปั่น +฿10</div></div>
+            <input type="checkbox" id="opt-frappe" style="width:16px;height:16px;accent-color:#111111;cursor:pointer;">
+            <div><div style="font-size:12px;font-weight:700;"><i class="fas fa-icicles"></i> เพิ่มปั่น (Frappe)</div><div style="font-size:10px;color:#94a3b8;">ปั่น +฿10</div></div>
           </label>
           <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;">
-            <input type="checkbox" id="opt-spiciness" style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;">
+            <input type="checkbox" id="opt-spiciness" style="width:16px;height:16px;accent-color:#111111;cursor:pointer;">
             <div><div style="font-size:12px;font-weight:700;">🌶️ ระดับความเผ็ด</div><div style="font-size:10px;color:#94a3b8;">ไม่เผ็ด-เผ็ดมาก</div></div>
           </label>
           <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;">
-            <input type="checkbox" id="opt-special" style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;">
-            <div><div style="font-size:12px;font-weight:700;">⭐ พิเศษ (Upsize)</div><div style="font-size:10px;color:#94a3b8;">พิเศษ +฿20</div></div>
+            <input type="checkbox" id="opt-special" style="width:16px;height:16px;accent-color:#111111;cursor:pointer;">
+            <div><div style="font-size:12px;font-weight:700;"><i class="fas fa-star"></i> พิเศษ (Upsize)</div><div style="font-size:10px;color:#94a3b8;">พิเศษ +฿20</div></div>
           </label>
           <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:10px;cursor:pointer;border:1.5px solid #e2e8f0;grid-column:1/-1;">
-            <input type="checkbox" id="opt-topping" style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;">
+            <input type="checkbox" id="opt-topping" style="width:16px;height:16px;accent-color:#111111;cursor:pointer;">
             <div><div style="font-size:12px;font-weight:700;">🧁 ท็อปปิ้ง (Add-ons)</div><div style="font-size:10px;color:#94a3b8;">เลือกท็อปปิ้งเพิ่ม</div></div>
           </label>
         </div>
@@ -5147,7 +5849,7 @@ function buildMenuSection(sec) {
       <input type="hidden" id="mm-img-data">
       <!-- Buttons -->
       <div style="display:flex;gap:10px;">
-        <button onclick="window.saveMenuItemFromModal()" style="flex:1;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,0.35);">
+        <button onclick="window.saveMenuItemFromModal()" style="flex:1;background:#111111;color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,0.35);">
           <i class="fas fa-save" style="margin-right:6px;"></i>บันทึกเมนู
         </button>
         <button onclick="window.closeMenuModal()" style="padding:13px 18px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;color:#64748b;">ยกเลิก</button>
@@ -5379,7 +6081,7 @@ window.renderMenuStats = function() {
     var soldOut = allMenuItems.filter(function(m){return m.status==='หมด';}).length;
     var cats    = new Set(allMenuItems.map(function(m){return m.category;})).size;
     var stats = [
-        {icon:'🍽️',label:'เมนูทั้งหมด',val:total,g:'linear-gradient(135deg,#6366f1,#8b5cf6)'},
+        {icon:'<i class="fas fa-utensils"></i>',label:'เมนูทั้งหมด',val:total,g:''#111111''},
         {icon:'✏️',label:'แก้ไขแล้ว',val:custom,g:'linear-gradient(135deg,#3b82f6,#06b6d4)'},
         {icon:'🚫',label:'หมดแล้ว',val:soldOut,g:'linear-gradient(135deg,#ef4444,#f97316)'},
         {icon:'📂',label:'หมวดหมู่',val:cats,g:'linear-gradient(135deg,#10b981,#059669)'},
@@ -5396,7 +6098,7 @@ function renderFilterTabs() {
     if (!el) return;
     el.innerHTML = FILTER_CATS.map(function(cat) {
         var active = cat===currentMenuFilter;
-        return '<button onclick="window.setMenuFilter(\''+cat+'\')" style="padding:6px 12px;border-radius:8px;border:1.5px solid '+(active?'#6366f1':'rgba(226,232,240,0.8)')+';background:'+(active?'linear-gradient(135deg,#6366f1,#8b5cf6)':'#fff')+';color:'+(active?'#fff':'#64748b')+';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;">'+cat+'</button>';
+        return '<button onclick="window.setMenuFilter(\''+cat+'\')" style="padding:6px 12px;border-radius:8px;border:1.5px solid '+(active?'#6366f1':'rgba(226,232,240,0.8)')+';background:'+(active?''#111111'':'#fff')+';color:'+(active?'#fff':'#64748b')+';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;">'+cat+'</button>';
     }).join('');
 }
 window.setMenuFilter = function(cat) { currentMenuFilter = cat; renderFilterTabs(); window.renderMenuCards(); };
@@ -5422,7 +6124,7 @@ window.renderMenuCards = function() {
         var imgSrc = m.image || 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=400&auto=format&fit=crop';
         var badge = '';
         if (m.isCustom) badge += '<span style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;letter-spacing:0.5px;">NEW</span> ';
-        if (m._override) badge += '<span style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;">แก้ไขแล้ว</span> ';
+        if (m._override) badge += '<span style="background:#111111;color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;">แก้ไขแล้ว</span> ';
         if (m.badge) badge += '<span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;">'+m.badge+'</span>';
         var itemJson = JSON.stringify({
             _key: m._key||m.name, key: m.key||m.name, name: m.name, price: m.price,
@@ -5441,10 +6143,10 @@ window.renderMenuCards = function() {
             + '<div style="font-weight:800;font-size:13px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+m.name+'">'+m.name+'</div>'
             + '<div style="font-size:10px;color:#94a3b8;margin-bottom:10px;">'+m.category+(m.subcategory?' › '+m.subcategory:'')+'</div>'
             + '<div style="display:flex;justify-content:space-between;align-items:center;">'
-            + '<span style="font-size:17px;font-weight:900;background:linear-gradient(135deg,#10b981,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">฿'+m.price+'</span>'
+            + '<span style="font-size:17px;font-weight:900;background:linear-gradient(135deg,#10b981,#059669);color:#111111;background-clip:text;">฿'+m.price+'</span>'
             + '<div style="display:flex;gap:6px;">'
             + '<button onclick="window.toggleMenuStatus(\''+key.replace(/'/g,"\\'")+'\',' + (soldOut ? '\'หมด\'':'\'ปกติ\'') + ')" title="'+(soldOut?'เปิดขาย':'ปิดขาย')+'" style="width:30px;height:30px;border-radius:8px;border:1.5px solid '+(soldOut?'#10b981':'#ef4444')+';background:'+(soldOut?'rgba(16,185,129,0.08)':'rgba(239,68,68,0.08)')+';cursor:pointer;color:'+(soldOut?'#10b981':'#ef4444')+';font-size:12px;display:flex;align-items:center;justify-content:center;">'+(soldOut?'✓':'✕')+'</button>'
-            + '<button onclick="window.openMenuModal(JSON.parse(decodeURIComponent(\''+encodeURIComponent(JSON.stringify({_key:m._key||m.name,key:m.key||m.name,name:m.name,price:m.price,category:m.category||'',subcategory:m.subcategory||'',badge:m.badge||'',image:m.image||'',status:m.status||'ปกติ',showIn:m.showIn||'both',isCustom:!!m.isCustom,_override:!!m._override,options:m.options||{}}))+'\'  )))" style="width:30px;height:30px;border-radius:8px;border:1.5px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.06);cursor:pointer;color:#6366f1;font-size:12px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-edit"></i></button>'
+            + '<button onclick="window.openMenuModal(JSON.parse(decodeURIComponent(\''+encodeURIComponent(JSON.stringify({_key:m._key||m.name,key:m.key||m.name,name:m.name,price:m.price,category:m.category||'',subcategory:m.subcategory||'',badge:m.badge||'',image:m.image||'',status:m.status||'ปกติ',showIn:m.showIn||'both',isCustom:!!m.isCustom,_override:!!m._override,options:m.options||{}}))+'\'  )))" style="width:30px;height:30px;border-radius:8px;border:1.5px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.06);cursor:pointer;color:#111111;font-size:12px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-edit"></i></button>'
             + '</div></div></div></div>';
     }).join('');
 };
@@ -5827,11 +6529,46 @@ document.head.appendChild(style);
         let slipBtn = data.slip ? `<button onclick="openSlipModal('${data.slip}')" style="margin-top:8px; background:var(--primary); color:white; border:none; padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer;">ดูสลิปโอนเงิน</button>` : "";
         el.innerHTML = `
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:12px; font-size:13px; color:#475569; line-height:1.5;">
-            <strong style="color:var(--primary); display:block; margin-bottom:4px;">🚚 ข้อมูลการจัดส่ง / ชำระเงิน</strong>
+            <strong style="color:var(--primary); display:block; margin-bottom:4px;"><i class="fas fa-truck"></i> ข้อมูลการจัดส่ง / ชำระเงิน</strong>
             ${dText}
             <br>${slipBtn}
         </div>`;
     }
+
+// Custom Confirm Function
+window.customConfirm = function(msg, callback) {
+    // If modal already exists, show it, otherwise create it
+    let modal = document.getElementById('custom-confirm-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'custom-confirm-modal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;';
+        modal.innerHTML = `
+            <div style="background:#fff; border-radius:12px; padding:24px; max-width:400px; width:90%; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+                <div style="font-size:40px; color:#111; margin-bottom:15px;"><i class="fas fa-exclamation-circle"></i></div>
+                <h3 style="margin:0 0 10px 0; color:#111; font-size:20px;">ยืนยันการทำรายการ</h3>
+                <p id="custom-confirm-msg" style="color:#555; margin-bottom:20px; font-size:16px;"></p>
+                <div style="display:flex; gap:10px; justify-content:center;">
+                    <button id="custom-confirm-cancel" style="flex:1; padding:12px; border-radius:8px; border:1px solid #ccc; background:#fff; color:#333; cursor:pointer; font-weight:bold;">ยกเลิก</button>
+                    <button id="custom-confirm-ok" style="flex:1; padding:12px; border-radius:8px; border:none; background:#111; color:#fff; cursor:pointer; font-weight:bold;">ตกลง</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    document.getElementById('custom-confirm-msg').innerText = msg;
+    modal.style.display = 'flex';
+    
+    document.getElementById('custom-confirm-cancel').onclick = function() {
+        modal.style.display = 'none';
+        if (callback) callback(false);
+    };
+    document.getElementById('custom-confirm-ok').onclick = function() {
+        modal.style.display = 'none';
+        if (callback) callback(true);
+    };
+};
+
 </script>
 
 </body>

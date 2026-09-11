@@ -1,0 +1,36 @@
+{
+  "rules": {
+    "points": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "customMenu": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "popupAd": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "banners": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "faceProfiles": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "slips": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "delivery": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "$other": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

@@ -1,0 +1,122 @@
+// ================================================================
+// WITHU APPS SCRIPT PATCH — Security Endpoints
+// วิธีใช้: เพิ่มโค้ดนี้ใน Google Apps Script ของร้าน
+//         แล้ว Deploy ใหม่ (Deploy > New deployment)
+// ================================================================
+
+// ── 1. GLOBAL CONSTANTS (ย้ายจาก admin.html มาไว้ที่นี่) ─────────
+
+const WITHU_ADMIN_PIN_HASH = 'REPLACE_WITH_SHA256_OF_YOUR_PIN';
+// วิธีหา hash: https://emn178.github.io/online-tools/sha256.html
+// ใส่ PIN เช่น "123456" → copy SHA-256 hash มาวางที่นี่
+// ตัวอย่าง: const WITHU_ADMIN_PIN_HASH = 'e10adc3949ba59abbe56e057f20f883e';  // MD5 ตัวอย่างเท่านั้น
+
+const WITHU_SESSION_STORE = 'withu_sessions'; // PropertiesService key
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 ชั่วโมง
+
+// ── 2. VERIFY PIN — สร้าง session token ──────────────────────────
+
+function verifyPinHandler(body) {
+  const pin = body.pin || '';
+  if (!pin) return { ok: false, error: 'NO_PIN' };
+
+  // Hash PIN แล้วเปรียบเทียบกับ hash ที่เก็บไว้
+  const digest = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    pin,
+    Utilities.Charset.UTF_8
+  );
+  const hex = digest.map(b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
+
+  if (hex !== WITHU_ADMIN_PIN_HASH) {
+    return { ok: false, error: 'INVALID_PIN' };
+  }
+
+  // สร้าง session token
+  const token = Utilities.getUuid();
+  const expiry = Date.now() + SESSION_TTL_MS;
+
+  // เก็บ token ใน Script Properties
+  const props = PropertiesService.getScriptProperties();
+  let sessions = {};
+  try { sessions = JSON.parse(props.getProperty(WITHU_SESSION_STORE) || '{}'); } catch(e) {}
+
+  // ลบ session เก่าที่หมดอายุ
+  Object.keys(sessions).forEach(k => {
+    if (sessions[k].expiry < Date.now()) delete sessions[k];
+  });
+
+  sessions[token] = { expiry };
+  props.setProperty(WITHU_SESSION_STORE, JSON.stringify(sessions));
+
+  return { ok: true, token };
+}
+
+// ── 3. VALIDATE TOKEN — ตรวจสอบก่อนทำ action ──────────────────
+
+function isValidToken(token) {
+  if (!token) return false;
+  const props = PropertiesService.getScriptProperties();
+  let sessions = {};
+  try { sessions = JSON.parse(props.getProperty(WITHU_SESSION_STORE) || '{}'); } catch(e) {}
+  const session = sessions[token];
+  return session && session.expiry > Date.now();
+}
+
+// ── 4. ตัวอย่าง: doPost ที่ validate token ก่อนทุก action ──────
+
+function doPost(e) {
+  let body = {};
+  try { body = JSON.parse(e.postData.contents); } catch(ex) { body = {}; }
+
+  const action = body.action || '';
+
+  // action verifyPin ไม่ต้อง token
+  if (action === 'verifyPin') {
+    return ContentService.createTextOutput(
+      JSON.stringify(verifyPinHandler(body))
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // ทุก action อื่น ต้อง validate token
+  if (!isValidToken(body.token)) {
+    return ContentService.createTextOutput(
+      JSON.stringify({ ok: false, error: 'UNAUTHORIZED' })
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // ── action ที่มีอยู่เดิม ─────────────────────────
+  if (action === 'updateStatus') {
+    // โค้ดเดิม ...
+  } else if (action === 'closeBill') {
+    // [SECURITY] คำนวณ earnedPoints ฝั่ง server จาก rowNums จริง
+    // ไม่เชื่อค่า earnedPointsHint ที่ client ส่งมา
+    const rows = body.rowNums || [];
+    const actualTotal = rows.reduce((sum, rowNum) => {
+      // ดึงราคาจริงจาก Sheet ตาม rowNum
+      // const sheet = SpreadsheetApp.openById('YOUR_SHEET_ID').getSheetByName('Orders');
+      // const price = sheet.getRange(rowNum, PRICE_COL).getValue();
+      // return sum + (parseFloat(price) || 0);
+      return sum; // placeholder — แทนที่ด้วย code จริง
+    }, 0);
+    const earnedPoints = Math.floor(actualTotal / 50); // คำนวณฝั่ง server
+    // ใช้ earnedPoints ตัวนี้แทน body.earnedPointsHint
+  } else if (action === 'saveFaceProfile') {
+    // [SECURITY] biometric data — save แยก path ที่มี auth rule
+    // ไม่ mix กับ getAdminData response
+  }
+
+  return ContentService.createTextOutput(
+    JSON.stringify({ ok: true })
+  ).setMimeType(ContentService.MimeType.JSON);
+}
+
+// ── 5. doGet — เพิ่ม CORS header สำหรับ verifyPin ──────────────
+
+function doGet(e) {
+  // เพิ่ม CORS สำหรับ action ที่ต้องการ response body
+  // (action อื่น ยังใช้ no-cors ได้เหมือนเดิม)
+  const output = ContentService.createTextOutput('');
+  // ... โค้ดเดิม
+  return output;
+}
